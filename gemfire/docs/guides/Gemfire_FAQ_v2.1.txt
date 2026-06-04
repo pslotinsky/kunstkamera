@@ -1,0 +1,1969 @@
+       @@@@@@@@  @@@@@@@@  @@@@@@@@@@   @@@@@@@@  @@@  @@@@@@@   @@@@@@@@
+      @@@@@@@@@  @@@@@@@@  @@@@@@@@@@@  @@@@@@@@  @@@  @@@@@@@@  @@@@@@@@
+      !@@        @@!       @@! @@! @@!  @@!       @@!  @@!  @@@  @@!
+      !@!        !@!       !@! !@! !@!  !@!       !@!  !@!  @!@  !@!
+      !@! @!@!@  @!!!:!    @!! !!@ @!@  @!!!:!    !!@  @!@!!@!   @!!!:!
+      !!! !!@!!  !!!!!:    !@!   ! !@!  !!!!!:    !!!  !!@!@!    !!!!!:
+      :!!   !!:  !!:       !!:     !!:  !!:       !!:  !!: :!!   !!:
+      :!:   !::  :!:       :!:     :!:  :!:       :!:  :!:  !:!  :!:
+       ::: ::::   :: ::::  :::     ::    ::        ::  ::   :::   :: ::::
+       :: :: :   : :: ::    :      :     :        :     :   : :  : :: ::
+
+
+                               Gemfire FAQ v2.1
+                                  -----------
+                         by TIDQ (Email at the bottom)
+
+
+========
+Contents
+--------
+
+For ease, every part of the FAQ can be accessed by hitting Ctrl+F and searching
+for the section number or section title.
+
+1.0 Preface
+   1.1 Game Overview
+   1.2 The Story
+2.0 Choosing a Family
+   2.1 Scenario 1
+   2.2 Scenario 2
+   2.3 Scenario 3
+   2.4 Scenario 4
+   2.5 Choosing an Advisor
+3.0 Statistics
+   3.1 Disposable State Statistics
+   3.2 Permanent State Statistics
+   3.3 Personal Statistics
+4.0 State Commands
+   4.1 Military Commands
+   4.2 Domestic Commands
+   4.3 Diplomatic Commands
+   4.4 Player Commands
+   4.5 Other Commands
+5.0 Battle
+   5.1 Battle Basics
+   5.2 Standard Units
+   5.3 Battle Commands
+   5.4 Frontal, Flanking, and Rear Assault
+   5.5 Captured Leaders
+6.0 5th Units
+   6.1 Explanation of Ranges
+   6.2 The Gems
+   6.3 Hired 5th Units
+7.0 Events
+   7.1 Good and Bad Events
+   7.2 Death
+8.0 Additional Things to Know
+   8.1 General Tips
+   8.2 The ROM Glitch
+   8.3 Beat the Game with a Non-Default Ruler
+9.0 Miscellany
+   9.1 Legal Stuff
+   9.2 Email Me
+   9.3 Version History
+   9.4 Special Thanks
+
+===========
+1.0 Preface
+-----------
+
+_________________
+1.1 Game Overview
+
+Gemfire is a strategy game released for the SNES, NES, and Genesis back in
+1992. The NES version was originally known as Royal Blood in Japan, and the
+16-bit versions were called Super Royal Blood. Although it's a mostly forgotten
+game from a time that strategy console games weren't popular at least here in
+America, it's really quite a good game. The player chooses one of several royal
+families jockeying for control of the land of Ishmeria, a vast island divided
+into 30 specific political territories. Conflict and strategy are up to the
+player to balance and master on two different levels, nation-building and
+turn-based battles. The ultimate goal is for the player to use his (or her)
+might and diplomacy to rule the entire country and reunite the pieces of
+Gemfire.
+
+The signature feature of Gemfire is the acquisition of magical gems from every
+family that the player defeats. Each gem holds a unique supernatural guardian
+that can aid soldiers in battle, and so the quantity and quality of gems that
+the player possesses can make the difference between success and failure.
+
+Overall though, the game isn't terribly difficult.
+
+_____________
+1.2 The Story
+
+It is an age of knights and chivalry. It is also an age of magic and beasts.
+The large island kingdom of Ishmeria is ruled with an iron fist by the evil
+King Eselred. The king remained the unchallenged ruler as long as he held the
+source of his power, a crown with seven magical Gems affixed to it, named
+Gemfire. Each Gem contained a magical guardian, six wizards and a dragon.
+
+In an act of defiance, the king's daughter Princess Robyn removed the Gems from
+Eselred's crown. The Gems scattered themselves throughout the land and sought
+out worthy rulers. Robyn's plot was found out by the king, however, and she
+was thrown into the dungeon for what might be the rest of her days.
+
+Six Gems found six different rulers. Now, these six families seek to overthrow
+King Eselred, as well as each other, with the power of the Gems by their side.
+The strongest Gem, the Dragon, still belongs to Eselred though. Thus begins a
+seven-sided war to bring peace back to the land. Only one family can control
+all of Ishmeria and reunite Gemfire!
+
+
+=====================
+2.0 Choosing a Family
+---------------------
+
+Although there is no difficulty setting in Gemfire, the ability to get ahead
+is most heavily determined by which family is chosen to start the game. There
+are four different scenarios, spread across a progressive timeline. In each
+scenario, the player gets to choose one of four different families, giving
+sixteen different ways to play the game. The ending of the game is exactly the
+same, no matter which ruler or scenario the player chooses. Every family can be
+played in at least one of the scenarios, with the exception of the villainous
+Lankshire family.
+
+____________________________
+2.1 Scenario 1: Erin & Ander
+
+"Six noble families have undertaken the task to overthrow King Eselred and
+secure Gemfire. Erin of Blanche and Ander of Lyle and the main contenders, yet
+only one family is destined to unite the crown!"
+
+In this scenario, the Lankshire family controls most of the map from the very
+start. Even though this is the first scenario, it might not be the most
+friendly to beginner players. The player will have to deal with the Eselred's
+powerful Dragon Gem in countless battles to get ahead.
+
+- Blanche
+  Ruler: Erin
+  Gem(s): Zendor
+  Territories: 3
+  Vassals: 4
+  In all four scenarios, Erin (of Blanche) and Ander (of Lyle) will be the
+  easiest paths to victory. Erin has a defensive advantage in terms of one of
+  his territories being completely untouched by the enemy to start. It's then
+  easy to distribute soldiers and riches away from the landlocked territory and
+  towards the frontline. The player also starts adjacent to an unclaimed
+  territory which can expand Erin's empire right off the bat. Zendor is the
+  third best Gem in the game and can easily keep any other 5th Unit in check.
+
+- Lyle
+  Ruler: Ander
+  Gem(s): Pluvius
+  Territories: 3
+  Vassals: 3
+  Although Ander starts out with the same amount of territory and one less
+  vassal than Erin, he is generally the strongest choice to start out the game
+  with in most scenarios. Unlike Erin, Ander starts out bordering three
+  unclaimed territories. It's possible to take all three of them on the first
+  turn, although Ander's forces will be spread thin if he gets too greedy. Even
+  more of an advantage to Ander is that he borders the lone territory of the
+  Chrysalis family. This gives Ander the opportunity to knock off one of his
+  opponents and secure a second Gem very close to the beginning of the game.
+  Pluvius is the second best Gem in the game, only eclipsed by the Dragon.
+
+- Coryll
+  Ruler: Lars
+  Gem(s): Empyron
+  Territories: 2
+  Vassals: 2
+  The Coryll family will provide more of a challenge than Erin or Ander. They
+  do have a defensive advantage of having a landlocked territory, much like
+  the Blanche family. They also have a Gem, Empyron, who is pretty good. Like
+  Ander, Lars starts out near a weak opponent in Erik of the Flax family.
+  However, Lars starts out just as weak as Erik, and there's a good chance that
+  the Lankshire family will get to Erik's Gem before the player does, if he's
+  not careful. Lars also has slightly weaker personal stats than Erin and
+  Ander. Lars does have advantages, but not nearly as strong as Erin and Ander.
+
+- Chrysalis
+  Ruler: Garth
+  Gems(s): Chylla
+  Territories: 1
+  Vassals: 2
+  Chrysalis is the pushover family in the first two scenarios, but in the first
+  scenario, the player has the option to play as their prince, Garth. There are
+  a couple of advantages. He does have a Gem, and his home territory only has
+  one access point from the outside, making it safe to expand outward. The
+  problem is that he still only has one territory, his personal stats are weak,
+  and his Gem, Chylla, is probably the worst in the game in some respects. One
+  of Garth's vassals, Sarthe, bears a scary resemblance to Pauly Shore. Hmm.
+  For a challenge, this family will have an uphill battle.
+
+
+___________________________
+2.2 Scenario 2: Flax's Shame
+
+"Prince Erik of Flax is cornered in the Southwest after defeating the Coryll
+Family. Now Flax feels threatened by the presence of Terian, the Prince who
+deserted the King."
+
+In the second scenario, the Lankshire Family has around the same amount of
+land controlled as in the first scenario. However, there is no unclaimed
+territory in the beginning, and both Erin and Ander start off with a solid four
+territories a piece instead of three. Unlike the other three scenarios, there
+is no horrible choice of family to start with.
+
+- Blanche
+  Ruler: Erin
+  Gem(s): Zendor
+  Territories: 4
+  Vassals: 7
+  The second scenario gives Erin another territory and many more vassals to
+  spread around. He doesn't have any barricaded territories, but he does have
+  some easy options for attacking outward, like territories 3 and 11. The
+  opportunity to be the first person to knock off the Tate family is also
+  there, but Erin will be fighting the Lankshire, Lyle, and Molbrew families
+  for that honor.
+
+- Lyle
+  Ruler: Ander
+  Gem(s): Pluvius
+  Territories: 4
+  Vassals: 6
+  Ander is still the strongest choice in this scenario, just edging out Erin.
+  Once again, Ander has the chance to take Garth's Gem very early in the game.
+  He also has fairly good access to the Molbrew and highly vulnerable Tate
+  families.
+
+- Flax
+  Ruler: Erik
+  Gem(s): Scylla
+  Territories: 3
+  Vassals: 2
+  This is the only scenario the player can use Erik of the Flax family. What's
+  rather strange is that although the scenario introduction claims that Erik
+  overthrew the Coryll family, he doesn't obtain their Gem. Instead, the
+  Empyron Gem somehow ended up on the other side of the map with the Tate
+  family. The ever-smiling Erik is not a bad choice to dominate Ishmeria,
+  although he's well below Erin and Ander. He does have a Gem in Scylla, which
+  is neither a bad Gem nor a great Gem. Geographically, he's in a great
+  position to expand from, with one landlocked territory. On the downside, the
+  only place he has to expand into is Lankshire territory. A mixed bag.
+
+- Molbrew
+  Ruler: Leander
+  Gem(s): Skulryk
+  Territories: 3
+  Vassals: 2
+  Statistically, the Molbrew family is the weakest choice to start the second
+  scenario with, although they're not terrible. They do have a respectable
+  three territories and a Gem. Leander himself has subpar stats. Their Gem,
+  Skulryk, has the least strength of all the Gems, but he does have great move
+  rate and range, so I really think he's at least better than Chylla.
+  Geographically, it appears like they're surrounded, but they're not that bad.
+  If Leander takes territory 15, they'll have one landlocked area and a lot of
+  options to expand. A bit of a challenge, but not the hardest scenario.
+
+
+____________________________
+2.3 Scenario 3: Terian's War
+
+"Terian overthrew the Molbrew Family and is positioned in the West. His rivals
+Erin and Ander each possess two gems of the crown, but magic is not the only
+way to capture Gemfire..."
+
+The annoying-to-battle Lankshire family starts out this scenario vastly
+weakened from the previous two scenarios, only controlling eight territories,
+while Erin and Ander have increased their empires to six regions a piece. Erin
+and Ander also start out this scenario with two Gems each, making them good
+choices for beginners.
+
+- Blanche
+  Ruler: Erin
+  Gem(s): Zendor, Skulryk
+  Territories: 6
+  Vassals: 7
+  By this point, Erin has six territories and two Gems. He has a geographically
+  secure empire that could easily expand westward with a bit of development.
+  Starting with Erin at this point in the game takes out a lot of the challenge
+  for experienced gamers, but it might be right up the alley for a novice.
+
+- Lyle
+  Ruler: Ander
+  Gem(s): Pluvius, Chylla
+  Territories: 6
+  Vassals: 7
+  By the third scenario, the advantage to choosing Ander over Erin has lessened
+  greatly, to the point where they're just about even. Pluvius is still
+  slightly stronger than Zendor, but that's about it. Ander, like Erin, has two
+  Gems from the get-go as well as six territories. Chances are in good favor
+  that Ander can take over the Tate family before Erin though.
+
+- Tate
+  Ruler: Terian
+  Gem(s): Empyron
+  Territories: 2
+  Vassals: 4
+  The rogue prince Terian stays a constant force throughout the last three
+  scenarios, and the player has the chance to control him in the third one.
+  Although he only starts with two territories, Terian's starting empire also
+  borders the only two unclaimed territories on the map. If he's willing to
+  take the risk, he can double his empire's size on the first turn, although
+  on some play-throughs, other empires will move first. Terian, like Lars,
+  starts with the Gem Empyron, which is a pretty good one.
+
+- Tordin
+  Ruler: Gweyn
+  Gem(s): None
+  Territories: 2
+  Vassals: 2
+  Ah, the Tordin Family. Gweyn is my personal favorite ruler to play as. The
+  Tordins are one of the two hardest families to use in the game. The Tordin
+  family is also the only family ruled by a woman. I guess the middle ages were
+  more progressive in other parallel universes. Start with two territories
+  surrounded by the Flax and Lankshire families. You get no Gems, and Gweyn has
+  a poor military rating. A firm grasp of the game's mechanics is fully
+  necessary for success with this family.
+
+
+_______________________
+2.4 Scenario 4: Gemfire
+
+"The Lankshire Family bribed Pender to desert his own brother, Erin. They hope
+to ally with Eadric, long lost son of Eselred, and gain his land in the South.
+One ruler must stop the warring and reunite Gemfire!"
+
+The Lankshires have crumbled into a smaller empire than Ander's and Erin's
+individual empires. They still control the Dragon Gem though, so knocking them
+over still won't be terribly easy. Eselred will also inevitably expand into the
+unclaimed territory directly south of him, getting back to a decent size
+fairly quickly. Overall, territory is most evenly distributed among the
+families in the fourth and final scenario.
+
+- Blanche
+  Ruler: Erin
+  Gem(s): Zendor, Skulryk
+  Territories: 7
+  Vassals: 8
+  For the fastest (and easiest) possible play-through of the game, look no
+  further than Prince Erin in the fourth and final scenario. He starts with
+  seven territories, the most of any family in any scenario, and two Gems,
+  including the mighty Zendor. Erin also has the opportunity to expand into an
+  eighth unclaimed territory, getting a big headstart. Erin also has easy
+  pickings with the Divas territory to the South.
+
+- Lyle
+  Ruler: Ander
+  Gem(s): Pluvius, Chylla
+  Territories: 6
+  Vassals: 7
+  Although Erin finally eclipses Ander in strength in the final scenario, Ander
+  is still ridiculously overpowered at the start of this scenario. Two Gems,
+  six territories, and the opportunity to expand into a seventh territory.
+  Terian's Gem would be a good first target for this scenario.
+
+- Tudoria
+  Ruler: Eadric
+  Gem(s): Scylla
+  Territories: 3
+  Vassals: 4
+  The enigmatic Prince Eadric has emerged in Ishmeria to stop his father,
+  Eselred, from abusing Gemfire for his selfish purposes. Eadric has
+  near-perfect Charm and Domestic stats, although his military strength is
+  merely average. Overall, he is a strong leader and commands a decent empire.
+  The southwest corner of the map is one of the best starting points to expand
+  from, and he already has a Gem to help him out. Eadric has serious work to
+  catch up to Ander and Erin at this point though, as they will probably be
+  harder to bring down than Eselred.
+
+- Divas
+  Leader: Loryn
+  Gem(s): None
+  Territories: 2
+  Vassals: 3
+  For unexplained reasons, one of the King's lords, Loryn, has gained political
+  control of his own and seeks to unite Gemfire. Along with Gweyn, Loryn's
+  scenario is one of the two hardest paths to winning the game. He starts with
+  two territories and no Gems. He does have the chance to expand into a third,
+  unclaimed territory, but that may not be a great idea. Spreading Loryn's
+  forces is tricky, as he as the worst geographic starting point. He leaves
+  himself exposed on all sides, making expansion difficult to start. In fact,
+  this is even a little harder than Gweyn's scenario, so good luck.
+  
+
+_______________________
+2.5 Choosing an Advisor
+
+After choosing a family and before jumping into the action, the player will get
+to choose an advisor. The advisor chosen does not affect gameplay in anyway.
+
+They are
+- Eldrow the Wise
+- Zorax the Mighty
+- Jade the Enlightened
+- Jasper the Riddler
+
+They only serve to give optional advice. Although, given the rather poor
+intelligence of the Computer AI, I don't put much stock in the advice of these
+experts. To hear the words of the advisor, simply hit one of the shoulder
+buttons at any time on the world map. They mostly spill blurbs like "Attack
+this territory" or "Invest in crops."
+
+One might think that the advisors dispense advice with biases, like Zorax being
+more inclined to invade other territories. However, this is completely false.
+The only difference between the advisors seems to be the wording of their
+sayings.
+
+I tend to avoid listening to the advisors entirely, as they're idiots, and in
+the case of Jasper, incredibly annoying.
+
+
+==============
+3.0 Statistics
+--------------
+
+The game is full of extremely nondescript statistics, so knowing what each one
+does and why they're important is useful.
+
+Every territory has stats unique to just itself. That's why keeping an eye on
+and developing each territory is important. Three of these stats are like
+disposable currency, rapidly fluctuating. The other three are more permanent
+and change more slowly over time.
+
+Every vassal, lord, and ruler in the game also has their own set of personal
+stats.
+
+_______________________________
+3.1 Disposable State Statistics
+
+- Gold
+  Every territory has its own treasury. Gold is one of the two main currency
+  in Gemfire. It's necessary to hire troops, develop Cultivation or Protection,
+  buy additional food, pay deployment costs for offensive battles, hire and
+  maintain 5th Units, pay ransoms, and use the Search command. The maximum
+  amount of Gold a single territory can have is 999.
+
+  Gold can be acquired through annual taxes, selling food, plundering an enemy
+  territory, collecting a ransom, the leprechaun event, and receiving it
+  through a transport from another territory.
+
+- Food
+  Food is the other major currency in Gemfire. It's needed to feed troops in
+  battle, raise the loyalty of subjects through giving, sell into gold, and pay
+  ransoms. The maximum amount of food a single territory can have is 999.
+
+  Food can be acquired through annual farm collection, buying it with gold,
+  plundering it from an enemy territory, collecting a ransom, the food event,
+  and receiving it through a transport from another territory.
+
+- Troops
+  Troops are the measure of a territory's military strength. The number of
+  men housed are the number that will defend the area should it come under
+  attack, not including 5th Units. In the event of attacking another area,
+  troops will be gathered from just one territory's pool, although not all of
+  them have to be used. Like gold and food, the maximum number that can stay
+  at a single territory is 999.
+
+  Troops can be acquired through the Recruit command, Moving Troops from a
+  neighboring territory, or the rare troops event.
+
+
+______________________________
+3.2 Permanent State Statistics
+
+- Loyalty
+  Loyalty is the measure of a territory's love for its ruler. It is
+  represented by a horizontal red flag to the right of the Gold. Loyalty
+  determines how much monetary taxes will be collected every September. In
+  addition, Loyalty also affects the amount of food that is taxed, along with
+  Cultivation. With zero Loyalty, food will not come in September. Every
+  time a territory is taken over by force, the Loyalty of that territory
+  reverts back to zero. Loyalty also lowers very gradually over a long time.
+
+  Loyalty is primarily increased by the Give Food command, although it is also
+  raised by a good event.
+
+- Cultivation
+  Not so surprisingly, Cultivation determines how much food will be collected
+  every September. Cultivation is not the only thing that affects food though,
+  as both high Cultivation and Loyalty are necessary. The better the farmland,
+  the more food is grown, and the more food can be taxed. Cultivation lowers
+  some in the event of warfare, as well as some bad events. It is represented
+  by a picture of grain to the right of Food.
+
+  Cultivation is raised by the Develop-Cultivation command.
+
+- Protection
+  The Protection stat primarily safeguards the territory against bad events.
+  Less bad events occur with high protection, and bad events that do occur have
+  a less negative effect. There may be more significance to Protection, but I
+  haven't found it yet. Protection lowers some in the event of warfare, as well
+  as some instances of Sabotage, and some bad events. It is represented by a
+  picture of a castle tower, to the right of Troops.
+
+  Protection is raised by the Develop-Protection command.
+
+
+_______________________
+3.3 Personal Statistics
+
+- Charm
+  The icon that looks like a Heart is that character's Charm rating. The
+  primary use of Charm is to increase the effectiveness of Give Food, which
+  raises a land's Loyalty. Charm may have bearing on other actions, but it is
+  not known for certain.
+
+  Charm of a character can be increased only through good events on the
+  territory where he or she rules or a Search item.
+
+- Domestic
+  The little icon of a piece of paper is that character's Domestic rating.
+  The higher a character's Domestic rating, the more he or she is able to
+  defend against Sabotage and Plunder. A high Domestic rating also increases
+  the effectiveness of Develop greatly, which is its most important use.
+
+  Domestic strength of a character can be increased only through good events on
+  the territory where he or she rules or a Search item.
+
+- Military
+  The sword and shield icon represents a character's Military strength. It has
+  a direct influence on the effectiveness of units in battle. High Military
+  strength means soldiers will kill more and be killed less. An even matchup
+  can turn into a lop-sided squashing if one side has an inferior Military
+  strength.
+
+  Military strength, like Charm and Domestic, can only be affected by events or
+  a Search item.
+
+- Fame
+  Fame is a stat that is completely exclusive to each family's ruler, and it
+  generally represents the overall might of the entire family. It's
+  represented by a badge on the ruler's view screen. Fame, aside from being
+  a measure of how cool the ruler is, affects some diplomatic actions, like
+  Ally, Defection, and Surrender. That is, high Fame makes them all slightly
+  more likely to succeed.
+
+  Fame increases as the player's empire increases. Winning battles and
+  acquiring new territory are the fastest ways to increase Fame. Getting new
+  vassals and a few other things affect it as well. Losing battles and
+  territory will lower Fame by the same degree.
+
+
+==================
+4.0 State Commands
+------------------
+
+These are the main commands on the map screen. All gameplay outside of battle
+uses these commands.
+
+_____________________
+4.1 Military Commands
+
+The military command menu is represented by the picture of two swords crossing
+in front of a shield. These are all the commands related to battle units.
+
+
+- Attack
+
+  The Attack command is, as one might guess, the command to attack a bordering
+  territory. Before going into battle, the attacker must decide how many troops
+  to take, how much food to take, and which 5th Unit to bring into battle.
+  Recommendations for battle are covered in the Battle section (5.1), and 5th
+  Units are covered in the 5th Units section (6.1).
+
+  There is a deployment cost for troops that shouldn't make a noticeable dent
+  on the pocketbook, but it can be determined by this simple formula:
+
+  Deployment Cost = 1/8 * (Number of troops) +10
+
+  In other words, for every 8 soldiers deployed, there's a charge of 1 gold
+  piece, plus a base cost of 10. As such, it costs 22 gold for 100 troops, 35
+  gold for 200 troops, 47 for 300 troops, and so on.
+
+  The formula for food needed in a battle is also linear:
+
+  Food needed per day = 1/10 * (Number of troops + 5th Unit Strength) +1
+
+  5th Unit Strength is only added into the formula if it's a HIRED 5th Unit.
+  The Gem guardians are exempt from the equation, because they can apparently
+  live without food, but other 5th Units do indeed need to be fed, just like
+  the rest of the soldiers.
+
+  Not including 5th Units, an army of 100 will require 11 food per day, an army
+  of 200 will require 21 food per day, an army of 300 will need 31 food, etc.
+
+  A successful attack acquires the target territory to the player. If there
+  was a ruler or vassal in charge of the attack, they will move from their
+  previous territory and instead be stationed in the new territory. The
+  territory the attack was led from will then be controlled remotely. The Home
+  territory can be moved in this way.
+
+
+- Recruit
+
+  A pretty straightforward command, this allows the player to recruit new
+  soldiers for that particular territory. Every soldier costs 2 gold pieces.
+  A maximum of 999 soldiers can be in each territory at a point in time.
+
+
+- Move Troops
+
+  This command lets the player move troops from one territory into a bordering
+  territory, so long as the target territory isn't occupied by another family.
+  It's primarily used to redistribute gold, food, troops, and hired 5th Units
+  to different regions under the player's control. It is also, however, the
+  command used to claim an unoccupied territory.
+
+  Like Transport, it allows the player to move food and gold to different parts
+  of his or her empire, but it's limited in that it can only transport to a
+  bordering territory.
+
+
+- Hire Monster
+
+  This command allows the player to both hire and fire 5th Units, not including
+  Gem guardians. During the time that Gem guardians are unavailable for several
+  turns, backup 5th Units can be the difference between winning and losing.
+
+  Unlike Gems, hired 5th Units can only be used by the territory at which
+  they're currently stationed. They can be moved to a different territory with
+  the Move Troops command.
+
+  Hired 5th Units require both a hiring cost and an upkeep cost, which are the
+  same amount. For example, the Bugbear costs 30 gold pieces. They cost 30
+  gold pieces for their initial hiring and then an additional 30 gold pieces
+  every three months. If there isn't enough money to pay the upkeep of a hired
+  5th Unit, they will desert the player.
+
+  More details on the different kinds of 5th Units are covered in the 5th Units
+  section (6.1).
+
+_____________________
+4.2 Domestic Commands
+
+Domestic commands are those that promote the welfare of the player's land. They
+are represented by a picture of a House on the main menu.
+
+
+- Develop
+
+  The Develop command allows the player to invest 10 gold pieces and a turn to
+  raise his or her Cultivation or Protection stat. Cultivation affects the
+  amount of food produced in a territory. Protection lessens the blow of
+  natural disasters. Develop has to be done repeatedly to get a good return,
+  but it's well worth it and pretty much required to win.
+
+  Either stat will raise from 2 to 5 points per Development, depending solely
+  on the Domestic stat of that land's lord.
+
+  In addition to being naturally rewarding, consistent use of the Develop
+  command is the sign of moral rulers in Ishmeria. Development will cause good
+  events to happen randomly at the yearly quarter. For more on random events,
+  see the Events section (8.1).
+
+
+- Trade
+
+  The Trade command allows the player to turn his gold into food and his food
+  into gold at will. It's a great way to balance commodities, but even better
+  is its ability to make that territory's lord rich. The exchange rate
+  fluctuates from month to month, which is the key to wealth. Check often.
+
+  The language of the exchange rate is simple to decipher:
+
+  "The prices are low." 1 gold = 2 food
+  "The prices are average." 1 gold = 1 food
+  "The prices are high." 2 gold = 1 food
+
+  Buy low and sell high. It's not out of the question to quadruple one's net
+  worth in a few months. Not surprising that Trade is the most easily abused
+  command and a major reason why the game is considered on the easy side by
+  some.
+
+  Also, Trade is one of the few commands that does not end the player's turn.
+
+
+- Give Food
+
+  Giving food is the primary way to raise the Loyalty of a territory. The
+  amount of Loyalty gained from giving food is dependant on Charm stat of that
+  territory's lord.
+
+  Unlike Develop, the player can invest a lot or a little into raising loyalty
+  per turn, giving 20, 50, 80, or 100 food shares. A lord with high Charm can
+  easily bring triple the Loyalty that a land with no lord would bring per
+  giving of food.
+
+
+- Transport
+
+  With this command, the player can send or receive gold and food from one
+  territory and put it in another, no matter how near or far. Even territories
+  under a family's rule that are physically separated from the rest of their
+  country can send and receive transports. An important command for
+  redistributing wealth to where it's needed, particularly newly acquired
+  territories with low domestic statistics.
+
+
+_______________________
+4.3 Diplomatic Commands
+
+Diplomatic commands are actions which involve foreign nations aside from direct
+attack. They're represented by a bright red flag in the main menu. All four
+Diplomatic commands have a chance of success or failure, so save the game
+before attempting one of them.
+
+
+- Ally
+
+  The Ally command lets the player enter a non-aggression pact with another
+  family. Other than the two families not being able to attack each other,
+  there is no economic or military benefit in entering an alliance.
+
+  The chance of success is dependent on the overall strength of both family's,
+  likely determined by relative Fame of each leader. As a rule of thumb, if
+  there's another family with twice as much territory as the player, they won't
+  Ally. If the target family is weaker than the player's, they will probably
+  accept the terms. If both families are about even in strength, it could go
+  either way. Be forewarned that the computer is prone to breaking alliances
+  whenever they feel like it.
+
+  The Ally command can only be used from the Home province. The Lankshire
+  family does not enter alliances.
+
+
+- Negotiate
+
+  Negotiate actually encompasses two different commands, Defection and
+  Surrender.
+
+  Defection is a very neat command. It lets the player try to persuade another
+  ruler's vassal to switch sides and join the player's ranks. If that vassal
+  is the lord of an enemy territory, the player will gain control of that
+  territory, riches, soldiers, and all, without even having to lift a weapon.
+
+  Vassals that don't control territories can also be recruited. To find them,
+  click on the opposing family's Home territory to bring up a list of names.
+
+  The success rate of Defection is not entirely known for certain. I have my
+  suspicions on which stats affect it, but I won't speculate. It has mostly to
+  do with the stats of the person being asked to defect rather than the
+  negotiator, as the same people seem to be easier to recruit in every game.
+  However, the ruler's Fame also must bear some weight, as the more powerful
+  the player is, the more people are willing to defect to his or her cause.
+  Heirs, however, are the hardest people in the game to recruit through
+  Defection usually, although it is possible.
+
+  It is also possible to recruit vassals by defeating them in battle. See the
+  Battle section for more details (5.5).
+
+  Surrender is a command that will be used very, very little in any game. As
+  the name implies, using this command will try to force another family into
+  surrendering to the player. A successful surrender means that an entire
+  family's vassals, territories, soldiers, and wealth will become property of
+  the player. It's quite the powerful command. As one might expect thought, it
+  almost never works. In order for a family to surrender, they need to be
+  vastly overpowered. As in, the player could be the most dominant family in
+  Ishmeria, and it still might not work. By the time the player is powerful
+  enough to get Surrender to work, he or she's essentially already won the game
+  anyway. Surrender is more of a time-saver towards the very end of the game
+  than actually useful in getting ahead.
+
+  The difference in power that determines the success of Surrender is almost
+  certainly determined by Fame.
+
+
+- Sabotage
+
+  This command gives the player the opportunity to damage a neighboring
+  territory. If Sabotage is successful, it will destroy either 1/5 of the
+  enemy troops, 1/5 of the enemy's Loyalty, or 1/5 of the enemy's Protection
+  stat.
+
+  The rate of success for Sabotage relies primarily on a low Domestic rating
+  for the lord of the area being sabotaged, although other factors might have
+  a small bearing on it.
+
+  The computer AI doesn't seem to use Sabotage very often, and neither do I. It
+  does have uses in certain situations though.
+
+
+- Plunder
+
+  Plunder is a fantastic command for the player who has rich neighbors. For
+  every successful Plunder of a neighboring territory, 1/5 of both the enemy's
+  gold AND food will become property of the player. It's a double-whammy of
+  hurting them and helping the player. If it works once, it will work
+  continuously, so keep robbing them. Success rate for Plunder is the nearly
+  the same as Sabotage, although it may be ever so slightly harder to Plunder,
+  as I've had some cases (although not often) where Sabotage was possible yet
+  Plunder was not.
+
+
+___________________
+4.4 Player Commands
+
+What I have dubbed "Player Commands" don't actually have an official name in
+the game. They're represented on the main menu by a picture of an armored
+helmet. Also, with the exception of Search, most of the Player commands don't
+end the player's turn.
+
+
+- View
+
+  View is the all-purpose information command in the game. It allows the player
+  to see statistics for his own people, his opponents' people, and stats on
+  different territories.
+
+  Initially, the game will ask to view a specific territory. Do so by using the
+  pop-up pointer on the map, and the gold, food, soldiers, loyalty,
+  cultivation, protection, and ruler of any territory are instantly visible.
+  Clicking on a territory also gives information about the entire family
+  associated with that particular land through the next set of commands.
+
+     One
+
+     The View-One command lets the player take a look at a specific vassal
+     in any family. Most units have three statistics: Charm, Domestic, and
+     Military strength, which become visible with View. Rulers have two other
+     features visible: The Fame stat and a simple graph, showing which parts
+     of Gemfire the ruler has thus far collected. More on the personal stats
+     can be found in the Statistics section (7.1).
+
+     Many
+
+     The View-Many command displays the three major stats for all vassals in
+     a family. There's no new information to be found here that can't be seen
+     in the View-One command, but it does display many of them at once in a
+     handy list.
+
+     Land
+
+     The View-Land command crunches information into a list, much like the
+     View-Many command. However, View-Land displays territories in a list
+     rather than people. With it, all of a families territories are organized
+     by gold, food, loyalty, cultivation, troops, but oddly enough, the
+     Protection stat is omitted.
+
+     5th Unit
+
+     View-5th Unit only works for territories that the player owns. Also, it
+     only views the available 5th Units for the territory that's been selected.
+     There's no way to view all 5th Units in the player's empire at once.
+
+
+- Change Lord
+
+  At the Home province, the player can use this command to change the lord of
+  any of his or her territories aside from Home. There are three settings that
+  each territory can be changed to.
+
+     You
+
+     Changing a territory's lord to "You" means that the ruler of the family
+     will control the territory remotely from the Home province. In game
+     mechanics, this means that the territory gets HALF of the bonuses of
+     having the actual lord. Unless the head of the family has absolutely
+     absurdly high stats compared to everyone else, a territory will always be
+     more productive with a real lord.
+
+     A territory controlled by You will have a portrait and name of the
+     family's ruler in place of where the lord would go. So, the only way to
+     see a visual difference between a remotely controlled territory and the
+     actual Home province where the ruler of the family IS an acting lord, is
+     the little icon below the name of the province. For Home, it is a red
+     shield. For a remotely controlled territory, it's a flag.
+
+     Lord
+
+     The difference between a lord and a vassal is that a lord controls land.
+     So essentially the Lord command takes the Lord of one territory in the
+     player's empire and moves him or her to a different territory. Lords
+     cannot control two territories at once, so the territory that the lord
+     was moved from will then become under the control of "You," until
+     instructed otherwise.
+
+     If the destination territory for the transferring lord already has a lord,
+     the initial lord will be ousted and put back into the vassal pool.
+
+     The Home territory can be shifted by the Lord command. First select the
+     territory that will become the new Home province. Then, when it asks which
+     lord to move, choose the current Home territory. The game will prompt
+     "Okay to move Yourself?" Then select Yea. Oddly enough, changing the Home
+     territory ends the player's turn, even though the Change Lord command does
+     not end the turn in all other cases.
+
+     Vassal
+
+     Selecting this command brings up a list of the player's vassals that do
+     not have assigned territories. The vassal will then become the new lord
+     of the target province and will then be removed from the vassal list.
+
+     Like with the "Lord" command, if the territory already had a lord in
+     place, he will be put onto the vassal list in place of the one that was
+     called up to rule.
+
+
+- Entrust
+
+  Entrust is the lazy man's command, although a recommended one near the end
+  of the game. A territory that becomes Entrusted will give up its turn every
+  month. Instead, the computer will decide what to do in that territory, if
+  anything. If the player changes his mind, he can simply Cancel the Entrust
+  at any time.
+
+  Generally, the computer is an idiot. Entrusting a territory is not a good
+  idea if that territory is on the border of enemy territory, or especially if
+  it's early in the game. Very late in the game, when there's no point in
+  developing so many states every turn, having to take 20 turns per month is
+  excessive. The game will go by much more swiftly if territories are Entrusted
+  late in the game. So it is a good command to have, but only if the player
+  is willing to give up the usefulness of the territory.
+
+
+- Search
+
+  Search is the only Player command that ends the player's turn. That's why
+  it's highly recommended that the player saves his game before using Search,
+  then loads the game afterwards to get the turn back.
+
+  The Search command does the one thing that View cannot, see 5th Units of
+  foreign lands. The usefulness of that information is questionable, but it's
+  merely a mask for the true usefulness of Search.
+
+  Searching enemy territories can sometimes randomly turn up special items.
+  These items will drastically increase character stats, much faster than any
+  other method in the game. Those items are:
+
+     Silver Sword          - Raises Military Strength +25
+     Sword of Fire         - Raises Military Strength +30
+     Sword of Victory      - Raises Military Strength +40
+     Scroll of the Planets - Raises Domestic +25
+     Scroll of Knowledge   - Raises Domestic +30
+     Scroll of the Sages   - Raises Domestic +40
+     Moonstone             - Raises Charm +30
+     Dragon Jewel          - Raises Charm +40
+
+  {Special thanks to everyone who emailed me about the Searchable items.
+  Unfortunately, there are too many to list, and I don't remember who first
+  told me about it.}
+
+__________________
+Other Commands 4.5
+
+There are only a few, more self-explanatory commands out of the main four
+categories, but they need to be mentioned.
+
+- End Turn
+
+  Press the Cancel button on the map screen to bring up the opportunity to
+  prematurely end the player's turn. 3/4 of the normal commands in the game
+  end the player's turn anyway, so there's a good chance that this command will
+  never be needed. Cultivation and Protection take so long to develop that I
+  usually spend idle turns investing in that rather than simply ending the
+  turn. If the player really doesn't care about developing a territory anymore,
+  he or she can simply Entrust it and forget about it, rather than ending
+  turns every month. The option is there if it's needed though.
+
+- Get Advice
+
+  Pressing the shoulder button will bring up advice from the player's advisor.
+  As I already stated earlier, the advisors are pretty useless, but perhaps
+  for beginner players, they can serve as a crutch of sorts.
+
+- Save Game
+
+  Self-explanatory. Hit Start to bring up the Save Game option. The game has
+  two in-game save slots. Saving in-game is necessary to fix glitched ROMs.
+  See the ROM Glitch section for details (8.2).
+
+- Load Game
+
+  Available either before starting the game or by hitting Start to bring up the
+  pause menu. Load an in-game save.
+
+- Speed
+
+  Change the message speed by going to the pause menu and selecting Speed. The
+  game is very light on messages, and even after playing through the game
+  countless times, I've never felt impatient enough to change the message
+  speed. The option is there for those who want it though.
+
+- Sound
+
+  Turn the in-game sound on or off by going to the pause menu and selecting
+  Sound. Console gamers will probably leave it on, but ROM players can use
+  the Sound feature as a way around the ROM Glitch. See the ROM Glitch section
+  for more details (8.2).
+
+- Quit
+
+  Nobody likes a quitter. Use this to quit the game. The game will ask if the
+  computer can take over for the player, at which point the game will become
+  a demo game. In a two-player game, having one player quit turns the game into
+  a single-player game. Using the Quit feature isn't necessary to simply turn
+  off the game. Turning off the game at any point won't harm the data.
+
+
+==========
+5.0 Battle
+----------
+
+Simply building stats and intimidating opponents isn't any fun without battles.
+I'd hesitate to call Battle the meat of the game though, because there is just
+too much other stuff. It is one of the most essential elements though.
+
+_________________
+5.1 Battle Basics
+
+Battle is initiated when one territory uses the Attack command to invade
+another territory. The person being invaded will have the option to Fight,
+Retreat, or Surrender. Surrender isn't an option unless the person being
+attacked has no men or food and doesn't have somewhere to retreat. I've never
+seen Surrender work in these circumstances. Retreating will cause the
+territory's lord to run to a neighboring province with his or her soldiers.
+There is a chance the lord can captured by the enemy during this process. Even
+if there's a healthy 5th Unit available, one side cannot enter combat without
+actual troops available. If both sides are able and willing to fight, the
+battle commences.
+
+All battle takes place on a 10 x 8 grid battlefield. Every battlefield looks
+different, and the geography of the obstacles depends on what part of the
+country the battle is taking place in. The attackers, colored reddish orange,
+start along the left edge of the map. The defenders, colored blue, start along
+the right edge of the map. Both sides have a flag on the battlefield
+representing their side's base, although the defenders have a wall partially
+surrounding theirs, or at least a grouping of fences.
+
+Each sides has their total number of troops divided into four equal units, plus
+both sides get to pick a 5th Unit of their choosing (6.0). These five units
+make up the battle forces, for a total of ten possible units on the battlefield
+to keep track of.
+
+There are four ways to achieve victory in battle:
+
+  1. Wipe out all of the opposing team's units.
+  2. Capture the opposing team's flag.
+  3. Let the opposing team run out of food.
+  4. Force the enemy to retreat.
+
+As stated in the Attack command section, the formula for food needed is
+
+   Food needed per day = 1/10 * (Number of troops + 5th Unit Strength) +1
+
+Wherein Gem guardians are exempt from the formula since they don't need food,
+but hired 5th Units DO need food. The food rations remaining on each side are
+represented by the number below each side's commander's name. The number in the
+parentheses is how many days' worth of food that number is.
+
+A "day" is four full turns. Day progression can be seen by the graphic on the
+top middle of the screen. In order, they are sunrise, noon, sunset, and night.
+Each new day begins at sunrise.
+
+Both sides can only use the bodies of their units and built Fences along with
+natural obstacles of the terrain to block the path for the enemy to capture
+their flag. Fences can be broken though, and units can be killed to clear that
+path.
+
+The computer will retreat if it feels it is less than one turn away from being
+wiped out. The computer will not retreat if it feels its flag is in danger.
+Retreating becomes impossible if there are no neighboring territories to
+retreat into.
+
+In general, the computer AI will stay back and guard its flag if the player
+has the clear advantage of numbers. If both sides are about equal in force, or
+the computer has the numerical advantage, they will take a more aggressive
+approach and advance towards the player's flag. Also, if the computer feels it
+can outlast the player's food supply, they also may hang back and defend their
+flag.
+
+__________________
+5.2 Standard Units
+
+Both sides in battle will have their number of troops divided into four equal
+units, one group of horsemen, two groups of knights, and one group of archers.
+Any remainder of troops that doesn't divide evenly gets tacked onto the total
+horsemen.
+
+- Horsemen
+  Move Rate: 3
+  Attack Range: Short
+  Horsemen can move three squares per turn. Their attack range is standard for
+  melee units. They can attack any hostile unit as long as it's standing on a
+  square right next to them.
+
+- Knights (Type 1)
+  Move Rate: 2
+  Attack Range: Short
+  Knights can't move as far as horsemen, and they have the same range. One
+  advantage they have is that they can build fences.
+
+- Knights (Type 2)
+  Move Rate: 2
+  Attack Range: Short
+  These knights are exactly the same as the other group of knights in every
+  way. The only difference is their graphic, so that the player can tell units
+  apart from each other.
+
+- Archers
+  Move Rate: 2
+  Attack Range: Long
+  Archers are the oddball of the four main units. While knights and horsemen
+  have the same attack power, and attack the same way, archers don't. Archers
+  are slightly weaker in attack power than knights and horsemen. However, they
+  attack only panels that are two squares away from them, not close up, and not
+  diagonally. Their big advantage besides their range is that they do not take
+  damage by attacking, like all short range units do. Their long range attack
+  can also reach over other units and obstacles. For a more clear diagram of
+  their attack range, see the Explanation of Ranges section (6.1).
+
+___________________
+5.3 Battle Commands
+
+The battle commands aren't that complicated, but they bear mentioning.
+
+- Move
+
+  The first thing a selected unit will be asked to do is Move. It's not
+  possible to do another unit action and then move. Most units can move two
+  squares per turn, but some can move three. Take care in how a character gets
+  from point A to point B, since it could affect which direction the unit is
+  facing when they're done moving. Units cannot change the direction they face
+  after they're done moving.
+
+- Attack
+
+  After the unit has moved (or has chosen to not move), it can attack any unit
+  in his range. Attacking will change the direction that unit is facing.
+  The effects of attack vary, depending on the unit and the way the unit it's
+  attacking is facing. More details on that are in section 5.4.
+
+- Fence
+
+  Fences keep the enemy at bay, at least temporarily. They cannot be traversed
+  by any unit except for Gargoyles and Wyverns, since they're extra cool and
+  can fly. Fences are instrumental in keeping an aggressive enemy away from the
+  flag. However, only knights can make fences. Making a Fence can fail and
+  waste a turn if the unit isn't strong.
+
+- Break
+
+  This command breaks a fence. Any unit in the game can try to break a fence.
+  If the unit isn't strong, Break can fail and waste a turn.
+
+- Wait
+
+  If the unit cannot or does not want to take a specific action, they have to
+  choose Wait after moving.
+
+
+The following commands are not unit-specific and can be accessed by hitting the
+cancel button when a unit is not selected.
+
+- End Turn
+
+  This command ends the turn and turns gameplay over to the opposite team. The
+  player does not have to move all of his of her units before ending the turn.
+  The Player can keep track of which units have been used in a turn, because
+  units that have already moved will be grayed out.
+
+- Auto mode
+
+  If there were ever a command to never use, ever, it's Auto mode. Entrusting
+  unused territories is one thing, but the computer is absolutely abysmal at
+  battles. If nothing else, putting the computer in charge will draw out the
+  battle too long, and may cost more troops than need to be sacrificed.
+
+- Animation
+
+  Turn the attack animation on and off with this. The only things that could be
+  considered spectacle in the entire game are the attack animations. Why anyone
+  would want to turn them off, I don't know. The choice is here.
+
+- Retreat
+
+  If all is lost, retreat. There won't be much loss to cut though. It probably
+  would be more beneficial to retreat before the battle than during it.
+
+
+_______________________________________
+5.4 Frontal, Flanking, and Rear Assault
+
+There is strategy in battle, and that comes in the form of how one unit attacks
+another. No matter which side gets attacked, a short range unit will incur
+damage to itself at the same time it's attacking. Long range units (like
+archers) do not. Gem guardians incur a flat percentage of strength loss,
+regardless of which side they're attacking.
+
+If one unit attacks another from its front, that is called a Frontal assault.
+It is the least advantageous to do a Frontal assault, as it will do the least
+amount of damage to the victim unit, and it will also do more backlash damage
+to the attacking unit.
+
+If one unit attacks another from its side, that is called a Flanking assault.
+Flanking attacks do more damage than a Frontal assault, and they will receive
+less backlash damage as well.
+
+If one unit attacks another in its back, that is called a Rear Assault. These
+attacks do the most damage to the enemy unit while allowing short range
+attackers to receive the least amount of backlash.
+
+One should always aim for Flanking and Rear assaults. Frontal assaults usually
+aren't even worth doing unless the victim unit is severely overpowered. In some
+extreme instances, where one side's commander has a higher Military rating than
+another, an attacking unit can actually hurt itself more with backlash than it
+hurts the other enemy in a Frontal assault. 
+
+This is all very straightforward, but some 5th Units (mainly the Gems) can
+attack other units at an angle. There's a very specific method that the game
+uses to determine what kind of assault is scored by angular attacks.
+
+If the unit is attacking in an L-shape, the long side of the L will be the side
+getting attacked.
+
+   ooV
+   ooo
+   oXo
+
+Let's say this is a 3x3 cutout of the map. If unit X is attacking V, which is
+facing south, it will be a Frontal assault, because X is still most turned to
+V's front.
+
+That's all fine, but what about perfect 45 degree angles?
+
+   ooV
+   ooo
+   Xoo
+
+Now, unit X is equally facing both unit V's side and front, assuming V is still
+facing south. If unit X attacks on this perfect diagonal line, it will always
+attack along the HORIZONTAL. So in this instance, unit X will get a Flanking
+assault on unit V.
+
+____________________
+5.5 Captured Leaders
+
+After a battle is over, the loser's leader in battle might be captured,
+assuming the losing army even had a leader. Even in the case of Retreat,
+there's a chance the retreating forces might have their leader captured. This
+can have very serious or very fun consequences.
+
+If the loser was trying to defend a landlocked territory (ie had no neighboring
+provinces to retreat to), the chance of capturing the ruler of that province
+is nearly 100%, except in the case of Eselred, who is extremely difficult to
+capture until you take his final territory, if it's even possible. However,
+taking a family's very last territory always results in capturing the ruler of
+the family.
+
+As long as the captured leader is not the ruler of the family, the captors
+will be forced to try and put that vassal up for ransom. That ransom will
+either be gold or food, food always being a higher price. I have yet to figure
+the formula for determining ransom prices.
+
+If the ransom is paid, the spoils will go to winning army's territory. If the
+ransom is refused, this will bring up three new choices. If a family leader is
+captured, they will forego the ransom procedure and go right to these choices.
+
+- Recruit
+  Recruit works just like Defection. If successful, the conquered vassal will
+  join the player's ranks. It should be noted that Recruit has a much higher
+  rate of success than Defection. Don't be afraid to try it. If the newly
+  recruited vassal was attacking from a different territory, his territory will
+  become property of the player as well.
+
+  Successfully Recruiting a family leader immediately puts all of his
+  territories, vassals, and armies under the player's control. Needless to say,
+  it's a huge score if that happens.
+
+- Release
+  This simply gives the vassal back to his or her family without a struggle or
+  ransom. Banish isn't always better than Release. A spared life could still
+  become the player's vassal one day.
+
+  As a side effect, releasing a vassal causes his military strength to go down.
+  (Thanks to "i like cheeze" for pointing this out.)
+
+- Banish
+  Simply put, the vassal is exiled from Ishmeria, never to return. Taking
+  enemy leaders out of the game can be fun, but it can also be overdone. Banish
+  has the most impact if it's used on heirs and family rulers. If the ruler of
+  a family is banished, one of his heirs will assume the throne. All of the
+  qualified heirs are listed in the Non-Default Ruler section (8.3).
+
+  If there are no heirs in the family (or they've all been banished), the
+  family will disband. When this happens, that family's Gem(s) will transfer
+  to whomever banished the ruler. Any lords that were in charge of one of the
+  family's remaining territories will declare supreme rule of that territory
+  and start their own family. Any territories that were controlled remotely by
+  the Home territory will become unclaimed. So technically, any character in
+  Gemfire can become a prince or princess. The player just won't be able to
+  control any of those families.
+
+=============
+6.0 5th Units
+-------------
+
+5th Units are as their name implies. All the soldiers in a battle are divided
+into four units, but another 5th unit can be provided by the player. These
+are either Gem guardians, hired units, or the Pastha which is neither. They
+all behave very differently, and some are very clearly better than others.
+
+Rather than having a number of men, some 5th Units (including all the Gems)
+have a single unit that instead has a specific amount of Strength. Strength
+functions the same way as having a number of men. The higher the Strength,
+the more damage that unit does. If the number gets too low, the 5th Unit dies
+or runs away. Gems cannot die.
+
+_________________________
+6.1 Explanation of Ranges
+
+All 5th Units (and all regular units as well) have an attack range that fits
+into one of four types. Their area of attack can be illustrated with the
+following diagrams.
+
+"." marks the location of the attacking unit.
+
+"X" marks the squares within the unit's attack range.
+
+"o" marks a square that cannot be attacked.
+
+
+- Long Range (Same as an archer)
+
+   ooXoo
+   ooooo
+   Xo.oX
+   ooooo
+   ooXoo
+
+Note: All long range units do less damage but do not take damage when attacking
+   
+
+- Short Range (Same as a knight/horseman)
+
+   ooooo
+   ooXoo
+   oX.Xo
+   ooXoo
+   ooooo
+
+
+- Circular Range
+
+   XXXXX
+   XoooX
+   Xo.oX
+   XoooX
+   XXXXX
+
+
+- Largest Range
+
+   XXXXX
+   XXXXX
+   XX.XX
+   XXXXX
+   XXXXX
+
+____________
+6.2 The Gems
+
+The ultimate collectible items in the game are the valuable Gems. The Gem
+guardians are usually the first choice for 5th Unit to bring into battle. The
+only reason not to is either because the player doesn't possess a Gem, or
+because the Gem has been used in a recent battle.
+
+If a Gem is used in battle, it needs to rest three months before it can be used
+again. If a Gem is defeated in battle, it needs to rest five months before it
+can be used again. As such, it is very advantageous to have multiple Gems, or
+at least backup 5th Units.
+
+The big downside to Gems in battle is that they lose Strength with every attack
+they use. It's always 10% Strength lost per attack, even if they're just taking
+out a single archer. The Strength loss is also unlike the backlash damage that
+short range characters take, in that the direction the victim unit is facing
+does not change the amount of strength loss the attacker receives back.
+
+- Dragon
+  Strength: 160
+  Move Rate: 2
+  Attack Range: Largest
+  Default Family: Lankshire (Scenario 1-4)
+  The Dragon is easily the best 5th Unit in the game. There are some others
+  with better a better move rate, but there isn't a more raw destructive force
+  than this.
+
+- Pluvius
+  Strength: 160
+  Move Rate: 2
+  Attack Range: Circular
+  Default Family: Lyle (Scenario 1-4)
+  Pluvius is possibly the best unit the player can start with. For an old
+  wizard, he sure does pack a punch. One of only three 5th Units that starts
+  with 160 Strength.
+
+- Zendor
+  Strength: 150
+  Move Rate: 3
+  Attack Range: Circular
+  Default Family: Blanche (Scenario 1-4)
+  The slight drop in strength in made up for by his exceptional move rate.
+  Zendor arguably can be considered the best unit in the game, although I still
+  think the Dragon is better.
+
+- Empyron
+  Strength: 140
+  Move Rate: 2
+  Attack Range: Short
+  Default Family: Coryll (Scenario 1), Tate (Scenario 2-4)
+  Empyron is completely outclassed by the Dragon, Zendor, and Pluvius. He
+  essentially has the move rate and attack range of a normal knight or soldier,
+  although he has the strength of a Gem guardian. He's more than capable of
+  holding his own against any foe once he finally gets in position to attack.
+
+- Scylla
+  Strength: 130
+  Move Rate: 2
+  Attack Range: Short
+  Default Family: Flax (Scenario 1-3), Tudoria (Scenario 4)
+  Scylla is essentially a weaker version of Empyron. Same move rate and attack
+  range, but less strength. I don't know if the game is trying to make her
+  feel inferior because she's a female and Empyron's a male, but she's still
+  not terrible Gem. She's just not a spectacular one either.
+
+- Chylla
+  Strength: 120
+  Move Rate: 3
+  Attack Range: Short
+  Default Family: Chrysalis (Scenario 1-2), Lyle (Scenario 3-4)
+  Well, she has good move rate. At this point though, low strength really makes
+  a big difference, and her attack range isn't helping her. Chylla is sure a
+  lot better than many hired 5th Units, but she won't be taking down the Dragon
+  by herself in most battles.
+
+- Skulryk
+  Strength: 110
+  Move Rate: 3
+  Attack Range: Circular
+  Default Family: Molbrew (Scenario 1-2), Blanche (Scenario 3-4)
+  I actually have a soft spot for Skulryk. He's the only Gem in the game
+  besides Zendor that can boast a maximum move rate AND a great attack range.
+  Plus, his attack is a whirling cloud of poison with a skull in the middle,
+  which is one of my favorite attacks. However, his low Strength KILLS him.
+  The difference between 160 Strength and 110 Strength is a lot in reality, but
+  I'd still take him over Chylla any day.
+
+
+___________________
+6.3 Hired 5th Units
+
+When there are no Gems available, or the player doesn't want to waste one on
+a battle where it isn't needed, hired 5th Units come into play. Unlike Gems,
+the player can't use a single hired monster in any territory he or she wishes.
+Hired monsters stay exclusive to a single territory, like troops. 5th Units
+can be transferred from the territories in which they were bought with the
+Move Troops command.
+
+The biggest downside to hired units is that they cost gold every three months
+to maintain their upkeep. The gold spent every quarter is equal to their hiring
+cost, so it's okay to be cheap. If they don't get paid, they'll run away.
+
+Also note that some of the best 5th Units in the game are humans. Humans,
+however, seem to be prone to deserting a territory for no reason though.
+
+The commentary written below the units is just opinion, not fact. Keep that in
+mind.
+
+- Bugbear
+  Strength: 100
+  Price: 30
+  Move Rate: 3
+  Attack Range: Short
+  The Bugbear is a singular unit, some kind of Bigfoot-type creature. He's so
+  ugly that he's almost adorable. Almost. If nothing else is available, the
+  Bugbear isn't the worst choice for his reasonable price tag, but he never lit
+  up my world.
+
+- Fachan
+  Strength: 100
+  Price: 40
+  Move Rate: 3
+  Attack Range: Largest
+  Well, the Fachan is not strong, and he's not the cheapest guy. He does have
+  great move rate, and he has the Dragon's rare attack range. He personally
+  never "did it" for me, but I've gotten feeback from multiple people saying
+  that he's one of their favorite units. Give it a shot.
+
+- Gargoyles
+  Strength: 120
+  Price: 40
+  Move Rate: 3*
+  Attack Range: Short
+  The asterisk is because Gargoyles have flying ability. Essentially, Gargoyles
+  are weaker, cheaper versions of my personal favorite hired 5th Unit, Wyverns.
+  Read more about Wyverns to see why flying is so great, but for Gargoyles
+  specifically, the price-to-strength ratio doesn't really satisfy me.
+
+- Gunners
+  Strength: 150
+  Price: 40
+  Move Rate: 3
+  Attack Range: Long
+  I cannot tell if there's an in-battle difference between Gunners, Shooters,
+  and Spearmen. What I do know is that Gunners cost twice as much as Spearmen.
+  Gunners are still a great unit, but the price is iffy. If Spearmen become
+  available, hire them and fire the Gunners.
+
+- Lancers
+  Strength: 180
+  Price: 50
+  Move Rate: 3
+  Attack Range: Short
+  No, that isn't a typo. Lancers start out with more strength than even the
+  Dragon. Although I doubt in a head-on contest that the Lancers would actually
+  prove to be stronger than the Dragon. Still, they're an insanely powerful
+  unit, with good move range. These guys are right up there with Wyverns for
+  their usefulness as top hired 5th Units, but they're not cheap.
+
+- Lizards
+  Strength: 110
+  Price: 60
+  Move Rate: 3
+  Attack Range: Short
+  Lizards wouldn't be all that bad, if they weren't so expensive. They're not
+  even close to being worth the 60 gold price tag.
+
+- Ogre
+  Strength: 100
+  Price: 50
+  Move Rate: 2
+  Attack Range: Short
+  To put it bluntly, the Ogre is a ripoff. The Ogre is a gimped Bugbear that
+  costs more, basically. Nowhere near that price tag.
+
+- Olog-Hai
+  Strength: 110
+  Price: 30
+  Move Rate: 2
+  Attack Range: Short
+  Olog-Hai are like Orks but slightly stronger and more expensive. Like Orks,
+  the Olog-Hai stink.
+
+- Orks
+  Strength: 100
+  Price: 20
+  Move Rate: 2
+  Attack Range: Short
+  Extremely cheap and extremely weak. Orks stink. There's also a bad event
+  where a hired monster will destroy part of a territory, and 90% of the time
+  that happens, it's Orks. Something about them likes to rampage. So honestly,
+  don't buy them. Skeletons are just as cheap and crappy, but won't rampage as
+  much.
+
+- Pastha
+  Strength: 160
+  Price: 0
+  Move Rate: 2
+  Attack Range: Short
+  The Pastha is not actually a "hired" monster, but he's not a Gem either. He's
+  somewhere in between. The Pastha is the only monster that is totally on par
+  in attack power with the Dragon. These guys are very strong. Unfortunately,
+  for some reason they also have the Gem guardians' one weakness, the 10%
+  strength penalty for every person they attack. They have minimal move and
+  attack range, which essentially makes the Pastha a stronger version of
+  Empyron.
+
+  Obtaining the Pastha is easy enough. Simply develop territories until good
+  events start happening. Eventually a Pastha will agree to come to one of the
+  player's territories. I accumulate a lot of these guys, which is good because
+  they're gone forever after using them in just one battle. On the positive
+  side, they don't cost anything to hold onto, and they will never abandon
+  their territory. Pasthas are REALLY, REALLY good. Hold onto them.
+
+- Pikemen
+  Strength: 150
+  Price: 40
+  Move Rate: 3
+  Attack Range: Short
+  Pikemen are like lancers, but weaker and cheaper. All in all, Pikemen are
+  great 5th Units, but if money is no object, there are a couple better
+  choices.
+
+- Skeletons
+  Strength: 100
+  Price: 20
+  Move Rate: 2
+  Attack Range: Short
+  Well, Skeletons are... cheap. They're definitely easy on the pocketbook, so
+  for the player that can't afford to buy a decent anything, these guys are a
+  lot better than having nothing, but they're also incredibly lame.
+
+- Shooters
+  Strength: 150
+  Price: 35
+  Move Rate: 3
+  Attack Range: Long
+  Shooters are like Spearmen and Gunners in Strength, range, and move rate.
+  Shooters are also cheaper than Gunners, but more expensive than Spearmen.
+  All in all, they're still great to have around. Dump them if Spearmen become
+  available.
+
+- Spearmen
+  Strength: 150
+  Price: 20
+  Move Rate: 3
+  Attack Range: Long
+  For a mere 20 gold, Spearmen are the best cheap unit in the game, bar none.
+  They're also in the running for the most useful 5th Unit, period. If there
+  are some up for grabs, take them. They, like archers, do not take damage when
+  they attack other units. They're basically an extra set of archers, but with
+  a better move rate.
+
+- Warriors:
+  Strength: 180
+  Price: 60
+  Move Rate: 3
+  Attack Range: Short
+  Warriors are essentially lancers but more expensive. They're still great
+  units though. Get them if it's affordable and lancers aren't available.
+
+- Wyverns
+  Strength: 150
+  Price: 60
+  Move Rate: 3*
+  Attack Range: Short
+  The asterisk by move rate is because Wyverns have a movement ability unique
+  to only them and Gargoyles. They can FLY. They fly over obstacles like
+  fences, trees, and rivers. Sneaking up on enemies is a pinch with Wyverns,
+  and they're quite strong too. In short, I love Wyverns. They're quite pricy
+  though, so I usually can't hold onto them forever unless I'm in a very
+  wealthy territory. On the plus side, Wyverns lack the rebellious nature of
+  human 5th Units, which are the only other hired 5th Units that really stack
+  up in usefulness against the Wyverns.
+
+==========
+7.0 Events
+----------
+
+_______________________
+7.1 Good and Bad Events
+
+To the first-time gamer, Events may look like random occurences with minor
+bonuses or demerits. However, while the effects are somewhat randomized, the
+frequency of events is not that random, and the player's control on these
+events can be harnessed to his or her advantage.
+
+The almighty Develop command, which should be used regardless of its effect on
+events, encourages good events to happen. Development is the sign of moral
+rulers in Gemfire, and morality is rewarded. Constant development across the
+player's many territories will have good things occuring on a constant basis.
+
+Bad events sometimes are not avoidable. Sometimes they are. The Protection
+stat decreases the frequency of bad events in that territory, as well as
+lessens the negative effect of those events. A high Protection stat has its
+uses, in other words.
+
+Events that affect the lord of a territory that occur in a province controlled
+by "You" actually affect the ruler of the family. This provides the only good
+reason in the game to NOT have a vassal in charge of a territory. Having
+remotely-controlled territories developing like machines is the fastest way
+to pump a ruler's stats.
+
+Here's a list of the good and bad events, and their effects.
+
+
+Good Events
+
+- "Kind redcaps cast good spells in (territory)."
+  The territory's Cultivation stat increases.
+
+- "A unicorn empowered the ruler of (territory)."
+  The lord of the territory gets a boost in his or her Domestic and Military
+  stats. One of my favorite events.
+
+- "A Pastha offered to fight for (territory)."
+  The Pastha becomes an available 5th Unit in that territory. See the 5th Unit
+  section for details. (6.3)
+
+- "An elvish troubador sang praises of (territory)."
+  That territory's Loyalty stat inceases.
+
+- "A Leprechaun left a small pot of gold in (territory)."
+  The territory gets an unimpressive amount of gold.
+
+- "A Far Garta gathered food for (territory)."
+  The territory gets an unimpressive amount of food.
+
+- "A fairy rounded up troops for (territory)."
+  The territory gets an unimpressive amount of troops.
+
+- "A Gwraig brought a charm to the ruler of (territory)."
+  The lord of the territory gets a boost in his or her Charm stat.
+
+- "Airial calmed stormy winds headed for (territory)."
+  Increases Protection.
+
+Bad Events
+
+- "Durahan rode through (territory) with the Shadow of Death."
+  The territory's Protection stat falls. Same as a Banshee.
+
+- "Black Annis frightened the people of (territory)."
+  The territory's Loyalty stat falls.
+
+- "A Banshee brought an evil omen to (territory)."
+  The territory's Protection stat falls. Same as Durahan.
+
+- "Mischievous pixies dug up the fields in (territory)."
+  The territory's Cultivation stat falls.
+
+- "The (5th Unit) went on a rampage, ravaging the land in (territory)."
+  The territory's Loyalty, Cultivation, AND Protection falls. Mega ouch. This
+  seems to happen most often in states with hired Orks, although I've also seen
+  Olog-Hai go on a rampage many times.
+
+- "Hobgoblins stole from (territory.)"
+  The territory loses a small amount of gold.
+
+- "Auguskiegies gobbled up food in (territory)."
+  The territory loses a small amount of food.
+
+- "A shrieker scared troops in (territory)."
+  The territory loses a small number of troops.
+
+- Heavy Snow
+  Randomly affects the northern territories. Occurs once per year in the month
+  of December. Causes damage to Permanent State Stats.
+
+- Flooding
+  Randomly affects the Eastern and Southeastern territories. Occurs once per
+  year in the month of June. Causes damage to Permanent State Stats.
+
+- Fire
+  Randomly affects the Western territories. Occurs once per year in the month
+  of September. Causes damage to Permanent State Stats.
+
+- Earthquake
+  Randomly affects the Southwestern territories. Occurs once per year in the
+  month of March. Causes damage to Permanent State Stats.
+
+- Plague
+  Much like the other seasonal bad events, except Plague occurs every season,
+  and can affect any territory. It strikes in December, March, June, and
+  September. States are affected negatively. Damn that plague.
+
+
+_________
+7.2 Death
+
+One special event that does not occur randomly is family death. When a
+character reaches the ripe old age of 75, they die. Sometimes they die a few
+months sooner, sometimes a few months later, but they die.
+
+Character stats will increase slightly each year until the age of 60. After 60,
+a character's stats will start to decrease until they die.
+(Thanks to Black Turtle for pointing this out.)
+
+Death can technically be prevented. When a character is scheduled to die,
+there is a small chance they won't die that particular month, but the
+likelihood of death does not decrease on a monthly basis. So to keep someone
+alive at the age of 75, the player would have to save the game every month and
+reload at the end of a turn if the vassal in question dies.
+
+So what happens when a family ruler dies and there are no heirs left? Well
+first of all, there is no chance in Hell that this event could occur unless the
+player were blatantly manipulating the game to make it happen. The game would
+have to go on for almost 30 years for something to happen, when it takes 7-10
+years to win the game.
+
+The same rules apply as if all the heirs had been Banished. The lords become
+rulers of their own new families, and remotely ruled territories become
+unclaimed. What happens if that family had a Gem? That, I'm not sure of. Since
+no family would be directly responsible for the crumbling of the family, I am
+not sure where the Gems would go.
+
+=============================
+8.0 Additional Things to Know
+-----------------------------
+
+Game mechanics aside, there are a few tips and strategies to keep in mind.
+
+________________
+8.1 General Tips
+
+- Defect early and defect often.
+  Almost as soon as the player starts the game, it's possible to obtain one or
+  two new territories simply by defecting unloyal lords. Some lords are rather
+  stubborn but might change their mind later after the player has obtained more
+  power. Try to defect people at least once every other year.
+
+- Check food prices every month.
+  Unless the player wants to make the game harder for himself, there's no
+  excuse for not checking the Trade prices. Sell most of the food when prices
+  are high and spend most of the gold when prices are low. It fluctuates from
+  month to month sometimes, so don't miss a crucial price change.
+
+- Don't attack a territory unless there will be enough troops left to defend.
+  Gemfire is like a game of chess. Knocking off another chess piece just
+  because the player can isn't always the best idea. Being left vulnerable is
+  worse than not attacking. Make sure there are enough troops built up to
+  defend the territory they're coming from and the territory they're going to.
+
+- Bide time to develop the land.
+  There should almost never be a turn wasted in Gemfire. Cultivation and
+  Protection only cost 10 gold each, so if there's nothing better to do,
+  keep developing. The extra return from food come September will be worth it.
+
+- Don't deal with the enemy Gems if it can be avoided.
+  The reason other 5th Units in the game exist is because Gems have to take
+  time to recharge between battles. If possible, wait until the enemy has
+  already been in a battle with another player. Eselred's army is a lot easier
+  to deal with the month after he uses his Dragon Gem to fend off an attack
+  from someone else.
+
+
+__________________
+8.2 The ROM Glitch
+
+Anyone playing Gemfire on their SNES console can skip this section.
+
+For those playing on an emulator, there is a particular part of the game that
+makes Gemfire glitch and can freeze gameplay. It is not the fault of currupt
+ROMs, simply an error that can occur. There is an easy fix for it though, so
+anyone can play Gemfire normally on an emulator as if they were playing on
+their console.
+
+Anytime a computer player attacks another computer player, the sound may stop
+on some emulators. While the loss of sound may not seem like a big deal, it
+signifies that the glitch has kicked in. While the sound is frozen, if the
+player either tries to attack another family, or another family attacks him or
+her, the game will freeze. That is to say, the screen will go black before
+battle starts and there's no way around it but to reset the game.
+
+There's are two simple ways around this though.
+
+If the game has already glitched, but the player is about to enter battle in
+one way or another, save the game using the in-game save feature. Save Stating
+will NOT fix it. Then, reset the game. Load the game manually, and the sound
+should be back the way it's supposed to be. Voila, the player will be able to
+attack his enemies once again.
+
+An even easier way around it is to simply turn off the sound before the game
+glitches, using the in-game sound option on the pause menu. That is, turn off
+the sound while it's still working. Don't wait until after the sound has frozen
+to turn the sound off. Otherwise, the glitch needs to be fixed with the first
+method. Turning off the sound at the beginning of the game means the game will
+never freeze. However, the player will also be deprived of any of the game's
+music and sound effects. Keep that in mind when choosing a method.
+
+__________________________________________
+8.3 Beat the Game with a Non-Default Ruler
+
+Finally mastered the game? Tired of playing with the same old people? Try this
+nifty little trick. It's possible to beat the game with someone other than
+Erin, Ander, Garth, Lars, Erik, Leander, Terian, Gweyn, Loryn, or Eadric.
+
+If the ruler of a family is banished from Ishmeria, a successor will then
+become the ruler of said family. There are only a select number of people who
+are eligible to take over a family. This is signified by small icon on the
+character's profile that resembles a branch of a family tree. This means they
+are related by blood to the ruler of the family. If the ruler of a family is
+banished when there are no successors, however, the family disbands, and new
+families will rise up in its place, headed by a former vassals. If this is the
+player's family, that means Gameover.
+
+So all one needs to do to get a new ruler is have their leader banished. The
+problem with this is that the computer almost never banishes people they
+capture. The solution is to start a two-player game. Have player one be the
+family that has the person you want to control. Have player two be some other
+family, hopefully one that's very close by. Save the game right when player two
+is next to player one's home province. With player one's leader, attack player
+two with ONE soldier. Then let player one lose the battle. If player one's
+leader isn't captured in the process, load the game and try again. Once the
+ruler is captured, banish him. Player one will then be asked to select a new
+leader from its list of successors. After that, have player two quit the game.
+Then, the computer will take over for player two, and the player will be once
+again playing a single-player game, except with a brand new ruler.
+
+The following people can be used to beat the game with this method:
+- Wolfen (Lyle family, Scenario 1-4)
+- Keyla (Lyle family, Scenario 2-4)
+- Randal (Lyle family, Scenario 3)
+- Pender (Blanche family, Scenario 1-3)
+- Anselm (Blanche family, Scenario 1-2)
+- Karl (Blanche family, Scenario 1-4)
+- Arkin (Blanche family, Scenario 2-3)
+- Elgis (Chrysalis family, Scenario 1)
+- Sarthe (Chrysalis family, Scenario 1)
+- Fuster (Molbrew family, Scenario 2)
+- Bryan (Tate family, Scenario 3)
+- Anise (Tate family, Scenario 3)
+- Alex (Tordin family, Scenario 3)
+
+So for all the equal opportunists out there, Gweyn isn't the only female
+capable of reuniting Gemfire. Keyla and Anise are also up for the challenge,
+even though Anise is only 15 years old at the start of her game!
+
+
+==============
+9.0 Miscellany
+--------------
+_______________
+9.1 Legal Stuff
+
+This FAQ is Copyright 2004-2005 by me. Any use of this FAQ without my
+explicit permission will be in a world of trouble, and I will find out if that
+happens. Gemfire is the Copyright product of KOEI and distributed by Nintendo.
+I am not in anyway affiliated with KOEI or Nintendo. This FAQ is solely for
+non-profit use.
+
+_______________
+9.2 Emailing Me
+
+I'd love to hear any commentary or questions about the FAQ. I can be reached
+at tasteless@gmail.com
+
+If there is something missing or wrong with the FAQ, please feel free to email
+me and I'll try to fix it. Also if you have a question that is not addressed in
+the FAQ, I will try to help you answer it. Also, if you wish to post this
+guide somewhere besides GameFAQs, please email me and ask permission. I'll
+probably say yes.
+
+Do NOT ask me where to get a copy of the ROM. These emails will go straight 
+into the trash.
+
+___________________
+9.3 Version History
+
+- 12/24/04 - v1.0 First edition of the FAQ is submitted to GameFAQs
+
+- 12/30/04 - v2.0 Big update so soon after publishing. Fixed a bunch of typos.
+  Reworded some of the intro. Added four more events. Added the "Captured
+  Leaders" section. Added the "Death" section. Made a big correction on the
+  Loyalty stat. Added an important footnote to the Search command. Fixed info
+  on changing Home Province in both the Attack command section and the
+  Change Lord command section.
+
+- 11/15/05 - v2.1 Based on feedback, I've made several important corrections.
+  I've added facts about releasing vassals and aging. I also finally have the
+  list of Searchable items, which is the most important omission from the FAQ.
+  With that added, I am now considering the FAQ to be complete, the ultimate
+  source for how to master Gemfire. This means this could be the last update.
+
+__________________
+9.4 Special Thanks
+
+
+Thanks to Black Turtle for giving me some corrections on remotely controlled
+provinces and the Red Cap event. Also thanks for telling me about aging stats.
+
+Thanks to "i like cheeze" for telling me about how releasing vassals lowers
+their military strength.
+
+Thanks to the MANY people who emailed me about the Searchable items.
+
+Special Thanks goes to KOEI for making such a fantastic game.
+
+Thanks to Blockbuster Video for first introducing this game to me 12 years ago.
+I have played this game to death since then, and this FAQ would not be here if
+it weren't for that franchise.
+
+Thanks also goes out to GameFAQs for being one of the greatest resources on
+the internet.
+
+
+_______________________________________________
+Gemfire FAQ (c) 2004-2005 John "TIDQ" Robertson

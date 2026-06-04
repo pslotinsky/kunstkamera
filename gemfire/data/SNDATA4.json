@@ -1,0 +1,1352 @@
+{
+  "lands": {
+    "1": {
+      "id": 1,
+      "land": "Dunmoor",
+      "gold": 186,
+      "food": 174,
+      "troops": 158,
+      "loyalty": 56,
+      "cultivation": 49,
+      "protection": 39,
+      "family": "Lyle",
+      "mercenaries": [
+        {
+          "type": "Orks",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Bugbear",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Pikemen",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "2": {
+      "id": 2,
+      "land": "Carveti",
+      "gold": 173,
+      "food": 178,
+      "troops": 134,
+      "loyalty": 68,
+      "cultivation": 56,
+      "protection": 55,
+      "family": "Lyle",
+      "mercenaries": [
+        {
+          "type": "Orks",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Fachan",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "3": {
+      "id": 3,
+      "land": "Cobrige",
+      "gold": 158,
+      "food": 162,
+      "troops": 131,
+      "loyalty": 45,
+      "cultivation": 42,
+      "protection": 39,
+      "family": "Blanche",
+      "mercenaries": [
+        {
+          "type": "Orks",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Fachan",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "4": {
+      "id": 4,
+      "land": "Banshea",
+      "gold": 191,
+      "food": 187,
+      "troops": 133,
+      "loyalty": 61,
+      "cultivation": 55,
+      "protection": 48,
+      "family": "Blanche",
+      "mercenaries": [
+        {
+          "type": "Orks",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Fachan",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "5": {
+      "id": 5,
+      "land": "Petaria",
+      "gold": 203,
+      "food": 205,
+      "troops": 151,
+      "loyalty": 70,
+      "cultivation": 59,
+      "protection": 58,
+      "family": "Blanche",
+      "mercenaries": [
+        {
+          "type": "Orks",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Bugbear",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "6": {
+      "id": 6,
+      "land": "Hyland",
+      "gold": 258,
+      "food": 262,
+      "troops": 249,
+      "loyalty": 54,
+      "cultivation": 49,
+      "protection": 47,
+      "family": "Blanche",
+      "mercenaries": [
+        {
+          "type": "Orks",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Fachan",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Spearmen",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "7": {
+      "id": 7,
+      "land": "Norwood",
+      "gold": 186,
+      "food": 191,
+      "troops": 205,
+      "loyalty": 59,
+      "cultivation": 54,
+      "protection": 46,
+      "family": "Lyle",
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Lizards",
+          "strength": 110,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "8": {
+      "id": 8,
+      "land": "Lisle",
+      "gold": 135,
+      "food": 140,
+      "troops": 102,
+      "loyalty": 46,
+      "cultivation": 45,
+      "protection": 34,
+      "family": "Lyle",
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Lizards",
+          "strength": 110,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "9": {
+      "id": 9,
+      "land": "Erewood",
+      "gold": 139,
+      "food": 146,
+      "troops": 145,
+      "loyalty": 42,
+      "cultivation": 40,
+      "protection": 33,
+      "family": "Lyle",
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Lizards",
+          "strength": 110,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Lancers",
+          "strength": 180,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "10": {
+      "id": 10,
+      "land": "Rodale",
+      "gold": 145,
+      "food": 153,
+      "troops": 151,
+      "loyalty": 40,
+      "cultivation": 42,
+      "protection": 34,
+      "family": "Blanche",
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "11": {
+      "id": 11,
+      "land": "Hermet",
+      "gold": 146,
+      "food": 155,
+      "troops": 146,
+      "loyalty": 45,
+      "cultivation": 52,
+      "protection": 39,
+      "family": "Blanche",
+      "mercenaries": [
+        {
+          "type": "Olog-hai",
+          "strength": 110,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "12": {
+      "id": 12,
+      "land": "Ostlan",
+      "gold": 141,
+      "food": 135,
+      "troops": 138,
+      "loyalty": 41,
+      "cultivation": 48,
+      "protection": 42,
+      "family": "Blanche",
+      "mercenaries": [
+        {
+          "type": "Olog-hai",
+          "strength": 110,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "13": {
+      "id": 13,
+      "land": "Powice",
+      "gold": 254,
+      "food": 259,
+      "troops": 268,
+      "loyalty": 49,
+      "cultivation": 45,
+      "protection": 36,
+      "family": "Lyle",
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Bugbear",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "14": {
+      "id": 14,
+      "land": "Cardyf",
+      "gold": 189,
+      "food": 195,
+      "troops": 196,
+      "loyalty": 48,
+      "cultivation": 43,
+      "protection": 38,
+      "family": "Tate",
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Bugbear",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Pikemen",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "15": {
+      "id": 15,
+      "land": "Eljing",
+      "gold": 84,
+      "food": 81,
+      "troops": 0,
+      "loyalty": 0,
+      "cultivation": 48,
+      "protection": 24,
+      "family": null,
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Wyvern",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Warriors",
+          "strength": 180,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "16": {
+      "id": 16,
+      "land": "Centra",
+      "gold": 98,
+      "food": 85,
+      "troops": 0,
+      "loyalty": 0,
+      "cultivation": 56,
+      "protection": 23,
+      "family": null,
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Bugbear",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Gunners",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "17": {
+      "id": 17,
+      "land": "Culver",
+      "gold": 208,
+      "food": 210,
+      "troops": 172,
+      "loyalty": 56,
+      "cultivation": 60,
+      "protection": 47,
+      "family": "Divas",
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "18": {
+      "id": 18,
+      "land": "Lindum",
+      "gold": 196,
+      "food": 193,
+      "troops": 156,
+      "loyalty": 45,
+      "cultivation": 55,
+      "protection": 30,
+      "family": "Divas",
+      "mercenaries": [
+        {
+          "type": "Olog-hai",
+          "strength": 110,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "19": {
+      "id": 19,
+      "land": "Caster",
+      "gold": 220,
+      "food": 211,
+      "troops": 199,
+      "loyalty": 54,
+      "cultivation": 61,
+      "protection": 39,
+      "family": "Lankshire",
+      "mercenaries": [
+        {
+          "type": "Olog-hai",
+          "strength": 110,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Shooters",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "20": {
+      "id": 20,
+      "land": "Anglia",
+      "gold": 156,
+      "food": 164,
+      "troops": 179,
+      "loyalty": 49,
+      "cultivation": 52,
+      "protection": 34,
+      "family": "Lankshire",
+      "mercenaries": [
+        {
+          "type": "Orks",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "21": {
+      "id": 21,
+      "land": "Oldlyn",
+      "gold": 93,
+      "food": 92,
+      "troops": 0,
+      "loyalty": 0,
+      "cultivation": 54,
+      "protection": 23,
+      "family": null,
+      "mercenaries": [
+        {
+          "type": "Orks",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "22": {
+      "id": 22,
+      "land": "Londre",
+      "gold": 406,
+      "food": 364,
+      "troops": 296,
+      "loyalty": 76,
+      "cultivation": 64,
+      "protection": 63,
+      "family": "Lankshire",
+      "mercenaries": [
+        {
+          "type": "Gargoyles",
+          "strength": 120,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Shooters",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "23": {
+      "id": 23,
+      "land": "Attley",
+      "gold": 154,
+      "food": 176,
+      "troops": 152,
+      "loyalty": 35,
+      "cultivation": 53,
+      "protection": 32,
+      "family": "Tate",
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Warriors",
+          "strength": 180,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "24": {
+      "id": 24,
+      "land": "Linden",
+      "gold": 151,
+      "food": 155,
+      "troops": 151,
+      "loyalty": 36,
+      "cultivation": 51,
+      "protection": 30,
+      "family": "Tate",
+      "mercenaries": [
+        {
+          "type": "Orks",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Wyvern",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "25": {
+      "id": 25,
+      "land": "Ashlan",
+      "gold": 184,
+      "food": 188,
+      "troops": 192,
+      "loyalty": 51,
+      "cultivation": 50,
+      "protection": 40,
+      "family": "Tudoria",
+      "mercenaries": [
+        {
+          "type": "Gargoyles",
+          "strength": 120,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Lizards",
+          "strength": 110,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Lancers",
+          "strength": 180,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "26": {
+      "id": 26,
+      "land": "Penzan",
+      "gold": 139,
+      "food": 148,
+      "troops": 146,
+      "loyalty": 55,
+      "cultivation": 48,
+      "protection": 38,
+      "family": "Tudoria",
+      "mercenaries": [
+        {
+          "type": "Orks",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Wyvern",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "27": {
+      "id": 27,
+      "land": "Belgam",
+      "gold": 176,
+      "food": 173,
+      "troops": 158,
+      "loyalty": 56,
+      "cultivation": 55,
+      "protection": 39,
+      "family": "Tudoria",
+      "mercenaries": [
+        {
+          "type": "Orks",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Spearmen",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "28": {
+      "id": 28,
+      "land": "Celsea",
+      "gold": 158,
+      "food": 167,
+      "troops": 180,
+      "loyalty": 54,
+      "cultivation": 62,
+      "protection": 35,
+      "family": "Lankshire",
+      "mercenaries": [
+        {
+          "type": "Gargoyles",
+          "strength": 120,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Wyvern",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "29": {
+      "id": 29,
+      "land": "Cambry",
+      "gold": 84,
+      "food": 75,
+      "troops": 0,
+      "loyalty": 0,
+      "cultivation": 48,
+      "protection": 25,
+      "family": null,
+      "mercenaries": [
+        {
+          "type": "Orks",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Gargoyles",
+          "strength": 120,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "30": {
+      "id": 30,
+      "land": "Farlan",
+      "gold": 96,
+      "food": 91,
+      "troops": 0,
+      "loyalty": 0,
+      "cultivation": 41,
+      "protection": 23,
+      "family": null,
+      "mercenaries": [
+        {
+          "type": "Gargoyles",
+          "strength": 120,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Gunners",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    }
+  },
+  "people": {
+    "Adryl": {
+      "name": "Adryl",
+      "political": 76,
+      "war": 87,
+      "charm": 51,
+      "fame": 0,
+      "location": 9,
+      "family": "Lyle",
+      "title": "Lord",
+      "relation": null
+    },
+    "Aiden": {
+      "name": "Aiden",
+      "political": 56,
+      "war": 73,
+      "charm": 38,
+      "fame": 0,
+      "location": 22,
+      "family": "Lankshire",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Alain": {
+      "name": "Alain",
+      "political": 60,
+      "war": 54,
+      "charm": 77,
+      "fame": 0,
+      "location": 25,
+      "family": "Tudoria",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Alex": {
+      "name": "Alex",
+      "political": 65,
+      "war": 76,
+      "charm": 77,
+      "fame": 0,
+      "location": 27,
+      "family": "Tudoria",
+      "title": "Lord",
+      "relation": null
+    },
+    "Ander": {
+      "name": "Ander",
+      "political": 95,
+      "war": 89,
+      "charm": 79,
+      "fame": 18,
+      "location": 13,
+      "family": "Lyle",
+      "title": "Prince",
+      "relation": "Lyle",
+      "null": [
+        ""
+      ]
+    },
+    "Andrew": {
+      "name": "Andrew",
+      "political": 45,
+      "war": 60,
+      "charm": 41,
+      "fame": 0,
+      "location": 2,
+      "family": "Lyle",
+      "title": "Lord",
+      "relation": null
+    },
+    "Anise": {
+      "name": "Anise",
+      "political": 72,
+      "war": 18,
+      "charm": 80,
+      "fame": 0,
+      "location": 14,
+      "family": "Tate",
+      "title": "Vassal",
+      "relation": "Tate"
+    },
+    "Bradley": {
+      "name": "Bradley",
+      "political": 48,
+      "war": 74,
+      "charm": 35,
+      "fame": 0,
+      "location": 25,
+      "family": "Tudoria",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Bryan": {
+      "name": "Bryan",
+      "political": 91,
+      "war": 81,
+      "charm": 75,
+      "fame": 0,
+      "location": 23,
+      "family": "Tate",
+      "title": "Lord",
+      "relation": "Tate"
+    },
+    "Cairn": {
+      "name": "Cairn",
+      "political": 56,
+      "war": 62,
+      "charm": 57,
+      "fame": 0,
+      "location": 6,
+      "family": "Blanche",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Eadric": {
+      "name": "Eadric",
+      "political": 93,
+      "war": 68,
+      "charm": 96,
+      "fame": 9,
+      "location": 25,
+      "family": "Tudoria",
+      "title": "Prince",
+      "relation": "Tudoria",
+      "null": [
+        ""
+      ]
+    },
+    "Elford": {
+      "name": "Elford",
+      "political": 69,
+      "war": 74,
+      "charm": 71,
+      "fame": 0,
+      "location": 22,
+      "family": "Lankshire",
+      "title": "Vassal",
+      "relation": "Lankshire"
+    },
+    "Elias": {
+      "name": "Elias",
+      "political": 48,
+      "war": 45,
+      "charm": 70,
+      "fame": 0,
+      "location": 17,
+      "family": "Divas",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Erin": {
+      "name": "Erin",
+      "political": 87,
+      "war": 94,
+      "charm": 80,
+      "fame": 21,
+      "location": 6,
+      "family": "Blanche",
+      "title": "Prince",
+      "relation": "Blanche",
+      "null": [
+        ""
+      ]
+    },
+    "Eselred": {
+      "name": "Eselred",
+      "political": 44,
+      "war": 40,
+      "charm": 51,
+      "fame": 12,
+      "location": 22,
+      "family": "Lankshire",
+      "title": "Prince",
+      "relation": "Lankshire",
+      "null": [
+        ""
+      ]
+    },
+    "Galford": {
+      "name": "Galford",
+      "political": 62,
+      "war": 78,
+      "charm": 53,
+      "fame": 0,
+      "location": 24,
+      "family": "Tate",
+      "title": "Lord",
+      "relation": "Tate"
+    },
+    "Geoff": {
+      "name": "Geoff",
+      "political": 89,
+      "war": 75,
+      "charm": 77,
+      "fame": 0,
+      "location": 22,
+      "family": "Lankshire",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Geolug": {
+      "name": "Geolug",
+      "political": 93,
+      "war": 85,
+      "charm": 62,
+      "fame": 0,
+      "location": 22,
+      "family": "Lankshire",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Geran": {
+      "name": "Geran",
+      "political": 43,
+      "war": 89,
+      "charm": 56,
+      "fame": 0,
+      "location": 10,
+      "family": "Blanche",
+      "title": "Lord",
+      "relation": null
+    },
+    "Gweyn": {
+      "name": "Gweyn",
+      "political": 82,
+      "war": 55,
+      "charm": 86,
+      "fame": 0,
+      "location": 4,
+      "family": "Blanche",
+      "title": "Lord",
+      "relation": null
+    },
+    "Hubert": {
+      "name": "Hubert",
+      "political": 76,
+      "war": 87,
+      "charm": 82,
+      "fame": 0,
+      "location": 28,
+      "family": "Lankshire",
+      "title": "Lord",
+      "relation": null
+    },
+    "Jerras": {
+      "name": "Jerras",
+      "political": 68,
+      "war": 45,
+      "charm": 72,
+      "fame": 0,
+      "location": 6,
+      "family": "Blanche",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Karl": {
+      "name": "Karl",
+      "political": 84,
+      "war": 62,
+      "charm": 81,
+      "fame": 0,
+      "location": 5,
+      "family": "Blanche",
+      "title": "Lord",
+      "relation": "Blanche"
+    },
+    "Karla": {
+      "name": "Karla",
+      "political": 71,
+      "war": 44,
+      "charm": 72,
+      "fame": 0,
+      "location": 22,
+      "family": "Lankshire",
+      "title": "Vassal",
+      "relation": "Lankshire"
+    },
+    "Kelvin": {
+      "name": "Kelvin",
+      "political": 73,
+      "war": 70,
+      "charm": 74,
+      "fame": 0,
+      "location": 26,
+      "family": "Tudoria",
+      "title": "Lord",
+      "relation": null
+    },
+    "Keyla": {
+      "name": "Keyla",
+      "political": 58,
+      "war": 84,
+      "charm": 86,
+      "fame": 0,
+      "location": 1,
+      "family": "Lyle",
+      "title": "Lord",
+      "relation": "Lyle"
+    },
+    "Loryn": {
+      "name": "Loryn",
+      "political": 82,
+      "war": 93,
+      "charm": 77,
+      "fame": 6,
+      "location": 17,
+      "family": "Divas",
+      "title": "Prince",
+      "relation": "Divas",
+      "null": [
+        ""
+      ]
+    },
+    "Melgan": {
+      "name": "Melgan",
+      "political": 44,
+      "war": 84,
+      "charm": 63,
+      "fame": 0,
+      "location": 17,
+      "family": "Divas",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Owen": {
+      "name": "Owen",
+      "political": 65,
+      "war": 87,
+      "charm": 66,
+      "fame": 0,
+      "location": 3,
+      "family": "Blanche",
+      "title": "Lord",
+      "relation": null
+    },
+    "Pender": {
+      "name": "Pender",
+      "political": 80,
+      "war": 96,
+      "charm": 23,
+      "fame": 0,
+      "location": 19,
+      "family": "Lankshire",
+      "title": "Lord",
+      "relation": null
+    },
+    "Raith": {
+      "name": "Raith",
+      "political": 32,
+      "war": 94,
+      "charm": 36,
+      "fame": 0,
+      "location": 18,
+      "family": "Divas",
+      "title": "Lord",
+      "relation": null
+    },
+    "Roland": {
+      "name": "Roland",
+      "political": 78,
+      "war": 81,
+      "charm": 84,
+      "fame": 0,
+      "location": 6,
+      "family": "Blanche",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Seagal": {
+      "name": "Seagal",
+      "political": 40,
+      "war": 43,
+      "charm": 60,
+      "fame": 0,
+      "location": 13,
+      "family": "Lyle",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Seth": {
+      "name": "Seth",
+      "political": 88,
+      "war": 73,
+      "charm": 74,
+      "fame": 0,
+      "location": 13,
+      "family": "Lyle",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Shabard": {
+      "name": "Shabard",
+      "political": 54,
+      "war": 78,
+      "charm": 62,
+      "fame": 0,
+      "location": 20,
+      "family": "Lankshire",
+      "title": "Lord",
+      "relation": null
+    },
+    "Terian": {
+      "name": "Terian",
+      "political": 81,
+      "war": 84,
+      "charm": 77,
+      "fame": 9,
+      "location": 14,
+      "family": "Tate",
+      "title": "Prince",
+      "relation": "Tate",
+      "null": [
+        ""
+      ]
+    },
+    "Veen": {
+      "name": "Veen",
+      "political": 74,
+      "war": 60,
+      "charm": 35,
+      "fame": 0,
+      "location": 6,
+      "family": "Blanche",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Walther": {
+      "name": "Walther",
+      "political": 40,
+      "war": 72,
+      "charm": 47,
+      "fame": 0,
+      "location": 8,
+      "family": "Lyle",
+      "title": "Lord",
+      "relation": null
+    },
+    "Wolfen": {
+      "name": "Wolfen",
+      "political": 66,
+      "war": 94,
+      "charm": 67,
+      "fame": 0,
+      "location": 7,
+      "family": "Lyle",
+      "title": "Lord",
+      "relation": "Lyle"
+    }
+  },
+  "families": {
+    "Blanche": {
+      "family": "Blanche",
+      "people": [
+        "Cairn",
+        "Erin",
+        "Geran",
+        "Gweyn",
+        "Jerras",
+        "Karl",
+        "Owen",
+        "Roland",
+        "Veen"
+      ],
+      "leader": "Erin"
+    },
+    "Divas": {
+      "family": "Divas",
+      "people": [
+        "Elias",
+        "Loryn",
+        "Melgan",
+        "Raith"
+      ],
+      "leader": "Loryn"
+    },
+    "Lankshire": {
+      "family": "Lankshire",
+      "people": [
+        "Aiden",
+        "Elford",
+        "Eselred",
+        "Geoff",
+        "Geolug",
+        "Hubert",
+        "Karla",
+        "Pender",
+        "Shabard"
+      ],
+      "leader": "Eselred"
+    },
+    "Lyle": {
+      "family": "Lyle",
+      "people": [
+        "Adryl",
+        "Ander",
+        "Andrew",
+        "Keyla",
+        "Seagal",
+        "Seth",
+        "Walther",
+        "Wolfen"
+      ],
+      "leader": "Ander"
+    },
+    "Tate": {
+      "family": "Tate",
+      "people": [
+        "Anise",
+        "Bryan",
+        "Galford",
+        "Terian"
+      ],
+      "leader": "Terian"
+    },
+    "Tudoria": {
+      "family": "Tudoria",
+      "people": [
+        "Alain",
+        "Alex",
+        "Bradley",
+        "Eadric",
+        "Kelvin"
+      ],
+      "leader": "Eadric"
+    }
+  }
+}

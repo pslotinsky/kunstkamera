@@ -1,0 +1,826 @@
+123456789012345678901234567890123456789012345678901234567890123456789012
+*********************************************
+Gemfire (SNES)
+
+A Guide by Greg Hartman
+
+Contact: good_catholic_boy /at/ yahoo /dot/ com
+         aolim: goodcatholicboy9
+
+-if you are lame, don't bother contacting me
+-if using email, please indicate in the subject that you are asking me
+about this guide.  very rarely do i bother opening emails from people i
+don't know that have blank subject lines.  If contacting me via my aol
+screen name, be warned that i check it sporadically so I very well might
+not get your message.  Email probably works best.
+-the only language i can speak with any degree of clarity is english.  
+please, if you are contacting me, do so in english (although if you require
+an answer that is only half-intelligible, german might work also). 
+definitely do not bother emailing me in any other language; i won't even 
+respond.
+********************************************
+
+Version History
+
+Version 1.0 (8/15/04)
+ -first version - it ain't perfect, but what is in this life?
+Version 1.01 (8/19/04)
+ -proofreading, some slight error corrections
+
+
+*********************************************
+
+Contents:
+
+I. Preface
+II. Starting a game
+III. State Commands
+IV. Battle Commands
+V. Fifth Units
+VI. Events
+VII. Tips/FAQs
+VIII. Legal
+
+*********************************************
+
+I. Preface
+
+Gemfire is an early Super Nintendo strategy game released by Koei that
+allows a player to control a specific faction in a fantasy-styled war
+simulation environment.  A player can control any number of ruling familes
+that are in rebellion against the tyranical Lankshire family, the evil
+and oppressive empire that has terrorized the people.
+
+The game differs slightly from traditional strategy games by including a 
+kind of wildcard in the form of 6 different gems.  Each gem allows the
+holder to summon its particular spirit for use in battle.  The game also
+adds some variety by including several different monsters and 
+mercenaries that a ruler can hire for use in battle.
+
+Overall, Gemfire is a relatively enjoyable simulation game that is not 
+extremely hard just to pick up and play for a short while.  Hopefully, this
+guide will make it even easier.
+
+*********************************************
+
+II. Starting the Game
+
+There are four different scenarios from which to choose.  In each 
+successive situation, the Lankshire family becomes slightly weaker and the
+rebellious factions become slightly stronger in terms of overall strength.
+Your choices are as follows:
+
+1. Erin and Ander:  The first scenario - here, the Lankshire family is
+by far the most dominant force, controlling a large portion of the map and
+the extremely powerful dragon gem.  You can play as the following familes:
+
+  a. Lyle - Probably the easiest ruler you can pick to play as here.  They
+     start fairly secure in the northwest corner of the map and have a 
+     good chance of eliminating the Chrysalis family early on to secure a
+     second (albeit lousy) gem.  Ander himself is a very powerful ruler, 
+     and the Pluvius gem is second only to the Dragon.
+
+  b. Blanche - These guys are a very close second to the Lyle family.  The
+     Zendor is a second only to Pluvius as far as controlable rulers' gems
+     go, and Erin has almost identical stats to Ander.  Not being able to
+     easily steal the Chrysalis family's garbage gem barely hurts them at
+     all.  
+
+  c. Coryll - This family is a little more difficult than the Lyle or 
+     Blanche.  Lars is not quite as good as either Erin or Ander, and their
+     gem, the Emperyon, will have a much harder time standing up to the
+     dragon.  They start close to the Flax family, which gives them a 
+     chance to possibly snatch up another gem, but my experience has taught
+     me that 9 times out of 10 Lankshire will beat them to it.  Still 
+     playable, but probably not the best idea for your first time.
+
+  d. Chrysalis - These guys are the scenario's losers.  Garth is only an
+     average ruler, and his gem, the Chylla is pretty much the worst.  To
+     make matters worse, he has to expand outwards through Ander's domain
+     before he can do anything else.  Really the only advantage they have
+     is that their state's island is very safe from invasion and relatively
+     easy from which to expand outwards.
+
+2. Flax's shame: Here, the Coryll family has been eliminated and Lyle and
+Blanche have gained some power.  There is a new family, the Tates, in state
+11.  You can play as the following families:
+
+   a. Lyle - Ander has gained a state and a little bit of domestic 
+      abilities.  He has a good starting position, and, with the power of
+      the Pluvius, is still the best playable ruler.
+
+   b. Blanche - Erin has also gained a state and some war ability.  He has
+      a slightly weaker position than Ander, but is still a close second.
+
+   c. Flax - Having defeated the Coryll family, Erik has a somewhat
+      secure position from which to expand.  The main problem is, of
+      course, that any advances he makes will have to be into Lankshire
+      territory.  The relatively weak Scylla doesn't help him much here,
+      although there are worse gems.  Not the best choice for a beginner.
+
+   d. Molbrew - Prince Leander has gained a territory since the first
+      scenario, but he has a very weak gem in Skulryk and not much in the
+      way of talented officers.  He can also make for a tough play.
+
+3. Terian's War:  This scenario has relocated the Tate family to the far
+west of the country, and eliminates the Chyrsalis and Molbrew families.
+Erin and Ander both gain some territory, and the Tordin family springs up
+in the south. Of those you can play:
+
+   a. Lyle - There isn't much new to be said here.  The Lyle family has
+      gained control of some new lands as well as the Chylla gem, which
+      serves as a worthy backup to the Pluvius.  They are still the best
+      choice out there.
+
+   b. Blanche - Erin has gained the Skulryk gem as his backup, and still
+      represents the next strongest choice.
+
+   c. Tate - Terian is in basically the same position he was in the prior
+      scenario, except that he has relocated to the land formerly of the
+      Molbrew family.  The Empyron is a powerful enough gem for him to
+      do some damage.
+
+   d. Tordin - These guys are the losers of the scenario.  They start with
+      no gem at all, and are on the fringes of the Lankshire family's 
+      lands.  It'll take some skill (and a lot of hired units) for them
+      to fight their way out.
+
+4. Gemfire: This is the final scenario, and the one where the King is the
+   weakest.  Erin and Ander are very powerful.  Of those you can play:
+
+   a. Lyle - Basically the same as the prior scenario, except for the
+      addition of a new territory.  By this point in the game, Ander is
+      more powerful than the King himself.
+
+   b. Blanche - Erin is roughly equal in power to Ander, as usual.  His
+      brother, Pender, has defected to the Lankshire family.
+
+   c. Tudoria - More or less a repeat of the Flax family with a different
+      name.  The Scylla will help them a lot, however, since they will
+      probably tangle with Terian before they engage the Lankshire family's
+      real strength.
+
+   d. Divas - Loryn, a former servant of the king, has taken up the role of
+      loser in this scenario.  With no gem, they are going to need a lot
+      skill in order to win.  Their best bet is tricking Pender to switch
+      to their side.
+
+Once you pick your ruler, you will be given a brief commentary by a few
+of your officers about the current war state.  You will then be asked to 
+choose an advisor.  Whomever you pick makes almost no difference at all, 
+since they all basically say the same thing with slightly different prose.
+
+Having chosen these options you will next see the world map and, 
+eventually, your own turn will come about.
+
+**********************************************************
+
+III. State Commands
+
+Upon your turn you will be presented with your particular state's info
+screen.  It lists the following statistics from top to bottom, left to 
+right.
+
+   a. Gold - The amount of gold in the state.  The max is 999.  Gold is 
+      used to hire troops or monsters (and to pay their salaries), for
+      investing in your state's growth, or to buy food.  Gold is collected
+      in September as a function of your city's economy and people's loyalty.
+
+   b. Food - The amount of food in the state.  The max is 999.  You use
+      food primarily to feed your army while it is in the field, but can
+      also sell it for cash or give it to your people to raise their 
+      loyalty.  Your army collects food in September as a result of taxes on
+      harvests (a function of your state's farmland development).
+
+   c. Troops - The amount of soldiers in your state.  The max is 999. You
+      (obviously) use soldiers to invade neighboring territories.  You gain
+      soldiers by drafting or through specific events.  The plague or other
+      disasters will lower your troop count.
+
+   d. People's loyalty - The loyalty of the people in this territory.  The
+      higher this value, the more taxes you will collect.  You raise it 
+      by giving food to the people.  A disaster, such as the plague, will
+      lower it. The max is 100.
+
+   e. Farm - The development of your state's farmland.  The higher this 
+      value, the more taxes you will collect in September from your harvest.
+      You can increase this value by spending money to develop the 
+      farmland.  It decreases as the result of warfare or a disaster, such
+      as a flood, hitting your territory.  The max is 200.
+
+   f. Protection - The protection of your state from natural disasters.  
+      The higher this value, the less damage your state will suffer as a
+      result of a disaster.  You can raise this value by investing gold to
+      develop it.  It decreases in the event of warfare or a disaster.  The
+      max is 200.
+
+The Commands
+
+There are 4 basic categories of commands for a state.  Broadly, these are
+Military, Domestic, Diplomatic, and Information and are symbolized by
+a sword and shield, a statehouse, a flag, and a knight, respectively. An
+* next to a command indicates that using the command expends the district's
+turn for the month.
+
+A. Military
+
+  1. * Attack a neighboring state.   You will have to specify the number of
+     soldiers you want to send, as well as how much food to bring along
+     with them.  Food (obviously) feeds your army in the field.  If
+     you run out, you will lose the battle, so make sure to bring enough.
+     It costs roughly 22 gold per 100 soldiers you are going to deploy.
+     In my experience, battles (against the computer, at least) rarely, if
+     ever, exceed five days in length - keep this in mind when deploying
+     your army.  See the section on warfare commands for more information.
+
+  2. * Recruit soldiers.  This will hire soldiers immediately from your 
+     current state.  Each soldier costs 2 gold.  There are no adverse
+     effects after recruiting soldiers.
+
+  3. * Move troops.  Move a specified amount of soldiers to a neighboring
+     friendly state.
+
+  4. * Hire monsters.  Hires a fifth unit of monsters or mercenaries.  The
+     amount of money you pay up front is the same amount of quarterly pay the
+     unit will demand.  For example, if you pay an ogre 50 gold to hire 
+     him, you will also pay him 50 gold every season to retain his services.
+     If you cannot afford to pay a unit's maintenence costs, he/they will
+     desert you.
+
+B. Domestic
+
+   1. * Develop.  You have two choices here, cultivation or protection.  
+      Both cost 10 gold and will raise the respective value anywhere from
+      2-5 depending on your governor's political/domestic ability (the one
+      that looks like a sheet of paper).  Repeatedly developing your
+      territories is virtuous in Gemfire, and can result in random events
+      occuring that will either raise your officer's abilities or improve
+      your state.
+
+   2. Trade.  This command allows you to trade food (either buying or 
+      selling) with the local merchant.  Prices can either be "high," 
+      "average," or "low."  If you think back to your introduction to
+      economics class, you will probably remember to buy low and sell high.
+
+   3. * Give food.  Distribute food to your peasants in an effort to earn
+      their loyalty.  The higher your officer's charm, the greater the
+      increase in loyalty will be.
+
+   4. * Transport.  Move goods to another city under your family's command.
+
+C. Diplomacy
+
+   1. * Ally.  Forge an alliance with another family.  You and your ally
+      will not be able to attack each other.  You can break the alliance
+      at any time with the break alliance command, which is also listed 
+      here.  Besides mutual non-aggression, there is no other advantage to
+      allying yourself with another power.  The Lankshire family does not
+      enter into alliances.
+
+   2. * Negotiate
+
+      a. Defection.  Try to trick another family's officer to switch sides
+      and join your force.  If you select a family's capital, you can 
+      recruit any officer who has yet to be deployed.  This command works
+      very well and should be used often early in the game to recruit a
+      pool of officers from the Lankshire family.  If you recruit a lord,
+      control of his state will switch to your faction.
+
+      b. Surrender.  Try to force another family to surrender to you.  This
+      only works if they are quite weak and you are quite powerful.  Many
+      of the very powerful rulers (Erin or Ander, for example) probably 
+      will not surrender.
+
+   3. * Sabotage.  This command attempts to lower the quality of a 
+      neighboring state.  If the commanding officer of the state has a 
+      high domestic ability, this command is more likely to fail.  
+      Sabotaging is vastly inferior to plundering.
+
+   4. * Plunder.  This command lets you steal a percentage (a large 
+      percentage) of food and gold from a neighboring province.  The higher
+      your abilities are in comparison to the leader of the target states
+      the higher the chances for success.  This command is a great way to
+      increase your gold or food in a pinch.
+
+D. Information (or miscellaneous commands)
+
+   1. View.  Lets you view any state in the land for free.  Once you select
+      the state you will also be given the following options.
+
+      a. One - view the data of one officer in this family.  The number
+      next to the officer's name indicates the state in which he currently
+      resides.  Any officer not currently ruling a territory as lord will
+      have your capital listed as his home state.  There are four abilities
+      in which an officer can be rated (three if he is not a ruler).
+
+         i. Domestic/Political ability (represented by a slip of paper) -
+         this value shows how proficient an officer is at developing either
+         the protection or cultivation of a province, as well as how well
+         he avoids domestic type plots (such as sabotage).
+
+         ii. War ability (represented by a sword and shield) - this value
+         shows how proficient an officer is at fighting in the field.  An
+         officer with high war ability will have sturdier troops that will
+         inflict more and take less damage when in combat.
+
+         iii. Charm (represented by a heart) - this value affects how well
+         an officer can win the loyalty of his subjects when he distributes
+         food.  I think it might also affect the success of diplomatic
+         commands such as defections and alliances, but I am less sure 
+         about this.
+
+         iv. Fame (ruler only - represented by a little badge) - this shows
+         how famous your ruler is throughout the land on a scale of 0-100.
+         This value might have some effect on surrendering or defections,
+         but I am unsure about this.  It goes up as you conquer more land
+         or as positive random events occur.
+
+     b. Many - views all the family's officers.  A large crown indicates
+        that the officer is the ruler, a small crown indicates the officer
+        is a lord (ie rules a state) and a helmet signifies that the 
+        officer is not currently assigned to rule anywhere.  Hitting A will
+        toggle pages if there are more than one.
+
+     c. Land - view all the lands currently controlled by this family.  All
+        of the info here has the same labels as it does on the state info
+        screen.  A shield indicates that a province is the capital of your
+        empire, whereas two cross swords indicates a province ruled by a
+        lord. A picture of a flag means that there is currently no lord 
+        assigned to the territory, but that you are ruling it from another
+        location.  This is generally bad, because your stats will be 
+        lowered greatly in any province you rule that is not the capital.  
+        A picture of a tower indicates that a territory is currently
+        entrusted to the care of its governor.
+
+     d. 5th Unit - view all the fifth units currently employed by the 
+        state.  The number next to the flexing soldier indicates the 
+        strength (in either numbers, or, in the case of gems, the HP) of
+        the unit.  The number below is the quarterly salary currently paid
+        to the unit.  Generally, the better the unit, the higher the 
+        salary.  A graph to the right indicates the range of the unit.  The
+        areas that are red indicate areas where the unit can attack if
+        positioned in the center.  A Gem will sometimes have a number 
+        listed next to its name.  This indicates how many months must pass
+        before it can be used again, as a gem can only be used once every
+        three months.  You can't view the fifth units of a foreign state
+        without using the search command.
+
+   2. Change lord.  This command allows you to change the current lord of
+      any state underneath your control.  Once you pick a state you'll be
+      asked who you want to rule the territory.  You get three choices:
+
+     a. You - your ruler will rule the state from afar (and suffer stat
+        penalties).  Generally, you do not want to do this unless you don't
+        have enough vassals to rule all your states or you are trying to
+        quickly build up your ruler's stats by having him rule many states
+        at once (see the tips/faq section).
+
+     b. Lord - the lord of another state will change the state he rules to
+        this one.  Lords can only govern one state at at time.  The lord
+        of this state will then rule the state the second officer is 
+        vacating.
+
+     c. Vassal - a vassal who is currently not ruling any other state will
+        assume control of this province.
+
+   3. Entrust - This command allows you to delegate control of a state to
+      its lord.  Generally, you do not want to do this to border states
+      unless you are very lazy, because the computer will not impress you
+      with how it chooses to govern your provinces.  The cancel command
+      allows you to regain control of an area that is currently entrusted
+      to its lord.
+
+   4. * Search - This allows you to investigate another enemy controlled
+      province to determine what fifth units are currently stationed there.
+      Sometimes the use of this command will result in you finding a rare
+      item that will increase the abilities of an officer.  It costs 5 gold
+      to use this command, and it expends the current state's turn.
+      
+***************************************************************
+
+IV. Battles
+
+A Battle breaks out (not surprisingly) when one army invades the state of
+another family.  The attacker (in red) begins on the left and the defender
+(in blue) on the right.  In the top corners of the map are the names of
+each sides' commanding officer and the total amount of food each army has
+in its possession.  The number in parentheses represents how many more 
+days each side can remain in battle with their current supplies.
+
+Immediately after the battle starts, the total amount of soldiers are 
+divided equally into quarters, with each segment of your army being 
+assigned to four (really three) different units types, as follows.
+
+ 1. Horsemen - These guys move three spaces instead of two.  They attack
+    adjacently.
+
+ 2. Archers - Archers have the advantage of being able to attack from
+    long distances, but they have no close range attack at all.  They move
+    two spaces.
+
+ 3. Shield Knights - The units move two spaces and can build fences.  
+
+ 4. Knights - Same as Shield Knights, but with a different avatar.
+
+Battle commands are incredibly simple.  You move a unit by selecting it 
+and then designating where you would like them to move.  If, at the end
+of their turn an enemy unit is in their attacking range, you can select
+that unit and launch an attack on it.  Your attack does more damage (and,
+likewise, you take more damage) based upon the direction from which you
+attack.  A frontal assault does the least damage and leaves your unit open
+to take the most casualties, whereas a flanking or rear assault can do
+more damage while limiting damage to the attacker.  The game's AI is very,
+very poor, so you should be able to almost always attack from at least a 
+flank.
+
+Knight units have the added skill of being able to build fences.  Fences
+serve as temporary barricades which prevent any unit incapable of flight
+from moving onto or through a battlefield square.  The more soldiers there
+are in a unit, the more likely they are to be able to successfully erect a
+fence.
+
+Any unit that ends their turn next to a fence can attempt to knock it down
+with the "break" command.  Again, the greater the strength of the unit, the
+higher the chances of succcessfully knocking down the fence.
+
+You can end your turn, toggle the unit animations, or withdraw your entire
+army at any time by pressing B and selecting the corresponding command
+from the menu.
+
+The battle continues until either one side is totally defeated, one side
+captures the other's flag, or one side runs out of food.  After a battle is
+over, there is a chance that the victorious side will capture the losing
+commander.  The captured general can be either ransomed, released, or 
+banished.  Sometimes the other family will refuse to pay the ransom and you
+can hire the captured officer.  Othertimes, the officer will refuse to
+join you, even after his family has refused to pay the ransom.  Banishing an
+officer removes him from the game completely.  Finally, if you capture the
+head of a family and recruit him the rest of the family will surrender to
+your army.
+
+**********************************************************
+
+V. Fifth Unit Types
+
+*Note: Gems (and the Pastha) have hit points instead of a soldier count.
+Also note that every time they attack they lose a set amount of hit points
+(about 10%) regardless of whom they are attacking and what kind of assault
+it is.  The more hit points the gem has when it attacks, the more damage it
+does. These units cannot be defeated, but rather retreat when they are
+in danger of possibly being destroyed.  Finally, note that gems can only
+be used once every 3 months.
+
+
+*Alright, another note: in the descriptions, a range of "adjacent" means
+that a unit can attack a unit directly next to it.  "Long" means the unit
+can attack a unit at long distances only (basically an extention of
+adjacent). "Box" means the unit can attack any unit that is two squares 
+away from it, in any direction.  Basically, this means any unit within two
+squares that isn't either next to or diagonally bordering it.  "All" means
+the unit can attack any unit within two squares of it, including diagonals.
+
+These are the fifth units available in the game:
+
+I. Gems
+
+Name: Dragon
+Hit Points: 160
+Upkeep: 0
+Attack Range: All
+Movement: 2
+Game's Note: 
+Commentary: The best fifth unit in the game.  The only way to get it, of
+course, is to conquer the Lankshire family, which generally takes a long 
+time unless you are playing the last scenario.  Still though, if you have
+it, it will be hard to lose.
+
+Name: Pluvius
+Hit Points: 160
+Upkeep: 0
+Attack Range: Box
+Movement: 2
+Game's Note: The supreme sorcerer
+Commentary: The best gem you can possibly start with.  Very powerful, and
+all the dragon has over it is a slightly more flexible range.  
+
+Name: Zendor
+Hit Points: 150
+Upkeep: 0
+Attack Range: Box
+Movement: 3
+Game's Note: Master of Lightning
+Commentary:  Basically the same as the Pluvius, but better mobility and
+slightly lower HP.  Still a great fifth unit.
+
+Name: Empyron
+Hit Points: 140
+Upkeep: 0
+Attack Range: Adjacent
+Movement: 2
+Game's Note: Shoots jets of blue fire
+Commentary: Not nearly as good as the previous three gems, the Empyron is
+still a respectable fighter and better than most of what you are going to
+be hiring.  Used correctly, he can match up against almost any other fifth
+unit.
+
+Name: Scylla
+Hit Points: 130 
+Upkeep: 0
+Attack Range: Adjacent
+Movement: 2
+Game's Note: Sets the winds free
+Commentary: Basically the same as the Empyron, just not as powerful.
+
+Name: Chylla
+Hit Points: 120
+Upkeep: 0
+Attack Range: Adjacent
+Movement: 3
+Game's Note: Unleashes a deadly chill
+Commentary:  The Chylla...isn't that great.  Her low hit points and 
+inability to strike from a distance make her pretty much the worst gem.
+Just about all she has going for her is that she is free, which isn't much.
+
+Name: Skulryk
+Hit Points: 110
+Upkeep: 0
+Attack Range: Box
+Movement: 3
+Game's Note: Blows a cloud of poison
+Commentary: Well, the long range attacks make the Skulryk slightly better
+than the Chylla, but he is still pretty lousy.  He has a very low amount
+of hit points, so the amount of damage he does is always pretty crummy.
+
+II. Other units
+
+Name: Pastha
+Hit Points: 160
+Upkeep: 0
+Attack Range: Adjacent
+Movement: 2
+Game's Note: Fights for moral rulers
+Commentary:  You can't hire a Pastha, but if you develop your state for
+several turns in a row, eventually one will volunteer to fight for you.
+Pasthas work like gems in that they have hit points, but will only fight
+one battle before leaving for good.  Pasthas are quite powerful and make
+a very good fifth unit, but are still slightly weaker than the Pluvius or
+Dragon, due to their limited range.
+
+Name: Ogre
+Hit Points: 100
+Upkeep: 50 gold/month
+Attack Range: Adjacent
+Movement: 2
+Game's Note: Club-swinging giant
+Commentary: Well, the ogre isn't a bad fifth unit in battle, but he's 
+hardly great.  He is hardly a good deal at 50 gold per season, so I would
+recommend passing on him.
+
+Name: Lizards
+Strength: 110
+Upkeep: 60
+Attack Range: Adjacent
+Movement: 3?
+Game's Note: Legendary fire beasts
+Commentary: Not really worth the pricetag.  I'd pass.
+
+Name: Bugbear
+Strength: 100
+Upkeep: 30
+Attack Range: Adjacent
+Movement: 3
+Game's Note: Throws enemy into a panic
+Commentary:  Similar to the Ogre, but still not a great choice.
+
+Name: Wyvern
+Strength: 150
+Upkeep: 60
+Attack Range: Adjacent
+Movement: 3 (flying)
+Game's Note: Dragon with deadly wings
+Commentary:  Not bad at all.  A little expensive, and probably not the 
+ideal unit with which to challenge the dragon, but still a good choice. It
+can also fly over obstacles on the battlefield, which is also pretty useful.
+
+Name: Skeletons
+Strength: 100
+Upkeep: 20
+Attack Range: Adjacent
+Movement: 2
+Game's Note: Sword-bearing skeletons
+Commentary:  Well, you get what you pay for.  Among the worst fifth units
+in the game, skeletons are better than nothing and have a low upkeap cost.
+Early in the game they are at least survivable if nothing else is available,
+but later on they suck.
+
+Name: Lancers
+Strength: 180
+Upkeep: 50
+Attack Range: Adjacent
+Movement: 3
+Game's Note: Fearless footsoldiers
+Commentary: Lancers are a very powerful unit in terms of numbers, and are
+quite a good deal at only 50 gold/season.  The problem is that early in the
+game when your ruler's fame is low they will probably desert you 
+immediately after you hire them.  If they'll stick around though, they're
+among the best.
+
+Name: Orcs
+Strength: 100
+Upkeep: 20
+Attack Range: Adjacent
+Movement: 3
+Game's Note: Axe-wielding brutes
+Commentary: Again, cheap but weak.  For some reason it seems as though orks
+are the most likely to go on a rampage (damaging your state) of all the 
+fifth units, but it might be my imagination.  Only use these guys if you 
+absolutely must.
+
+Name: Pikemen
+Strength: 150
+Upkeep: 40
+Attack Range: Adjacent
+Movement: 3
+Game's Note: Zealous crusaders
+Commentary:  Not a bad price for what you get.  Again, the biggest problem
+is they'll desert you just as easily as any other mercenary group, which
+make them harder to use until late in the game when your family has more
+fame.
+
+Name: Olog-Hai
+Strength: 110
+Upkeep: 30
+Attack Range: Adjacent
+Movement: 2
+Game's Note: Sharp-clawed savages
+Commentary: Basically, a better version of Orcs.  If you can afford the
+extra gold, there's no reason not to prefer them.  They also are quite 
+likely to terrorize your state by rampaging.
+
+Name: Spearmen
+Strength: 150
+Upkeep: 20
+Attack Range: Long
+Movement: 3
+Game's Note: Spear-heaving mercenaries
+Commentary: Definitely a bargain at the price.  If you have the fame to 
+keep them and need a fifth unit, they're a very good choice.
+
+Name: Fachan
+Strength: 100
+Upkeep: 40
+Attack Range: All
+Movement: 3
+Game's Note: Rock-heaving cyclops
+Commentary: A very interesting unit, and the only unit in the entire game
+that can be attacked head on by a melee unit, then just walk around them
+and get a rear assault.  It does have a rather low HP, so it's really not
+super useful, but i still like it for some reason.  
+
+Name: Gunners
+Strength: 150
+Upkeep: 40
+Attack Range: Long
+Movement: 3
+Game's Note: Expert cannoneers
+Commentary: Similar to spearmen, but a little more costly.  Not bad, but
+not great either.
+
+Name: Warriors
+Strength: 180
+Upkeep: 60
+Attack Range: Adjacent
+Movement: 3
+Game's Note: Elite Highlanders
+Commentary: Another great fifth unit, but costly and eager to desert you.
+If you have high fame, however, there's no reason not to use them.
+
+Name: Gargoyles
+Strength: 120
+Upkeep: 40
+Attack Range: Adjacent
+Movement: 3 (flying)
+Game's Note: Winged monsters
+Commentary: Not a bad choice, but not great either.  At least they can fly.
+
+Name: Shooters
+Strength: 150
+Upkeep: 35
+Attack Range: Long
+Movement: 3
+Game's note: Sharpshooting mercenaries
+Commentary: Similar to Gunners, but a tad cheaper.  Not bad.
+
+**********************************************************************
+
+VI. Random Events
+
+For the most part, you get "good" events if you develop your territory and
+give to the people.  If you ignore these tasks, you get "bad" events.  The
+only exception to this is the "The X went on rampage, ravaging the
+land" and natural disaster events, which are totally random. Disaster events
+occur only in specific seasons, whereas other random events can take place
+between any month. Anyway, here is the list.
+
+I. The "bad" events
+
+ 1. Flooding - Occurs randomly in June and damages the development of any
+    province in the southeast.
+
+ 2. Plague - Can occur every quarter randomly and damages any random state.
+
+ 3. Fires - Occurs randomly in September and can damage any province in the
+    western middle of the country.
+
+ 4. Heavy Snows - Occurs randomly in December can damage any territory in
+    the far north of the map.
+
+ 5. Earthquake - Occurs randomly in March and damages any territory in the
+    southwest.
+
+ 6. Durhan rides through with the shadow of death - lowers the protection
+    in your state.
+
+ 7. Black Annis frightened the people of x - lowers the people's loyalty
+    in the affected province.
+
+ 8. A Banshee brought an evil omen to x - lowers the protection in the
+    affected state.
+
+ 9. Micheviouis pixies dug up the fields of x - lowers the cultivation 
+    value of the affected state.
+
+ 10. X went on a rampage, ravaging the land - lowers all the developmental
+     values of the current province.
+
+II. The "good" events
+
+ 1. A unicorn empowered the ruler of x - increases the affected province's
+    lord's political ability and war.
+
+ 2. Kind recaps cast good spells in x - increases the protection of the
+    affected province.
+
+ 3. A captured Leprechaun left a pot of gold in x - gives the affected state
+    a small amount of gold.
+ 
+ 4. A gwraig brough a charm to the ruler of x - the affected state's lord's
+    charm increases
+
+ 5. A far gorta gathered food for x - the affected state gets a small 
+    increase in food.
+
+ 6. A fairy rounded up troops for x - the affected state gets a small 
+    increase in troops.
+
+ 7. An elvish troubadour sang songs of praise in x - the people's loyalty
+    of the affected state increases.
+
+ 8. A Pastha offered to fight for x - you gain a pastha as a fifth unit,
+    free of charge.
+
+*****************************************************************
+
+VII. Some Tips
+
+1. Generally, you are much, much better off running your provinces yourself
+rather than entrusting them to their lords.  The AI for entrusted 
+territories assuredly won't impress anyone.
+
+2. Take advantage of the fact that gems can only be used once every three
+months, especially if you are fighting with the Lankshire family.  Take 
+note of the first time they are involved in a battle and then try to attack
+them within three months of that time.  This way, they won't be able to
+use their gem and will have to resort to either using no fifth unit or a
+hired monster that is probably not nearly as powerful.  You will have a 
+huge advantage fighting with your gem if they don't have theirs.
+
+3. The battle AI is incredibly simple.  Basically, every enemy unit will
+simply bum rush your flag.  This makes it quite easy to score flanking and
+rear attacks on your opponents, since they don't care at all about leaving
+themselves exposed.
+
+4. If you want to power your ruler up quickly, simply let him rule several
+provinces.  Although he won't be a powerful governor, he can keep 
+developing the states and will still get the bonuses if a unicorn or gwraig
+empowers him.  You can max a ruler out this way fairly quickly.
+
+5. Play against another human.  It's more fun that way.
+
+******************************************************************
+
+VIII. Legal
+
+This guide is copyright 2004 by Greg Hartman.
+
+The game is copyrighted by Koei.  Although my vast knowledge of this game
+might lead one to believe otherwise (ha ha), I was not affiliated in any
+way with its production or release.
+
+As of 8/19/04, the only site that may post this guide is:
+
+http://www.gamefaqs.com
+
+If you are interested in posting this guide on your website, simply contact
+me and I will entertain (and probably allow) your request.  It is illegal
+to post this guide without permission, and only a jerk would do so.
