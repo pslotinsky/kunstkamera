@@ -1,11 +1,13 @@
+import './WorldMap.scss';
 import worldMapSvgMarkup from '@/assets/map.svg?raw';
 import worldMapImageUrl from '@/assets/map.webp';
 import { View } from '@/lib/View';
 import { ProvinceSelectedEvent } from './ProvinceSelectedEvent';
+import type { WorldMapContext } from './types';
 
 export type Highlighting = 'selected' | 'neighbor';
 
-export class WorldMapView extends View {
+export class WorldMapView extends View<WorldMapContext> {
   protected readonly rootClass = 'world-map';
 
   private provinceElements = new Map<number, SVGElement>();
@@ -32,11 +34,26 @@ export class WorldMapView extends View {
   protected override onMount(): void {
     this.element.querySelector('image')?.setAttribute('href', worldMapImageUrl);
     this.provinceElements = this.createProvinceElements();
+    this.applyOwnershipTints();
     this.element.addEventListener(
       'click',
       (event) => this.handleProvinceClick(event),
       { signal: this.listenerSignal },
     );
+  }
+
+  private applyOwnershipTints(): void {
+    const { provinces } = this.context.map;
+
+    for (const province of provinces) {
+      const element = this.provinceElements.get(province.number);
+
+      if (province.owner) {
+        element?.style.setProperty('--owner-tint', province.owner.color);
+      } else {
+        element?.style.removeProperty('--owner-tint');
+      }
+    }
   }
 
   private createProvinceElements(): Map<number, SVGElement> {

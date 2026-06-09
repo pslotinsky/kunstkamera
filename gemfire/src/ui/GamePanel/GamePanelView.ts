@@ -1,3 +1,4 @@
+import './GamePanel.scss';
 import { View } from '@/lib/View';
 import type { GamePanelContext, GamePanelViews } from './types';
 

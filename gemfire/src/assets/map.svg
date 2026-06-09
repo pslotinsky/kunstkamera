@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1448 1086">
-  <style>
-.province{fill:transparent;stroke:#111;stroke-width:1.25;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke;cursor:pointer;}
-.province:hover{fill:rgba(255,255,255,.10);}
-.province.neighbor{fill:rgba(86,156,255,.28);}
-.province.selected{fill:rgba(255,209,102,.45);}
-  </style>
   <image href="map.webp" x="0" y="0" width="1448" height="1086" preserveAspectRatio="none"/>
   <g id="province-regions" transform="translate(-39.394 -12.121) scale(4.955564 5.022888)">
     <path id="province-1" class="province" data-province="1" data-biome="arctic" d="M 165 13.592 L 165 15.592 L 168 18.592 L 167 19.592 L 170 21.592 L 172 24.592 L 179 24.592 L 180 23.592 L 186 23.592 L 187 24.592 L 198 23.592 L 199 24.592 L 201 23.592 L 206 25.592 L 210 23.592 L 212 24.592 L 214 21.592 L 214 18.592 L 216 17.592 L 216 15.592 L 212 14.592 L 207 10.592 L 202 10.592 L 201 11.592 L 197 11.592 L 196 10.592 L 195 11.592 L 194 10.592 L 193 11.592 L 190 11.592 L 189 10.592 L 185 10.592 L 184 9.592 L 177 8.592 L 176 7.592 L 170 12.592 L 165 13.592 Z"/>

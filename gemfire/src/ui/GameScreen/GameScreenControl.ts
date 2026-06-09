@@ -13,7 +13,7 @@ export class GameScreenControl extends Control<
 
   public constructor(context: GameScreenContext) {
     super(GameScreenView, context, {
-      worldMap: new WorldMapControl(),
+      worldMap: new WorldMapControl({ map: context.world.map }),
       gamePanel: new GamePanelControl({ world: context.world }),
     });
   }

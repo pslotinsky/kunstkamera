@@ -3,28 +3,31 @@ import type { Province } from './Province';
 
 export interface FamilyParams {
   readonly name: string;
-  readonly crest: string;
-  readonly ruler: General;
-  readonly members: General[];
-  readonly homeProvince: Province;
-  readonly fame: number;
+  readonly color: string;
+  readonly crest?: string | undefined;
+  readonly ruler?: General | undefined;
+  readonly members?: readonly General[];
+  readonly homeProvince?: Province | undefined;
+  readonly fame?: number;
 }
 
 export class Family {
   public readonly name: string;
-  public readonly crest: string;
-  public ruler: General;
-  public readonly members: General[];
-  public homeProvince: Province;
+  public readonly color: string;
+  public readonly crest?: string | undefined;
+  public ruler?: General | undefined;
+  public readonly members: readonly General[];
+  public homeProvince?: Province | undefined;
   public fame: number;
   public ally?: Family;
 
   public constructor(params: FamilyParams) {
     this.name = params.name;
+    this.color = params.color;
     this.crest = params.crest;
     this.ruler = params.ruler;
-    this.members = params.members;
+    this.members = params.members ?? [];
     this.homeProvince = params.homeProvince;
-    this.fame = params.fame;
+    this.fame = params.fame ?? 0;
   }
 }

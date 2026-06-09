@@ -15,6 +15,10 @@ export class ProvinceInfoControl extends Control<ProvinceInfoView> {
     province: Province,
     neighbors: readonly Province[],
   ): void {
-    this.update({ selection: { province, neighbors } });
+    const crestUrl = province.owner
+      ? `/crests/${province.owner.name.toLowerCase()}.png`
+      : undefined;
+
+    this.update({ selection: { province, neighbors, crestUrl } });
   }
 }

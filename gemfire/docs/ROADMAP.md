@@ -11,8 +11,8 @@ Reverse-engineering and the spec under `docs/spec/` — shared groundwork the re
 
 Strategic map of Ishmeria: provinces, ownership, and movement.
 
-- [ ] see the full map of Ishmeria
-- [ ] see who owns each province
+- [x] see the full map of Ishmeria
+- [x] see who owns each province
 - [ ] inspect a province's details
 - [ ] scout a rival province before attacking
 - [ ] claim a neutral province by moving into it

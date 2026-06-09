@@ -1,3 +1,4 @@
+import './GameScreen.scss';
 import { View } from '@/lib/View';
 import type { GameScreenContext, GameScreenViews } from './types';
 

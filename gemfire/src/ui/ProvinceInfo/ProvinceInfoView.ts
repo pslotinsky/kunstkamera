@@ -1,3 +1,4 @@
+import './ProvinceInfo.scss';
 import { View } from '@/lib/View';
 import type { ProvinceInfoContext, ProvinceSelection } from './types';
 
@@ -19,12 +20,18 @@ export class ProvinceInfoView extends View<ProvinceInfoContext> {
   }
 
   private renderProvince(selection: ProvinceSelection): string {
-    const { province, neighbors } = selection;
+    const { province, neighbors, crestUrl } = selection;
+    const owner = province.owner?.name ?? 'Neutral';
 
     return `
       <section class="${this.rootClass}">
-        <h2>${province}</h2>
-        <p>Owner: ${province.owner?.name ?? 'Neutral'}</p>
+        <header class="${this.rootClass}__header">
+          ${crestUrl ? `<img class="${this.rootClass}__crest" src="${crestUrl}" alt="${owner} crest" />` : ''}
+          <div>
+            <h2>${province}</h2>
+            <p>Owner: ${owner}</p>
+          </div>
+        </header>
         <p>Gov: ${province.governor?.name ?? '—'}</p>
         <div class="${this.rootClass}__stats">
           <div class="${this.rootClass}__column">

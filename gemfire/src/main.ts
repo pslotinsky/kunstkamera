@@ -1,4 +1,4 @@
-import './style.css';
+import './style.scss';
 import { WorldFactory } from '@/core/WorldFactory';
 import { GameScreenControl } from '@/ui/GameScreen/GameScreenControl';
 

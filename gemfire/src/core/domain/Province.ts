@@ -7,6 +7,7 @@ export interface ProvinceParams {
   readonly number: number;
   readonly name: string;
   readonly neighbors: readonly number[];
+  readonly owner?: Family | undefined;
   readonly resources?: Resources;
   readonly development?: Development;
 }
@@ -17,13 +18,14 @@ export class Province {
   public readonly neighbors: readonly number[];
   public resources: Resources;
   public development: Development;
-  public owner?: Family;
+  public owner?: Family | undefined;
   public governor?: General;
 
   public constructor(params: ProvinceParams) {
     this.number = params.number;
     this.name = params.name;
     this.neighbors = params.neighbors;
+    this.owner = params.owner;
     this.resources = params.resources ?? Resources.createEmpty();
     this.development = params.development ?? Development.createEmpty();
   }
