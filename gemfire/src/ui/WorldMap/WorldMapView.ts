@@ -1,21 +1,22 @@
 import worldMapSvgMarkup from '@/assets/map.svg?raw';
 import worldMapImageUrl from '@/assets/map.webp';
-import type { Province } from '@/core/domain/Province';
-import { Component } from '@/ui/Component';
+import { View } from '@/lib/View';
 import { ProvinceSelectedEvent } from './ProvinceSelectedEvent';
 
-export class WorldMapComponent extends Component {
+export type Highlighting = 'selected' | 'neighbor';
+
+export class WorldMapView extends View {
   protected readonly rootClass = 'world-map';
 
   private provinceElements = new Map<number, SVGElement>();
 
-  public highlight(province: Province): void {
-    const neighbors = new Set(province.neighbors);
+  public addHighlighting(
+    provinceNumber: number,
+    highlighting: Highlighting,
+  ): void {
+    const element = this.provinceElements.get(provinceNumber);
 
-    for (const [provinceNumber, element] of this.provinceElements) {
-      element.classList.toggle('selected', provinceNumber === province.number);
-      element.classList.toggle('neighbor', neighbors.has(provinceNumber));
-    }
+    element?.classList.add(highlighting);
   }
 
   public clearHighlighting(): void {
@@ -34,7 +35,7 @@ export class WorldMapComponent extends Component {
     this.element.addEventListener(
       'click',
       (event) => this.handleProvinceClick(event),
-      { signal: this.listeners.signal },
+      { signal: this.listenerSignal },
     );
   }
 

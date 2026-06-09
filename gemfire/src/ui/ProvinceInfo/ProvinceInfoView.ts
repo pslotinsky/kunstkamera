@@ -1,32 +1,12 @@
-import type { Province } from '@/core/domain/Province';
-import { Component } from '@/ui/Component';
+import { View } from '@/lib/View';
+import type { ProvinceInfoContext, ProvinceSelection } from './types';
 
-interface ProvinceSelection {
-  province: Province;
-  neighbors: readonly Province[];
-}
-
-export class ProvinceInfoComponent extends Component {
+export class ProvinceInfoView extends View<ProvinceInfoContext> {
   protected readonly rootClass = 'province-info';
 
-  private selection: ProvinceSelection | undefined;
-
-  public showHint(): void {
-    this.selection = undefined;
-    this.rerender();
-  }
-
-  public showProvince(
-    province: Province,
-    neighbors: readonly Province[],
-  ): void {
-    this.selection = { province, neighbors };
-    this.rerender();
-  }
-
   public render(): string {
-    return this.selection
-      ? this.renderProvince(this.selection)
+    return this.context.selection
+      ? this.renderProvince(this.context.selection)
       : this.renderHint();
   }
 

@@ -1,6 +1,6 @@
 import './style.css';
 import { WorldFactory } from '@/core/WorldFactory';
-import { GameScreenComponent } from '@/ui/game/GameScreenComponent';
+import { GameScreenControl } from '@/ui/GameScreen/GameScreenControl';
 
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) {
@@ -8,5 +8,5 @@ if (!app) {
 }
 
 const world = new WorldFactory().create();
-const screen = new GameScreenComponent(world);
+const screen = new GameScreenControl({ world });
 screen.mount(app);
