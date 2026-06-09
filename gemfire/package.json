@@ -9,13 +9,15 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format": "biome format --write",
+    "lint": "biome lint --write",
+    "check": "biome check --write && npm run typecheck",
+    "check:ci": "biome check && npm run typecheck",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "devDependencies": {
-    "prettier": "3.8.3",
+    "@biomejs/biome": "^2.4.16",
     "sass": "^1.100.0",
     "typescript": "^6.0.3",
     "vite": "^8.0.16",

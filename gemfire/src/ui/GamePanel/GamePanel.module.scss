@@ -1,4 +1,4 @@
-.game-panel {
+.root {
   flex: 0 0 18rem;
   position: sticky;
   top: 1rem;
@@ -7,7 +7,7 @@
   border-radius: 8px;
 }
 
-.game-panel__date {
+.date {
   margin: 0 0 1rem;
   font-size: 0.85rem;
   letter-spacing: 0.05em;

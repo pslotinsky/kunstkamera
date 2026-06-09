@@ -1,9 +1,11 @@
-import './ProvinceInfo.scss';
 import { View } from '@/lib/View';
+
 import type { ProvinceInfoContext, ProvinceSelection } from './types';
 
+import styles from './ProvinceInfo.module.scss';
+
 export class ProvinceInfoView extends View<ProvinceInfoContext> {
-  protected readonly rootClass = 'province-info';
+  protected readonly rootClass = styles.root!;
 
   public render(): string {
     return this.context.selection
@@ -13,8 +15,8 @@ export class ProvinceInfoView extends View<ProvinceInfoContext> {
 
   private renderHint(): string {
     return `
-      <section class="${this.rootClass}">
-        <p class="${this.rootClass}__hint">Select a province.</p>
+      <section class="${styles.root}">
+        <p class="${styles.hint}">Select a province.</p>
       </section>
     `;
   }
@@ -24,23 +26,23 @@ export class ProvinceInfoView extends View<ProvinceInfoContext> {
     const owner = province.owner?.name ?? 'Neutral';
 
     return `
-      <section class="${this.rootClass}">
-        <header class="${this.rootClass}__header">
-          ${crestUrl ? `<img class="${this.rootClass}__crest" src="${crestUrl}" alt="${owner} crest" />` : ''}
+      <section class="${styles.root}">
+        <header class="${styles.header}">
+          ${crestUrl ? `<img class="${styles.crest}" src="${crestUrl}" alt="${owner} crest" />` : ''}
           <div>
             <h2>${province}</h2>
             <p>Owner: ${owner}</p>
           </div>
         </header>
         <p>Gov: ${province.governor?.name ?? '—'}</p>
-        <div class="${this.rootClass}__stats">
-          <div class="${this.rootClass}__column">
+        <div class="${styles.stats}">
+          <div class="${styles.column}">
             <h3>Resources</h3>
             <p>Gold ${province.resources.gold}</p>
             <p>Food ${province.resources.food}</p>
             <p>Troops ${province.resources.troops}</p>
           </div>
-          <div class="${this.rootClass}__column">
+          <div class="${styles.column}">
             <h3>Development</h3>
             <p>Loyalty ${province.development.loyalty}</p>
             <p>Cultivation ${province.development.cultivation}</p>

@@ -1,14 +1,16 @@
-import './GamePanel.scss';
 import { View } from '@/lib/View';
+
 import type { GamePanelContext, GamePanelViews } from './types';
 
+import styles from './GamePanel.module.scss';
+
 export class GamePanelView extends View<GamePanelContext, GamePanelViews> {
-  protected readonly rootClass = 'game-panel';
+  protected readonly rootClass = styles.root!;
 
   public render(): string {
     return `
-      <aside class="${this.rootClass}">
-        <p class="${this.rootClass}__date">${this.context.world.date}</p>
+      <aside class="${styles.root}">
+        <p class="${styles.date}">${this.context.world.date}</p>
         ${this.views.provinceInfo.render()}
       </aside>
     `;

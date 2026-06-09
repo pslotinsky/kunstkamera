@@ -1,7 +1,8 @@
 import type { Province } from '@/core/domain/Province';
 import { Control } from '@/lib/Control';
-import { WorldMapView } from './WorldMapView';
+
 import type { WorldMapContext } from './types';
+import { WorldMapView } from './WorldMapView';
 
 export class WorldMapControl extends Control<WorldMapView> {
   public constructor(context: WorldMapContext) {

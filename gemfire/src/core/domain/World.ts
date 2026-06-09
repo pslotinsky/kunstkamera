@@ -1,7 +1,7 @@
 import type { CalendarDate } from './CalendarDate';
-import type { WorldMap } from './WorldMap';
 import type { Family } from './Family';
 import type { General } from './General';
+import type { WorldMap } from './WorldMap';
 
 export interface WorldParams {
   readonly date: CalendarDate;

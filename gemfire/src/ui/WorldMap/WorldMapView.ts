@@ -1,14 +1,16 @@
-import './WorldMap.scss';
 import worldMapSvgMarkup from '@/assets/map.svg?raw';
 import worldMapImageUrl from '@/assets/map.webp';
 import { View } from '@/lib/View';
+
 import { ProvinceSelectedEvent } from './ProvinceSelectedEvent';
 import type { WorldMapContext } from './types';
+
+import styles from './WorldMap.module.scss';
 
 export type Highlighting = 'selected' | 'neighbor';
 
 export class WorldMapView extends View<WorldMapContext> {
-  protected readonly rootClass = 'world-map';
+  protected readonly rootClass = styles.root!;
 
   private provinceElements = new Map<number, SVGElement>();
 
@@ -28,7 +30,7 @@ export class WorldMapView extends View<WorldMapContext> {
   }
 
   public render(): string {
-    return `<div class="${this.rootClass}">${worldMapSvgMarkup}</div>`;
+    return `<div class="${styles.root}">${worldMapSvgMarkup}</div>`;
   }
 
   protected override onMount(): void {
@@ -60,10 +62,9 @@ export class WorldMapView extends View<WorldMapContext> {
     const result = new Map<number, SVGElement>();
 
     const elements = this.element.querySelectorAll<SVGElement>('.province');
-    let provinceNumber;
 
     for (const element of elements) {
-      provinceNumber = Number(element.dataset.province);
+      const provinceNumber = Number(element.dataset.province);
       result.set(provinceNumber, element);
     }
 

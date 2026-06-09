@@ -1,16 +1,16 @@
-.world-map {
+.root {
   flex: 1 1 auto;
   min-width: 0;
 }
 
-.world-map svg {
+.root svg {
   display: block;
   width: 100%;
   height: auto;
   border-radius: 8px;
 }
 
-.world-map .province {
+.root :global(.province) {
   fill: var(--owner-tint, transparent);
   stroke: #111;
   stroke-width: 1.25;
@@ -20,14 +20,14 @@
   cursor: pointer;
 }
 
-.world-map .province:hover {
+.root :global(.province:hover) {
   fill: rgba(255, 255, 255, 0.1);
 }
 
-.world-map .province.neighbor {
+.root :global(.province.neighbor) {
   fill: rgba(86, 156, 255, 0.28);
 }
 
-.world-map .province.selected {
+.root :global(.province.selected) {
   fill: rgba(255, 209, 102, 0.45);
 }

@@ -1,6 +1,7 @@
 import type { Province } from '@/core/domain/Province';
 import { Control } from '@/lib/Control';
 import { ProvinceInfoControl } from '@/ui/ProvinceInfo/ProvinceInfoControl';
+
 import { GamePanelView } from './GamePanelView';
 import type { GamePanelContext, GamePanelControls } from './types';
 

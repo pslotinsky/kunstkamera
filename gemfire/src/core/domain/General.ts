@@ -1,5 +1,5 @@
-import type { Stats } from './Stats';
 import type { CalendarDate } from './CalendarDate';
+import type { Stats } from './Stats';
 
 export interface GeneralParams {
   readonly name: string;

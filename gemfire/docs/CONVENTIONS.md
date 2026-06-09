@@ -1,6 +1,6 @@
 # Gemfire — Conventions
 
-Conventions for the Gemfire TypeScript codebase. An editor formatter (Prettier defaults) enforces layout; the rules below cover everything it can't.
+Conventions for the Gemfire TypeScript codebase. Biome (formatter, linter, and import organizer) enforces layout and a baseline of lint rules; the conventions below cover everything it can't.
 
 ## Files & modules
 
@@ -137,6 +137,8 @@ Conventions for the Gemfire TypeScript codebase. An editor formatter (Prettier d
 - **The mount cycle is balanced, and listeners clean themselves up.** Every listener — both `listen(...)` and a subclass's own `this.element.addEventListener(...)` — is registered with the base `listenerSignal` (an `AbortController` signal). `unmount()` runs `onUnmount()` then aborts the signal, removing them all at once; `rerender()` is a full re-mount — `onUnmount()`, abort, then re-`onMount()` on the new element — so nothing is wired twice and nothing leaks. A consequence: aborting on rerender drops a component's inbound subscriptions, so **a component others `listen` to must update in place (state-pushing methods like `highlight`), never `rerender`** — only leaf components with no subscribers (e.g. `ProvinceInfoComponent`) rerender.
 - **A child talks to its parent through a typed event, not a callback.** A child dispatches a `CustomEvent` subclass on itself — e.g. `ProvinceSelectedEvent extends CustomEvent<number>`, whose event type is its own class name (`super(ProvinceSelectedEvent.name, { detail: provinceNumber })`) and which exposes its payload through a named getter (`provinceNumber`) rather than the raw `detail`. The parent subscribes with the base `listen(EventClass, handler)` helper, which keys off the class name and narrows with `instanceof`, so the handler is fully typed with no cast: `this.worldMap.listen(ProvinceSelectedEvent, (event) => this.selectProvince(event.provinceNumber))`.
 
-## Formatting
+## Formatting & linting
 
-- Prettier with **single quotes** (`.prettierrc.json`); otherwise its defaults — semicolons, trailing commas, ~80-column width. Run `npm run format`; `npm run format:check` must pass. Prettier is scoped to code (`.prettierignore` excludes `docs`, `data`, `assets`) so reference material isn't reformatted.
+- Biome (`biome.json`) handles formatting, linting, and import organization in one tool — **single quotes**, 2-space indent, ~80-column width, trailing commas. Run `npm run check` to format + lint + organize imports and typecheck in one pass; `npm run check:ci` is the verify-only variant and must pass. `npm run format` and `npm run lint` apply each step alone.
+- Imports are auto-grouped, blank-line separated, and sorted within each group: Node builtins, then packages, then the `@/` alias, then relative paths, with `.scss` side-effect imports left where they sit. Don't hand-order imports — let `biome check` do it.
+- Biome is scoped to code (`data`, `docs`, `package-lock.json` are excluded) so reference material and generated files aren't reformatted. `noExplicitAny` is a warning, not an error, so the type-erased base-class generics in `src/lib` are allowed.

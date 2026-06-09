@@ -1,7 +1,7 @@
-import { Resources } from './Resources';
 import { Development } from './Development';
 import type { Family } from './Family';
 import type { General } from './General';
+import { Resources } from './Resources';
 
 export interface ProvinceParams {
   readonly number: number;
