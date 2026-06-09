@@ -92,9 +92,12 @@ The map is a view over the shared world aggregate; it reads these entities (it d
 classDiagram
   class World {
     +CalendarDate date
-    +Province[] provinces
+    +WorldMap map
     +Family[] families
     +General[] generals
+  }
+  class WorldMap {
+    +Province[] provinces
   }
   class CalendarDate {
     <<value object>>
@@ -134,25 +137,26 @@ classDiagram
   class General {
     +string name
     +Image portrait
-    +Attributes attributes
+    +Stats stats
     +CalendarDate birth
     +int loyalty
   }
-  class Attributes {
+  class Stats {
     <<value object>>
     +int intelligence
     +int war
     +int charisma
   }
-  World "1" --> "30" Province
+  World "1" *-- "1" WorldMap
   World "1" --> "*" Family
   World "1" --> "*" General
   World "1" *-- "1" CalendarDate
+  WorldMap "1" --> "30" Province
   Province "*" --> "0..1" Family : owner
   Province "*" --> "0..1" General : governor
   Province "1" *-- "1" Resources
   Province "1" *-- "1" Development
-  General "1" *-- "1" Attributes
+  General "1" *-- "1" Stats
   General "1" *-- "1" CalendarDate
   Family "1" --> "1" General : ruler
   Family "1" --> "*" General : members

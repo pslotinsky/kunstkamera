@@ -1,0 +1,23 @@
+{
+  "name": "gemfire",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A from-scratch remake of the Koei SNES strategy game Gemfire (learning / craftsmanship project).",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "prettier": "3.8.3",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.8"
+  }
+}
