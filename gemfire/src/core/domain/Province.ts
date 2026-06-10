@@ -37,6 +37,14 @@ export class Province {
     return this.neighbors.includes(otherNumber);
   }
 
+  public isOwner(family: Family): boolean {
+    return this.owner?.isEqual(family) ?? false;
+  }
+
+  public isNeutral(): boolean {
+    return !this.owner;
+  }
+
   public toString(): string {
     return `${this.number} ${this.name}`;
   }

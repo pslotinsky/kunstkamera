@@ -12,6 +12,7 @@ export class GamePanelView extends View<GamePanelContext, GamePanelViews> {
       <aside class="${styles.root}">
         <p class="${styles.date}">${this.context.world.date}</p>
         ${this.views.provinceInfo.render()}
+        ${this.views.provinceCommands.render()}
       </aside>
     `;
   }

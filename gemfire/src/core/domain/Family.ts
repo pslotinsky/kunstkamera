@@ -31,4 +31,8 @@ export class Family {
   public get crest(): string {
     return `/crests/${this.name.toLowerCase()}.png`;
   }
+
+  public isEqual(other: Family): boolean {
+    return this.name === other.name;
+  }
 }
