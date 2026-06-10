@@ -15,6 +15,7 @@ import { Resources } from '@/core/domain/Resources';
 import { Stats } from '@/core/domain/Stats';
 import { World } from '@/core/domain/World';
 import { WorldMap } from '@/core/domain/WorldMap';
+import { Collection } from '@/lib/Collection';
 
 const startDate = new CalendarDate(1186, 4);
 
@@ -29,12 +30,7 @@ export class WorldFactory {
 
     this.assignHomeProvinces(scenario, families, provinces);
 
-    return new World({
-      date: startDate,
-      map,
-      families: [...families.values()],
-      generals: [...generals.values()],
-    });
+    return new World({ date: startDate, map, families, generals });
   }
 
   private defaultScenario(): Scenario {
@@ -47,7 +43,7 @@ export class WorldFactory {
     return scenario;
   }
 
-  private createGenerals(scenario: Scenario): Map<string, General> {
+  private createGenerals(scenario: Scenario): Collection<string, General> {
     const generals = new Map<string, General>();
 
     for (const definition of scenario.generals) {
@@ -64,42 +60,40 @@ export class WorldFactory {
       );
     }
 
-    return generals;
+    return new Collection(generals, 'general');
   }
 
   private createFamilies(
     scenario: Scenario,
-    generals: Map<string, General>,
-  ): Map<string, Family> {
+    generals: Collection<string, General>,
+  ): Collection<string, Family> {
     const families = new Map<string, Family>();
 
     for (const definition of scenario.families) {
       families.set(definition.name, this.createFamily(definition, generals));
     }
 
-    return families;
+    return new Collection(families, 'family');
   }
 
   private createFamily(
     definition: FamilyDefinition,
-    generals: Map<string, General>,
+    generals: Collection<string, General>,
   ): Family {
     return new Family({
       name: definition.name,
       color: this.getFamilyColor(definition.name),
-      ruler: this.getGeneralOrFail(generals, definition.ruler),
-      members: definition.members.map((name) =>
-        this.getGeneralOrFail(generals, name),
-      ),
+      ruler: generals.getOrFail(definition.ruler),
+      members: definition.members.map((name) => generals.getOrFail(name)),
       fame: definition.fame,
     });
   }
 
   private createProvinces(
     scenario: Scenario,
-    families: Map<string, Family>,
-    generals: Map<string, General>,
-  ): Map<number, Province> {
+    families: Collection<string, Family>,
+    generals: Collection<string, General>,
+  ): Collection<number, Province> {
     const definitions = new Map(
       scenario.provinces.map((definition) => [definition.number, definition]),
     );
@@ -121,18 +115,20 @@ export class WorldFactory {
       );
     }
 
-    return provinces;
+    return new Collection(provinces, 'province');
   }
 
   private createProvince(
     geography: ProvinceData,
     definition: ProvinceDefinition,
-    families: Map<string, Family>,
-    generals: Map<string, General>,
+    families: Collection<string, Family>,
+    generals: Collection<string, General>,
   ): Province {
-    const owner = definition.owner ? families.get(definition.owner) : undefined;
+    const owner = definition.owner
+      ? families.getOrFail(definition.owner)
+      : undefined;
     const resident = definition.governor
-      ? this.getGeneralOrFail(generals, definition.governor)
+      ? generals.getOrFail(definition.governor)
       : undefined;
 
     return new Province({
@@ -156,16 +152,16 @@ export class WorldFactory {
 
   private assignHomeProvinces(
     scenario: Scenario,
-    families: Map<string, Family>,
-    provinces: Map<number, Province>,
+    families: Collection<string, Family>,
+    provinces: Collection<number, Province>,
   ): void {
-    for (const family of families.values()) {
+    for (const family of families.all) {
       const seat = scenario.provinces.find(
         (definition) => definition.governor === family.ruler?.name,
       );
 
       if (seat) {
-        family.homeProvince = provinces.get(seat.number);
+        family.homeProvince = provinces.getOrFail(seat.number);
       }
     }
   }
@@ -178,18 +174,5 @@ export class WorldFactory {
     }
 
     return family.color;
-  }
-
-  private getGeneralOrFail(
-    generals: Map<string, General>,
-    name: string,
-  ): General {
-    const general = generals.get(name);
-
-    if (general === undefined) {
-      throw new Error(`Unknown general: ${name}`);
-    }
-
-    return general;
   }
 }

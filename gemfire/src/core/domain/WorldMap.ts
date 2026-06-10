@@ -1,32 +1,30 @@
+import type { Collection } from '@/lib/Collection';
+
 import type { Province } from './Province';
 
 export class WorldMap {
-  private readonly provincesByNumber: Map<number, Province>;
+  private readonly provincesCollection: Collection<number, Province>;
 
-  public constructor(provinces: Map<number, Province>) {
-    this.provincesByNumber = provinces;
+  public constructor(provinces: Collection<number, Province>) {
+    this.provincesCollection = provinces;
   }
 
   public get provinces(): readonly Province[] {
-    return [...this.provincesByNumber.values()];
+    return this.provincesCollection.all;
   }
 
   public getProvince(number: number): Province {
-    const province = this.provincesByNumber.get(number);
-
-    if (province === undefined) {
-      throw new Error(`No province numbered ${number}`);
-    }
-
-    return province;
+    return this.provincesCollection.getOrFail(number);
   }
 
   public getNeighbors(province: Province | number): Province[] {
     const origin =
-      typeof province === 'number' ? this.getProvince(province) : province;
+      typeof province === 'number'
+        ? this.provincesCollection.getOrFail(province)
+        : province;
 
     return origin.neighbors.map((neighborNumber) =>
-      this.getProvince(neighborNumber),
+      this.provincesCollection.getOrFail(neighborNumber),
     );
   }
 }

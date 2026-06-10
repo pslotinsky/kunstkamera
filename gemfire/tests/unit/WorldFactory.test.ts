@@ -6,7 +6,7 @@ const world = new WorldFactory().create();
 
 describe('WorldFactory', () => {
   it('owns provinces with families from the world, leaving the rest neutral', () => {
-    const families = new Set(world.families);
+    const families = new Set(world.families.all);
 
     let ownedCount = 0;
     let neutralCount = 0;
@@ -36,7 +36,7 @@ describe('WorldFactory', () => {
   });
 
   it('seats each family ruler in the home province they govern', () => {
-    for (const family of world.families) {
+    for (const family of world.families.all) {
       expect(family.homeProvince?.governor, family.name).toBe(family.ruler);
     }
   });
