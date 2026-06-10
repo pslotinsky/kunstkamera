@@ -1,5 +1,7 @@
 # Gemfire — Roadmap
 
+Features and their steps are listed in build order: top to bottom is what to do next, and each item assumes the ones above it exist.
+
 ## Groundwork
 
 Reverse-engineering and the spec under `docs/spec/` — shared groundwork the remake builds on.
@@ -9,36 +11,109 @@ Reverse-engineering and the spec under `docs/spec/` — shared groundwork the re
 
 ## 1. Global map
 
-Strategic map of Ishmeria: provinces, ownership, and movement.
+The strategic screen you act from: provinces, ownership, details, and the orders launched from each.
 
 - [x] see the full map of Ishmeria
 - [x] see who owns each province
 - [ ] inspect a province's details
-- [ ] scout a rival province before attacking
-- [ ] claim a neutral province by moving into it
+- [ ] see the orders available for a province you control
 
-## 2. Province management
+## 2. The monthly turn
 
-Economy actions: cultivate, develop, trade, recruit, give food, transport, and protection.
+The loop that drives play: issue every province's orders, then let time pass.
 
-- [ ] grow a province's economy (cultivate, develop, trade)
-- [ ] recruit troops; move troops and food to neighbors
-- [ ] transport gold and food to any province
-- [ ] raise loyalty and protection (each command carries goodwill)
-- [ ] trade at a market rate that swings month to month
-- [ ] collect the annual tax and harvest
+- [ ] issue your provinces' orders for the month
+- [ ] advance to the next month once orders are set
+- [ ] collect the annual tax and harvest as the year turns
 
-## 3. General management
+## 3. Province economy
 
-Generals: recruitment, assignment, stats, lordship, and loyalty.
+The Domestic orders that grow a province month over month.
+
+- [ ] develop a province and cultivate its fields
+- [ ] build protection against attack and disaster
+- [ ] give food to raise loyalty (every order carries goodwill)
+- [ ] trade food at a market rate that swings month to month
+- [ ] transport gold and food to any province you own
+
+## 4. Generals & lords
+
+Who runs your provinces: viewing, recruiting, and assigning the family's members.
 
 - [ ] view a general's stats and fame
-- [ ] assign generals, change a province's lord, or rule it directly
-- [ ] move your home province
 - [ ] recruit new generals
+- [ ] appoint or change a province's lord, or rule it directly
+- [ ] move your home province
 - [ ] reward generals to keep them loyal
 
-## 4. Character lifecycle
+## 5. Armies & movement
+
+Fielding and moving forces — bloodless expansion before any battle.
+
+- [ ] build an army from a province's generals and troops
+- [ ] recruit troops with gold
+- [ ] move troops and food into a neighboring province
+- [ ] claim a neutral province by moving into it
+- [ ] review army strength before battle
+
+## 6. Fifth Units
+
+The hiring economy for the allies that will fill an army's fifth slot — defined and acquired before the battles that use them.
+
+- [ ] hire a monster, skilled fighter, or magician into the fifth slot
+- [ ] pay quarterly upkeep, or watch hired units desert
+- [ ] dismiss a hired Fifth Unit
+
+## 7. Search & treasure
+
+What spying into a province turns up, and the scouting that readies an attack.
+
+- [ ] search a province for hidden generals, artifacts, and gems
+- [ ] scout a rival province before attacking
+- [ ] spy on a rival province's Fifth Unit
+- [ ] equip artifacts to boost a general
+
+## 8. Gems
+
+Gems as family-level assets — finding, claiming, moving, and holding them; the path to Crown Gemfire. Their Guardians fight in Battle.
+
+- [ ] find and claim gems
+- [ ] move a gem between your provinces
+- [ ] hold several gems at once
+
+## 9. Battle
+
+The whole tactical layer, built once — and last in the war chain, so it consumes every combatant already defined: generals' troops, hired Fifth Units, and Gem Guardians, with the enemy run by a tactical AI.
+
+- [ ] declare war on an adjacent rival province
+- [ ] when your land is attacked, choose to fight, retreat, or surrender
+- [ ] fight on a 10×8 field of plains, woods, rivers, boulders, bridges, and walls
+- [ ] maneuver by position and facing; strike from front, flank, or rear
+- [ ] build and break fences (flying units ignore them)
+- [ ] field a Fifth Unit and summon a Gem's Guardian, resting or cooling them between battles
+- [ ] face an enemy army run by a tactical AI, or auto-resolve the fight
+- [ ] win by flag, food timer, or rout — across the sunrise-to-midnight day cycle
+- [ ] retreat from a losing battle, risking capture
+
+## 10. Conquest & captives
+
+The immediate fruits of a won battle.
+
+- [ ] claim gold, food, and land as war spoils
+- [ ] knock a rival family out of the game
+- [ ] ransom, recruit, release, or banish a captured leader
+- [ ] buy a captured ruler's freedom
+
+## 11. Diplomacy
+
+The Diplomacy orders: alliance, defection, sabotage, plunder, and surrender.
+
+- [ ] propose and break alliances
+- [ ] make enemy generals defect
+- [ ] sabotage and plunder rival provinces
+- [ ] accept a family's surrender
+
+## 12. Character lifecycle
 
 Generals age, grow, and die; a fallen ruler's family passes to an heir.
 
@@ -47,110 +122,48 @@ Generals age, grow, and die; a fallen ruler's family passes to an heir.
 - [ ] pass a fallen ruler's family to an heir
 - [ ] see a heirless family disband — its gems and lands scatter
 
-## 5. Army management
+## 13. Strategic AI
 
-Troops and the Fifth Unit slot (Gems and hired monsters).
-
-- [ ] build an army from generals and troops
-- [ ] fill the Fifth Unit slot with a Gem or hired monster
-- [ ] pay quarterly upkeep, or watch hired units desert
-- [ ] rest hired magicians between battles
-- [ ] dismiss a hired Fifth Unit
-- [ ] review army strength before battle
-
-## 6. Gems
-
-Gems as family-level assets: Guardians, transfer, cooldown, and strategic role.
-
-- [ ] find and claim gems
-- [ ] move a gem between your provinces
-- [ ] summon its Guardian in battle, then wait out its cooldown
-- [ ] hold several gems and rotate them as cooldowns allow
-
-## 7. Search & artifacts
-
-Searching provinces for hidden generals, treasure, and gems; artifacts that boost a general.
-
-- [ ] search a province for generals, artifacts, and gems
-- [ ] equip artifacts to boost a general
-- [ ] spy on a rival province's Fifth Unit
-
-## 8. Battle map
-
-Tactical 10×8 combat: terrain, units, facing, fences, the food timer, and victory conditions.
-
-- [ ] fight on a 10×8 field of plains, woods, rivers, boulders, bridges, and walls
-- [ ] maneuver by position and facing; strike from front, flank, or rear
-- [ ] build and break fences (flying units ignore them)
-- [ ] when your land is attacked, choose to fight, retreat, or surrender
-- [ ] retreat from a losing battle, risking capture
-- [ ] win by flag, food timer, or rout — across the sunrise-to-midnight day cycle
-
-## 9. AI opponents
-
-Strategic and tactical AI, Entrust, and auto-control.
+Rival families that take their own monthly turns, plus handing your own work to the computer. (Tactical AI lives with Battle.)
 
 - [ ] face rival families that act on their own
-- [ ] entrust provinces or auto-resolve battles
+- [ ] entrust a province to its lord, freeing you from its orders
 
-## 10. Victory & defeat
+## 14. Victory & defeat
 
-Campaign goal, captured leaders, war spoils, and the win/lose ending.
+How the campaign ends.
 
 - [ ] win by unifying Ishmeria
-- [ ] knock a rival family out (and be knocked out)
-- [ ] ransom, recruit, release, or banish a captured leader
-- [ ] buy a captured ruler's freedom
-- [ ] claim gold, food, and land as war spoils
+- [ ] be knocked out when your last province falls
 - [ ] see the campaign's ending
 
-## 11. Diplomacy
+## 15. Events
 
-Ally, defection, surrender, sabotage, and plunder.
-
-- [ ] propose and break alliances
-- [ ] sabotage and plunder rival provinces
-- [ ] make enemy generals defect, or accept a family's surrender
-
-## 12. Events
-
-Good and bad events, disasters, goodwill, and Pastha.
+Good and bad events, seasonal disasters, and Pastha.
 
 - [ ] hit random good and bad events
 - [ ] suffer seasonal disasters by region (snow, fire, flood, quake, plague)
 - [ ] trigger special events like Pastha
 - [ ] hear the banshee when a ruler dies
 
-## 13. Main menu & scenario select
+## 16. New game & advisors
 
-Title screen, scenario and ruler choice, and new-game setup.
+Starting a campaign: title screen, scenario and family choice, and an advisor to consult.
 
 - [ ] start a new game from the title screen
 - [ ] pick one of the four scenarios
 - [ ] choose the family you play
-
-## 14. Advisors
-
-Pick an advisor and consult them during play.
-
 - [ ] pick one of four advisors at setup
 - [ ] get advice on your next move during play
 
-## 15. Save / load
+## 17. Save / load
 
 Persistence of game state between sessions.
 
 - [ ] save a game in progress
 - [ ] load and resume a saved game
 
-## 16. Audio
-
-Music and sound effects across the game.
-
-- [ ] hear music across menus, map, and battle
-- [ ] hear sound effects for actions and combat
-
-## 17. Options / settings
+## 18. Options / settings
 
 Game settings and session control.
 
@@ -159,7 +172,14 @@ Game settings and session control.
 - [ ] toggle sound
 - [ ] quit, or hand the game to the computer to finish
 
-## 18. Multiplayer
+## 19. Audio
+
+Music and sound effects across the game.
+
+- [ ] hear music across menus, map, and battle
+- [ ] hear sound effects for actions and combat
+
+## 20. Multiplayer
 
 Hot-seat play: multiple human players sharing one game.
 
