@@ -19,6 +19,9 @@ import { Collection } from '@/lib/Collection';
 
 const startDate = new CalendarDate(1186, 4);
 
+// TODO: replaced by the family chosen at new-game setup (feature 13)
+const playerFamily = 'Blanche';
+
 export class WorldFactory {
   public create(): World {
     const scenario = this.defaultScenario();
@@ -30,7 +33,9 @@ export class WorldFactory {
 
     this.assignHomeProvinces(scenario, families, provinces);
 
-    return new World({ date: startDate, map, families, generals });
+    const player = families.getOrFail(playerFamily);
+
+    return new World({ date: startDate, map, families, generals, player });
   }
 
   private defaultScenario(): Scenario {
