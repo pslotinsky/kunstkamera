@@ -1,0 +1,26 @@
+{
+  "name": "gemfire",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A from-scratch remake of the Koei SNES strategy game Gemfire (learning / craftsmanship project).",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "format": "biome format --write",
+    "lint": "biome lint --write",
+    "check": "biome check --write && npm run typecheck",
+    "check:ci": "biome check && npm run typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.16",
+    "sass": "^1.100.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.8"
+  }
+}
