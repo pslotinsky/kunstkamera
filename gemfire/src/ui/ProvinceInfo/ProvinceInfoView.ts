@@ -23,13 +23,23 @@ export class ProvinceInfoView extends View<ProvinceInfoContext> {
   }
 
   private renderProvince(province: Province): string {
+    const details = province.isOwner(this.context.player)
+      ? this.renderDetails(province)
+      : '';
+
     return `
       <section class="${styles.root}">
         ${this.renderHeader(province)}
-        ${this.renderGovernor(province)}
-        ${this.renderStats(province)}
-        ${this.renderNeighbors(province)}
+        ${details}
       </section>
+    `;
+  }
+
+  private renderDetails(province: Province): string {
+    return `
+      ${this.renderGovernor(province)}
+      ${this.renderStats(province)}
+      ${this.renderNeighbors(province)}
     `;
   }
 

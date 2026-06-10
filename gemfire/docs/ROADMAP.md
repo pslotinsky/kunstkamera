@@ -15,8 +15,8 @@ The strategic screen you act from: provinces, ownership, details, and the orders
 
 - [x] see the full map of Ishmeria
 - [x] see who owns each province
-- [ ] inspect a province's details
-- [ ] see the orders available for a province you control
+- [x] inspect a province's details
+- [x] see the orders available for a province you control
 
 ## 2. The monthly turn
 
