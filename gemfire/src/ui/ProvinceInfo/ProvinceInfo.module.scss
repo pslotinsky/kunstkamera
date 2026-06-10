@@ -22,6 +22,21 @@
   image-rendering: pixelated;
 }
 
+.governor {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.25rem 0 0.75rem;
+}
+
+.portrait {
+  flex: 0 0 auto;
+  width: 40px;
+  height: auto;
+  border-radius: 4px;
+  image-rendering: pixelated;
+}
+
 .hint {
   margin: 0;
   opacity: 0.6;

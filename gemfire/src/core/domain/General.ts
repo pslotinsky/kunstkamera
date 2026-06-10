@@ -3,24 +3,25 @@ import type { Stats } from './Stats';
 
 export interface GeneralParams {
   readonly name: string;
-  readonly portrait: string;
   readonly stats: Stats;
-  readonly birth: CalendarDate;
-  readonly loyalty: number;
+  readonly birth?: CalendarDate | undefined;
+  readonly loyalty?: number | undefined;
 }
 
 export class General {
   public readonly name: string;
-  public readonly portrait: string;
   public readonly stats: Stats;
-  public readonly birth: CalendarDate;
-  public loyalty: number;
+  public readonly birth?: CalendarDate | undefined;
+  public loyalty?: number | undefined;
 
   public constructor(params: GeneralParams) {
     this.name = params.name;
-    this.portrait = params.portrait;
     this.stats = params.stats;
     this.birth = params.birth;
     this.loyalty = params.loyalty;
+  }
+
+  public get portrait(): string {
+    return `/portraits/${this.name.toLowerCase()}.png`;
   }
 }

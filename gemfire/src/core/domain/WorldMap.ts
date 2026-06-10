@@ -1,15 +1,14 @@
 import type { Province } from './Province';
 
 export class WorldMap {
-  public readonly provinces: readonly Province[];
-
   private readonly provincesByNumber: Map<number, Province>;
 
-  public constructor(provinces: readonly Province[]) {
-    this.provinces = provinces;
-    this.provincesByNumber = new Map(
-      provinces.map((province) => [province.number, province]),
-    );
+  public constructor(provinces: Map<number, Province>) {
+    this.provincesByNumber = provinces;
+  }
+
+  public get provinces(): readonly Province[] {
+    return [...this.provincesByNumber.values()];
   }
 
   public getProvince(number: number): Province {

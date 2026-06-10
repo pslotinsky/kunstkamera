@@ -1,15 +1,45 @@
+import { SCENARIO_1 } from './scenario-1';
+
+export interface GeneralDefinition {
+  readonly name: string;
+  readonly intelligence: number;
+  readonly war: number;
+  readonly charisma: number;
+}
+
 export interface FamilyDefinition {
+  readonly name: string;
+  readonly ruler: string;
+  readonly members: readonly string[];
+  readonly fame: number;
+}
+
+export interface ProvinceDefinition {
+  readonly number: number;
+  readonly owner?: string;
+  readonly governor?: string;
+  readonly gold: number;
+  readonly food: number;
+  readonly troops: number;
+  readonly loyalty: number;
+  readonly cultivation: number;
+  readonly protection: number;
+}
+
+export interface Scenario {
+  readonly number: number;
+  readonly name: string;
+  readonly generals: readonly GeneralDefinition[];
+  readonly families: readonly FamilyDefinition[];
+  readonly provinces: readonly ProvinceDefinition[];
+}
+
+export interface FamilyColor {
   readonly name: string;
   readonly color: string;
 }
 
-export interface ScenarioDefinition {
-  readonly id: string;
-  readonly name: string;
-  readonly ownership: Readonly<Record<string, readonly number[]>>;
-}
-
-export const FAMILIES: readonly FamilyDefinition[] = [
+export const FAMILIES: readonly FamilyColor[] = [
   { name: 'Lankshire', color: 'rgba(162, 89, 224, 0.4)' },
   { name: 'Blanche', color: 'rgba(116, 185, 255, 0.4)' },
   { name: 'Lyle', color: 'rgba(214, 48, 49, 0.4)' },
@@ -23,18 +53,4 @@ export const FAMILIES: readonly FamilyDefinition[] = [
   { name: 'Divas', color: 'rgba(0, 206, 201, 0.4)' },
 ];
 
-const erinAndAnder: ScenarioDefinition = {
-  id: 'erin-and-ander',
-  name: 'Erin & Ander',
-  ownership: {
-    Lyle: [2, 6, 7],
-    Blanche: [3, 4, 5],
-    Chrysalis: [8],
-    Lankshire: [11, 12, 15, 16, 17, 18, 19, 20, 21, 22, 23, 28, 29, 30],
-    Molbrew: [13, 14],
-    Flax: [24, 27],
-    Coryll: [25, 26],
-  },
-};
-
-export const SCENARIOS: readonly ScenarioDefinition[] = [erinAndAnder];
+export const SCENARIOS: readonly Scenario[] = [SCENARIO_1];

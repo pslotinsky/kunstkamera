@@ -1,11 +1,7 @@
 import type { Province } from '@/core/domain/Province';
-
-export interface ProvinceSelection {
-  readonly province: Province;
-  readonly neighbors: readonly Province[];
-  readonly crestUrl?: string | undefined;
-}
+import type { WorldMap } from '@/core/domain/WorldMap';
 
 export interface ProvinceInfoContext {
-  selection?: ProvinceSelection | undefined;
+  readonly map: WorldMap;
+  selection?: Province | undefined;
 }

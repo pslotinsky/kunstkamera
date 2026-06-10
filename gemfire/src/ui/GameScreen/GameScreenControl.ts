@@ -34,12 +34,11 @@ export class GameScreenControl extends Control<
     } else {
       this.selected = provinceNumber;
 
-      const map = this.context.world.map;
+      const { map } = this.context.world;
       const province = map.getProvince(provinceNumber);
-      const neighbors = map.getNeighbors(province);
 
       this.controls.worldMap.highlight(province);
-      this.controls.gamePanel.showProvince(province, neighbors);
+      this.controls.gamePanel.showProvince(province);
     }
   }
 }

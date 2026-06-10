@@ -11,7 +11,7 @@ export class GamePanelControl extends Control<
 > {
   public constructor(context: GamePanelContext) {
     super(GamePanelView, context, {
-      provinceInfo: new ProvinceInfoControl(),
+      provinceInfo: new ProvinceInfoControl(context.world.map),
     });
   }
 
@@ -19,10 +19,7 @@ export class GamePanelControl extends Control<
     this.controls.provinceInfo.showHint();
   }
 
-  public showProvince(
-    province: Province,
-    neighbors: readonly Province[],
-  ): void {
-    this.controls.provinceInfo.showProvince(province, neighbors);
+  public showProvince(province: Province): void {
+    this.controls.provinceInfo.showProvince(province);
   }
 }
