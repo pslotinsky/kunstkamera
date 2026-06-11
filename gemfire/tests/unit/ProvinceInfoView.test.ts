@@ -29,8 +29,5 @@ describe('ProvinceInfoView', () => {
 });
 
 function panelFor(selection: Province | undefined): string {
-  return new ProvinceInfoView(
-    { map: world.map, player: world.player, selection },
-    {},
-  ).render();
+  return new ProvinceInfoView({ player: world.player, selection }, {}).render();
 }

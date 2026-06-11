@@ -5,3 +5,24 @@
   max-width: 1400px;
   margin: 0 auto;
 }
+
+.mapArea {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.date {
+  position: absolute;
+  top: 1.75rem;
+  left: 1.75rem;
+  z-index: 1;
+  margin: 0;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  pointer-events: none;
+}

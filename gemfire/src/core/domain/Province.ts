@@ -46,6 +46,6 @@ export class Province {
   }
 
   public toString(): string {
-    return `${this.number} ${this.name}`;
+    return `${this.number}: ${this.name}`;
   }
 }

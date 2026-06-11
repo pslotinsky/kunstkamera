@@ -1,6 +1,5 @@
 import { PROVINCES, type ProvinceData } from '@/config/provinces';
 import {
-  FAMILIES,
   type FamilyDefinition,
   type ProvinceDefinition,
   SCENARIOS,
@@ -87,7 +86,6 @@ export class WorldFactory {
   ): Family {
     return new Family({
       name: definition.name,
-      color: this.getFamilyColor(definition.name),
       ruler: generals.getOrFail(definition.ruler),
       members: definition.members.map((name) => generals.getOrFail(name)),
       fame: definition.fame,
@@ -169,15 +167,5 @@ export class WorldFactory {
         family.homeProvince = provinces.getOrFail(seat.number);
       }
     }
-  }
-
-  private getFamilyColor(name: string): string {
-    const family = FAMILIES.find((entry) => entry.name === name);
-
-    if (family === undefined) {
-      throw new Error(`No color defined for family: ${name}`);
-    }
-
-    return family.color;
   }
 }

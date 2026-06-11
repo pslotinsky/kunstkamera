@@ -14,7 +14,7 @@ export abstract class View<
   protected element!: HTMLElement;
   protected readonly context: Readonly<Context>;
   protected readonly views: Views;
-  protected listeners = new AbortController();
+  protected abortController = new AbortController();
 
   private readonly events = new EventTarget();
 
@@ -41,14 +41,14 @@ export abstract class View<
   public unmount(): void {
     this.onUnmount();
     this.unmountChildren();
-    this.listeners.abort();
+    this.abortController.abort();
     this.element.remove();
   }
 
   public rerender(): void {
     this.onUnmount();
-    this.listeners.abort();
-    this.listeners = new AbortController();
+    this.abortController.abort();
+    this.abortController = new AbortController();
 
     const replacement = this.renderToElement();
     this.element.replaceWith(replacement);
@@ -67,16 +67,12 @@ export abstract class View<
           handler(event);
         }
       },
-      { signal: this.listeners.signal },
+      { signal: this.abortController.signal },
     );
   }
 
   protected dispatch(event: Event): void {
     this.events.dispatchEvent(event);
-  }
-
-  protected get listenerSignal(): AbortSignal {
-    return this.listeners.signal;
   }
 
   protected onMount(): void {}

@@ -85,7 +85,7 @@ Conventions for the Gemfire TypeScript codebase. Biome (formatter, linter, and i
     this.element.addEventListener(
       'click',
       (event) => this.handleClick(event),
-      { signal: this.listenerSignal },
+      { signal: this.abortController.signal },
     );
   }
   ```

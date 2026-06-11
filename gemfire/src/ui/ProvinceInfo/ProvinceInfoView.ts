@@ -1,3 +1,9 @@
+import cultivationIconUrl from '@/assets/icons/cultivation.webp';
+import foodIconUrl from '@/assets/icons/food.webp';
+import goldIconUrl from '@/assets/icons/gold.webp';
+import loyaltyIconUrl from '@/assets/icons/loyalty.webp';
+import protectionIconUrl from '@/assets/icons/protection.webp';
+import troopsIconUrl from '@/assets/icons/troops.webp';
 import type { Province } from '@/core/domain/Province';
 import { View } from '@/lib/View';
 
@@ -23,8 +29,9 @@ export class ProvinceInfoView extends View<ProvinceInfoContext> {
   }
 
   private renderProvince(province: Province): string {
+    const divider = `<hr class="${styles.divider}" />`;
     const details = province.isOwner(this.context.player)
-      ? this.renderDetails(province)
+      ? `${divider}${this.renderDetails(province)}${divider}`
       : '';
 
     return `
@@ -39,7 +46,6 @@ export class ProvinceInfoView extends View<ProvinceInfoContext> {
     return `
       ${this.renderGovernor(province)}
       ${this.renderStats(province)}
-      ${this.renderNeighbors(province)}
     `;
   }
 
@@ -54,8 +60,8 @@ export class ProvinceInfoView extends View<ProvinceInfoContext> {
       <header class="${styles.header}">
         ${crest}
         <div>
+          <h2>${ownerName}</h2>
           <h2>${province}</h2>
-          <p>Owner: ${ownerName}</p>
         </div>
       </header>
     `;
@@ -68,26 +74,47 @@ export class ProvinceInfoView extends View<ProvinceInfoContext> {
       ? `
         <div class="${styles.governor}">
           <img class="${styles.portrait}" src="${governor.portrait}" alt="${governor.name}" />
-          <span>Gov: ${governor.name}</span>
+          <h2>${governor.name}</h2>
         </div>
       `
-      : '<p>Gov: —</p>';
+      : '';
   }
 
   private renderStats(province: Province): string {
     return `
       <div class="${styles.stats}">
         ${this.renderColumn('Resources', [
-          `Gold ${province.resources.gold}`,
-          `Food ${province.resources.food}`,
-          `Troops ${province.resources.troops}`,
+          this.renderStat(goldIconUrl, 'Gold', province.resources.gold),
+          this.renderStat(foodIconUrl, 'Food', province.resources.food),
+          this.renderStat(troopsIconUrl, 'Troops', province.resources.troops),
         ])}
         ${this.renderColumn('Development', [
-          `Loyalty ${province.development.loyalty}`,
-          `Cultivation ${province.development.cultivation}`,
-          `Protection ${province.development.protection}`,
+          this.renderStat(
+            loyaltyIconUrl,
+            'Loyalty',
+            province.development.loyalty,
+          ),
+          this.renderStat(
+            cultivationIconUrl,
+            'Cultivation',
+            province.development.cultivation,
+          ),
+          this.renderStat(
+            protectionIconUrl,
+            'Protection',
+            province.development.protection,
+          ),
         ])}
       </div>
+    `;
+  }
+
+  private renderStat(iconUrl: string, label: string, value: number): string {
+    return `
+      <p class="${styles.stat}">
+        <img class="${styles.statIcon}" src="${iconUrl}" alt="${label}" title="${label}" />
+        <span>${value}</span>
+      </p>
     `;
   }
 
@@ -95,14 +122,8 @@ export class ProvinceInfoView extends View<ProvinceInfoContext> {
     return `
       <div class="${styles.column}">
         <h3>${title}</h3>
-        ${rows.map((row) => `<p>${row}</p>`).join('')}
+        ${rows.join('')}
       </div>
     `;
-  }
-
-  private renderNeighbors(province: Province): string {
-    const neighbors = this.context.map.getNeighbors(province);
-
-    return `<p>Neighbors (${neighbors.length}): ${neighbors.join(', ')}</p>`;
   }
 }
