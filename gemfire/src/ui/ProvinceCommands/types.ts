@@ -1,7 +1,9 @@
-import type { Family } from '@/core/domain/Family';
-import type { Province } from '@/core/domain/Province';
+import type { CommandGroup } from '@/core/commands/province/catalog';
+import type { World } from '@/core/domain/World';
+import type { EventBus } from '@/lib/EventBus';
 
 export interface ProvinceCommandsContext {
-  readonly player: Family;
-  selection?: Province | undefined;
+  readonly world: World;
+  readonly commands: readonly CommandGroup[];
+  readonly events: EventBus;
 }

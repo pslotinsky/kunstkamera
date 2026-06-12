@@ -15,17 +15,19 @@ export class ProvinceInfoView extends View<ProvinceInfoContext> {
   protected readonly rootClass = styles.root!;
 
   public render(): string {
-    const province = this.context.selection;
+    return `<section class="${styles.root}">${this.renderHint()}</section>`;
+  }
 
-    return province ? this.renderProvince(province) : this.renderHint();
+  public showProvince(province: Province): void {
+    this.element.innerHTML = this.renderProvince(province);
+  }
+
+  public showHint(): void {
+    this.element.innerHTML = this.renderHint();
   }
 
   private renderHint(): string {
-    return `
-      <section class="${styles.root}">
-        <p class="${styles.hint}">Select a province.</p>
-      </section>
-    `;
+    return `<p class="${styles.hint}">Select a province.</p>`;
   }
 
   private renderProvince(province: Province): string {
@@ -35,10 +37,8 @@ export class ProvinceInfoView extends View<ProvinceInfoContext> {
       : '';
 
     return `
-      <section class="${styles.root}">
-        ${this.renderHeader(province)}
-        ${details}
-      </section>
+      ${this.renderHeader(province)}
+      ${details}
     `;
   }
 

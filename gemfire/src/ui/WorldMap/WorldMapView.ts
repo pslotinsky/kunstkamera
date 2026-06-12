@@ -41,7 +41,7 @@ export class WorldMapView extends View<WorldMapContext> {
     this.element.addEventListener(
       'click',
       (event) => this.handleProvinceClick(event),
-      { signal: this.abortController.signal },
+      { signal: this.lifetime.signal },
     );
   }
 
@@ -81,7 +81,7 @@ export class WorldMapView extends View<WorldMapContext> {
 
       if (provinceElement) {
         const provinceNumber = Number(provinceElement.dataset.province);
-        this.dispatch(new ProvinceSelectedEvent(provinceNumber));
+        this.publish(new ProvinceSelectedEvent(provinceNumber));
       }
     }
   }

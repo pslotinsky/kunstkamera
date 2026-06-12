@@ -12,17 +12,24 @@
   min-width: 0;
 }
 
-.date {
+.turnStatus {
   position: absolute;
   top: 1.75rem;
   left: 1.75rem;
   z-index: 1;
+  pointer-events: none;
+}
+
+.date {
   margin: 0;
-  padding: 0.4rem 0.75rem;
-  border-radius: 6px;
   font-size: 1.25rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  pointer-events: none;
+}
+
+.status {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  opacity: 0.85;
 }

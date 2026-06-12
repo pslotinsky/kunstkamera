@@ -10,10 +10,10 @@ export class ProvinceInfoControl extends Control<ProvinceInfoView> {
   }
 
   public showHint(): void {
-    this.update({ selection: undefined });
+    this.view.showHint();
   }
 
   public showProvince(province: Province): void {
-    this.update({ selection: province });
+    this.view.showProvince(province);
   }
 }

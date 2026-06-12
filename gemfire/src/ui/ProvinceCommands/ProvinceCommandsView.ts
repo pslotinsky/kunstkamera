@@ -2,78 +2,67 @@ import diplomacyIconUrl from '@/assets/icons/diplomacy.webp';
 import domesticIconUrl from '@/assets/icons/domestic.webp';
 import militaryIconUrl from '@/assets/icons/military.webp';
 import vassalIconUrl from '@/assets/icons/vassal.webp';
+import type {
+  CommandGroup,
+  CommandGroupTitle,
+} from '@/core/commands/province/catalog';
+import type { WorldCommand } from '@/core/commands/WorldCommand';
+import type { Province } from '@/core/domain/Province';
 import { View } from '@/lib/View';
 
+import { CommandSelectedEvent } from './CommandSelectedEvent';
+import { TurnSkippedEvent } from './TurnSkippedEvent';
 import type { ProvinceCommandsContext } from './types';
 
 import styles from './ProvinceCommands.module.scss';
 
-interface CommandGroup {
-  readonly title: string;
-  readonly iconUrl: string;
-  readonly commands: readonly string[];
-}
-
-const COMMAND_GROUPS: readonly CommandGroup[] = [
-  {
-    title: 'Military',
-    iconUrl: militaryIconUrl,
-    commands: ['Attack', 'Recruit', 'Move Troops', 'Hire Monster'],
-  },
-  {
-    title: 'Domestic',
-    iconUrl: domesticIconUrl,
-    commands: [
-      'Develop',
-      'Cultivation',
-      'Protection',
-      'Trade',
-      'Give Food',
-      'Transport',
-    ],
-  },
-  {
-    title: 'Diplomacy',
-    iconUrl: diplomacyIconUrl,
-    commands: ['Ally', 'Negotiate'],
-  },
-  {
-    title: 'Vassal',
-    iconUrl: vassalIconUrl,
-    commands: ['View', 'Change Lord', 'Entrust', 'Search'],
-  },
-];
+const GROUP_ICONS: Record<CommandGroupTitle, string> = {
+  Military: militaryIconUrl,
+  Domestic: domesticIconUrl,
+  Diplomacy: diplomacyIconUrl,
+  Vassal: vassalIconUrl,
+};
 
 export class ProvinceCommandsView extends View<ProvinceCommandsContext> {
   protected readonly rootClass = styles.root!;
 
   public render(): string {
-    const province = this.context.selection;
-    const menu = province?.isOwner(this.context.player)
-      ? this.renderMenu()
-      : '';
-
-    return `<section class="${styles.root}">${menu}</section>`;
-  }
-
-  protected renderMenu(): string {
-    const groupButtons = COMMAND_GROUPS.map((group) =>
-      this.renderGroupButton(group),
-    ).join('');
-    const commandSections = COMMAND_GROUPS.map((group) =>
-      this.renderCommands(group),
-    ).join('');
+    const groupButtons = this.context.commands
+      .map((group) => this.renderGroupButton(group))
+      .join('');
+    const commandSections = this.context.commands
+      .map((group) => this.renderCommands(group))
+      .join('');
 
     return `
-      <div class="${styles.groups}">${groupButtons}</div>
-      ${commandSections}
+      <section class="${styles.root} ${styles.hidden}">
+        <div class="${styles.groups}">${groupButtons}</div>
+        ${commandSections}
+        <button class="${styles.skipTurn}" type="button" data-action="skip-turn" disabled>Skip Turn</button>
+      </section>
     `;
+  }
+
+  public showProvince(province: Province): void {
+    const { world } = this.context;
+
+    if (province.isOwner(world.player)) {
+      this.element.classList.remove(styles.hidden!);
+      this.closeGroups();
+      this.setActionsEnabled(world.turnQueue.current === province);
+    } else {
+      this.hide();
+    }
+  }
+
+  public hide(): void {
+    this.element.classList.add(styles.hidden!);
   }
 
   protected renderGroupButton(group: CommandGroup): string {
     return `
       <button class="${styles.groupButton}" type="button" data-group="${group.title}" aria-pressed="false">
-        <img class="${styles.groupIcon}" src="${group.iconUrl}" alt="" />
+        <img class="${styles.groupIcon}" src="${GROUP_ICONS[group.title]}" alt="" />
         <span>${group.title}</span>
       </button>
     `;
@@ -82,45 +71,67 @@ export class ProvinceCommandsView extends View<ProvinceCommandsContext> {
   protected renderCommands(group: CommandGroup): string {
     const classes = `${styles.commands} ${styles.hidden}`;
     const commands = group.commands
-      .map(
-        (command) =>
-          `<button class="${styles.command}" type="button" disabled>${command}</button>`,
-      )
+      .map((command) => this.renderCommand(command))
       .join('');
 
     return `<div class="${classes}" data-group="${group.title}">${commands}</div>`;
   }
 
-  protected override onMount(): void {
-    this.element.addEventListener(
-      'click',
-      (event) => this.handleGroupClick(event),
-      { signal: this.abortController.signal },
-    );
+  protected renderCommand(command: WorldCommand): string {
+    return `<button class="${styles.command}" type="button" data-command="${command.label}" disabled>${command.label}</button>`;
   }
 
-  private handleGroupClick(event: MouseEvent): void {
-    if (event.target instanceof Element) {
-      const groupButton =
-        event.target.closest<HTMLButtonElement>('button[data-group]');
+  protected override onMount(): void {
+    this.element.addEventListener('click', (event) => this.handleClick(event), {
+      signal: this.lifetime.signal,
+    });
+  }
 
-      if (groupButton) {
-        this.toggleGroup(groupButton);
+  private setActionsEnabled(enabled: boolean): void {
+    const actionButtons = this.element.querySelectorAll<HTMLButtonElement>(
+      'button[data-command], button[data-action]',
+    );
+
+    for (const button of actionButtons) {
+      button.disabled = !enabled;
+    }
+  }
+
+  private handleClick(event: MouseEvent): void {
+    if (event.target instanceof Element) {
+      const button = event.target.closest<HTMLButtonElement>('button');
+
+      if (button?.dataset.group) {
+        this.toggleGroup(button);
+      } else if (button?.dataset.command) {
+        this.selectCommand(button.dataset.command);
+      } else if (button?.dataset.action === 'skip-turn') {
+        this.publish(new TurnSkippedEvent());
       }
+    }
+  }
+
+  private selectCommand(label: string): void {
+    const command = this.context.commands
+      .flatMap((group) => group.commands)
+      .find((candidate) => candidate.label === label);
+
+    if (command) {
+      this.publish(new CommandSelectedEvent(command));
     }
   }
 
   private toggleGroup(groupButton: HTMLButtonElement): void {
     const isOpen = groupButton.classList.contains(styles.open!);
 
-    this.clearSelection();
+    this.closeGroups();
 
     if (!isOpen) {
-      this.select(groupButton);
+      this.openGroup(groupButton);
     }
   }
 
-  private clearSelection(): void {
+  private closeGroups(): void {
     const groupButtons =
       this.element.querySelectorAll<HTMLButtonElement>('button[data-group]');
 
@@ -137,7 +148,7 @@ export class ProvinceCommandsView extends View<ProvinceCommandsContext> {
     }
   }
 
-  private select(groupButton: HTMLButtonElement): void {
+  private openGroup(groupButton: HTMLButtonElement): void {
     groupButton.classList.add(styles.open!);
     groupButton.setAttribute('aria-pressed', 'true');
 

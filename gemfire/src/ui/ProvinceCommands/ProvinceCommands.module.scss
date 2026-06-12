@@ -2,6 +2,10 @@
   display: contents;
 }
 
+.root.hidden {
+  display: none;
+}
+
 .groups {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -70,9 +74,35 @@
   background: #1f2740;
   border: 1px solid #2c3656;
   border-radius: 4px;
+  cursor: pointer;
+}
+
+.command:hover:not(:disabled) {
+  border-color: #56649a;
 }
 
 .command:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.skipTurn {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.4rem 0.5rem;
+  font: inherit;
+  color: inherit;
+  background: #1f2740;
+  border: 1px solid #2c3656;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.skipTurn:hover:not(:disabled) {
+  border-color: #56649a;
+}
+
+.skipTurn:disabled {
   opacity: 0.5;
   cursor: default;
 }

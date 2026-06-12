@@ -3,6 +3,7 @@ import type { Collection } from '@/lib/Collection';
 import type { CalendarDate } from './CalendarDate';
 import type { Family } from './Family';
 import type { General } from './General';
+import { TurnQueue } from './TurnQueue';
 import type { WorldMap } from './WorldMap';
 
 export interface WorldParams {
@@ -15,6 +16,7 @@ export interface WorldParams {
 
 export class World {
   public date: CalendarDate;
+  public readonly turnQueue: TurnQueue;
   public readonly map: WorldMap;
   public readonly families: Collection<string, Family>;
   public readonly generals: Collection<string, General>;
@@ -26,5 +28,6 @@ export class World {
     this.families = params.families;
     this.generals = params.generals;
     this.player = params.player;
+    this.turnQueue = new TurnQueue(this.map.provinces);
   }
 }

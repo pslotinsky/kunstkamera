@@ -22,9 +22,9 @@ The strategic screen you act from: provinces, ownership, details, and the orders
 
 The loop that drives play: issue every province's orders, then let time pass.
 
-- [ ] issue your provinces' orders for the month
-- [ ] advance to the next month once orders are set
-- [ ] collect the annual tax and harvest as the year turns
+- [x] issue your provinces' orders for the month
+- [x] advance to the next month once orders are set
+- [x] collect the annual tax and harvest as the year turns
 
 ## 3. Province economy
 
