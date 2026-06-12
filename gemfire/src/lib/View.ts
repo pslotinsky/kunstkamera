@@ -1,6 +1,6 @@
 import { EventBus, type EventClass } from './EventBus';
 
-export type AnyView = View<any, any>;
+export type AnyView = View<unknown, ViewRecord>;
 export type ViewRecord = Record<string, AnyView>;
 
 export abstract class View<
