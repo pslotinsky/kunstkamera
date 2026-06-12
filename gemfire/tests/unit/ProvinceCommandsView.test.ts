@@ -1,37 +1,29 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Province } from '@/core/domain/Province';
+import { createCommandGroups } from '@/core/commands/province/catalog';
 import { WorldFactory } from '@/core/WorldFactory';
+import { EventBus } from '@/lib/EventBus';
+import styles from '@/ui/ProvinceCommands/ProvinceCommands.module.scss';
 import { ProvinceCommandsView } from '@/ui/ProvinceCommands/ProvinceCommandsView';
 
-const world = new WorldFactory().create();
-
 describe('ProvinceCommandsView', () => {
-  it('shows the command menu only for a province the player owns', () => {
-    const owner = world.map.provinces.find((province) =>
-      province.isOwner(world.player),
-    );
-    const rival = world.map.provinces.find(
-      (province) => !province.isOwner(world.player),
-    );
-    const neutral = world.map.provinces.find((province) =>
-      province.isNeutral(),
-    );
+  it('renders the menu hidden, closed, and disabled until a province takes the turn', () => {
+    const world = new WorldFactory().create();
+    const events = new EventBus();
+    const commands = createCommandGroups({ world, events });
+    const markup = new ProvinceCommandsView(
+      { world, commands, events },
+      {},
+    ).render();
+    const sections = markup.match(/<div class="[^"]*" data-group=/g);
 
-    expect(owner, 'a player-owned province').toBeDefined();
-    expect(rival, 'a rival-owned province').toBeDefined();
-    expect(neutral, 'a neutral province').toBeDefined();
+    expect(markup).toContain(`class="${styles.root} ${styles.hidden}"`);
+    expect(markup).toContain('data-action="skip-turn" disabled>');
+    expect(markup).not.toMatch(/data-command="[^"]+">/);
+    expect(sections).toHaveLength(4);
 
-    expect(menuFor(owner)).toContain('Develop');
-    expect(menuFor(rival)).not.toContain('Develop');
-    expect(menuFor(neutral)).not.toContain('Develop');
-    expect(menuFor(undefined)).not.toContain('Develop');
+    for (const section of sections ?? []) {
+      expect(section).toContain(styles.hidden);
+    }
   });
 });
-
-function menuFor(selection: Province | undefined): string {
-  return new ProvinceCommandsView(
-    { player: world.player, selection },
-    {},
-  ).render();
-}

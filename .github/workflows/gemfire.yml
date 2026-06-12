@@ -1,0 +1,49 @@
+name: Gemfire
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - gemfire/**
+      - .github/workflows/gemfire.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - gemfire/**
+      - .github/workflows/gemfire.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: gemfire
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: gemfire/.nvmrc
+          cache: npm
+          cache-dependency-path: gemfire/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Check
+        run: npm run check:ci
+
+      - name: Test
+        if: success() || failure()
+        run: npm test

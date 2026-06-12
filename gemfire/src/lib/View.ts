@@ -1,10 +1,7 @@
+import { EventBus, type EventClass } from './EventBus';
+
 export type AnyView = View<any, any>;
 export type ViewRecord = Record<string, AnyView>;
-
-type EventClass<EventType extends Event> = {
-  new (...args: never[]): EventType;
-  readonly name: string;
-};
 
 export abstract class View<
   Context = Record<string, never>,
@@ -14,9 +11,9 @@ export abstract class View<
   protected element!: HTMLElement;
   protected readonly context: Readonly<Context>;
   protected readonly views: Views;
-  protected listeners = new AbortController();
+  protected readonly lifetime = new AbortController();
 
-  private readonly events = new EventTarget();
+  private readonly events = new EventBus();
 
   public constructor(context: Readonly<Context>, views: Views) {
     this.context = context;
@@ -41,42 +38,19 @@ export abstract class View<
   public unmount(): void {
     this.onUnmount();
     this.unmountChildren();
-    this.listeners.abort();
+    this.lifetime.abort();
     this.element.remove();
   }
 
-  public rerender(): void {
-    this.onUnmount();
-    this.listeners.abort();
-    this.listeners = new AbortController();
-
-    const replacement = this.renderToElement();
-    this.element.replaceWith(replacement);
-    this.element = replacement;
-    this.onMount();
-  }
-
-  public listen<EventType extends Event>(
+  public subscribe<EventType extends object>(
     eventClass: EventClass<EventType>,
     handler: (event: EventType) => void,
   ): void {
-    this.events.addEventListener(
-      eventClass.name,
-      (event) => {
-        if (event instanceof eventClass) {
-          handler(event);
-        }
-      },
-      { signal: this.listeners.signal },
-    );
+    this.events.subscribe(eventClass, handler);
   }
 
-  protected dispatch(event: Event): void {
-    this.events.dispatchEvent(event);
-  }
-
-  protected get listenerSignal(): AbortSignal {
-    return this.listeners.signal;
+  protected publish(event: object): void {
+    this.events.publish(event);
   }
 
   protected onMount(): void {}

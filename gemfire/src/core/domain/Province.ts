@@ -1,7 +1,7 @@
 import { Development } from './Development';
 import type { Family } from './Family';
 import type { General } from './General';
-import { Resources } from './Resources';
+import { type ResourceGains, Resources } from './Resources';
 
 export interface ProvinceParams {
   readonly number: number;
@@ -32,6 +32,10 @@ export class Province {
     this.development = params.development ?? Development.createEmpty();
   }
 
+  public addResources(gains: ResourceGains): void {
+    this.resources = this.resources.add(gains);
+  }
+
   public isNeighbor(other: Province | number): boolean {
     const otherNumber = typeof other === 'number' ? other : other.number;
     return this.neighbors.includes(otherNumber);
@@ -41,11 +45,15 @@ export class Province {
     return this.owner?.isEqual(family) ?? false;
   }
 
+  public hasOwner(): boolean {
+    return !!this.owner;
+  }
+
   public isNeutral(): boolean {
-    return !this.owner;
+    return !this.hasOwner();
   }
 
   public toString(): string {
-    return `${this.number} ${this.name}`;
+    return `${this.number}: ${this.name}`;
   }
 }

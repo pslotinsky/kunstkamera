@@ -1,3 +1,4 @@
+import type { EventClass } from './EventBus';
 import type { AnyView, View } from './View';
 
 export type AnyControl = Control<AnyView, any>;
@@ -47,20 +48,11 @@ export abstract class Control<
     this.view.unmount();
   }
 
-  public listen<EventType extends Event>(
-    eventClass: { new (...args: never[]): EventType; readonly name: string },
+  public subscribe<EventType extends object>(
+    eventClass: EventClass<EventType>,
     handler: (event: EventType) => void,
   ): void {
-    this.view.listen(eventClass, handler);
-  }
-
-  protected update(changes: Partial<ContextOf<TView>>): void {
-    Object.assign(this.context, changes);
-    this.rerender();
-  }
-
-  protected rerender(): void {
-    this.view.rerender();
+    this.view.subscribe(eventClass, handler);
   }
 
   protected onMount(): void {}

@@ -1,3 +1,6 @@
+import type { Province } from '@/core/domain/Province';
+import { MonthStartedEvent } from '@/core/events/MonthStartedEvent';
+import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
 import { Control } from '@/lib/Control';
 import { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
 import { ProvinceSelectedEvent } from '@/ui/WorldMap/ProvinceSelectedEvent';
@@ -15,14 +18,39 @@ export class GameScreenControl extends Control<
   public constructor(context: GameScreenContext) {
     super(GameScreenView, context, {
       worldMap: new WorldMapControl({ map: context.world.map }),
-      gamePanel: new GamePanelControl({ world: context.world }),
+      gamePanel: new GamePanelControl({
+        world: context.world,
+        commands: context.commands,
+        events: context.events,
+      }),
     });
   }
 
   protected override onMount(): void {
-    this.controls.worldMap.listen(ProvinceSelectedEvent, (event) => {
+    this.controls.worldMap.subscribe(ProvinceSelectedEvent, (event) => {
       this.selectProvince(event.provinceNumber);
     });
+    this.context.events.subscribe(MonthStartedEvent, (event) => {
+      this.view.showDate(event.date);
+    });
+    this.context.events.subscribe(TurnStartedEvent, (event) => {
+      this.handleTurnStart(event);
+    });
+
+    const current = this.context.world.turnQueue.current;
+
+    if (current) {
+      this.showProvince(current);
+    }
+  }
+
+  private handleTurnStart(event: TurnStartedEvent): void {
+    const { province, turnNumber } = event;
+
+    if (province.isOwner(this.context.world.player)) {
+      this.view.showTurn(province, turnNumber);
+      this.showProvince(province);
+    }
   }
 
   private selectProvince(provinceNumber: number): void {
@@ -32,13 +60,16 @@ export class GameScreenControl extends Control<
       this.controls.worldMap.clearHighlighting();
       this.controls.gamePanel.showHint();
     } else {
-      this.selected = provinceNumber;
-
       const { map } = this.context.world;
-      const province = map.getProvince(provinceNumber);
 
-      this.controls.worldMap.highlight(province);
-      this.controls.gamePanel.showProvince(province);
+      this.showProvince(map.getProvince(provinceNumber));
     }
+  }
+
+  private showProvince(province: Province): void {
+    this.selected = province.number;
+
+    this.controls.worldMap.highlight(province);
+    this.controls.gamePanel.showProvince(province);
   }
 }
