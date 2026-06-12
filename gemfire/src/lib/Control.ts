@@ -1,14 +1,14 @@
 import type { EventClass } from './EventBus';
-import type { AnyView, View } from './View';
+import type { AnyView, View, ViewRecord } from './View';
 
-export type AnyControl = Control<AnyView, any>;
+export type AnyControl = Control<AnyView, ControlRecord>;
 export type ControlRecord = Record<string, AnyControl>;
 
 export type ContextOf<TView extends AnyView> =
-  TView extends View<infer Context, any> ? Context : never;
+  TView extends View<infer Context, ViewRecord> ? Context : never;
 
 export type ViewsOf<TView extends AnyView> =
-  TView extends View<any, infer Views> ? Views : never;
+  TView extends View<unknown, infer Views> ? Views : never;
 
 export type ChildrenViews<Controls extends ControlRecord> = {
   [Key in keyof Controls]: Controls[Key]['view'];
