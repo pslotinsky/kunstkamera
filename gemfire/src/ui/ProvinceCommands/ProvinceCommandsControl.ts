@@ -31,7 +31,9 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
       event.command.execute();
     });
     this.subscribe(TurnSkippedEvent, () => {
-      this.context.events.publish(new TurnEndedEvent());
+      const { world, events } = this.context;
+
+      events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
     });
   }
 }

@@ -8,6 +8,8 @@ export class NegotiateCommand extends WorldCommand {
   }
 
   public execute(): void {
-    this.context.events.publish(new TurnEndedEvent());
+    const { world, events } = this.context;
+
+    events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
   }
 }

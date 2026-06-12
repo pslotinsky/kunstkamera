@@ -11,7 +11,8 @@ export class GameScreenView extends View<GameScreenContext, GameScreenViews> {
 
   public render(): string {
     const { views, context } = this;
-    const current = context.world.turnQueue.current;
+    const { current, turnNumber } = context.world.turnQueue;
+    const status = current ? this.renderTurn(current, turnNumber) : '';
 
     return `
       <div class="${styles.root}">
@@ -19,7 +20,7 @@ export class GameScreenView extends View<GameScreenContext, GameScreenViews> {
         <div class="${styles.mapArea}">
           <div class="${styles.turnStatus}">
             <p class="${styles.date}">${context.world.date}</p>
-            <p class="${styles.status}">${current ? this.renderTurn(current) : ''}</p>
+            <p class="${styles.status}">${status}</p>
           </div>
           ${views.worldMap.render()}
         </div>
@@ -31,12 +32,12 @@ export class GameScreenView extends View<GameScreenContext, GameScreenViews> {
     this.setText(styles.date!, String(date));
   }
 
-  public showTurn(province: Province): void {
-    this.setText(styles.status!, this.renderTurn(province));
+  public showTurn(province: Province, turnNumber: number): void {
+    this.setText(styles.status!, this.renderTurn(province, turnNumber));
   }
 
-  private renderTurn(province: Province): string {
-    return `Turn: ${province.name}`;
+  private renderTurn(province: Province, turnNumber: number): string {
+    return `Turn ${turnNumber}: ${province.name}`;
   }
 
   private setText(className: string, text: string): void {

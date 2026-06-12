@@ -101,7 +101,9 @@ function drainMonth(fixture: Fixture): void {
   const monthStart = fixture.world.date;
 
   while (fixture.world.date.equals(monthStart)) {
-    fixture.events.publish(new TurnEndedEvent());
+    fixture.events.publish(
+      new TurnEndedEvent(fixture.world.turnQueue.turnNumber),
+    );
   }
 }
 
@@ -128,7 +130,7 @@ describe('WorldEngine', () => {
     const { world, events } = createFixture(new CalendarDate(1186, 4));
     const province = world.turnQueue.current!;
 
-    events.publish(new TurnEndedEvent());
+    events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
 
     expect(world.turnQueue.current).not.toBe(province);
   });
@@ -136,11 +138,11 @@ describe('WorldEngine', () => {
   it('advances the month only when the queue drains, then queues the next month', () => {
     const { world, events } = createFixture(new CalendarDate(1186, 4));
 
-    events.publish(new TurnEndedEvent());
+    events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
 
     expect(world.date.equals(new CalendarDate(1186, 4))).toBe(true);
 
-    events.publish(new TurnEndedEvent());
+    events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
 
     expect(world.date.equals(new CalendarDate(1186, 5))).toBe(true);
     expect(world.turnQueue.current?.isOwner(world.player)).toBe(true);
@@ -162,8 +164,8 @@ describe('WorldEngine', () => {
       expect(event.date).toBe(world.date);
     });
 
-    events.publish(new TurnEndedEvent());
-    events.publish(new TurnEndedEvent());
+    events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
+    events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
 
     expect(announcements).toEqual([
       'player turn started',

@@ -1,15 +1,15 @@
-export type EventClass<EventType extends Event> = {
-  new (...args: never[]): EventType;
-  readonly name: string;
-};
+export type EventClass<EventType> = new (...args: never[]) => EventType;
+
+type Handler = (event: never) => void;
 
 export class EventBus {
-  private readonly events = new EventTarget();
-  private readonly pending: Event[] = [];
+  private readonly subscribers = new Map<EventClass<unknown>, Handler[]>();
+  private readonly observers: ((event: object) => void)[] = [];
+  private readonly pending: object[] = [];
 
   private isDispatching = false;
 
-  public publish(event: Event): void {
+  public publish(event: object): void {
     this.pending.push(event);
 
     if (!this.isDispatching) {
@@ -17,15 +17,18 @@ export class EventBus {
     }
   }
 
-  public subscribe<EventType extends Event>(
+  public subscribe<EventType extends object>(
     eventClass: EventClass<EventType>,
     handler: (event: EventType) => void,
   ): void {
-    this.events.addEventListener(eventClass.name, (event) => {
-      if (event instanceof eventClass) {
-        handler(event);
-      }
-    });
+    const handlers = this.subscribers.get(eventClass) ?? [];
+
+    handlers.push(handler as Handler);
+    this.subscribers.set(eventClass, handlers);
+  }
+
+  public observe(observer: (event: object) => void): void {
+    this.observers.push(observer);
   }
 
   private dispatchPending(): void {
@@ -35,11 +38,24 @@ export class EventBus {
       let event = this.pending.shift();
 
       while (event) {
-        this.events.dispatchEvent(event);
+        for (const observer of this.observers) {
+          observer(event);
+        }
+
+        this.dispatch(event);
         event = this.pending.shift();
       }
     } finally {
       this.isDispatching = false;
+    }
+  }
+
+  private dispatch(event: object): void {
+    const handlers =
+      this.subscribers.get(event.constructor as EventClass<unknown>) ?? [];
+
+    for (const handler of handlers) {
+      (handler as (event: object) => void)(event);
     }
   }
 }

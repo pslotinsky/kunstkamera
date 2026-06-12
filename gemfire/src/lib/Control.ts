@@ -48,7 +48,7 @@ export abstract class Control<
     this.view.unmount();
   }
 
-  public subscribe<EventType extends Event>(
+  public subscribe<EventType extends object>(
     eventClass: EventClass<EventType>,
     handler: (event: EventType) => void,
   ): void {

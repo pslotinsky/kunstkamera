@@ -1,5 +1,3 @@
-export class TurnEndedEvent extends Event {
-  public constructor() {
-    super(TurnEndedEvent.name);
-  }
+export class TurnEndedEvent {
+  public constructor(public readonly turnNumber: number) {}
 }

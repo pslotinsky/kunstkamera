@@ -21,6 +21,10 @@ export class TurnQueue {
     return this.order[this.currentIndex];
   }
 
+  public get turnNumber(): number {
+    return this.currentIndex + 1;
+  }
+
   public isDone(): boolean {
     return this.currentIndex >= this.order.length;
   }

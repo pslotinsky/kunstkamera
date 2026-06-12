@@ -15,6 +15,12 @@ const events = new EventBus();
 const engine = new WorldEngine(world, events);
 const commands = createCommandGroups({ world, events });
 
+if (import.meta.env.DEV) {
+  events.observe((event) => {
+    console.debug(`[event] ${event.constructor.name}`, event);
+  });
+}
+
 engine.start();
 
 const screen = new GameScreenControl({ world, events, commands });

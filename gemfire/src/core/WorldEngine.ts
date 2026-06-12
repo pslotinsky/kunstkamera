@@ -29,7 +29,7 @@ export class WorldEngine {
 
   private handleTurnStart(province: Province): void {
     if (!province.isOwner(this.world.player)) {
-      this.events.publish(new TurnEndedEvent());
+      this.events.publish(new TurnEndedEvent(this.world.turnQueue.turnNumber));
     }
   }
 
@@ -37,7 +37,7 @@ export class WorldEngine {
     this.world.turnQueue.next();
 
     if (this.world.turnQueue.isDone()) {
-      this.events.publish(new MonthEndedEvent());
+      this.events.publish(new MonthEndedEvent(this.world.date));
     } else {
       this.startTurn();
     }
@@ -59,10 +59,10 @@ export class WorldEngine {
   }
 
   private startTurn(): void {
-    const current = this.world.turnQueue.current;
+    const { current, turnNumber } = this.world.turnQueue;
 
     if (current) {
-      this.events.publish(new TurnStartedEvent(current));
+      this.events.publish(new TurnStartedEvent(turnNumber, current));
     }
   }
 }

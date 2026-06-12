@@ -42,14 +42,14 @@ export abstract class View<
     this.element.remove();
   }
 
-  public subscribe<EventType extends Event>(
+  public subscribe<EventType extends object>(
     eventClass: EventClass<EventType>,
     handler: (event: EventType) => void,
   ): void {
     this.events.subscribe(eventClass, handler);
   }
 
-  protected publish(event: Event): void {
+  protected publish(event: object): void {
     this.events.publish(event);
   }
 

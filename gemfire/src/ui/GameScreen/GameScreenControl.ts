@@ -34,7 +34,7 @@ export class GameScreenControl extends Control<
       this.view.showDate(event.date);
     });
     this.context.events.subscribe(TurnStartedEvent, (event) => {
-      this.handleTurnStart(event.province);
+      this.handleTurnStart(event);
     });
 
     const current = this.context.world.turnQueue.current;
@@ -44,9 +44,11 @@ export class GameScreenControl extends Control<
     }
   }
 
-  private handleTurnStart(province: Province): void {
+  private handleTurnStart(event: TurnStartedEvent): void {
+    const { province, turnNumber } = event;
+
     if (province.isOwner(this.context.world.player)) {
-      this.view.showTurn(province);
+      this.view.showTurn(province, turnNumber);
       this.showProvince(province);
     }
   }
