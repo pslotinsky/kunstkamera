@@ -73,7 +73,7 @@ After any order resolves, the province info panel refreshes — development, gol
 
 The table is our invention — a provisional model that makes prices breathe with the year (cheap around the harvest, dear by spring) while staying one lookup. It is the tuning seam: later variants can price by how much food the realm holds, or carry a good/normal/bad yield modifier from the last harvest, without touching Trade. The rate shows only inside the Trade dialog, preserving the original's check-by-opening-Trade rhythm.
 
-**Goodwill is part of the order's mutation.** "Every order carries goodwill" — and recording it is just another province write, like spending gold or raising loyalty: the base's protected `endTurn(goodwill = 0)` calls `province.recordAction(goodwill)` and publishes `TurnEnded`, and each command passes its §D.5 modifier at the call site (`this.endTurn(1)` from Cultivation, plain `this.endTurn()` from Transport) — no field on the base, the value lives where the order's effects live. No event in between — the bus is for flow (the queue reacts to `TurnEnded`), not for sibling state writes, and feature 15's check needs only the accumulated `actionCount` hitting 3. Turn-consuming commands call `endTurn()` instead of hand-publishing; Skip Turn keeps publishing `TurnEnded` directly — no action recorded, so a skipped month leaves the counters untouched (spec §11.2: only turn-based actions count). The counters live on `Province` and just accumulate — feature 15 reads and resets them.
+**Goodwill is part of the order's mutation.** "Every order carries goodwill" — and recording it is just another province write, like spending gold or raising loyalty: the base offers two protected helpers, `recordAction(goodwill = 0)` writing the counters on the current province and `endTurn()` publishing `TurnEnded`, and each turn-consuming command calls both, passing its §D.5 modifier (`this.recordAction(1)` from Cultivation, plain `this.recordAction()` from Transport) — no field on the base, the value lives where the order's effects live. No event in between — the bus is for flow (the queue reacts to `TurnEnded`), not for sibling state writes, and feature 15's check needs only the accumulated `actionCount` hitting 3. Skip Turn publishes `TurnEnded` directly — no action recorded, so a skipped month leaves the counters untouched (spec §11.2: only turn-based actions count). The counters live on `Province` and just accumulate — feature 15 reads and resets them.
 
 **Provisional formulas, flagged.** Give Food is Medium-High confidence (`floor(CHA × Food / 300)`, spec §4.6) — adopted as is. The Develop gain is only bounded (+2…+5 scaling with Intelligence, minimum +2; thresholds unverified) — we provisionally tier it as `2 + floor(INT / 25)`, capped at +5, in one place so the real thresholds drop in. A province without a governor uses the minimums (gain +2, Charm 0). Both join appendix-d's unknown-formula register workflow.
 
@@ -122,7 +122,8 @@ classDiagram
     <<abstract>>
     +string label
     +canExecute() bool
-    #endTurn(goodwill) void
+    #recordAction(goodwill) void
+    #endTurn() void
     +execute(params) void
   }
   class CultivationCommand {
@@ -150,7 +151,7 @@ classDiagram
   WorldCommand --> Province : mutates current
 ```
 
-_Every capped number is a `Stat` — value plus max, `add` clamps to 0…max, negative gains spend. `Resources` (gold, food, troops — max 999) and `Development` (loyalty 100, cultivation/protection 200) mass-update their stats via `add(gains)`; all three stay immutable value objects. `WorldCommand.endTurn(goodwill = 0)` = `province.recordAction(goodwill)` + publish `TurnEnded`; `recordAction` accumulates the hidden counters. Commands also publish `ProvinceUpdated` after mutating. `Market.swing(month)` re-rolls the rate within the month's seasonal range; the engine calls it in its `MonthStarted` handler alongside tax & harvest. The leftover `DevelopCommand` placeholder is deleted._
+_Every capped number is a `Stat` — value plus max, `add` clamps to 0…max, negative gains spend. `Resources` (gold, food, troops — max 999) and `Development` (loyalty 100, cultivation/protection 200) mass-update their stats via `add(gains)`; all three stay immutable value objects. `WorldCommand.recordAction(goodwill = 0)` writes the hidden counters on the current province; `WorldCommand.endTurn()` publishes `TurnEnded`. Commands also publish `ProvinceUpdated` after mutating. `Market.swing(month)` re-rolls the rate within the month's seasonal range; the engine calls it in its `MonthStarted` handler alongside tax & harvest. The leftover `DevelopCommand` placeholder is deleted._
 
 ## Flow
 

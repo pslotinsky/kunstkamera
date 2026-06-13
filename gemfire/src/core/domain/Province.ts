@@ -1,4 +1,4 @@
-import { Development } from './Development';
+import { Development, type DevelopmentGains } from './Development';
 import type { Family } from './Family';
 import type { General } from './General';
 import { type ResourceGains, Resources } from './Resources';
@@ -19,6 +19,8 @@ export class Province {
   public readonly neighbors: readonly number[];
   public resources: Resources;
   public development: Development;
+  public goodwill = 0;
+  public actionCount = 0;
   public owner?: Family | undefined;
   public governor?: General | undefined;
 
@@ -28,17 +30,40 @@ export class Province {
     this.neighbors = params.neighbors;
     this.owner = params.owner;
     this.governor = params.governor;
-    this.resources = params.resources ?? Resources.createEmpty();
-    this.development = params.development ?? Development.createEmpty();
+    this.resources = params.resources ?? Resources.empty();
+    this.development = params.development ?? Development.empty();
   }
 
-  public addResources(gains: ResourceGains): void {
-    this.resources = this.resources.add(gains);
+  public increaseResources(gains: ResourceGains): void {
+    this.resources = this.resources.increase(gains);
   }
 
-  public isNeighbor(other: Province | number): boolean {
-    const otherNumber = typeof other === 'number' ? other : other.number;
-    return this.neighbors.includes(otherNumber);
+  public decreaseResources(costs: ResourceGains): void {
+    this.resources = this.resources.decrease(costs);
+  }
+
+  public increaseDevelopment(gains: DevelopmentGains): void {
+    this.development = this.development.increase(gains);
+  }
+
+  public decreaseDevelopment(gains: DevelopmentGains): void {
+    this.development = this.development.decrease(gains);
+  }
+
+  public recordAction(goodwill: number): void {
+    this.goodwill = Math.min(15, Math.max(this.goodwill + goodwill, -15));
+
+    if (goodwill) {
+      this.actionCount = (this.actionCount + 1) % 3;
+    }
+  }
+
+  public isEqual(other: Province): boolean {
+    return this.number === other.number;
+  }
+
+  public isNeighbor(other: Province): boolean {
+    return this.neighbors.includes(other.number);
   }
 
   public isOwner(family: Family): boolean {

@@ -16,4 +16,8 @@ export class ProvinceInfoControl extends Control<ProvinceInfoView> {
   public showProvince(province: Province): void {
     this.view.showProvince(province);
   }
+
+  public actualizeProvince(province: Province): void {
+    this.view.actualizeProvince(province);
+  }
 }

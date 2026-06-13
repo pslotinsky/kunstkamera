@@ -7,12 +7,11 @@ import type {
   CommandGroupTitle,
 } from '@/core/commands/province/catalog';
 import type { WorldCommand } from '@/core/commands/WorldCommand';
-import type { Province } from '@/core/domain/Province';
 import { View } from '@/lib/View';
 
 import { CommandSelectedEvent } from './CommandSelectedEvent';
 import { TurnSkippedEvent } from './TurnSkippedEvent';
-import type { ProvinceCommandsContext } from './types';
+import type { ProvinceCommandsContext, ProvinceCommandsViews } from './types';
 
 import styles from './ProvinceCommands.module.scss';
 
@@ -23,8 +22,58 @@ const GROUP_ICONS: Record<CommandGroupTitle, string> = {
   Vassal: vassalIconUrl,
 };
 
-export class ProvinceCommandsView extends View<ProvinceCommandsContext> {
+export class ProvinceCommandsView extends View<
+  ProvinceCommandsContext,
+  ProvinceCommandsViews
+> {
   protected readonly rootClass = styles.root!;
+
+  public show(): void {
+    this.element.classList.remove(styles.hidden!);
+    this.closeGroups();
+    this.setActionsEnabled(true);
+  }
+
+  public hide(): void {
+    this.element.classList.add(styles.hidden!);
+  }
+
+  public selectCommand(label: string): void {
+    const button = this.element.querySelector<HTMLButtonElement>(
+      `button[data-command="${label}"]`,
+    );
+
+    button?.classList.add(styles.selected!);
+  }
+
+  public deselectCommand(label: string): void {
+    const button = this.element.querySelector<HTMLButtonElement>(
+      `button[data-command="${label}"]`,
+    );
+
+    button?.classList.remove(styles.selected!);
+  }
+
+  public closeGroups(): void {
+    const groupButtons =
+      this.element.querySelectorAll<HTMLButtonElement>('button[data-group]');
+
+    for (const button of groupButtons) {
+      button.classList.remove(styles.open!);
+      button.setAttribute('aria-pressed', 'false');
+    }
+
+    const commandSections =
+      this.element.querySelectorAll<HTMLElement>('div[data-group]');
+
+    for (const section of commandSections) {
+      section.classList.add(styles.hidden!);
+    }
+  }
+
+  public disableActions(): void {
+    this.setActionsEnabled(false);
+  }
 
   public render(): string {
     const groupButtons = this.context.commands
@@ -38,25 +87,10 @@ export class ProvinceCommandsView extends View<ProvinceCommandsContext> {
       <section class="${styles.root} ${styles.hidden}">
         <div class="${styles.groups}">${groupButtons}</div>
         ${commandSections}
+        ${this.views.cultivationDialog.render()}
         <button class="${styles.skipTurn}" type="button" data-action="skip-turn" disabled>Skip Turn</button>
       </section>
     `;
-  }
-
-  public showProvince(province: Province): void {
-    const { world } = this.context;
-
-    if (province.isOwner(world.player)) {
-      this.element.classList.remove(styles.hidden!);
-      this.closeGroups();
-      this.setActionsEnabled(world.turnQueue.current === province);
-    } else {
-      this.hide();
-    }
-  }
-
-  public hide(): void {
-    this.element.classList.add(styles.hidden!);
   }
 
   protected renderGroupButton(group: CommandGroup): string {
@@ -88,12 +122,22 @@ export class ProvinceCommandsView extends View<ProvinceCommandsContext> {
   }
 
   private setActionsEnabled(enabled: boolean): void {
-    const actionButtons = this.element.querySelectorAll<HTMLButtonElement>(
-      'button[data-command], button[data-action]',
+    const commandButtons = this.element.querySelectorAll<HTMLButtonElement>(
+      'button[data-command]',
     );
 
-    for (const button of actionButtons) {
-      button.disabled = !enabled;
+    for (const button of commandButtons) {
+      const command = this.findCommand(button.dataset.command ?? '');
+
+      button.disabled = !enabled || !command?.canExecute();
+    }
+
+    const skipButton = this.element.querySelector<HTMLButtonElement>(
+      'button[data-action="skip-turn"]',
+    );
+
+    if (skipButton) {
+      skipButton.disabled = !enabled;
     }
   }
 
@@ -104,21 +148,25 @@ export class ProvinceCommandsView extends View<ProvinceCommandsContext> {
       if (button?.dataset.group) {
         this.toggleGroup(button);
       } else if (button?.dataset.command) {
-        this.selectCommand(button.dataset.command);
+        this.selectCommandAction(button.dataset.command);
       } else if (button?.dataset.action === 'skip-turn') {
         this.publish(new TurnSkippedEvent());
       }
     }
   }
 
-  private selectCommand(label: string): void {
-    const command = this.context.commands
-      .flatMap((group) => group.commands)
-      .find((candidate) => candidate.label === label);
+  private selectCommandAction(label: string): void {
+    const command = this.findCommand(label);
 
     if (command) {
       this.publish(new CommandSelectedEvent(command));
     }
+  }
+
+  private findCommand(label: string): WorldCommand | undefined {
+    return this.context.commands
+      .flatMap((group) => group.commands)
+      .find((candidate) => candidate.label === label);
   }
 
   private toggleGroup(groupButton: HTMLButtonElement): void {
@@ -128,23 +176,6 @@ export class ProvinceCommandsView extends View<ProvinceCommandsContext> {
 
     if (!isOpen) {
       this.openGroup(groupButton);
-    }
-  }
-
-  private closeGroups(): void {
-    const groupButtons =
-      this.element.querySelectorAll<HTMLButtonElement>('button[data-group]');
-
-    for (const button of groupButtons) {
-      button.classList.remove(styles.open!);
-      button.setAttribute('aria-pressed', 'false');
-    }
-
-    const commandSections =
-      this.element.querySelectorAll<HTMLElement>('div[data-group]');
-
-    for (const section of commandSections) {
-      section.classList.add(styles.hidden!);
     }
   }
 

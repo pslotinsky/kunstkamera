@@ -1,5 +1,6 @@
 import type { Province } from '@/core/domain/Province';
 import { MonthStartedEvent } from '@/core/events/MonthStartedEvent';
+import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
 import { Control } from '@/lib/Control';
 import { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
@@ -35,6 +36,11 @@ export class GameScreenControl extends Control<
     });
     this.context.events.subscribe(TurnStartedEvent, (event) => {
       this.handleTurnStart(event);
+    });
+    this.context.events.subscribe(ProvinceUpdatedEvent, (event) => {
+      if (this.selected === event.province.number) {
+        this.controls.gamePanel.actualizeProvince(event.province);
+      }
     });
 
     const current = this.context.world.turnQueue.current;

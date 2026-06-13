@@ -1,25 +1,29 @@
-export interface ResourceGains {
-  readonly gold?: number;
-  readonly food?: number;
-  readonly troops?: number;
-}
+import { Stats, type StatsParams } from './Stats';
 
-export class Resources {
-  public static createEmpty(): Resources {
-    return new Resources(0, 0, 0);
+const RESOURCE_MAXES = {
+  gold: 999,
+  food: 999,
+  troops: 999,
+};
+
+export type ResourceKey = keyof typeof RESOURCE_MAXES;
+
+export type ResourceGains = StatsParams<ResourceKey>;
+
+export class Resources extends Stats<ResourceKey> {
+  public static empty(): Resources {
+    return new Resources({});
   }
 
-  public constructor(
-    public readonly gold: number,
-    public readonly food: number,
-    public readonly troops: number,
-  ) {}
+  public static from(definition: ResourceGains): Resources {
+    return new Resources(definition);
+  }
 
-  public add(gains: ResourceGains): Resources {
-    return new Resources(
-      this.gold + (gains.gold ?? 0),
-      this.food + (gains.food ?? 0),
-      this.troops + (gains.troops ?? 0),
-    );
+  declare readonly gold: number;
+  declare readonly food: number;
+  declare readonly troops: number;
+
+  protected constructor(values: ResourceGains) {
+    super(values, RESOURCE_MAXES);
   }
 }

@@ -81,6 +81,11 @@
   border-color: #56649a;
 }
 
+.command.selected {
+  background: #2c3656;
+  border-color: #56649a;
+}
+
 .command:disabled {
   opacity: 0.5;
   cursor: default;

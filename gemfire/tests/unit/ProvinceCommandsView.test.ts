@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { createCommandGroups } from '@/core/commands/province/catalog';
 import { WorldFactory } from '@/core/WorldFactory';
 import { EventBus } from '@/lib/EventBus';
+import { ConfirmCommandDialogView } from '@/ui/ProvinceCommands/CommandDialog/ConfirmCommandDialogView';
 import styles from '@/ui/ProvinceCommands/ProvinceCommands.module.scss';
 import { ProvinceCommandsView } from '@/ui/ProvinceCommands/ProvinceCommandsView';
 
@@ -11,9 +12,10 @@ describe('ProvinceCommandsView', () => {
     const world = new WorldFactory().create();
     const events = new EventBus();
     const commands = createCommandGroups({ world, events });
+    const cultivationDialog = new ConfirmCommandDialogView({ prompt: '' }, {});
     const markup = new ProvinceCommandsView(
       { world, commands, events },
-      {},
+      { cultivationDialog },
     ).render();
     const sections = markup.match(/<div class="[^"]*" data-group=/g);
 

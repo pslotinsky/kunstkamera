@@ -1,15 +1,12 @@
-import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
+import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
-import { WorldCommand, type WorldCommandContext } from '../WorldCommand';
-
-export class MoveTroopsCommand extends WorldCommand {
+export class MoveTroopsCommand extends ProvinceCommand {
   public constructor(context: WorldCommandContext) {
     super('Move Troops', context);
   }
 
   public execute(): void {
-    const { world, events } = this.context;
-
-    events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
+    this.recordAction();
+    this.endTurn();
   }
 }

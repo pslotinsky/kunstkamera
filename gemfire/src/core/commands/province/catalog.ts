@@ -3,7 +3,6 @@ import { AllyCommand } from './AllyCommand';
 import { AttackCommand } from './AttackCommand';
 import { ChangeLordCommand } from './ChangeLordCommand';
 import { CultivationCommand } from './CultivationCommand';
-import { DevelopCommand } from './DevelopCommand';
 import { EntrustCommand } from './EntrustCommand';
 import { GiveFoodCommand } from './GiveFoodCommand';
 import { HireMonsterCommand } from './HireMonsterCommand';
@@ -43,7 +42,6 @@ export function createCommandGroups(
     {
       title: 'Domestic',
       commands: [
-        new DevelopCommand(context),
         new CultivationCommand(context),
         new ProtectionCommand(context),
         new TradeCommand(context),

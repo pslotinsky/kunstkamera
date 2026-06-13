@@ -1,4 +1,5 @@
 import type { Province } from '@/core/domain/Province';
+import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 
 import { WorldCommand, type WorldCommandContext } from './WorldCommand';
 
@@ -24,10 +25,11 @@ export class TaxAndHarvestCommand extends WorldCommand {
   }
 
   private collect(province: Province): void {
-    province.addResources({
+    province.increaseResources({
       gold: PROVISIONAL_TAX_GOLD,
       food: this.calculateHarvest(province),
     });
+    this.context.events.publish(new ProvinceUpdatedEvent(province));
   }
 
   private calculateHarvest(province: Province): number {
