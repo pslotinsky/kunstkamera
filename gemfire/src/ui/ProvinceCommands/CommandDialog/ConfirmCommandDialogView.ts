@@ -5,15 +5,20 @@ import { ConfirmClickedEvent } from './ConfirmClickedEvent';
 import styles from './CommandDialog.module.scss';
 
 interface ConfirmCommandDialogContext {
+  readonly name: string;
   readonly prompt: string;
 }
 
 export class ConfirmCommandDialogView extends CommandDialogView<ConfirmCommandDialogContext> {
   protected readonly rootClass = styles.root!;
 
+  protected override get rootSelector(): string {
+    return `[data-dialog="${this.context.name}"]`;
+  }
+
   public render(): string {
     return `
-      <div class="${styles.root} ${styles.hidden}">
+      <div class="${styles.root} ${styles.hidden}" data-dialog="${this.context.name}">
         <p class="${styles.prompt}">${this.context.prompt}</p>
         <div class="${styles.actions}">
           <button class="${styles.button}" type="button" data-action="confirm">Yea</button>

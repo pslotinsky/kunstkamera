@@ -69,11 +69,15 @@ export abstract class View<
     }
   }
 
+  protected get rootSelector(): string {
+    return `.${this.rootClass}`;
+  }
+
   private findRootOrFail(container: HTMLElement): HTMLElement {
-    const root = container.querySelector<HTMLElement>(`.${this.rootClass}`);
+    const root = container.querySelector<HTMLElement>(this.rootSelector);
 
     if (!root) {
-      throw new Error(`.${this.rootClass} not found in container`);
+      throw new Error(`${this.rootSelector} not found in container`);
     }
 
     return root;

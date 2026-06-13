@@ -1,5 +1,7 @@
 import { CultivationCommand } from '@/core/commands/province/CultivationCommand';
 import type { CommandGroup } from '@/core/commands/province/catalog';
+import { DevelopCommand } from '@/core/commands/province/DevelopCommand';
+import { ProtectionCommand } from '@/core/commands/province/ProtectionCommand';
 import type { WorldCommand } from '@/core/commands/WorldCommand';
 import type { World } from '@/core/domain/World';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
@@ -28,7 +30,10 @@ export class ProvinceCommandsControl extends Control<
   private readonly dialogs = new Map<
     string,
     CommandDialogControl<AnyCommandDialogView>
-  >([[CultivationCommand.name, this.controls.cultivationDialog]]);
+  >([
+    [CultivationCommand.name, this.controls.cultivationDialog],
+    [ProtectionCommand.name, this.controls.protectionDialog],
+  ]);
 
   private pending: PendingDialog | null = null;
 
@@ -42,7 +47,12 @@ export class ProvinceCommandsControl extends Control<
       { world, commands, events },
       {
         cultivationDialog: new ConfirmCommandDialogControl(
-          `Invest ${CultivationCommand.COST} gold for cultivation?`,
+          CultivationCommand.name,
+          `Invest ${DevelopCommand.COST} gold for cultivation?`,
+        ),
+        protectionDialog: new ConfirmCommandDialogControl(
+          ProtectionCommand.name,
+          `Invest ${DevelopCommand.COST} gold for protection?`,
         ),
       },
     );
@@ -61,13 +71,10 @@ export class ProvinceCommandsControl extends Control<
       this.selectCommand(event.command),
     );
 
-    this.controls.cultivationDialog.subscribe(ConfirmClickedEvent, () =>
-      this.confirmCommand(),
-    );
-
-    this.controls.cultivationDialog.subscribe(CancelClickedEvent, () =>
-      this.closeDialog(),
-    );
+    for (const dialog of this.dialogs.values()) {
+      dialog.subscribe(ConfirmClickedEvent, () => this.confirmCommand());
+      dialog.subscribe(CancelClickedEvent, () => this.closeDialog());
+    }
 
     this.subscribe(TurnSkippedEvent, () => {
       const { world, events } = this.context;
@@ -77,6 +84,16 @@ export class ProvinceCommandsControl extends Control<
   }
 
   private selectCommand(command: WorldCommand): void {
+    const alreadyOpen = this.pending?.command === command;
+
+    this.closeDialog();
+
+    if (!alreadyOpen) {
+      this.runCommand(command);
+    }
+  }
+
+  private runCommand(command: WorldCommand): void {
     const dialog = this.dialogs.get(command.constructor.name);
 
     if (dialog) {

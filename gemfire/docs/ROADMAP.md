@@ -31,7 +31,7 @@ The loop that drives play: issue every province's orders, then let time pass.
 The Domestic orders that grow a province month over month.
 
 - [x] develop a province and cultivate its fields
-- [ ] build protection against attack and disaster
+- [x] build protection against attack and disaster
 - [ ] give food to raise loyalty (every order carries goodwill)
 - [ ] trade food at a market rate that swings month to month
 - [ ] transport gold and food to any province you own

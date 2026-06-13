@@ -12,10 +12,17 @@ describe('ProvinceCommandsView', () => {
     const world = new WorldFactory().create();
     const events = new EventBus();
     const commands = createCommandGroups({ world, events });
-    const cultivationDialog = new ConfirmCommandDialogView({ prompt: '' }, {});
+    const cultivationDialog = new ConfirmCommandDialogView(
+      { name: 'CultivationCommand', prompt: '' },
+      {},
+    );
+    const protectionDialog = new ConfirmCommandDialogView(
+      { name: 'ProtectionCommand', prompt: '' },
+      {},
+    );
     const markup = new ProvinceCommandsView(
       { world, commands, events },
-      { cultivationDialog },
+      { cultivationDialog, protectionDialog },
     ).render();
     const sections = markup.match(/<div class="[^"]*" data-group=/g);
 

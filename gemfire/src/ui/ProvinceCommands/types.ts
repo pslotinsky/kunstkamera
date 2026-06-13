@@ -13,6 +13,7 @@ export interface ProvinceCommandsContext {
 
 export type ProvinceCommandsControls = {
   readonly cultivationDialog: ConfirmCommandDialogControl;
+  readonly protectionDialog: ConfirmCommandDialogControl;
 };
 
 export type ProvinceCommandsViews = ChildrenViews<ProvinceCommandsControls>;

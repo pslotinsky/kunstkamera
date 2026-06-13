@@ -9,6 +9,7 @@ import type {
 import type { WorldCommand } from '@/core/commands/WorldCommand';
 import { View } from '@/lib/View';
 
+import { CommandDialogView } from './CommandDialog/CommandDialogView';
 import { CommandSelectedEvent } from './CommandSelectedEvent';
 import { TurnSkippedEvent } from './TurnSkippedEvent';
 import type { ProvinceCommandsContext, ProvinceCommandsViews } from './types';
@@ -87,10 +88,17 @@ export class ProvinceCommandsView extends View<
       <section class="${styles.root} ${styles.hidden}">
         <div class="${styles.groups}">${groupButtons}</div>
         ${commandSections}
-        ${this.views.cultivationDialog.render()}
+        ${this.renderDialogs()}
         <button class="${styles.skipTurn}" type="button" data-action="skip-turn" disabled>Skip Turn</button>
       </section>
     `;
+  }
+
+  protected renderDialogs(): string {
+    return Object.values(this.views)
+      .filter((view) => view instanceof CommandDialogView)
+      .map((view) => view.render())
+      .join('');
   }
 
   protected renderGroupButton(group: CommandGroup): string {

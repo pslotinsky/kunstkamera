@@ -1,12 +1,14 @@
-import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
+import type { DevelopmentGains } from '@/core/domain/Development';
 
-export class ProtectionCommand extends ProvinceCommand {
+import type { WorldCommandContext } from '../ProvinceCommand';
+import { DevelopCommand } from './DevelopCommand';
+
+export class ProtectionCommand extends DevelopCommand {
   public constructor(context: WorldCommandContext) {
     super('Protection', context);
   }
 
-  public execute(): void {
-    this.recordAction(1);
-    this.endTurn();
+  protected gains(amount: number): DevelopmentGains {
+    return { protection: amount };
   }
 }
