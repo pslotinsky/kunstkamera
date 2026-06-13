@@ -11,10 +11,10 @@ export function countTo(element: Element, from: number, to: number): void {
 
     if (step < STEPS_COUNT) {
       const value = Math.round(from + stepSize * step);
-      element.innerHTML = value.toString();
+      element.textContent = value.toString();
     } else {
       clearInterval(interval);
-      element.innerHTML = to.toString();
+      element.textContent = to.toString();
     }
   }, stepDuration);
 }

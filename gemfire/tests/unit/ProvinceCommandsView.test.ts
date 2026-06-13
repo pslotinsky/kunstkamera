@@ -4,6 +4,7 @@ import { createCommandGroups } from '@/core/commands/province/catalog';
 import { WorldFactory } from '@/core/WorldFactory';
 import { EventBus } from '@/lib/EventBus';
 import { ConfirmCommandDialogView } from '@/ui/ProvinceCommands/CommandDialog/ConfirmCommandDialogView';
+import { GiveFoodDialogView } from '@/ui/ProvinceCommands/CommandDialog/GiveFoodDialogView';
 import styles from '@/ui/ProvinceCommands/ProvinceCommands.module.scss';
 import { ProvinceCommandsView } from '@/ui/ProvinceCommands/ProvinceCommandsView';
 
@@ -20,9 +21,13 @@ describe('ProvinceCommandsView', () => {
       { name: 'ProtectionCommand', prompt: '' },
       {},
     );
+    const giveFoodDialog = new GiveFoodDialogView(
+      { name: 'GiveFoodCommand' },
+      {},
+    );
     const markup = new ProvinceCommandsView(
       { world, commands, events },
-      { cultivationDialog, protectionDialog },
+      { cultivationDialog, protectionDialog, giveFoodDialog },
     ).render();
     const sections = markup.match(/<div class="[^"]*" data-group=/g);
 

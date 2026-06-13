@@ -1,18 +1,62 @@
 import { View, type ViewRecord } from '@/lib/View';
 
+import { CancelClickedEvent } from './CancelClickedEvent';
+import { ConfirmClickedEvent } from './ConfirmClickedEvent';
+
 import styles from './CommandDialog.module.scss';
 
-export type AnyCommandDialogView = CommandDialogView<unknown, ViewRecord>;
+export interface CommandDialogContext {
+  readonly name: string;
+}
+
+export type AnyCommandDialogView = CommandDialogView<
+  CommandDialogContext,
+  ViewRecord
+>;
 
 export abstract class CommandDialogView<
-  Context = Record<string, never>,
+  Context extends CommandDialogContext = CommandDialogContext,
   Views extends ViewRecord = Record<string, never>,
 > extends View<Context, Views> {
+  protected readonly rootClass = styles.root!;
+
+  protected override get rootSelector(): string {
+    return `[data-dialog="${this.context.name}"]`;
+  }
+
   public show(): void {
     this.element.classList.remove(styles.hidden!);
   }
 
   public hide(): void {
     this.element.classList.add(styles.hidden!);
+  }
+
+  public render(): string {
+    return `
+      <div class="${styles.root} ${styles.hidden}" data-dialog="${this.context.name}">
+        ${this.renderBody()}
+      </div>
+    `;
+  }
+
+  protected abstract renderBody(): string;
+
+  protected override onMount(): void {
+    this.element.addEventListener(
+      'click',
+      (event) => {
+        const button = (event.target as Element).closest<HTMLButtonElement>(
+          'button',
+        );
+
+        if (button?.dataset.action === 'confirm') {
+          this.publish(new ConfirmClickedEvent());
+        } else if (button?.dataset.action === 'cancel') {
+          this.publish(new CancelClickedEvent());
+        }
+      },
+      { signal: this.lifetime.signal },
+    );
   }
 }

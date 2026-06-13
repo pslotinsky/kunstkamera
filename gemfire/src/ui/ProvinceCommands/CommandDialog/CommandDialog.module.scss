@@ -26,6 +26,11 @@
   cursor: pointer;
 }
 
-.button:hover {
+.button:hover:not(:disabled) {
   border-color: #56649a;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
 }

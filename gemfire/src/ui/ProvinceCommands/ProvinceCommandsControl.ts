@@ -1,6 +1,7 @@
 import { CultivationCommand } from '@/core/commands/province/CultivationCommand';
 import type { CommandGroup } from '@/core/commands/province/catalog';
 import { DevelopCommand } from '@/core/commands/province/DevelopCommand';
+import { GiveFoodCommand } from '@/core/commands/province/GiveFoodCommand';
 import { ProtectionCommand } from '@/core/commands/province/ProtectionCommand';
 import type { WorldCommand } from '@/core/commands/WorldCommand';
 import type { World } from '@/core/domain/World';
@@ -13,6 +14,7 @@ import type { CommandDialogControl } from './CommandDialog/CommandDialogControl'
 import type { AnyCommandDialogView } from './CommandDialog/CommandDialogView';
 import { ConfirmClickedEvent } from './CommandDialog/ConfirmClickedEvent';
 import { ConfirmCommandDialogControl } from './CommandDialog/ConfirmCommandDialogControl';
+import { GiveFoodDialogControl } from './CommandDialog/GiveFoodDialogControl';
 import { CommandSelectedEvent } from './CommandSelectedEvent';
 import { ProvinceCommandsView } from './ProvinceCommandsView';
 import { TurnSkippedEvent } from './TurnSkippedEvent';
@@ -33,6 +35,7 @@ export class ProvinceCommandsControl extends Control<
   >([
     [CultivationCommand.name, this.controls.cultivationDialog],
     [ProtectionCommand.name, this.controls.protectionDialog],
+    [GiveFoodCommand.name, this.controls.giveFoodDialog],
   ]);
 
   private pending: PendingDialog | null = null;
@@ -54,6 +57,7 @@ export class ProvinceCommandsControl extends Control<
           ProtectionCommand.name,
           `Invest ${DevelopCommand.COST} gold for protection?`,
         ),
+        giveFoodDialog: new GiveFoodDialogControl(GiveFoodCommand.name, world),
       },
     );
   }
@@ -72,7 +76,7 @@ export class ProvinceCommandsControl extends Control<
     );
 
     for (const dialog of this.dialogs.values()) {
-      dialog.subscribe(ConfirmClickedEvent, () => this.confirmCommand());
+      dialog.subscribe(ConfirmClickedEvent, () => this.completeCommand());
       dialog.subscribe(CancelClickedEvent, () => this.closeDialog());
     }
 
@@ -99,19 +103,19 @@ export class ProvinceCommandsControl extends Control<
     if (dialog) {
       this.pending = { command, dialog };
       this.view.selectCommand(command.label);
-      dialog.open();
+      dialog.open(command);
     } else {
       command.execute();
     }
   }
 
-  private confirmCommand(): void {
-    const pending = this.pending;
+  private completeCommand(): void {
+    const command = this.pending?.command;
 
     this.closeDialog();
 
-    if (pending) {
-      pending.command.execute();
+    if (command) {
+      command.execute();
       this.view.closeGroups();
       this.view.disableActions();
     }
