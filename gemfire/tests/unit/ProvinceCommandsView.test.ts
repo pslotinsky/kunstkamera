@@ -5,6 +5,7 @@ import { WorldFactory } from '@/core/WorldFactory';
 import { EventBus } from '@/lib/EventBus';
 import { ConfirmCommandDialogView } from '@/ui/ProvinceCommands/CommandDialog/ConfirmCommandDialogView';
 import { GiveFoodDialogView } from '@/ui/ProvinceCommands/CommandDialog/GiveFoodDialogView';
+import { TradeDialogView } from '@/ui/ProvinceCommands/CommandDialog/TradeDialogView';
 import styles from '@/ui/ProvinceCommands/ProvinceCommands.module.scss';
 import { ProvinceCommandsView } from '@/ui/ProvinceCommands/ProvinceCommandsView';
 
@@ -25,9 +26,10 @@ describe('ProvinceCommandsView', () => {
       { name: 'GiveFoodCommand' },
       {},
     );
+    const tradeDialog = new TradeDialogView({ name: 'TradeCommand' }, {});
     const markup = new ProvinceCommandsView(
       { world, commands, events },
-      { cultivationDialog, protectionDialog, giveFoodDialog },
+      { cultivationDialog, protectionDialog, giveFoodDialog, tradeDialog },
     ).render();
     const sections = markup.match(/<div class="[^"]*" data-group=/g);
 

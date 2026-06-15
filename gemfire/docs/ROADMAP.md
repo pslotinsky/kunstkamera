@@ -33,7 +33,7 @@ The Domestic orders that grow a province month over month.
 - [x] develop a province and cultivate its fields
 - [x] build protection against attack and disaster
 - [x] give food to raise loyalty (every order carries goodwill)
-- [ ] trade food at a market rate that swings month to month
+- [x] trade food at a market rate that swings month to month
 - [ ] transport gold and food to any province you own
 
 ## 4. Generals & lords

@@ -1,6 +1,5 @@
 import type { DevelopmentGains } from '@/core/domain/Development';
 import type { Province } from '@/core/domain/Province';
-import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 
 import { ProvinceCommand } from '../ProvinceCommand';
 
@@ -21,12 +20,10 @@ export abstract class DevelopCommand extends ProvinceCommand {
     const province = this.currentProvince;
 
     if (province && this.canExecute()) {
-      province.decreaseResources({ gold: DevelopCommand.COST });
-      province.increaseDevelopment(this.gains(this.calculateGain(province)));
+      province.addResources({ gold: -DevelopCommand.COST });
+      province.addDevelopment(this.gains(this.calculateGain(province)));
 
-      this.publish(new ProvinceUpdatedEvent(province));
-      this.recordAction(1);
-      this.endTurn(800);
+      this.complete(province, 1);
     }
   }
 

@@ -44,6 +44,7 @@ export class WorldEngine {
   }
 
   private handleMonthStart(): void {
+    this.world.market.swing(this.world.date.month);
     this.taxAndHarvest.execute();
   }
 

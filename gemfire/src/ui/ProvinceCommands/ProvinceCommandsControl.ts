@@ -3,6 +3,7 @@ import type { CommandGroup } from '@/core/commands/province/catalog';
 import { DevelopCommand } from '@/core/commands/province/DevelopCommand';
 import { GiveFoodCommand } from '@/core/commands/province/GiveFoodCommand';
 import { ProtectionCommand } from '@/core/commands/province/ProtectionCommand';
+import { TradeCommand } from '@/core/commands/province/TradeCommand';
 import type { WorldCommand } from '@/core/commands/WorldCommand';
 import type { World } from '@/core/domain/World';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
@@ -15,6 +16,7 @@ import type { AnyCommandDialogView } from './CommandDialog/CommandDialogView';
 import { ConfirmClickedEvent } from './CommandDialog/ConfirmClickedEvent';
 import { ConfirmCommandDialogControl } from './CommandDialog/ConfirmCommandDialogControl';
 import { GiveFoodDialogControl } from './CommandDialog/GiveFoodDialogControl';
+import { TradeDialogControl } from './CommandDialog/TradeDialogControl';
 import { CommandSelectedEvent } from './CommandSelectedEvent';
 import { ProvinceCommandsView } from './ProvinceCommandsView';
 import { TurnSkippedEvent } from './TurnSkippedEvent';
@@ -36,6 +38,7 @@ export class ProvinceCommandsControl extends Control<
     [CultivationCommand.name, this.controls.cultivationDialog],
     [ProtectionCommand.name, this.controls.protectionDialog],
     [GiveFoodCommand.name, this.controls.giveFoodDialog],
+    [TradeCommand.name, this.controls.tradeDialog],
   ]);
 
   private pending: PendingDialog | null = null;
@@ -58,6 +61,7 @@ export class ProvinceCommandsControl extends Control<
           `Invest ${DevelopCommand.COST} gold for protection?`,
         ),
         giveFoodDialog: new GiveFoodDialogControl(GiveFoodCommand.name, world),
+        tradeDialog: new TradeDialogControl(TradeCommand.name, world),
       },
     );
   }
@@ -110,15 +114,27 @@ export class ProvinceCommandsControl extends Control<
   }
 
   private completeCommand(): void {
-    const command = this.pending?.command;
+    const pending = this.pending;
 
-    this.closeDialog();
-
-    if (command) {
-      command.execute();
-      this.view.closeGroups();
-      this.view.disableActions();
+    if (pending) {
+      if (pending.command.consumesTurn()) {
+        this.commitTurn(pending);
+      } else {
+        this.executeAndRefresh(pending);
+      }
     }
+  }
+
+  private commitTurn(pending: PendingDialog): void {
+    this.closeDialog();
+    pending.command.execute();
+    this.view.closeGroups();
+    this.view.disableActions();
+  }
+
+  private executeAndRefresh(pending: PendingDialog): void {
+    pending.command.execute();
+    pending.dialog.refresh();
   }
 
   private closeDialog(): void {

@@ -22,24 +22,12 @@ export class Stats<T extends string = string> {
     return this.stats.get(key)!.value;
   }
 
-  public increase(gains: StatsParams<T>): this {
+  public add(gains: StatsParams<T>): this {
     const newValues = {} as Record<T, number>;
 
     for (const [key, stat] of this.stats) {
-      newValues[key] = stat.increase(
+      newValues[key] = stat.add(
         (gains as Record<T, number | undefined>)[key] ?? 0,
-      ).value;
-    }
-
-    return this.clone(newValues);
-  }
-
-  public decrease(costs: StatsParams<T>): this {
-    const newValues = {} as Record<T, number>;
-
-    for (const [key, stat] of this.stats) {
-      newValues[key] = stat.decrease(
-        (costs as Record<T, number | undefined>)[key] ?? 0,
       ).value;
     }
 

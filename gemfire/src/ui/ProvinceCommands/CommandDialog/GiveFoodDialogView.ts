@@ -42,7 +42,7 @@ export class GiveFoodDialogView extends CommandDialogView<GiveFoodDialogContext>
 
     return `
       <p class="${styles.prompt}" data-prompt>Give how much food?</p>
-      <div class="${styles.actions}">${options}</div>
+      <div class="${styles.options}">${options}</div>
     `;
   }
 

@@ -25,7 +25,7 @@ export class TaxAndHarvestCommand extends WorldCommand {
   }
 
   private collect(province: Province): void {
-    province.increaseResources({
+    province.addResources({
       gold: PROVISIONAL_TAX_GOLD,
       food: this.calculateHarvest(province),
     });

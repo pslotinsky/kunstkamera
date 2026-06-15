@@ -1,5 +1,3 @@
-import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
-
 import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
 const CHARISMA_DIVISOR = 300;
@@ -18,12 +16,10 @@ export class GiveFoodCommand extends ProvinceCommand {
       const charisma = province.governor?.stats.charisma ?? 0;
       const loyalty = Math.floor((charisma * this.food) / CHARISMA_DIVISOR);
 
-      province.decreaseResources({ food: this.food });
-      province.increaseDevelopment({ loyalty });
+      province.addResources({ food: -this.food });
+      province.addDevelopment({ loyalty });
 
-      this.publish(new ProvinceUpdatedEvent(province));
-      this.recordAction(1);
-      this.endTurn(800);
+      this.complete(province, 1);
     }
   }
 }

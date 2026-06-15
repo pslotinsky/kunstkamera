@@ -5,6 +5,7 @@ import type { EventBus } from '@/lib/EventBus';
 
 import type { ConfirmCommandDialogControl } from './CommandDialog/ConfirmCommandDialogControl';
 import type { GiveFoodDialogControl } from './CommandDialog/GiveFoodDialogControl';
+import type { TradeDialogControl } from './CommandDialog/TradeDialogControl';
 
 export interface ProvinceCommandsContext {
   readonly world: World;
@@ -16,6 +17,7 @@ export type ProvinceCommandsControls = {
   readonly cultivationDialog: ConfirmCommandDialogControl;
   readonly protectionDialog: ConfirmCommandDialogControl;
   readonly giveFoodDialog: GiveFoodDialogControl;
+  readonly tradeDialog: TradeDialogControl;
 };
 
 export type ProvinceCommandsViews = ChildrenViews<ProvinceCommandsControls>;

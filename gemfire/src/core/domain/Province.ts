@@ -34,20 +34,12 @@ export class Province {
     this.development = params.development ?? Development.empty();
   }
 
-  public increaseResources(gains: ResourceGains): void {
-    this.resources = this.resources.increase(gains);
+  public addResources(gains: ResourceGains): void {
+    this.resources = this.resources.add(gains);
   }
 
-  public decreaseResources(costs: ResourceGains): void {
-    this.resources = this.resources.decrease(costs);
-  }
-
-  public increaseDevelopment(gains: DevelopmentGains): void {
-    this.development = this.development.increase(gains);
-  }
-
-  public decreaseDevelopment(gains: DevelopmentGains): void {
-    this.development = this.development.decrease(gains);
+  public addDevelopment(gains: DevelopmentGains): void {
+    this.development = this.development.add(gains);
   }
 
   public recordAction(goodwill: number): void {

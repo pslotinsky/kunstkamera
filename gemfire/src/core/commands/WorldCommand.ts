@@ -24,6 +24,10 @@ export abstract class WorldCommand {
     return true;
   }
 
+  public consumesTurn(): boolean {
+    return true;
+  }
+
   protected get currentProvince(): Province | undefined {
     const { world } = this.context;
 

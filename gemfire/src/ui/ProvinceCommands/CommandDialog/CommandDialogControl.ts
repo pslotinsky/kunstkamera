@@ -13,6 +13,8 @@ export abstract class CommandDialogControl<
     this.view.show();
   }
 
+  public refresh(): void {}
+
   public close(): void {
     this.view.hide();
   }
