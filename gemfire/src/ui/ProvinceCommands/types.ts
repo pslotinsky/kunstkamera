@@ -3,7 +3,7 @@ import type { World } from '@/core/domain/World';
 import type { ChildrenViews } from '@/lib/Control';
 import type { EventBus } from '@/lib/EventBus';
 
-import type { ConfirmCommandDialogControl } from './CommandDialog/ConfirmCommandDialogControl';
+import type { DevelopDialogControl } from './CommandDialog/DevelopDialogControl';
 import type { GiveFoodDialogControl } from './CommandDialog/GiveFoodDialogControl';
 import type { TradeDialogControl } from './CommandDialog/TradeDialogControl';
 import type { TransportDialogControl } from './CommandDialog/TransportDialogControl';
@@ -15,8 +15,7 @@ export interface ProvinceCommandsContext {
 }
 
 export type ProvinceCommandsControls = {
-  readonly cultivationDialog: ConfirmCommandDialogControl;
-  readonly protectionDialog: ConfirmCommandDialogControl;
+  readonly developDialog: DevelopDialogControl;
   readonly giveFoodDialog: GiveFoodDialogControl;
   readonly tradeDialog: TradeDialogControl;
   readonly transportDialog: TransportDialogControl;

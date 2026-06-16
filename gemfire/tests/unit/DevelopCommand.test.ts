@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { CultivationCommand } from '@/core/commands/province/CultivationCommand';
-import type { DevelopCommand } from '@/core/commands/province/DevelopCommand';
-import { ProtectionCommand } from '@/core/commands/province/ProtectionCommand';
-import type { WorldCommandContext } from '@/core/commands/WorldCommand';
+import {
+  DevelopCommand,
+  type DevelopTarget,
+} from '@/core/commands/province/DevelopCommand';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 
@@ -12,28 +12,12 @@ import { makeFamily, makeGeneral, makeProvince, makeWorld } from './factories';
 const INITIAL_GOLD = 500;
 const INITIAL_STAT = 20;
 
-const developOrders = [
-  {
-    label: 'CultivationCommand',
-    stat: 'cultivation',
-    make: (context: WorldCommandContext) => new CultivationCommand(context),
-  },
-  {
-    label: 'ProtectionCommand',
-    stat: 'protection',
-    make: (context: WorldCommandContext) => new ProtectionCommand(context),
-  },
-] as const;
-
 interface FixtureOptions {
   readonly gold?: number | undefined;
   readonly intelligence?: number | undefined;
 }
 
-function createFixture(
-  make: (context: WorldCommandContext) => DevelopCommand,
-  options: FixtureOptions = {},
-) {
+function createFixture(target: DevelopTarget, options: FixtureOptions = {}) {
   const governor = makeGeneral({
     name: 'Ander',
     intelligence: options.intelligence,
@@ -49,18 +33,22 @@ function createFixture(
     protection: INITIAL_STAT,
   });
   const { world, events } = makeWorld([province], family);
-  const command = make({ world, events });
+  const command = new DevelopCommand({ world, events });
+
+  command.target = target;
 
   return { world, events, province, command };
 }
 
-describe.each(developOrders)('$label', ({ make, stat }) => {
+const targets: readonly DevelopTarget[] = ['cultivation', 'protection'];
+
+describe.each(targets)('DevelopCommand (%s)', (target) => {
   afterEach(() => vi.useRealTimers());
 
   it('spends gold, raises its stat, records the deed, and ends the turn', () => {
     vi.useFakeTimers();
 
-    const { events, province, command } = createFixture(make, {
+    const { events, province, command } = createFixture(target, {
       intelligence: 50,
       gold: INITIAL_GOLD,
     });
@@ -71,7 +59,7 @@ describe.each(developOrders)('$label', ({ make, stat }) => {
     command.execute();
 
     expect(province.resources.gold).toBe(INITIAL_GOLD - 10);
-    expect(province.development[stat]).toBe(INITIAL_STAT + 4);
+    expect(province.development[target]).toBe(INITIAL_STAT + 4);
     expect(province.goodwill).toBe(1);
     expect(province.actionCount).toBe(1);
     expect(
@@ -86,8 +74,8 @@ describe.each(developOrders)('$label', ({ make, stat }) => {
   });
 
   it('scales the gain with the governor intelligence', () => {
-    const dull = createFixture(make, { intelligence: 0, gold: INITIAL_GOLD });
-    const bright = createFixture(make, {
+    const dull = createFixture(target, { intelligence: 0, gold: INITIAL_GOLD });
+    const bright = createFixture(target, {
       intelligence: 99,
       gold: INITIAL_GOLD,
     });
@@ -95,12 +83,12 @@ describe.each(developOrders)('$label', ({ make, stat }) => {
     dull.command.execute();
     bright.command.execute();
 
-    expect(dull.province.development[stat]).toBe(INITIAL_STAT + 2);
-    expect(bright.province.development[stat]).toBe(INITIAL_STAT + 5);
+    expect(dull.province.development[target]).toBe(INITIAL_STAT + 2);
+    expect(bright.province.development[target]).toBe(INITIAL_STAT + 5);
   });
 
   it('refuses when gold is short', () => {
-    const { events, province, command } = createFixture(make, { gold: 9 });
+    const { events, province, command } = createFixture(target, { gold: 9 });
     const published: object[] = [];
 
     events.observe((event) => published.push(event));
@@ -110,7 +98,7 @@ describe.each(developOrders)('$label', ({ make, stat }) => {
     command.execute();
 
     expect(province.resources.gold).toBe(9);
-    expect(province.development[stat]).toBe(INITIAL_STAT);
+    expect(province.development[target]).toBe(INITIAL_STAT);
     expect(province.actionCount).toBe(0);
     expect(published).toEqual([]);
   });

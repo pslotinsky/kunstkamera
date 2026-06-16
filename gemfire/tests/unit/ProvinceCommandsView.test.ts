@@ -4,7 +4,7 @@ import { createCommandGroups } from '@/core/commands/province/catalog';
 import { WorldFactory } from '@/core/WorldFactory';
 import { EventBus } from '@/lib/EventBus';
 import { AmountFieldView } from '@/ui/ProvinceCommands/AmountField/AmountFieldView';
-import { ConfirmCommandDialogView } from '@/ui/ProvinceCommands/CommandDialog/ConfirmCommandDialogView';
+import { DevelopDialogView } from '@/ui/ProvinceCommands/CommandDialog/DevelopDialogView';
 import { GiveFoodDialogView } from '@/ui/ProvinceCommands/CommandDialog/GiveFoodDialogView';
 import { TradeDialogView } from '@/ui/ProvinceCommands/CommandDialog/TradeDialogView';
 import { TransportDialogView } from '@/ui/ProvinceCommands/CommandDialog/TransportDialogView';
@@ -16,14 +16,7 @@ describe('ProvinceCommandsView', () => {
     const world = new WorldFactory().create();
     const events = new EventBus();
     const commands = createCommandGroups({ world, events });
-    const cultivationDialog = new ConfirmCommandDialogView(
-      { name: 'CultivationCommand', prompt: '' },
-      {},
-    );
-    const protectionDialog = new ConfirmCommandDialogView(
-      { name: 'ProtectionCommand', prompt: '' },
-      {},
-    );
+    const developDialog = new DevelopDialogView({ name: 'DevelopCommand' }, {});
     const giveFoodDialog = new GiveFoodDialogView(
       { name: 'GiveFoodCommand' },
       {},
@@ -42,8 +35,7 @@ describe('ProvinceCommandsView', () => {
     const markup = new ProvinceCommandsView(
       { world, commands, events },
       {
-        cultivationDialog,
-        protectionDialog,
+        developDialog,
         giveFoodDialog,
         tradeDialog,
         transportDialog,

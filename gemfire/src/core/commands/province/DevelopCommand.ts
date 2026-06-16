@@ -1,14 +1,22 @@
 import type { DevelopmentGains } from '@/core/domain/Development';
 import type { Province } from '@/core/domain/Province';
 
-import { ProvinceCommand } from '../ProvinceCommand';
+import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
 const MIN_GAIN = 2;
 const MAX_GAIN = 5;
 const INTELLIGENCE_PER_GAIN = 25;
 
-export abstract class DevelopCommand extends ProvinceCommand {
+export type DevelopTarget = 'cultivation' | 'protection';
+
+export class DevelopCommand extends ProvinceCommand {
   public static readonly COST = 10;
+
+  public target: DevelopTarget = 'cultivation';
+
+  public constructor(context: WorldCommandContext) {
+    super('Develop', context);
+  }
 
   public override canExecute(): boolean {
     const gold = this.currentProvince?.resources.gold ?? 0;
@@ -27,7 +35,11 @@ export abstract class DevelopCommand extends ProvinceCommand {
     }
   }
 
-  protected abstract gains(amount: number): DevelopmentGains;
+  private gains(amount: number): DevelopmentGains {
+    return this.target === 'cultivation'
+      ? { cultivation: amount }
+      : { protection: amount };
+  }
 
   private calculateGain({ governor }: Province): number {
     const intelligence = governor?.stats.intelligence ?? 0;

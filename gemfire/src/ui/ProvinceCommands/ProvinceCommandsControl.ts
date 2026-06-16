@@ -1,8 +1,6 @@
-import { CultivationCommand } from '@/core/commands/province/CultivationCommand';
 import type { CommandGroup } from '@/core/commands/province/catalog';
 import { DevelopCommand } from '@/core/commands/province/DevelopCommand';
 import { GiveFoodCommand } from '@/core/commands/province/GiveFoodCommand';
-import { ProtectionCommand } from '@/core/commands/province/ProtectionCommand';
 import { TradeCommand } from '@/core/commands/province/TradeCommand';
 import { TransportCommand } from '@/core/commands/province/TransportCommand';
 import type { WorldCommand } from '@/core/commands/WorldCommand';
@@ -13,7 +11,7 @@ import { Control } from '@/lib/Control';
 import type { EventBus } from '@/lib/EventBus';
 
 import type { AnyCommandDialogControl } from './CommandDialog/CommandDialogControl';
-import { ConfirmCommandDialogControl } from './CommandDialog/ConfirmCommandDialogControl';
+import { DevelopDialogControl } from './CommandDialog/DevelopDialogControl';
 import { GiveFoodDialogControl } from './CommandDialog/GiveFoodDialogControl';
 import { TradeDialogControl } from './CommandDialog/TradeDialogControl';
 import { TransportDialogControl } from './CommandDialog/TransportDialogControl';
@@ -34,8 +32,7 @@ export class ProvinceCommandsControl extends Control<
   ProvinceCommandsControls
 > {
   private readonly dialogs = new Map<string, AnyCommandDialogControl>([
-    [CultivationCommand.name, this.controls.cultivationDialog],
-    [ProtectionCommand.name, this.controls.protectionDialog],
+    [DevelopCommand.name, this.controls.developDialog],
     [GiveFoodCommand.name, this.controls.giveFoodDialog],
     [TradeCommand.name, this.controls.tradeDialog],
     [TransportCommand.name, this.controls.transportDialog],
@@ -52,14 +49,7 @@ export class ProvinceCommandsControl extends Control<
       ProvinceCommandsView,
       { world, commands, events },
       {
-        cultivationDialog: new ConfirmCommandDialogControl(
-          CultivationCommand.name,
-          `Invest ${DevelopCommand.COST} gold for cultivation?`,
-        ),
-        protectionDialog: new ConfirmCommandDialogControl(
-          ProtectionCommand.name,
-          `Invest ${DevelopCommand.COST} gold for protection?`,
-        ),
+        developDialog: new DevelopDialogControl(DevelopCommand.name),
         giveFoodDialog: new GiveFoodDialogControl(GiveFoodCommand.name, world),
         tradeDialog: new TradeDialogControl(TradeCommand.name, world),
         transportDialog: new TransportDialogControl(
