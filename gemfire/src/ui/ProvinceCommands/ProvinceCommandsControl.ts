@@ -19,8 +19,11 @@ import { CommandSelectedEvent } from './CommandSelectedEvent';
 import { ProvinceCommandsView } from './ProvinceCommandsView';
 import { TargetingEndedEvent } from './TargetingEndedEvent';
 import { TargetingStartedEvent } from './TargetingStartedEvent';
-import { TurnSkippedEvent } from './TurnSkippedEvent';
 import type { ProvinceCommandsControls } from './types';
+
+// Pause after a turn-consuming command so the player sees its result before the
+// turn advances — presentation pacing, kept out of the synchronous domain.
+const TURN_END_DELAY_MS = 800;
 
 interface PendingDialog {
   readonly command: WorldCommand;
@@ -81,12 +84,6 @@ export class ProvinceCommandsControl extends Control<
       dialog.onConfirm(() => this.completeCommand());
       dialog.onCancel(() => this.closeDialog());
     }
-
-    this.subscribe(TurnSkippedEvent, () => {
-      const { world, events } = this.context;
-
-      events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
-    });
   }
 
   private selectCommand(command: WorldCommand): void {
@@ -114,6 +111,10 @@ export class ProvinceCommandsControl extends Control<
       }
     } else {
       command.execute();
+
+      if (command.consumesTurn()) {
+        this.finishTurn();
+      }
     }
   }
 
@@ -132,8 +133,19 @@ export class ProvinceCommandsControl extends Control<
   private commitTurn(pending: PendingDialog): void {
     this.closeDialog();
     pending.command.execute();
+    this.finishTurn();
+  }
+
+  private finishTurn(): void {
     this.view.closeGroups();
     this.view.disableActions();
+
+    const { world, events } = this.context;
+
+    setTimeout(
+      () => events.publish(new TurnEndedEvent(world.turnQueue.turnNumber)),
+      TURN_END_DELAY_MS,
+    );
   }
 
   private executeAndRefresh(pending: PendingDialog): void {

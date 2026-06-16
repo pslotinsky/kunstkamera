@@ -4,7 +4,7 @@ Conventions for the Gemfire TypeScript codebase. Biome (formatter, linter, and i
 
 ## Files & modules
 
-- **One class per file; the filename matches the class name in PascalCase** — `WorldMap.ts` exports `class WorldMap`, `GameScreenComponent.ts` exports `class GameScreenComponent`. This holds for the UI too: a component is a class.
+- **One class per file; the filename matches the class name in PascalCase** — `WorldMap.ts` exports `class WorldMap`, `GameScreenView.ts` exports `class GameScreenView`. This holds for the UI too: each component is a `View` class (markup + in-place DOM updates) paired with a `Control` class (state + coordination), one class per file.
 - Modules that are pure data or plain functions use **kebab-case** filenames — config (`provinces.ts`), render-models (`map-view-model.ts`), shared helpers (`dom.ts`).
 
 ## Classes
@@ -73,7 +73,7 @@ Conventions for the Gemfire TypeScript codebase. Biome (formatter, linter, and i
   ```
 
 - Use the **`private` keyword** for private fields, never `#`.
-- **Constructors do no side-effecting work.** They wire dependencies (store params, construct collaborators) and may compute pure derived state — but no DOM building/attachment, I/O, event wiring, or other side effects. For a component that work belongs in the `onMount()` lifecycle hook, which runs once the element exists:
+- **Constructors do no side-effecting work.** They wire dependencies (store params, construct collaborators) and may compute pure derived state — but no DOM building/attachment, I/O, subscriptions, or other side effects. For a component the markup is its `template` getter, and side-effecting setup (subscriptions, imperative DOM that a template can't express) belongs in the `onMount()` lifecycle hook, which runs once the element exists:
 
   ```ts
   public constructor(world: World) {
@@ -82,10 +82,8 @@ Conventions for the Gemfire TypeScript codebase. Biome (formatter, linter, and i
   }
 
   protected override onMount(): void {
-    this.element.addEventListener(
-      'click',
-      (event) => this.handleClick(event),
-      { signal: this.domListeners.signal },
+    this.subscribe(ProvinceSelectedEvent, (event) =>
+      this.selectProvince(event.provinceNumber),
     );
   }
   ```
@@ -130,11 +128,11 @@ Conventions for the Gemfire TypeScript codebase. Biome (formatter, linter, and i
 
 ## UI & DOM
 
-- **Render through trusted template strings — no manual DOM building, no untrusted HTML.** A component returns its markup as a template string from `render()`, and the base `Component` parses it once (via a `<template>` element). Everything interpolated must be trusted: static config and domain values (province names, counts), never unescaped user input. If dynamic text from outside the app ever enters a template, escape it first.
-- **Component naming.** Every UI component class ends in `*Component` — `GameScreenComponent` (the top-level screen the player sees), `WorldMapComponent`, `GamePanelComponent`, `ProvinceInfoComponent`. Not `*View` (that is the render-model vocabulary — `ProvinceView`, `mapViewModel` — and these classes hold state and wire events, so they behave more like controllers than views); not `*Widget` (reserve that for low-level primitives like a `Button`).
-- **One component, one concern, one DOM subtree — and they nest.** Split the UI into small components rather than one class that does everything: the top-level component (`GameScreenComponent`) builds the page layout and coordinates state (selection); each component owns a single concern — `WorldMapComponent` is the interactive SVG only (province paths, clicks, highlights — no domain), `GamePanelComponent` is the left rail that composes its own children (a `ProvinceInfoComponent` section, with command/family sections to follow). A parent pushes state down by calling its children's methods, and a child reports up by publishing a typed event (see below).
-- **Components render to a string and own their lifecycle, not the constructor.** A component's constructor only wires dependencies (including constructing its child components). `render()` returns the component's HTML and embeds each child inline via `${child.render()}`; `onMount()` adopts that DOM and wires events. The root installs with `mount(container)` (builds its element, appends it); a child adopts its already-rendered DOM with `attach(container)`. **Each component declares its root class once as a `rootClass` field, used in its own `render()` and read by `attach()` to find itself — so a parent never names a child's root selector.** A parent calls `child.attach(this.element)`, never `child.attach(this.element.querySelector('.child-root'))`. `main.ts`: `new GameScreenComponent(world)` then `screen.mount(app)`.
-- **A view renders once and updates in place — there is no rerender.** `render()` runs a single time at mount; every later change is a targeted DOM mutation on the standing element: toggle a class (`hide()`, highlights), flip a property (`disabled`), or swap a leaf's content with `this.element.innerHTML = this.renderContent()` (the info panel, the turn status). Both DOM listeners and inbound `subscribe(...)` registrations use the single base `lifetime` AbortController, aborted once in `unmount()` — nothing is wired twice and nothing leaks.
+- **Render with lit-html, once — no manual DOM building, no untrusted HTML.** A `View`'s markup is its `template` getter, which returns a lit-html `TemplateResult` from an `html` tagged template; the base `View` renders it into the element once at mount and never re-renders. Everything interpolated must be trusted: static config and domain values (province names, counts), never unescaped user input — lit escapes text bindings by default, and `unsafeHTML` is reserved for trusted raw markup (the map SVG).
+- **Component naming.** Each UI component is a pair: a `*View` class (`GameScreenView`, `WorldMapView`, `ProvinceInfoView`) owning markup and in-place DOM updates, and a `*Control` class (`GameScreenControl`, `WorldMapControl`, …) owning state, coordination, and event subscriptions. The split is what makes the `*View` name honest — coordination lives in the control, not the view. Reserve `*Widget` for low-level primitives (a `Button`); render-models stay plain data in kebab-case modules (`map-view-model.ts`), not `*View` classes.
+- **One component, one concern, one DOM subtree — and they nest.** Split the UI into small components rather than one class that does everything: `GameScreenControl` coordinates top-level state (selection, the active turn) while `GameScreenView` lays out the page; each component owns a single concern — `WorldMapView` is the interactive SVG only (province paths, clicks, highlights — no domain), `GamePanelView` is the left rail that composes its children (`ProvinceInfoView`, `ProvinceCommandsView`). A parent control pushes state down by calling its child controls' methods, and a child reports up by publishing a typed event (see below).
+- **A View's markup is its `template` getter; events bind inline; lifecycle lives in `mount`/`onMount`, not the constructor.** Constructors only wire dependencies — a `Control` constructs its `View` and its child controls. The `View`'s `template` getter returns its lit-html markup and embeds each child inline via `${this.views.child.template}`; event handlers are declared inline as lit bindings (`@click=${() => this.publish(new TurnSkippedEvent())}`), so there is no manual `addEventListener` except for raw injected markup like the map SVG (delegation in `onMount`). The root installs with `mount(container)` — it renders its template once, then locates its element; a child adopts its already-rendered DOM with `attach(container)`. **Each View declares its root class once as a `rootClass` field, read by `rootSelector`/`attach()` to find itself — so a parent never names a child's root selector** (a parent calls `child.attach(this.element)`, never `child.attach(this.element.querySelector('.child-root'))`). `main.ts`: `new GameScreenControl({ world, events, commands })` then `screen.mount(app)`.
+- **A View renders once and updates in place — there is no rerender.** The `template` getter renders a single time at mount; every later change is a targeted DOM mutation on the standing element: toggle a class (`hide()`, highlights), flip a property (`disabled`), or swap a leaf's content with `this.element.innerHTML = …` (the info panel, the turn status). Both DOM listeners and inbound `subscribe(...)` registrations use the single base `lifetime` AbortController, aborted once in `unmount()` — nothing is wired twice and nothing leaks.
 - **A child talks to its parent through a typed event, not a callback.** An event is a plain class carrying its payload as readonly fields — `class ProvinceSelectedEvent { constructor(public readonly provinceNumber: number) {} }` — no DOM `Event`/`CustomEvent` inheritance, so events log clean in the console (`events.observe` + `console.debug` in dev mode shows the whole causal chain without DOM noise). The `EventBus` keys subscriptions by the event's constructor, so handlers are fully typed with no cast: `this.worldMap.subscribe(ProvinceSelectedEvent, (event) => this.selectProvince(event.provinceNumber))`. The same bus class serves the core (engine ↔ commands) and each component. The bus dispatches run-to-completion: an event published while another dispatches is queued FIFO, never nested — handlers may freely answer events with new events, and long reaction chains cannot overflow the stack.
 
 ## Formatting & linting

@@ -64,13 +64,14 @@ function drainMonth(fixture: Fixture): void {
 }
 
 describe('WorldEngine', () => {
-  it('advances the queue when a turn-consuming command executes on the current province', () => {
+  it('records the action but leaves the turn for the orchestrator when a command executes', () => {
     const { world, events } = createFixture(new CalendarDate(1186, 4));
     const province = world.turnQueue.current!;
 
     new RecruitCommand({ world, events }).execute();
 
-    expect(world.turnQueue.current).not.toBe(province);
+    expect(world.turnQueue.current).toBe(province);
+    expect(province.actionCount).toBe(1);
   });
 
   it('keeps the current province after a free command', () => {

@@ -1,8 +1,7 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { GiveFoodCommand } from '@/core/commands/province/GiveFoodCommand';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
-import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 
 import { makeFamily, makeGeneral, makeProvince, makeWorld } from './factories';
 
@@ -33,11 +32,7 @@ function createFixture(options: FixtureOptions = {}) {
 }
 
 describe('GiveFoodCommand', () => {
-  afterEach(() => vi.useRealTimers());
-
-  it('spends food, raises loyalty by the governor charm, and ends the turn', () => {
-    vi.useFakeTimers();
-
+  it('spends food, raises loyalty by the governor charm, and records the deed', () => {
     const { events, province, command } = createFixture({ charisma: 90 });
     const published: object[] = [];
 
@@ -53,12 +48,6 @@ describe('GiveFoodCommand', () => {
     expect(
       published.some((event) => event instanceof ProvinceUpdatedEvent),
     ).toBe(true);
-
-    vi.runAllTimers();
-
-    expect(published.some((event) => event instanceof TurnEndedEvent)).toBe(
-      true,
-    );
   });
 
   it('leaves loyalty untouched when the province has no governor', () => {

@@ -7,6 +7,5 @@ export class MoveTroopsCommand extends ProvinceCommand {
 
   public execute(): void {
     this.recordAction();
-    this.endTurn();
   }
 }

@@ -9,11 +9,11 @@ import type {
   CommandGroupTitle,
 } from '@/core/commands/province/catalog';
 import type { WorldCommand } from '@/core/commands/WorldCommand';
+import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { View } from '@/lib/View';
 
 import { CommandDialogView } from './CommandDialog/CommandDialogView';
 import { CommandSelectedEvent } from './CommandSelectedEvent';
-import { TurnSkippedEvent } from './TurnSkippedEvent';
 import type { ProvinceCommandsContext, ProvinceCommandsViews } from './types';
 
 import styles from './ProvinceCommands.module.scss';
@@ -91,7 +91,7 @@ export class ProvinceCommandsView extends View<
           type="button"
           data-action="skip-turn"
           disabled
-          @click=${() => this.publish(new TurnSkippedEvent())}
+          @click=${() => this.skipTurn()}
         >
           Skip Turn
         </button>
@@ -141,6 +141,12 @@ export class ProvinceCommandsView extends View<
         ${command.label}
       </button>
     `;
+  }
+
+  private skipTurn(): void {
+    const { world, events } = this.context;
+
+    events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
   }
 
   private setActionsEnabled(enabled: boolean): void {

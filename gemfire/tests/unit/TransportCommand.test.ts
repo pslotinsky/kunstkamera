@@ -1,8 +1,7 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { TransportCommand } from '@/core/commands/province/TransportCommand';
 import type { Province } from '@/core/domain/Province';
-import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 
 import { makeFamily, makeProvince, makeWorld } from './factories';
 
@@ -27,20 +26,13 @@ function createFixture(options: { readonly rivalReceiver?: boolean } = {}) {
     (province) => !province.isEqual(source),
   ) as Province;
   const command = new TransportCommand({ world, events });
-  const published: object[] = [];
 
-  events.observe((event) => published.push(event));
-
-  return { source, target, command, published };
+  return { source, target, command };
 }
 
 describe('TransportCommand', () => {
-  afterEach(() => vi.useRealTimers());
-
-  it('sends gold and food to the chosen province, ending the turn at goodwill 0', () => {
-    vi.useFakeTimers();
-
-    const { source, target, command, published } = createFixture();
+  it('sends gold and food to the chosen province at goodwill 0', () => {
+    const { source, target, command } = createFixture();
 
     command.direction = 'send';
     command.destination = target.number;
@@ -54,17 +46,9 @@ describe('TransportCommand', () => {
     expect(target.resources.food).toBe(INITIAL_FOOD + 40);
     expect(source.goodwill).toBe(0);
     expect(source.actionCount).toBe(1);
-
-    vi.runAllTimers();
-
-    expect(published.some((event) => event instanceof TurnEndedEvent)).toBe(
-      true,
-    );
   });
 
-  it('receives gold and food from the chosen province, ending the turn', () => {
-    vi.useFakeTimers();
-
+  it('receives gold and food from the chosen province', () => {
     const { source, target, command } = createFixture();
 
     command.direction = 'receive';
@@ -78,8 +62,6 @@ describe('TransportCommand', () => {
     expect(target.resources.gold).toBe(INITIAL_GOLD - 30);
     expect(target.resources.food).toBe(INITIAL_FOOD - 40);
     expect(source.actionCount).toBe(1);
-
-    vi.runAllTimers();
   });
 
   it('refuses a transfer the sender cannot afford', () => {

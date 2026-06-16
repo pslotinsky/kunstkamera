@@ -1,11 +1,10 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   DevelopCommand,
   type DevelopTarget,
 } from '@/core/commands/province/DevelopCommand';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
-import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 
 import { makeFamily, makeGeneral, makeProvince, makeWorld } from './factories';
 
@@ -43,11 +42,7 @@ function createFixture(target: DevelopTarget, options: FixtureOptions = {}) {
 const targets: readonly DevelopTarget[] = ['cultivation', 'protection'];
 
 describe.each(targets)('DevelopCommand (%s)', (target) => {
-  afterEach(() => vi.useRealTimers());
-
-  it('spends gold, raises its stat, records the deed, and ends the turn', () => {
-    vi.useFakeTimers();
-
+  it('spends gold, raises its stat, and records the deed', () => {
     const { events, province, command } = createFixture(target, {
       intelligence: 50,
       gold: INITIAL_GOLD,
@@ -65,12 +60,6 @@ describe.each(targets)('DevelopCommand (%s)', (target) => {
     expect(
       published.some((event) => event instanceof ProvinceUpdatedEvent),
     ).toBe(true);
-
-    vi.runAllTimers();
-
-    expect(published.some((event) => event instanceof TurnEndedEvent)).toBe(
-      true,
-    );
   });
 
   it('scales the gain with the governor intelligence', () => {

@@ -7,6 +7,5 @@ export class AttackCommand extends ProvinceCommand {
 
   public execute(): void {
     this.recordAction(-1);
-    this.endTurn();
   }
 }
