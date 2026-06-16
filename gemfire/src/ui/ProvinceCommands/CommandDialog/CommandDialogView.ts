@@ -1,3 +1,5 @@
+import { html, type TemplateResult } from 'lit-html';
+
 import { View, type ViewRecord } from '@/lib/View';
 
 import { CancelClickedEvent } from './CancelClickedEvent';
@@ -32,31 +34,24 @@ export abstract class CommandDialogView<
     this.element.classList.add(styles.hidden!);
   }
 
-  public render(): string {
-    return `
-      <div class="${styles.root} ${styles.hidden}" data-dialog="${this.context.name}">
+  public get template(): TemplateResult {
+    return html`
+      <div
+        class="${styles.root} ${styles.hidden}"
+        data-dialog=${this.context.name}
+      >
         ${this.renderBody()}
       </div>
     `;
   }
 
-  protected abstract renderBody(): string;
+  protected abstract renderBody(): TemplateResult;
 
-  protected override onMount(): void {
-    this.element.addEventListener(
-      'click',
-      (event) => {
-        const button = (event.target as Element).closest<HTMLButtonElement>(
-          'button',
-        );
+  protected confirm(): void {
+    this.publish(new ConfirmClickedEvent());
+  }
 
-        if (button?.dataset.action === 'confirm') {
-          this.publish(new ConfirmClickedEvent());
-        } else if (button?.dataset.action === 'cancel') {
-          this.publish(new CancelClickedEvent());
-        }
-      },
-      { signal: this.lifetime.signal },
-    );
+  protected cancel(): void {
+    this.publish(new CancelClickedEvent());
   }
 }

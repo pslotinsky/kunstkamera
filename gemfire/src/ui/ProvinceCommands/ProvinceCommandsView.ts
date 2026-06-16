@@ -1,3 +1,5 @@
+import { html, type TemplateResult } from 'lit-html';
+
 import diplomacyIconUrl from '@/assets/icons/diplomacy.webp';
 import domesticIconUrl from '@/assets/icons/domestic.webp';
 import militaryIconUrl from '@/assets/icons/military.webp';
@@ -76,57 +78,69 @@ export class ProvinceCommandsView extends View<
     this.setActionsEnabled(false);
   }
 
-  public render(): string {
-    const groupButtons = this.context.commands
-      .map((group) => this.renderGroupButton(group))
-      .join('');
-    const commandSections = this.context.commands
-      .map((group) => this.renderCommands(group))
-      .join('');
-
-    return `
+  public get template(): TemplateResult {
+    return html`
       <section class="${styles.root} ${styles.hidden}">
-        <div class="${styles.groups}">${groupButtons}</div>
-        ${commandSections}
+        <div class=${styles.groups}>
+          ${this.context.commands.map((group) => this.renderGroupButton(group))}
+        </div>
+        ${this.context.commands.map((group) => this.renderCommands(group))}
         ${this.renderDialogs()}
-        <button class="${styles.skipTurn}" type="button" data-action="skip-turn" disabled>Skip Turn</button>
+        <button
+          class=${styles.skipTurn}
+          type="button"
+          data-action="skip-turn"
+          disabled
+          @click=${() => this.publish(new TurnSkippedEvent())}
+        >
+          Skip Turn
+        </button>
       </section>
     `;
   }
 
-  protected renderDialogs(): string {
+  protected renderDialogs(): TemplateResult[] {
     return Object.values(this.views)
       .filter((view) => view instanceof CommandDialogView)
-      .map((view) => view.render())
-      .join('');
+      .map((view) => view.template);
   }
 
-  protected renderGroupButton(group: CommandGroup): string {
-    return `
-      <button class="${styles.groupButton}" type="button" data-group="${group.title}" aria-pressed="false">
-        <img class="${styles.groupIcon}" src="${GROUP_ICONS[group.title]}" alt="" />
+  protected renderGroupButton(group: CommandGroup): TemplateResult {
+    return html`
+      <button
+        class=${styles.groupButton}
+        type="button"
+        data-group=${group.title}
+        aria-pressed="false"
+        @click=${(event: Event) =>
+          this.toggleGroup(event.currentTarget as HTMLButtonElement)}
+      >
+        <img class=${styles.groupIcon} src=${GROUP_ICONS[group.title]} alt="" />
         <span>${group.title}</span>
       </button>
     `;
   }
 
-  protected renderCommands(group: CommandGroup): string {
-    const classes = `${styles.commands} ${styles.hidden}`;
-    const commands = group.commands
-      .map((command) => this.renderCommand(command))
-      .join('');
-
-    return `<div class="${classes}" data-group="${group.title}">${commands}</div>`;
+  protected renderCommands(group: CommandGroup): TemplateResult {
+    return html`
+      <div class="${styles.commands} ${styles.hidden}" data-group=${group.title}>
+        ${group.commands.map((command) => this.renderCommand(command))}
+      </div>
+    `;
   }
 
-  protected renderCommand(command: WorldCommand): string {
-    return `<button class="${styles.command}" type="button" data-command="${command.label}" disabled>${command.label}</button>`;
-  }
-
-  protected override onMount(): void {
-    this.element.addEventListener('click', (event) => this.handleClick(event), {
-      signal: this.lifetime.signal,
-    });
+  protected renderCommand(command: WorldCommand): TemplateResult {
+    return html`
+      <button
+        class=${styles.command}
+        type="button"
+        data-command=${command.label}
+        disabled
+        @click=${() => this.publish(new CommandSelectedEvent(command))}
+      >
+        ${command.label}
+      </button>
+    `;
   }
 
   private setActionsEnabled(enabled: boolean): void {
@@ -146,28 +160,6 @@ export class ProvinceCommandsView extends View<
 
     if (skipButton) {
       skipButton.disabled = !enabled;
-    }
-  }
-
-  private handleClick(event: MouseEvent): void {
-    if (event.target instanceof Element) {
-      const button = event.target.closest<HTMLButtonElement>('button');
-
-      if (button?.dataset.group) {
-        this.toggleGroup(button);
-      } else if (button?.dataset.command) {
-        this.selectCommandAction(button.dataset.command);
-      } else if (button?.dataset.action === 'skip-turn') {
-        this.publish(new TurnSkippedEvent());
-      }
-    }
-  }
-
-  private selectCommandAction(label: string): void {
-    const command = this.findCommand(label);
-
-    if (command) {
-      this.publish(new CommandSelectedEvent(command));
     }
   }
 

@@ -1,3 +1,6 @@
+import { html, type TemplateResult } from 'lit-html';
+import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
+
 import cultivationIconUrl from '@/assets/icons/cultivation.webp';
 import foodIconUrl from '@/assets/icons/food.webp';
 import goldIconUrl from '@/assets/icons/gold.webp';
@@ -29,8 +32,10 @@ const STATS_META: Record<StatKey, { label: string; icon: string }> = {
 export class ProvinceInfoView extends View<ProvinceInfoContext> {
   protected readonly rootClass = styles.root!;
 
-  public render(): string {
-    return `<section class="${styles.root}">${this.renderHint()}</section>`;
+  public get template(): TemplateResult {
+    return html`<section class=${styles.root}>
+      ${unsafeHTML(this.renderHint())}
+    </section>`;
   }
 
   public showHint(): void {

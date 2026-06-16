@@ -1,3 +1,5 @@
+import { html, type TemplateResult } from 'lit-html';
+
 import type { TradeDirection } from '@/core/commands/province/TradeCommand';
 import type { MarketRateName } from '@/core/domain/MarketRate';
 
@@ -58,42 +60,47 @@ export class TradeDialogView extends CommandDialogView<
     this.confirmButton.disabled = !enabled;
   }
 
-  protected renderBody(): string {
-    const directions = DIRECTIONS.map(
-      ({ direction, label }) =>
-        `<button class="${styles.button}" type="button" data-direction="${direction}">${label}</button>`,
-    ).join('');
-
-    return `
-      <p class="${styles.prompt}" data-prompt></p>
-      <div class="${styles.actions}">${directions}</div>
-      <div class="${styles.section} ${styles.hidden}" data-amounts>
-        <p class="${styles.prompt}" data-range></p>
-        ${this.views.amount.render()}
+  protected renderBody(): TemplateResult {
+    return html`
+      <p class=${styles.prompt} data-prompt></p>
+      <div class=${styles.actions}>
+        ${DIRECTIONS.map(
+          ({ direction, label }) => html`<button
+            class=${styles.button}
+            type="button"
+            data-direction=${direction}
+            @click=${() => this.publish(new DirectionSelectedEvent(direction))}
+          >
+            ${label}
+          </button>`,
+        )}
       </div>
-      <div class="${styles.actions} ${styles.section} ${styles.hidden}" data-footer>
-        <button class="${styles.button}" type="button" data-action="confirm" disabled>Yea</button>
-        <button class="${styles.button}" type="button" data-action="cancel">Nay</button>
+      <div class="${styles.section} ${styles.hidden}" data-amounts>
+        <p class=${styles.prompt} data-range></p>
+        ${this.views.amount.template}
+      </div>
+      <div
+        class="${styles.actions} ${styles.section} ${styles.hidden}"
+        data-footer
+      >
+        <button
+          class=${styles.button}
+          type="button"
+          data-action="confirm"
+          disabled
+          @click=${() => this.confirm()}
+        >
+          Yea
+        </button>
+        <button
+          class=${styles.button}
+          type="button"
+          @click=${() => this.cancel()}
+        >
+          Nay
+        </button>
       </div>
     `;
-  }
-
-  protected override onMount(): void {
-    super.onMount();
-
-    this.element.addEventListener(
-      'click',
-      (event) => {
-        const button = (event.target as Element).closest<HTMLButtonElement>(
-          '[data-direction]',
-        );
-
-        if (button?.dataset.direction) {
-          this.publish(new DirectionSelectedEvent(button.dataset.direction));
-        }
-      },
-      { signal: this.lifetime.signal },
-    );
   }
 
   private get prompt(): HTMLElement {

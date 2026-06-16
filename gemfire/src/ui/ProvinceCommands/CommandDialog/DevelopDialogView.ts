@@ -1,3 +1,5 @@
+import { html, type TemplateResult } from 'lit-html';
+
 import {
   DevelopCommand,
   type DevelopTarget,
@@ -37,39 +39,45 @@ export class DevelopDialogView extends CommandDialogView<DevelopDialogContext> {
     }
   }
 
-  protected renderBody(): string {
-    const targets = TARGETS.map(
-      ({ target, label }) =>
-        `<button class="${styles.button}" type="button" data-develop="${target}">${label}</button>`,
-    ).join('');
-
-    return `
-      <p class="${styles.prompt}">Which one?</p>
-      <div class="${styles.actions}">${targets}</div>
-      <p class="${styles.prompt} ${styles.section} ${styles.hidden}" data-confirm-prompt></p>
-      <div class="${styles.actions} ${styles.section} ${styles.hidden}" data-footer>
-        <button class="${styles.button}" type="button" data-action="confirm">Yea</button>
-        <button class="${styles.button}" type="button" data-action="cancel">Nay</button>
+  protected renderBody(): TemplateResult {
+    return html`
+      <p class=${styles.prompt}>Which one?</p>
+      <div class=${styles.actions}>
+        ${TARGETS.map(
+          ({ target, label }) => html`<button
+            class=${styles.button}
+            type="button"
+            data-develop=${target}
+            @click=${() => this.publish(new DevelopTargetSelectedEvent(target))}
+          >
+            ${label}
+          </button>`,
+        )}
+      </div>
+      <p
+        class="${styles.prompt} ${styles.section} ${styles.hidden}"
+        data-confirm-prompt
+      ></p>
+      <div
+        class="${styles.actions} ${styles.section} ${styles.hidden}"
+        data-footer
+      >
+        <button
+          class=${styles.button}
+          type="button"
+          @click=${() => this.confirm()}
+        >
+          Yea
+        </button>
+        <button
+          class=${styles.button}
+          type="button"
+          @click=${() => this.cancel()}
+        >
+          Nay
+        </button>
       </div>
     `;
-  }
-
-  protected override onMount(): void {
-    super.onMount();
-
-    this.element.addEventListener(
-      'click',
-      (event) => {
-        const button = (event.target as Element).closest<HTMLButtonElement>(
-          '[data-develop]',
-        );
-
-        if (button?.dataset.develop) {
-          this.publish(new DevelopTargetSelectedEvent(button.dataset.develop));
-        }
-      },
-      { signal: this.lifetime.signal },
-    );
   }
 
   private get targetButtons(): NodeListOf<HTMLButtonElement> {

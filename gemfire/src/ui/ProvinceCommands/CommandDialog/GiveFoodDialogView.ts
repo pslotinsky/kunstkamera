@@ -1,5 +1,6 @@
+import { html, type TemplateResult } from 'lit-html';
+
 import { CommandDialogView } from './CommandDialogView';
-import { ConfirmClickedEvent } from './ConfirmClickedEvent';
 
 import styles from './CommandDialog.module.scss';
 
@@ -34,32 +35,26 @@ export class GiveFoodDialogView extends CommandDialogView<GiveFoodDialogContext>
     }
   }
 
-  protected renderBody(): string {
-    const options = AMOUNTS.map(
-      (amount) =>
-        `<button class="${styles.button}" type="button" data-amount="${amount}">${amount}</button>`,
-    ).join('');
-
-    return `
-      <p class="${styles.prompt}" data-prompt>Give how much food?</p>
-      <div class="${styles.options}">${options}</div>
+  protected renderBody(): TemplateResult {
+    return html`
+      <p class=${styles.prompt} data-prompt>Give how much food?</p>
+      <div class=${styles.options}>
+        ${AMOUNTS.map(
+          (amount) => html`<button
+            class=${styles.button}
+            type="button"
+            data-amount=${amount}
+            @click=${() => this.choose(amount)}
+          >
+            ${amount}
+          </button>`,
+        )}
+      </div>
     `;
   }
 
-  protected override onMount(): void {
-    this.element.addEventListener(
-      'click',
-      (event) => {
-        const button = (event.target as Element).closest<HTMLButtonElement>(
-          'button',
-        );
-
-        if (button?.dataset.amount) {
-          this.chosen = Number(button.dataset.amount);
-          this.publish(new ConfirmClickedEvent());
-        }
-      },
-      { signal: this.lifetime.signal },
-    );
+  private choose(amount: number): void {
+    this.chosen = amount;
+    this.confirm();
   }
 }

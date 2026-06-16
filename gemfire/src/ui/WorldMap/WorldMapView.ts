@@ -1,3 +1,6 @@
+import { html, type TemplateResult } from 'lit-html';
+import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
+
 import worldMapSvgMarkup from '@/assets/map.svg?raw';
 import worldMapImageUrl from '@/assets/map.webp';
 import { View } from '@/lib/View';
@@ -36,8 +39,8 @@ export class WorldMapView extends View<WorldMapContext> {
     }
   }
 
-  public render(): string {
-    return `<div class="${styles.root}">${worldMapSvgMarkup}</div>`;
+  public get template(): TemplateResult {
+    return html`<div class=${styles.root}>${unsafeHTML(worldMapSvgMarkup)}</div>`;
   }
 
   protected override onMount(): void {

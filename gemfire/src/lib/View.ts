@@ -1,3 +1,5 @@
+import { render, type TemplateResult } from 'lit-html';
+
 import { EventBus, type EventClass } from './EventBus';
 
 export type AnyView = View<unknown, ViewRecord>;
@@ -20,11 +22,11 @@ export abstract class View<
     this.views = views;
   }
 
-  public abstract render(): string;
+  public abstract get template(): TemplateResult;
 
   public mount(container: HTMLElement): void {
-    this.element = this.renderToElement();
-    container.append(this.element);
+    render(this.template, container);
+    this.element = this.findRootOrFail(container);
     this.attachChildren();
     this.onMount();
   }
@@ -81,13 +83,5 @@ export abstract class View<
     }
 
     return root;
-  }
-
-  private renderToElement(): HTMLElement {
-    const template = document.createElement('template');
-
-    template.innerHTML = this.render().trim();
-
-    return template.content.firstElementChild as HTMLElement;
   }
 }

@@ -1,3 +1,5 @@
+import { html, type TemplateResult } from 'lit-html';
+
 import { View } from '@/lib/View';
 
 import { AmountChangedEvent } from './AmountChangedEvent';
@@ -16,16 +18,26 @@ export class AmountFieldView extends View<AmountFieldContext> {
     return `[data-amount-field="${this.context.name}"]`;
   }
 
-  public render(): string {
-    const fractions = FRACTIONS.map(
-      (fraction) =>
-        `<button class="${styles.button}" type="button" data-fraction>${fraction.label}</button>`,
-    ).join('');
-
-    return `
-      <div class="${styles.options}" data-amount-field="${this.context.name}">
-        ${fractions}
-        <input class="${styles.input}" type="number" min="0" data-amount-input />
+  public get template(): TemplateResult {
+    return html`
+      <div class=${styles.options} data-amount-field=${this.context.name}>
+        ${FRACTIONS.map(
+          (fraction) => html`<button
+            class=${styles.button}
+            type="button"
+            data-fraction
+            @click=${(event: Event) => this.handleFractionClick(event)}
+          >
+            ${fraction.label}
+          </button>`,
+        )}
+        <input
+          class=${styles.input}
+          type="number"
+          min="0"
+          data-amount-input
+          @input=${(event: Event) => this.handleInputChange(event)}
+        />
       </div>
     `;
   }
@@ -46,26 +58,16 @@ export class AmountFieldView extends View<AmountFieldContext> {
     });
   }
 
-  protected override onMount(): void {
-    this.element.addEventListener(
-      'click',
-      (event) => {
-        const button = (event.target as Element).closest<HTMLButtonElement>(
-          '[data-fraction]',
-        );
+  private handleFractionClick(event: Event): void {
+    const button = event.currentTarget as HTMLButtonElement;
 
-        if (button) {
-          this.publish(new AmountChangedEvent(Number(button.dataset.amount)));
-        }
-      },
-      { signal: this.lifetime.signal },
-    );
+    this.publish(new AmountChangedEvent(Number(button.dataset.amount)));
+  }
 
-    this.input.addEventListener(
-      'input',
-      () => this.publish(new AmountChangedEvent(Number(this.input.value))),
-      { signal: this.lifetime.signal },
-    );
+  private handleInputChange(event: Event): void {
+    const input = event.currentTarget as HTMLInputElement;
+
+    this.publish(new AmountChangedEvent(Number(input.value)));
   }
 
   private get fractionButtons(): NodeListOf<HTMLButtonElement> {
