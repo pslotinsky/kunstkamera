@@ -40,9 +40,13 @@ export class GamePanelControl extends Control<
     this.controls.provinceInfo.actualizeProvince(province);
   }
 
+  public pickTarget(province: Province): void {
+    this.controls.provinceCommands.pickTarget(province);
+  }
+
   private isCommandsVisible(province: Province): boolean {
     const { world } = this.context;
 
-    return world.isProvinceTurn(province) && province.isOwner(world.player);
+    return world.isProvinceTurn(province) && province.isBelongsTo(world.player);
   }
 }

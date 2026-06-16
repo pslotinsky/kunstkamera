@@ -45,20 +45,20 @@ export class Province {
   public recordAction(goodwill: number): void {
     this.goodwill = Math.min(15, Math.max(this.goodwill + goodwill, -15));
 
-    if (goodwill) {
-      this.actionCount = (this.actionCount + 1) % 3;
-    }
+    this.actionCount = (this.actionCount + 1) % 3;
   }
 
-  public isEqual(other: Province): boolean {
-    return this.number === other.number;
+  public isEqual(other?: Province | number): boolean {
+    return typeof other === 'number'
+      ? this.number === other
+      : this.number === other?.number;
   }
 
   public isNeighbor(other: Province): boolean {
     return this.neighbors.includes(other.number);
   }
 
-  public isOwner(family: Family): boolean {
+  public isBelongsTo(family: Family): boolean {
     return this.owner?.isEqual(family) ?? false;
   }
 

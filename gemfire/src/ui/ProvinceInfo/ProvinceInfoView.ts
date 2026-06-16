@@ -71,7 +71,7 @@ export class ProvinceInfoView extends View<ProvinceInfoContext> {
 
   private renderProvince(province: Province): string {
     const divider = `<hr class="${styles.divider}" />`;
-    const details = province.isOwner(this.context.player)
+    const details = province.isBelongsTo(this.context.player)
       ? `${divider}${this.renderDetails(province)}${divider}`
       : '';
 

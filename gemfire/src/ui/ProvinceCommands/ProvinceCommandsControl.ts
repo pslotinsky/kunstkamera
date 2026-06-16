@@ -4,41 +4,41 @@ import { DevelopCommand } from '@/core/commands/province/DevelopCommand';
 import { GiveFoodCommand } from '@/core/commands/province/GiveFoodCommand';
 import { ProtectionCommand } from '@/core/commands/province/ProtectionCommand';
 import { TradeCommand } from '@/core/commands/province/TradeCommand';
+import { TransportCommand } from '@/core/commands/province/TransportCommand';
 import type { WorldCommand } from '@/core/commands/WorldCommand';
+import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { Control } from '@/lib/Control';
 import type { EventBus } from '@/lib/EventBus';
 
-import { CancelClickedEvent } from './CommandDialog/CancelClickedEvent';
-import type { CommandDialogControl } from './CommandDialog/CommandDialogControl';
-import type { AnyCommandDialogView } from './CommandDialog/CommandDialogView';
-import { ConfirmClickedEvent } from './CommandDialog/ConfirmClickedEvent';
+import type { AnyCommandDialogControl } from './CommandDialog/CommandDialogControl';
 import { ConfirmCommandDialogControl } from './CommandDialog/ConfirmCommandDialogControl';
 import { GiveFoodDialogControl } from './CommandDialog/GiveFoodDialogControl';
 import { TradeDialogControl } from './CommandDialog/TradeDialogControl';
+import { TransportDialogControl } from './CommandDialog/TransportDialogControl';
 import { CommandSelectedEvent } from './CommandSelectedEvent';
 import { ProvinceCommandsView } from './ProvinceCommandsView';
+import { TargetingEndedEvent } from './TargetingEndedEvent';
+import { TargetingStartedEvent } from './TargetingStartedEvent';
 import { TurnSkippedEvent } from './TurnSkippedEvent';
 import type { ProvinceCommandsControls } from './types';
 
 interface PendingDialog {
   readonly command: WorldCommand;
-  readonly dialog: CommandDialogControl<AnyCommandDialogView>;
+  readonly dialog: AnyCommandDialogControl;
 }
 
 export class ProvinceCommandsControl extends Control<
   ProvinceCommandsView,
   ProvinceCommandsControls
 > {
-  private readonly dialogs = new Map<
-    string,
-    CommandDialogControl<AnyCommandDialogView>
-  >([
+  private readonly dialogs = new Map<string, AnyCommandDialogControl>([
     [CultivationCommand.name, this.controls.cultivationDialog],
     [ProtectionCommand.name, this.controls.protectionDialog],
     [GiveFoodCommand.name, this.controls.giveFoodDialog],
     [TradeCommand.name, this.controls.tradeDialog],
+    [TransportCommand.name, this.controls.transportDialog],
   ]);
 
   private pending: PendingDialog | null = null;
@@ -62,6 +62,10 @@ export class ProvinceCommandsControl extends Control<
         ),
         giveFoodDialog: new GiveFoodDialogControl(GiveFoodCommand.name, world),
         tradeDialog: new TradeDialogControl(TradeCommand.name, world),
+        transportDialog: new TransportDialogControl(
+          TransportCommand.name,
+          world,
+        ),
       },
     );
   }
@@ -74,14 +78,18 @@ export class ProvinceCommandsControl extends Control<
     this.view.hide();
   }
 
+  public pickTarget(province: Province): void {
+    this.pending?.dialog.pickTarget(province);
+  }
+
   protected override onMount(): void {
     this.subscribe(CommandSelectedEvent, (event) =>
       this.selectCommand(event.command),
     );
 
     for (const dialog of this.dialogs.values()) {
-      dialog.subscribe(ConfirmClickedEvent, () => this.completeCommand());
-      dialog.subscribe(CancelClickedEvent, () => this.closeDialog());
+      dialog.onConfirm(() => this.completeCommand());
+      dialog.onCancel(() => this.closeDialog());
     }
 
     this.subscribe(TurnSkippedEvent, () => {
@@ -108,6 +116,12 @@ export class ProvinceCommandsControl extends Control<
       this.pending = { command, dialog };
       this.view.selectCommand(command.label);
       dialog.open(command);
+
+      if (command.requiresTarget) {
+        this.context.events.publish(
+          new TargetingStartedEvent(command.selectableTargets),
+        );
+      }
     } else {
       command.execute();
     }
@@ -139,9 +153,15 @@ export class ProvinceCommandsControl extends Control<
 
   private closeDialog(): void {
     if (this.pending) {
-      this.view.deselectCommand(this.pending.command.label);
+      const { command } = this.pending;
+
+      this.view.deselectCommand(command.label);
       this.pending.dialog.close();
       this.pending = null;
+
+      if (command.requiresTarget) {
+        this.context.events.publish(new TargetingEndedEvent());
+      }
     }
   }
 }

@@ -12,19 +12,27 @@
 
 .root :global(.province) {
   fill: transparent;
+}
+
+.root :global(.province.current) {
+  fill: rgba(255, 209, 102, 0.45);
+}
+
+.root :global(.province.selectable) {
+  fill: rgba(120, 220, 160, 0.12);
+  stroke: rgba(120, 220, 160, 0.55);
+  stroke-width: 1;
   cursor: pointer;
 }
 
-.root :global(.province:hover) {
-  fill: rgba(255, 255, 255, 0.1);
-}
-
-.root :global(.province.neighbor) {
-  fill: rgba(86, 156, 255, 0.28);
+.root :global(.province.selectable:hover) {
+  fill: rgba(120, 220, 160, 0.28);
 }
 
 .root :global(.province.selected) {
-  fill: rgba(255, 209, 102, 0.45);
+  fill: rgba(120, 220, 160, 0.45);
+  stroke: rgba(120, 220, 160, 0.9);
+  stroke-width: 1;
 }
 
 .root :global(.province-markers) {

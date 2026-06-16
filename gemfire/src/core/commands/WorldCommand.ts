@@ -28,6 +28,14 @@ export abstract class WorldCommand {
     return true;
   }
 
+  public get selectableTargets(): readonly number[] {
+    return [];
+  }
+
+  public get requiresTarget(): boolean {
+    return this.selectableTargets.length > 0;
+  }
+
   protected get currentProvince(): Province | undefined {
     const { world } = this.context;
 

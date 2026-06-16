@@ -101,7 +101,7 @@ describe('WorldEngine', () => {
     events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
 
     expect(world.date.equals(new CalendarDate(1186, 5))).toBe(true);
-    expect(world.turnQueue.current?.isOwner(world.player)).toBe(true);
+    expect(world.turnQueue.current?.isBelongsTo(world.player)).toBe(true);
   });
 
   it('announces every turn start, auto-ending rival and neutral ones', () => {
@@ -111,7 +111,7 @@ describe('WorldEngine', () => {
     events.subscribe(TurnStartedEvent, (event) => {
       expect(event.province).toBe(world.turnQueue.current);
 
-      if (event.province.isOwner(world.player)) {
+      if (event.province.isBelongsTo(world.player)) {
         announcements.push('player turn started');
       }
     });
