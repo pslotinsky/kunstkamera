@@ -28,6 +28,8 @@ export abstract class Control<
   protected readonly context: ContextOf<TView>;
   protected readonly controls: Controls;
 
+  private readonly lifetime = new AbortController();
+
   public constructor(
     ViewClass: ViewConstructor<TView>,
     context: ContextOf<TView>,
@@ -46,6 +48,10 @@ export abstract class Control<
   public unmount(): void {
     this.disconnect();
     this.view.unmount();
+  }
+
+  protected get signal(): AbortSignal {
+    return this.lifetime.signal;
   }
 
   protected subscribe<EventType extends object>(
@@ -73,6 +79,8 @@ export abstract class Control<
     for (const control of Object.values(this.controls)) {
       control.disconnect();
     }
+
+    this.lifetime.abort();
   }
 
   private collectViews(): ViewsOf<TView> {

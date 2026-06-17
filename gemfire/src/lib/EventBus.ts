@@ -20,15 +20,41 @@ export class EventBus {
   public subscribe<EventType extends object>(
     eventClass: EventClass<EventType>,
     handler: (event: EventType) => void,
+    signal?: AbortSignal,
   ): void {
     const handlers = this.subscribers.get(eventClass) ?? [];
 
     handlers.push(handler as Handler);
     this.subscribers.set(eventClass, handlers);
+
+    this.removeOnAbort(handlers, handler as Handler, signal);
   }
 
-  public observe(observer: (event: object) => void): void {
+  public observe(
+    observer: (event: object) => void,
+    signal?: AbortSignal,
+  ): void {
     this.observers.push(observer);
+
+    this.removeOnAbort(this.observers, observer, signal);
+  }
+
+  private removeOnAbort<Item>(
+    items: Item[],
+    item: Item,
+    signal?: AbortSignal,
+  ): void {
+    signal?.addEventListener(
+      'abort',
+      () => {
+        const index = items.indexOf(item);
+
+        if (index > -1) {
+          items.splice(index, 1);
+        }
+      },
+      { once: true },
+    );
   }
 
   private dispatchPending(): void {

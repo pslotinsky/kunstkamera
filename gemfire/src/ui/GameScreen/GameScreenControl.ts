@@ -3,6 +3,7 @@ import { MonthStartedEvent } from '@/core/events/MonthStartedEvent';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
 import { Control } from '@/lib/Control';
+import type { EventClass } from '@/lib/EventBus';
 import { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
 import { TargetingEndedEvent } from '@/ui/ProvinceCommands/TargetingEndedEvent';
 import { TargetingStartedEvent } from '@/ui/ProvinceCommands/TargetingStartedEvent';
@@ -33,29 +34,32 @@ export class GameScreenControl extends Control<
     this.controls.worldMap.onProvinceSelected((province) => {
       this.selectProvince(province);
     });
-    this.context.events.subscribe(MonthStartedEvent, (event) => {
-      this.view.showDate(event.date);
-    });
-    this.context.events.subscribe(TurnStartedEvent, (event) => {
-      this.handleTurnStart(event);
-    });
-    this.context.events.subscribe(ProvinceUpdatedEvent, (event) => {
+    this.onWorldEvent(MonthStartedEvent, (event) =>
+      this.view.showDate(event.date),
+    );
+    this.onWorldEvent(TurnStartedEvent, (event) => this.handleTurnStart(event));
+    this.onWorldEvent(ProvinceUpdatedEvent, (event) => {
       if (this.selected === event.province.number) {
         this.controls.gamePanel.actualizeProvince(event.province);
       }
     });
-    this.context.events.subscribe(TargetingStartedEvent, (event) => {
-      this.startTargeting(event.selectable);
-    });
-    this.context.events.subscribe(TargetingEndedEvent, () => {
-      this.endTargeting();
-    });
+    this.onWorldEvent(TargetingStartedEvent, (event) =>
+      this.startTargeting(event.selectable),
+    );
+    this.onWorldEvent(TargetingEndedEvent, () => this.endTargeting());
 
     const current = this.context.world.turnQueue.current;
 
     if (current) {
       this.showProvince(current);
     }
+  }
+
+  private onWorldEvent<EventType extends object>(
+    eventClass: EventClass<EventType>,
+    handler: (event: EventType) => void,
+  ): void {
+    this.context.events.subscribe(eventClass, handler, this.signal);
   }
 
   private handleTurnStart(event: TurnStartedEvent): void {
