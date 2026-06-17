@@ -6,14 +6,18 @@
   display: none;
 }
 
-.groups {
+.tiles {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.35rem;
   margin-top: 0.75rem;
 }
 
-.groupButton {
+.tiles.hidden {
+  display: none;
+}
+
+.tile {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -28,7 +32,7 @@
   cursor: pointer;
 }
 
-.groupButton span {
+.tile span {
   max-width: 100%;
   overflow: hidden;
   font-size: 0.55rem;
@@ -37,58 +41,34 @@
   opacity: 0.7;
 }
 
-.groupButton:hover {
+.tile:hover:not(:disabled) {
   border-color: #56649a;
 }
 
-.groupButton.open {
+.tile.open,
+.tile.selected {
   background: #2c3656;
   border-color: #56649a;
 }
 
-.groupButton.open span {
+.tile.open span,
+.tile.selected span {
   opacity: 1;
 }
 
-.groupIcon {
-  width: 40px;
-  height: 40px;
-  image-rendering: pixelated;
-}
-
-.commands {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin-top: 0.75rem;
-}
-
-.commands.hidden {
-  display: none;
-}
-
-.command {
-  padding: 0.25rem 0.5rem;
-  font: inherit;
-  color: inherit;
-  background: #1f2740;
-  border: 1px solid #2c3656;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.command:hover:not(:disabled) {
-  border-color: #56649a;
-}
-
-.command.selected {
-  background: #2c3656;
-  border-color: #56649a;
-}
-
-.command:disabled {
+.tile:disabled {
   opacity: 0.5;
   cursor: default;
+}
+
+.groupIcon,
+.commandIcon {
+  width: 40px;
+  height: 40px;
+}
+
+.groupIcon {
+  image-rendering: pixelated;
 }
 
 .skipTurn {

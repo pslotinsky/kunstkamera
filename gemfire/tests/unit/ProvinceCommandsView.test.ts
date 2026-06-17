@@ -42,7 +42,7 @@ describe('ProvinceCommandsView', () => {
     const root = container.querySelector<HTMLElement>(`.${styles.root}`)!;
     const groupSections = root.querySelectorAll('div[data-group]');
     const commandButtons = [
-      ...root.querySelectorAll<HTMLButtonElement>(`.${styles.command}`),
+      ...root.querySelectorAll<HTMLButtonElement>('button[data-command]'),
     ];
     const skipButton = root.querySelector<HTMLButtonElement>(
       `.${styles.skipTurn}`,

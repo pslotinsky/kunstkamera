@@ -1,8 +1,12 @@
-import { html, type TemplateResult } from 'lit-html';
+import { html, nothing, type TemplateResult } from 'lit-html';
 
+import developIconUrl from '@/assets/icons/develop.webp';
 import diplomacyIconUrl from '@/assets/icons/diplomacy.webp';
 import domesticIconUrl from '@/assets/icons/domestic.webp';
+import giveFoodIconUrl from '@/assets/icons/give-food.webp';
 import militaryIconUrl from '@/assets/icons/military.webp';
+import tradeIconUrl from '@/assets/icons/trade.webp';
+import transportIconUrl from '@/assets/icons/transport.webp';
 import vassalIconUrl from '@/assets/icons/vassal.webp';
 import type {
   CommandGroup,
@@ -23,6 +27,13 @@ const GROUP_ICONS: Record<CommandGroupTitle, string> = {
   Domestic: domesticIconUrl,
   Diplomacy: diplomacyIconUrl,
   Vassal: vassalIconUrl,
+};
+
+const COMMAND_ICONS: Record<string, string> = {
+  Develop: developIconUrl,
+  Trade: tradeIconUrl,
+  'Give Food': giveFoodIconUrl,
+  Transport: transportIconUrl,
 };
 
 export class ProvinceCommandsView extends View<
@@ -81,7 +92,7 @@ export class ProvinceCommandsView extends View<
   public get template(): TemplateResult {
     return html`
       <section class="${styles.root} ${styles.hidden}">
-        <div class=${styles.groups}>
+        <div class=${styles.tiles}>
           ${this.context.commands.map((group) => this.renderGroupButton(group))}
         </div>
         ${this.context.commands.map((group) => this.renderCommands(group))}
@@ -108,7 +119,7 @@ export class ProvinceCommandsView extends View<
   protected renderGroupButton(group: CommandGroup): TemplateResult {
     return html`
       <button
-        class=${styles.groupButton}
+        class=${styles.tile}
         type="button"
         data-group=${group.title}
         aria-pressed="false"
@@ -123,22 +134,32 @@ export class ProvinceCommandsView extends View<
 
   protected renderCommands(group: CommandGroup): TemplateResult {
     return html`
-      <div class="${styles.commands} ${styles.hidden}" data-group=${group.title}>
+      <div
+        class="${styles.tiles} ${styles.hidden}"
+        data-group=${group.title}
+      >
         ${group.commands.map((command) => this.renderCommand(command))}
       </div>
     `;
   }
 
   protected renderCommand(command: WorldCommand): TemplateResult {
+    const icon = COMMAND_ICONS[command.label];
+
     return html`
       <button
-        class=${styles.command}
+        class=${styles.tile}
         type="button"
         data-command=${command.label}
         disabled
         @click=${() => this.publish(new CommandSelectedEvent(command))}
       >
-        ${command.label}
+        ${
+          icon
+            ? html`<img class=${styles.commandIcon} src=${icon} alt="" />`
+            : nothing
+        }
+        <span>${command.label}</span>
       </button>
     `;
   }
