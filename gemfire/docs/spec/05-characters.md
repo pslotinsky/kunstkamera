@@ -378,7 +378,7 @@ This is one of the reasons characters are central to the game’s strategic stru
 
 ## Annual Growth
 
-Characters improve over time. Ordinary officers gain small yearly stat increases, while rulers and force leaders gain larger ones. Later in life stats decline, and characters eventually die of old age. The exact per-year magnitude is unquantified.
+Characters improve over time. Ordinary officers gain small yearly stat increases, while rulers and force leaders gain larger ones. Stats rise each year until roughly age 60, then decline, and a character dies of old age at about 75 (a few months either way). These age thresholds are player-tested (medium confidence); the exact per-year magnitude is unquantified.
 
 This is why a character's INT / WAR / CHA differ between scenarios (which are five years apart) — the per-scenario stat tables reflect it.
 
@@ -538,4 +538,4 @@ The following character-system details remain unresolved:
 6. Exact Fame gain and loss formulas.
 7. Exact annual character growth formula.
 8. Exact effects of Banish.
-9. Exact aging thresholds and the per-year magnitude of stat growth and decline.
+9. The per-year magnitude of stat growth and decline (the age thresholds — growth to ~60, decline after, death ~75 — are player-tested).
