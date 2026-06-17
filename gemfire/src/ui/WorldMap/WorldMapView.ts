@@ -1,3 +1,6 @@
+import { html, type TemplateResult } from 'lit-html';
+import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
+
 import worldMapSvgMarkup from '@/assets/map.svg?raw';
 import worldMapImageUrl from '@/assets/map.webp';
 import { View } from '@/lib/View';
@@ -8,7 +11,13 @@ import type { WorldMapContext } from './types';
 
 import styles from './WorldMap.module.scss';
 
-export type Highlighting = 'selected' | 'neighbor';
+export type Highlighting = 'current' | 'selectable' | 'selected';
+
+const HIGHLIGHTING: readonly Highlighting[] = [
+  'current',
+  'selectable',
+  'selected',
+];
 
 export class WorldMapView extends View<WorldMapContext> {
   protected readonly rootClass = styles.root!;
@@ -26,12 +35,12 @@ export class WorldMapView extends View<WorldMapContext> {
 
   public clearHighlighting(): void {
     for (const element of this.provinceElements.values()) {
-      element.classList.remove('selected', 'neighbor');
+      element.classList.remove(...HIGHLIGHTING);
     }
   }
 
-  public render(): string {
-    return `<div class="${styles.root}">${worldMapSvgMarkup}</div>`;
+  public get template(): TemplateResult {
+    return html`<div class=${styles.root}>${unsafeHTML(worldMapSvgMarkup)}</div>`;
   }
 
   protected override onMount(): void {

@@ -1,15 +1,25 @@
-import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
+import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
-import { WorldCommand, type WorldCommandContext } from '../WorldCommand';
+const CHARISMA_DIVISOR = 300;
 
-export class GiveFoodCommand extends WorldCommand {
+export class GiveFoodCommand extends ProvinceCommand {
+  public food = 0;
+
   public constructor(context: WorldCommandContext) {
     super('Give Food', context);
   }
 
   public execute(): void {
-    const { world, events } = this.context;
+    const province = this.currentProvince;
 
-    events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
+    if (province && this.food > 0 && this.food <= province.resources.food) {
+      const charisma = province.governor?.stats.charisma ?? 0;
+      const loyalty = Math.floor((charisma * this.food) / CHARISMA_DIVISOR);
+
+      province.addResources({ food: -this.food });
+      province.addDevelopment({ loyalty });
+
+      this.complete(province, 1);
+    }
   }
 }

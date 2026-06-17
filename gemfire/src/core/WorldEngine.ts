@@ -28,7 +28,7 @@ export class WorldEngine {
   }
 
   private handleTurnStart(province: Province): void {
-    if (!province.isOwner(this.world.player)) {
+    if (!province.isBelongsTo(this.world.player)) {
       this.events.publish(new TurnEndedEvent(this.world.turnQueue.turnNumber));
     }
   }
@@ -44,6 +44,7 @@ export class WorldEngine {
   }
 
   private handleMonthStart(): void {
+    this.world.market.swing(this.world.date.month);
     this.taxAndHarvest.execute();
   }
 

@@ -6,12 +6,12 @@ import {
   type Scenario,
 } from '@/config/scenarios';
 import { CalendarDate } from '@/core/domain/CalendarDate';
+import { Characteristics } from '@/core/domain/Characteristics';
 import { Development } from '@/core/domain/Development';
 import { Family } from '@/core/domain/Family';
 import { General } from '@/core/domain/General';
 import { Province } from '@/core/domain/Province';
 import { Resources } from '@/core/domain/Resources';
-import { Stats } from '@/core/domain/Stats';
 import { World } from '@/core/domain/World';
 import { WorldMap } from '@/core/domain/WorldMap';
 import { Collection } from '@/lib/Collection';
@@ -55,11 +55,7 @@ export class WorldFactory {
         definition.name,
         new General({
           name: definition.name,
-          stats: new Stats(
-            definition.intelligence,
-            definition.war,
-            definition.charisma,
-          ),
+          stats: Characteristics.from(definition),
         }),
       );
     }
@@ -140,16 +136,8 @@ export class WorldFactory {
       neighbors: geography.neighbors,
       owner,
       governor: resident ?? owner?.ruler,
-      resources: new Resources(
-        definition.gold,
-        definition.food,
-        definition.troops,
-      ),
-      development: new Development(
-        definition.loyalty,
-        definition.cultivation,
-        definition.protection,
-      ),
+      resources: Resources.from(definition),
+      development: Development.from(definition),
     });
   }
 

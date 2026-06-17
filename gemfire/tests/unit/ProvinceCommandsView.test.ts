@@ -1,8 +1,14 @@
+// @vitest-environment jsdom
 import { describe, expect, it } from 'vitest';
 
 import { createCommandGroups } from '@/core/commands/province/catalog';
 import { WorldFactory } from '@/core/WorldFactory';
 import { EventBus } from '@/lib/EventBus';
+import { AmountFieldView } from '@/ui/ProvinceCommands/AmountField/AmountFieldView';
+import { DevelopDialogView } from '@/ui/ProvinceCommands/CommandDialog/DevelopDialogView';
+import { GiveFoodDialogView } from '@/ui/ProvinceCommands/CommandDialog/GiveFoodDialogView';
+import { TradeDialogView } from '@/ui/ProvinceCommands/CommandDialog/TradeDialogView';
+import { TransportDialogView } from '@/ui/ProvinceCommands/CommandDialog/TransportDialogView';
 import styles from '@/ui/ProvinceCommands/ProvinceCommands.module.scss';
 import { ProvinceCommandsView } from '@/ui/ProvinceCommands/ProvinceCommandsView';
 
@@ -11,19 +17,45 @@ describe('ProvinceCommandsView', () => {
     const world = new WorldFactory().create();
     const events = new EventBus();
     const commands = createCommandGroups({ world, events });
-    const markup = new ProvinceCommandsView(
+    const view = new ProvinceCommandsView(
       { world, commands, events },
-      {},
-    ).render();
-    const sections = markup.match(/<div class="[^"]*" data-group=/g);
+      {
+        developDialog: new DevelopDialogView({ name: 'DevelopCommand' }, {}),
+        giveFoodDialog: new GiveFoodDialogView({ name: 'GiveFoodCommand' }, {}),
+        tradeDialog: new TradeDialogView(
+          { name: 'TradeCommand' },
+          { amount: new AmountFieldView({ name: 'amount' }, {}) },
+        ),
+        transportDialog: new TransportDialogView(
+          { name: 'TransportCommand' },
+          {
+            gold: new AmountFieldView({ name: 'gold' }, {}),
+            food: new AmountFieldView({ name: 'food' }, {}),
+          },
+        ),
+      },
+    );
 
-    expect(markup).toContain(`class="${styles.root} ${styles.hidden}"`);
-    expect(markup).toContain('data-action="skip-turn" disabled>');
-    expect(markup).not.toMatch(/data-command="[^"]+">/);
-    expect(sections).toHaveLength(4);
+    const container = document.createElement('div');
+    view.mount(container);
 
-    for (const section of sections ?? []) {
-      expect(section).toContain(styles.hidden);
+    const root = container.querySelector<HTMLElement>(`.${styles.root}`)!;
+    const groupSections = root.querySelectorAll('div[data-group]');
+    const commandButtons = [
+      ...root.querySelectorAll<HTMLButtonElement>('button[data-command]'),
+    ];
+    const skipButton = root.querySelector<HTMLButtonElement>(
+      `.${styles.skipTurn}`,
+    );
+
+    expect(root.classList.contains(styles.hidden!)).toBe(true);
+    expect(groupSections).toHaveLength(4);
+    expect(skipButton?.disabled).toBe(true);
+    expect(commandButtons.length).toBeGreaterThan(0);
+    expect(commandButtons.every((button) => button.disabled)).toBe(true);
+
+    for (const section of groupSections) {
+      expect(section.classList.contains(styles.hidden!)).toBe(true);
     }
   });
 });

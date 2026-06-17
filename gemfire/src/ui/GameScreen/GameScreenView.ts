@@ -1,3 +1,5 @@
+import { html, type TemplateResult } from 'lit-html';
+
 import type { CalendarDate } from '@/core/domain/CalendarDate';
 import type { Province } from '@/core/domain/Province';
 import { View } from '@/lib/View';
@@ -9,20 +11,20 @@ import styles from './GameScreen.module.scss';
 export class GameScreenView extends View<GameScreenContext, GameScreenViews> {
   protected readonly rootClass = styles.root!;
 
-  public render(): string {
+  public get template(): TemplateResult {
     const { views, context } = this;
     const { current, turnNumber } = context.world.turnQueue;
     const status = current ? this.renderTurn(current, turnNumber) : '';
 
-    return `
-      <div class="${styles.root}">
-        ${views.gamePanel.render()}
-        <div class="${styles.mapArea}">
-          <div class="${styles.turnStatus}">
-            <p class="${styles.date}">${context.world.date}</p>
-            <p class="${styles.status}">${status}</p>
+    return html`
+      <div class=${styles.root}>
+        ${views.gamePanel.template}
+        <div class=${styles.mapArea}>
+          <div class=${styles.turnStatus}>
+            <p class=${styles.date}>${String(context.world.date)}</p>
+            <p class=${styles.status}>${status}</p>
           </div>
-          ${views.worldMap.render()}
+          ${views.worldMap.template}
         </div>
       </div>
     `;

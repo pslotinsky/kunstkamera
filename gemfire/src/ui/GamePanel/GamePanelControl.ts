@@ -23,11 +23,30 @@ export class GamePanelControl extends Control<
 
   public showHint(): void {
     this.controls.provinceInfo.showHint();
-    this.controls.provinceCommands.clear();
+    this.controls.provinceCommands.hide();
   }
 
   public showProvince(province: Province): void {
     this.controls.provinceInfo.showProvince(province);
-    this.controls.provinceCommands.showProvince(province);
+
+    if (this.isCommandsVisible(province)) {
+      this.controls.provinceCommands.show();
+    } else {
+      this.controls.provinceCommands.hide();
+    }
+  }
+
+  public actualizeProvince(province: Province): void {
+    this.controls.provinceInfo.actualizeProvince(province);
+  }
+
+  public pickTarget(province: Province): void {
+    this.controls.provinceCommands.pickTarget(province);
+  }
+
+  private isCommandsVisible(province: Province): boolean {
+    const { world } = this.context;
+
+    return world.isProvinceTurn(province) && province.isBelongsTo(world.player);
   }
 }

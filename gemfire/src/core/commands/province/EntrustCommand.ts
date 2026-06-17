@@ -1,6 +1,6 @@
-import { WorldCommand, type WorldCommandContext } from '../WorldCommand';
+import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
-export class EntrustCommand extends WorldCommand {
+export class EntrustCommand extends ProvinceCommand {
   public constructor(context: WorldCommandContext) {
     super('Entrust', context);
   }

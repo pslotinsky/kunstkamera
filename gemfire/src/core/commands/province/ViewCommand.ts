@@ -1,6 +1,6 @@
-import { WorldCommand, type WorldCommandContext } from '../WorldCommand';
+import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
-export class ViewCommand extends WorldCommand {
+export class ViewCommand extends ProvinceCommand {
   public constructor(context: WorldCommandContext) {
     super('View', context);
   }

@@ -1,15 +1,52 @@
-import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
+import type { DevelopmentGains } from '@/core/domain/Development';
+import type { Province } from '@/core/domain/Province';
 
-import { WorldCommand, type WorldCommandContext } from '../WorldCommand';
+import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
-export class DevelopCommand extends WorldCommand {
+const MIN_GAIN = 2;
+const MAX_GAIN = 5;
+const INTELLIGENCE_PER_GAIN = 25;
+
+export type DevelopTarget = 'cultivation' | 'protection';
+
+export class DevelopCommand extends ProvinceCommand {
+  public static readonly COST = 10;
+
+  public target: DevelopTarget = 'cultivation';
+
   public constructor(context: WorldCommandContext) {
     super('Develop', context);
   }
 
-  public execute(): void {
-    const { world, events } = this.context;
+  public override canExecute(): boolean {
+    const gold = this.currentProvince?.resources.gold ?? 0;
 
-    events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
+    return gold >= DevelopCommand.COST;
+  }
+
+  public execute(): void {
+    const province = this.currentProvince;
+
+    if (province && this.canExecute()) {
+      province.addResources({ gold: -DevelopCommand.COST });
+      province.addDevelopment(this.gains(this.calculateGain(province)));
+
+      this.complete(province, 1);
+    }
+  }
+
+  private gains(amount: number): DevelopmentGains {
+    return this.target === 'cultivation'
+      ? { cultivation: amount }
+      : { protection: amount };
+  }
+
+  private calculateGain({ governor }: Province): number {
+    const intelligence = governor?.stats.intelligence ?? 0;
+
+    return Math.min(
+      MIN_GAIN + Math.floor(intelligence / INTELLIGENCE_PER_GAIN),
+      MAX_GAIN,
+    );
   }
 }

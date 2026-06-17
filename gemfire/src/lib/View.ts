@@ -1,3 +1,5 @@
+import { render, type TemplateResult } from 'lit-html';
+
 import { EventBus, type EventClass } from './EventBus';
 
 export type AnyView = View<unknown, ViewRecord>;
@@ -20,11 +22,11 @@ export abstract class View<
     this.views = views;
   }
 
-  public abstract render(): string;
+  public abstract get template(): TemplateResult;
 
   public mount(container: HTMLElement): void {
-    this.element = this.renderToElement();
-    container.append(this.element);
+    render(this.template, container);
+    this.element = this.findRootOrFail(container);
     this.attachChildren();
     this.onMount();
   }
@@ -69,21 +71,17 @@ export abstract class View<
     }
   }
 
+  protected get rootSelector(): string {
+    return `.${this.rootClass}`;
+  }
+
   private findRootOrFail(container: HTMLElement): HTMLElement {
-    const root = container.querySelector<HTMLElement>(`.${this.rootClass}`);
+    const root = container.querySelector<HTMLElement>(this.rootSelector);
 
     if (!root) {
-      throw new Error(`.${this.rootClass} not found in container`);
+      throw new Error(`${this.rootSelector} not found in container`);
     }
 
     return root;
-  }
-
-  private renderToElement(): HTMLElement {
-    const template = document.createElement('template');
-
-    template.innerHTML = this.render().trim();
-
-    return template.content.firstElementChild as HTMLElement;
   }
 }

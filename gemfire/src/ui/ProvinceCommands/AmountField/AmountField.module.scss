@@ -1,0 +1,46 @@
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.options button {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0.25rem 0.5rem;
+}
+
+.options .input {
+  flex-basis: 100%;
+  width: auto;
+}
+
+.input {
+  width: 3.5rem;
+  padding: 0.25rem 0.4rem;
+  font: inherit;
+  color: inherit;
+  background: #1f2740;
+  border: 1px solid #2c3656;
+  border-radius: 4px;
+}
+
+.button {
+  padding: 0.25rem 0.75rem;
+  font: inherit;
+  color: inherit;
+  background: #1f2740;
+  border: 1px solid #2c3656;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+  border-color: #56649a;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

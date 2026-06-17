@@ -1,16 +1,16 @@
 import type { CalendarDate } from './CalendarDate';
-import type { Stats } from './Stats';
+import type { Characteristics } from './Characteristics';
 
 export interface GeneralParams {
   readonly name: string;
-  readonly stats: Stats;
+  readonly stats: Characteristics;
   readonly birth?: CalendarDate | undefined;
   readonly loyalty?: number | undefined;
 }
 
 export class General {
   public readonly name: string;
-  public readonly stats: Stats;
+  public readonly stats: Characteristics;
   public readonly birth?: CalendarDate | undefined;
   public loyalty?: number | undefined;
 

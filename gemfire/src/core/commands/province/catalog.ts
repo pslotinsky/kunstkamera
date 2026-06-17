@@ -2,14 +2,12 @@ import type { WorldCommand, WorldCommandContext } from '../WorldCommand';
 import { AllyCommand } from './AllyCommand';
 import { AttackCommand } from './AttackCommand';
 import { ChangeLordCommand } from './ChangeLordCommand';
-import { CultivationCommand } from './CultivationCommand';
 import { DevelopCommand } from './DevelopCommand';
 import { EntrustCommand } from './EntrustCommand';
 import { GiveFoodCommand } from './GiveFoodCommand';
 import { HireMonsterCommand } from './HireMonsterCommand';
 import { MoveTroopsCommand } from './MoveTroopsCommand';
 import { NegotiateCommand } from './NegotiateCommand';
-import { ProtectionCommand } from './ProtectionCommand';
 import { RecruitCommand } from './RecruitCommand';
 import { SearchCommand } from './SearchCommand';
 import { TradeCommand } from './TradeCommand';
@@ -44,8 +42,6 @@ export function createCommandGroups(
       title: 'Domestic',
       commands: [
         new DevelopCommand(context),
-        new CultivationCommand(context),
-        new ProtectionCommand(context),
         new TradeCommand(context),
         new GiveFoodCommand(context),
         new TransportCommand(context),
