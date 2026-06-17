@@ -31,6 +31,8 @@ function createFixture(target: DevelopTarget, options: FixtureOptions = {}) {
     cultivation: INITIAL_STAT,
     protection: INITIAL_STAT,
   });
+  family.homeProvince = province;
+
   const { world, events } = makeWorld([province], family);
   const command = new DevelopCommand({ world, events });
 

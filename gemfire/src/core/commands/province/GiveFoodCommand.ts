@@ -13,7 +13,7 @@ export class GiveFoodCommand extends ProvinceCommand {
     const province = this.currentProvince;
 
     if (province && this.food > 0 && this.food <= province.resources.food) {
-      const charisma = province.governor?.stats.charisma ?? 0;
+      const charisma = province.effectiveStats.charisma;
       const loyalty = Math.floor((charisma * this.food) / CHARISMA_DIVISOR);
 
       province.addResources({ food: -this.food });

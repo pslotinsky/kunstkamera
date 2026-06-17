@@ -55,7 +55,7 @@ export class TransportDialogControl extends CommandDialogControl<
 
     if (
       source?.owner &&
-      province.isBelongsTo(source.owner) &&
+      province.belongsTo(source.owner) &&
       !province.isEqual(source)
     ) {
       this.target = {

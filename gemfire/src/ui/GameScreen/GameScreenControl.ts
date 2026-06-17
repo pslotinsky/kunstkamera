@@ -65,7 +65,7 @@ export class GameScreenControl extends Control<
   private handleTurnStart(event: TurnStartedEvent): void {
     const { province, turnNumber } = event;
 
-    if (province.isBelongsTo(this.context.world.player)) {
+    if (province.belongsTo(this.context.world.player)) {
       this.view.showTurn(province, turnNumber);
       this.showProvince(province);
     }

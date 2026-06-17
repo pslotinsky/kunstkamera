@@ -34,6 +34,16 @@ export class Stats<T extends string = string> {
     return this.clone(newValues);
   }
 
+  public multiplyAll(coefficient: number): this {
+    const newValues = {} as Record<T, number>;
+
+    for (const [key, stat] of this.stats) {
+      newValues[key] = stat.multiply(coefficient).value;
+    }
+
+    return this.clone(newValues);
+  }
+
   private clone(values: StatsParams<T>): this {
     return new (this.constructor as new (values?: StatsParams<T>) => this)(
       values,

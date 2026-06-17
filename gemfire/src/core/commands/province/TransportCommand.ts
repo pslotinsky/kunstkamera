@@ -74,7 +74,7 @@ export class TransportCommand extends ProvinceCommand {
   private isValidSelection(source: Province, target: Province): boolean {
     return (
       source.hasOwner() &&
-      target.isBelongsTo(source.owner!) &&
+      target.belongsTo(source.owner!) &&
       !source.isEqual(target)
     );
   }

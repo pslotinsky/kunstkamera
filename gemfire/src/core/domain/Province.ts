@@ -1,3 +1,6 @@
+import { isDefined } from '@/lib/value/isDefined';
+
+import { Characteristics } from './Characteristics';
 import { Development, type DevelopmentGains } from './Development';
 import type { Family } from './Family';
 import type { General } from './General';
@@ -12,6 +15,10 @@ export interface ProvinceParams {
   readonly resources?: Resources;
   readonly development?: Development;
 }
+
+const MAX_GOODWILL = 15;
+const ACTIONS_PER_TURN = 3;
+const REMOTE_PENALTY = 0.5;
 
 export class Province {
   public readonly number: number;
@@ -34,6 +41,28 @@ export class Province {
     this.development = params.development ?? Development.empty();
   }
 
+  public assignGovernor(governor: General | undefined): void {
+    this.governor = governor;
+  }
+
+  public ruledBy(general: General | undefined): boolean {
+    return isDefined(this.governor) && this.governor === general;
+  }
+
+  public get isHome(): boolean {
+    return isDefined(this.owner) && this.isEqual(this.owner.homeProvince);
+  }
+
+  public get isRemotelyRuled(): boolean {
+    return this.ruledBy(this.owner?.ruler) && !this.isHome;
+  }
+
+  public get effectiveStats(): Characteristics {
+    const stats = this.governor?.stats ?? Characteristics.empty();
+
+    return this.isRemotelyRuled ? stats.multiplyAll(REMOTE_PENALTY) : stats;
+  }
+
   public addResources(gains: ResourceGains): void {
     this.resources = this.resources.add(gains);
   }
@@ -43,9 +72,12 @@ export class Province {
   }
 
   public recordAction(goodwill: number): void {
-    this.goodwill = Math.min(15, Math.max(this.goodwill + goodwill, -15));
+    this.goodwill = Math.min(
+      MAX_GOODWILL,
+      Math.max(this.goodwill + goodwill, -MAX_GOODWILL),
+    );
 
-    this.actionCount = (this.actionCount + 1) % 3;
+    this.actionCount = (this.actionCount + 1) % ACTIONS_PER_TURN;
   }
 
   public isEqual(other?: Province | number): boolean {
@@ -58,7 +90,7 @@ export class Province {
     return this.neighbors.includes(other.number);
   }
 
-  public isBelongsTo(family: Family): boolean {
+  public belongsTo(family: Family): boolean {
     return this.owner?.isEqual(family) ?? false;
   }
 

@@ -1,6 +1,6 @@
-import { render, type TemplateResult } from "lit-html";
+import { render, type TemplateResult } from 'lit-html';
 
-import { EventBus, type EventClass } from "./EventBus";
+import { EventBus, type EventClass } from './EventBus';
 
 export type AnyView = View<unknown, ViewRecord>;
 export type ViewRecord = Record<string, AnyView>;
