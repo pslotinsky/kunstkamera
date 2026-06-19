@@ -50,8 +50,8 @@ Fielding and moving forces — bloodless expansion before any battle.
 
 - [ ] build an army from a province's generals and troops
 - [x] recruit troops with gold
-- [ ] move troops and food into a neighboring province
-- [ ] claim a neutral province by moving into it
+- [x] move troops and food into a neighboring province
+- [x] claim a neutral province by moving into it
 - [ ] review army strength before battle
 
 ## 6. Fifth Units
