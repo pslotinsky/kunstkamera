@@ -2,6 +2,8 @@ import { ChangeLordCommand } from '@/core/commands/province/ChangeLordCommand';
 import type { CommandGroup } from '@/core/commands/province/catalog';
 import { DevelopCommand } from '@/core/commands/province/DevelopCommand';
 import { GiveFoodCommand } from '@/core/commands/province/GiveFoodCommand';
+import { MoveTroopsCommand } from '@/core/commands/province/MoveTroopsCommand';
+import { RecruitCommand } from '@/core/commands/province/RecruitCommand';
 import { TradeCommand } from '@/core/commands/province/TradeCommand';
 import { TransportCommand } from '@/core/commands/province/TransportCommand';
 import type { WorldCommand } from '@/core/commands/WorldCommand';
@@ -15,6 +17,8 @@ import { ChangeLordDialogControl } from './CommandDialog/ChangeLordDialogControl
 import type { AnyCommandDialogControl } from './CommandDialog/CommandDialogControl';
 import { DevelopDialogControl } from './CommandDialog/DevelopDialogControl';
 import { GiveFoodDialogControl } from './CommandDialog/GiveFoodDialogControl';
+import { MoveTroopsDialogControl } from './CommandDialog/MoveTroopsDialogControl';
+import { RecruitDialogControl } from './CommandDialog/RecruitDialogControl';
 import { TradeDialogControl } from './CommandDialog/TradeDialogControl';
 import { TransportDialogControl } from './CommandDialog/TransportDialogControl';
 import { CommandSelectedEvent } from './CommandSelectedEvent';
@@ -41,6 +45,8 @@ export class ProvinceCommandsControl extends Control<
     [GiveFoodCommand.name, this.controls.giveFoodDialog],
     [TradeCommand.name, this.controls.tradeDialog],
     [TransportCommand.name, this.controls.transportDialog],
+    [RecruitCommand.name, this.controls.recruitDialog],
+    [MoveTroopsCommand.name, this.controls.moveTroopsDialog],
     [ChangeLordCommand.name, this.controls.changeLordDialog],
   ]);
 
@@ -60,6 +66,11 @@ export class ProvinceCommandsControl extends Control<
         tradeDialog: new TradeDialogControl(TradeCommand.name, world),
         transportDialog: new TransportDialogControl(
           TransportCommand.name,
+          world,
+        ),
+        recruitDialog: new RecruitDialogControl(RecruitCommand.name, world),
+        moveTroopsDialog: new MoveTroopsDialogControl(
+          MoveTroopsCommand.name,
           world,
         ),
         changeLordDialog: new ChangeLordDialogControl(

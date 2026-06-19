@@ -6,6 +6,8 @@ import type { EventBus } from '@/lib/EventBus';
 import type { ChangeLordDialogControl } from './CommandDialog/ChangeLordDialogControl';
 import type { DevelopDialogControl } from './CommandDialog/DevelopDialogControl';
 import type { GiveFoodDialogControl } from './CommandDialog/GiveFoodDialogControl';
+import type { MoveTroopsDialogControl } from './CommandDialog/MoveTroopsDialogControl';
+import type { RecruitDialogControl } from './CommandDialog/RecruitDialogControl';
 import type { TradeDialogControl } from './CommandDialog/TradeDialogControl';
 import type { TransportDialogControl } from './CommandDialog/TransportDialogControl';
 
@@ -20,6 +22,8 @@ export type ProvinceCommandsControls = {
   readonly giveFoodDialog: GiveFoodDialogControl;
   readonly tradeDialog: TradeDialogControl;
   readonly transportDialog: TransportDialogControl;
+  readonly recruitDialog: RecruitDialogControl;
+  readonly moveTroopsDialog: MoveTroopsDialogControl;
   readonly changeLordDialog: ChangeLordDialogControl;
 };
 

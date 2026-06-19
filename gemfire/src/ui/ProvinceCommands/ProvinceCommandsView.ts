@@ -1,12 +1,16 @@
 import { html, nothing, type TemplateResult } from 'lit-html';
 
+import attackIconUrl from '@/assets/icons/attack.webp';
 import changeLordIconUrl from '@/assets/icons/change-lord.webp';
 import developIconUrl from '@/assets/icons/develop.webp';
 import diplomacyIconUrl from '@/assets/icons/diplomacy.webp';
 import domesticIconUrl from '@/assets/icons/domestic.webp';
 import entrustIconUrl from '@/assets/icons/entrust.webp';
 import giveFoodIconUrl from '@/assets/icons/give-food.webp';
+import hireMonsterIconUrl from '@/assets/icons/hire-monster.webp';
 import militaryIconUrl from '@/assets/icons/military.webp';
+import moveTroopsIconUrl from '@/assets/icons/move-troops.webp';
+import recruitIconUrl from '@/assets/icons/recruit.webp';
 import searchIconUrl from '@/assets/icons/search.webp';
 import tradeIconUrl from '@/assets/icons/trade.webp';
 import transportIconUrl from '@/assets/icons/transport.webp';
@@ -34,6 +38,10 @@ const GROUP_ICONS: Record<CommandGroupTitle, string> = {
 };
 
 const COMMAND_ICONS: Record<string, string> = {
+  Attack: attackIconUrl,
+  Recruit: recruitIconUrl,
+  'Move Troops': moveTroopsIconUrl,
+  'Hire Monster': hireMonsterIconUrl,
   Develop: developIconUrl,
   Trade: tradeIconUrl,
   'Give Food': giveFoodIconUrl,
