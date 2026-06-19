@@ -28,7 +28,7 @@ export class WorldEngine {
   }
 
   private handleTurnStart(province: Province): void {
-    if (!province.isBelongsTo(this.world.player)) {
+    if (!province.belongsTo(this.world.player)) {
       this.events.publish(new TurnEndedEvent(this.world.turnQueue.turnNumber));
     }
   }

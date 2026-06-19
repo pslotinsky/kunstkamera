@@ -25,6 +25,7 @@ export class GameScreenView extends View<GameScreenContext, GameScreenViews> {
             <p class=${styles.status}>${status}</p>
           </div>
           ${views.worldMap.template}
+          ${views.familyOverview.template}
         </div>
       </div>
     `;

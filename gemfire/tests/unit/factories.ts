@@ -12,6 +12,7 @@ import { EventBus } from '@/lib/EventBus';
 
 interface GeneralParams {
   readonly name?: string | undefined;
+  readonly birth?: CalendarDate | undefined;
   readonly intelligence?: number | undefined;
   readonly war?: number | undefined;
   readonly charisma?: number | undefined;
@@ -20,13 +21,15 @@ interface GeneralParams {
 interface FamilyParams {
   readonly name?: string | undefined;
   readonly ruler?: General | undefined;
+  readonly members?: readonly General[] | undefined;
+  readonly homeProvince?: Province | undefined;
 }
 
 interface ProvinceParams {
   readonly number?: number | undefined;
   readonly name?: string | undefined;
   readonly neighbors?: number[] | undefined;
-  readonly owner?: Family | undefined;
+  readonly family?: Family | undefined;
   readonly governor?: General | undefined;
   readonly gold?: number | undefined;
   readonly food?: number | undefined;
@@ -36,9 +39,14 @@ interface ProvinceParams {
   readonly protection?: number | undefined;
 }
 
+let generalSequence = 0;
+
 export function makeGeneral(params: GeneralParams = {}): General {
+  generalSequence += 1;
+
   return new General({
-    name: params.name ?? 'General',
+    name: params.name ?? `General ${generalSequence}`,
+    birth: params.birth ?? new CalendarDate(170, 1),
     stats: Characteristics.from({
       intelligence: params.intelligence ?? 50,
       war: params.war ?? 50,
@@ -47,11 +55,25 @@ export function makeGeneral(params: GeneralParams = {}): General {
   });
 }
 
+let placeholderHomeNumber = 0;
+
 export function makeFamily(params: FamilyParams = {}): Family {
+  const ruler = params.ruler ?? makeGeneral();
+
   return new Family({
     name: params.name ?? 'Family',
-    ruler: params.ruler ?? makeGeneral(),
+    ruler,
+    members: params.members ?? [ruler],
+    homeProvince: params.homeProvince ?? makePlaceholderHome(),
   });
+}
+
+// A family always has a seat; tests that don't exercise it get a placeholder
+// with a negative number that can never match a real province.
+function makePlaceholderHome(): Province {
+  placeholderHomeNumber -= 1;
+
+  return makeProvince({ number: placeholderHomeNumber });
 }
 
 export function makeProvince(params: ProvinceParams = {}): Province {
@@ -59,7 +81,7 @@ export function makeProvince(params: ProvinceParams = {}): Province {
     number: params.number ?? 1,
     name: params.name ?? 'Province',
     neighbors: params.neighbors ?? [],
-    owner: params.owner,
+    family: params.family,
     governor: params.governor,
     resources: Resources.from({
       gold: params.gold ?? 0,
@@ -83,12 +105,10 @@ export function makeWorld(
   const generalMap = new Map<string, General>();
 
   for (const province of provinces) {
-    if (province.owner) {
-      familyMap.set(province.owner.name, province.owner);
-      if (province.owner.ruler) {
-        generalMap.set(province.owner.ruler.name, province.owner.ruler);
-      }
-      for (const member of province.owner.members) {
+    if (province.family) {
+      familyMap.set(province.family.name, province.family);
+      generalMap.set(province.family.ruler.name, province.family.ruler);
+      for (const member of province.family.members) {
         generalMap.set(member.name, member);
       }
     }

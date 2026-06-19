@@ -25,7 +25,7 @@ function createFixture(date: CalendarDate): Fixture {
       number: 1,
       name: 'Rodale',
       neighbors: [2],
-      owner: blanche,
+      family: blanche,
       gold: 500,
       food: 400,
       troops: 100,
@@ -33,11 +33,16 @@ function createFixture(date: CalendarDate): Fixture {
       cultivation: 20,
       protection: 30,
     }),
-    makeProvince({ number: 2, name: 'Ulster', neighbors: [1], owner: blanche }),
+    makeProvince({
+      number: 2,
+      name: 'Ulster',
+      neighbors: [1],
+      family: blanche,
+    }),
     makeProvince({
       number: 3,
       name: 'Hertzog',
-      owner: lankshire,
+      family: lankshire,
       loyalty: 5,
       cultivation: 5,
       protection: 5,
@@ -102,7 +107,7 @@ describe('WorldEngine', () => {
     events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
 
     expect(world.date.equals(new CalendarDate(1186, 5))).toBe(true);
-    expect(world.turnQueue.current?.isBelongsTo(world.player)).toBe(true);
+    expect(world.turnQueue.current?.belongsTo(world.player)).toBe(true);
   });
 
   it('announces every turn start, auto-ending rival and neutral ones', () => {
@@ -112,7 +117,7 @@ describe('WorldEngine', () => {
     events.subscribe(TurnStartedEvent, (event) => {
       expect(event.province).toBe(world.turnQueue.current);
 
-      if (event.province.isBelongsTo(world.player)) {
+      if (event.province.belongsTo(world.player)) {
         announcements.push('player turn started');
       }
     });

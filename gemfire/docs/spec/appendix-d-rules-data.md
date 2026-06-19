@@ -76,7 +76,7 @@ Search
 | Surrender            | Diplomacy      | Yes                               | Attempts to absorb enemy family.        |
 | Sabotage             | Diplomacy      | Yes                               | Damages enemy province or reputation.   |
 | Plunder              | Diplomacy      | Yes                               | Steals Gold / Food.                     |
-| Search               | Search         | Yes                               | Finds artifacts / inspects Fifth Units. |
+| Search               | Search         | Yes                               | Finds artifacts, locates Gems, inspects Fifth Units. |
 | View / Enquiry       | Administration | No                                | Inspects data.                          |
 | Change Lord          | Administration | N/A / uncertain                   | Assigns lord.                           |
 | Entrust              | Administration | N/A / setup command               | Delegates province to AI.               |
@@ -169,7 +169,7 @@ Confirmed or strongly supported turn-consuming actions include:
 | Attack           | Invades adjacent province.                     |
 | Transport / Move | Moves resources / troops.                      |
 | Diplomacy        | Ally, Defection, Surrender, Sabotage, Plunder. |
-| Search           | Artifact / Fifth Unit intelligence.            |
+| Search           | Artifact, Gem, and Fifth Unit intelligence.    |
 | Hire Monster     | Likely consumes action; verify by version.     |
 
 ---

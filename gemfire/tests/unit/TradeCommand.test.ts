@@ -14,7 +14,7 @@ function createFixture(rate: MarketRate) {
   const family = makeFamily({ name: 'Blanche' });
   const province = makeProvince({
     number: 1,
-    owner: family,
+    family: family,
     gold: INITIAL_GOLD,
     food: INITIAL_FOOD,
   });

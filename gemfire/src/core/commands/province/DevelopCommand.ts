@@ -41,8 +41,8 @@ export class DevelopCommand extends ProvinceCommand {
       : { protection: amount };
   }
 
-  private calculateGain({ governor }: Province): number {
-    const intelligence = governor?.stats.intelligence ?? 0;
+  private calculateGain(province: Province): number {
+    const intelligence = province.effectiveStats.intelligence;
 
     return Math.min(
       MIN_GAIN + Math.floor(intelligence / INTELLIGENCE_PER_GAIN),

@@ -274,6 +274,8 @@ A Gem transfers with the family. If a family surrenders, the victor gains its Ge
 > (Appendix B.3) are authored and do not always follow the conqueror — e.g.,
 > Flax defeats Coryll, yet Empyron passes to Tate, not Flax.
 
+Per the manuals, the Search command can also look for Gems: Search reveals which families hold them but never transfers one. Acquisition is solely through family absorption above.
+
 ---
 
 ## Transfer Model

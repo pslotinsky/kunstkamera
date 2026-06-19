@@ -6,17 +6,19 @@ const CHARACTERISTICS_MAXES = {
   charisma: 100,
 };
 
-type CharacteristicsKey = keyof typeof CHARACTERISTICS_MAXES;
+export type CharacteristicsKey = keyof typeof CHARACTERISTICS_MAXES;
 
 export type CharacteristicsValues = StatsParams<CharacteristicsKey>;
 
 export class Characteristics extends Stats<CharacteristicsKey> {
-  public static from(definition: {
-    readonly intelligence: number;
-    readonly war: number;
-    readonly charisma: number;
-  }): Characteristics {
-    return new Characteristics(definition);
+  public static empty(): Characteristics {
+    return new Characteristics({});
+  }
+
+  public static from(definition: CharacteristicsValues): Characteristics {
+    const { charisma = 0, intelligence = 0, war = 0 } = definition;
+
+    return new Characteristics({ charisma, intelligence, war });
   }
 
   declare readonly intelligence: number;

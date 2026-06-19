@@ -246,6 +246,8 @@ They can damage province stats, reduce resources, frighten troops, or harm stabi
 | Auguskiegies gobbled up food                        | Food decreases.                                |
 | Shrieker scared troops                              | Troops decrease.                               |
 
+The death-banshee is separate from this list. When any ruler dies of old age (§5.9), a banshee's wail is heard across Ishmeria as the audible signal of the death; it has no stat effect and is unrelated to the *Banshee brought an evil omen* bad event above.
+
 ---
 
 ## Bad Event Sources

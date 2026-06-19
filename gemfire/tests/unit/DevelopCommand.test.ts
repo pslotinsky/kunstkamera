@@ -24,13 +24,15 @@ function createFixture(target: DevelopTarget, options: FixtureOptions = {}) {
   const family = makeFamily({ name: 'Blanche', ruler: governor });
   const province = makeProvince({
     number: 1,
-    owner: family,
+    family: family,
     governor,
     gold: options.gold,
     loyalty: 10,
     cultivation: INITIAL_STAT,
     protection: INITIAL_STAT,
   });
+  family.homeProvince = province;
+
   const { world, events } = makeWorld([province], family);
   const command = new DevelopCommand({ world, events });
 

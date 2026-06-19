@@ -38,13 +38,11 @@ The Domestic orders that grow a province month over month.
 
 ## 4. Generals & lords
 
-Who runs your provinces: viewing, recruiting, and assigning the family's members.
+Who runs your provinces: viewing and assigning the family's members.
 
-- [ ] view a general's stats and fame
-- [ ] recruit new generals
-- [ ] appoint or change a province's lord, or rule it directly
-- [ ] move your home province
-- [ ] reward generals to keep them loyal
+- [x] view a general's stats and fame
+- [x] appoint or change a province's lord, or rule it directly
+- [ ] ~~move your home province~~ — cancelled
 
 ## 5. Armies & movement
 
@@ -68,17 +66,16 @@ The hiring economy for the allies that will fill an army's fifth slot — define
 
 What spying into a province turns up, and the scouting that readies an attack.
 
-- [ ] search a province for hidden generals, artifacts, and gems
+- [ ] search a province for artifacts and gems
 - [ ] scout a rival province before attacking
 - [ ] spy on a rival province's Fifth Unit
 - [ ] equip artifacts to boost a general
 
 ## 8. Gems
 
-Gems as family-level assets — finding, claiming, moving, and holding them; the path to Crown Gemfire. Their Guardians fight in Battle.
+Gems as family-level assets — finding, claiming, and holding them; the path to Crown Gemfire. Their Guardians fight in Battle.
 
 - [ ] find and claim gems
-- [ ] move a gem between your provinces
 - [ ] hold several gems at once
 
 ## 9. Battle
