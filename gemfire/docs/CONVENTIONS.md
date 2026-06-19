@@ -140,3 +140,7 @@ Conventions for the Gemfire TypeScript codebase. Biome (formatter, linter, and i
 - Biome (`biome.json`) handles formatting, linting, and import organization in one tool — **single quotes**, 2-space indent, ~80-column width, trailing commas. Run `npm run check` to format + lint + organize imports and typecheck in one pass; `npm run check:ci` is the verify-only variant and must pass. `npm run format` and `npm run lint` apply each step alone.
 - Imports are auto-grouped, blank-line separated, and sorted within each group: Node builtins, then packages, then the `@/` alias, then relative paths, with `.scss` side-effect imports left where they sit. Don't hand-order imports — let `biome check` do it.
 - Biome is scoped to code (`data`, `docs`, `package-lock.json` are excluded) so reference material and generated files aren't reformatted. `noExplicitAny` is a warning, not an error, so the type-erased base-class generics in `src/lib` are allowed.
+
+## Commits
+
+- **Commit per task — small and focused.** Land each discrete change as its own commit once it is green (`npm run check` and tests pass), rather than letting many tasks pile up on the working tree and landing one sweeping batch — small commits are reviewable, large ones are not; split separable concerns (a refactor, a feature, docs, tests) into their own commits when they don't depend on each other.
