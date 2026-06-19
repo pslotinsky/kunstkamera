@@ -32,8 +32,8 @@ export class ProvinceMarkers {
   }
 
   private createMarker(province: Province, anchor: MarkerAnchor): SVGElement[] {
-    const crest = province.owner
-      ? this.createCrest(province.owner, anchor)
+    const crest = province.family
+      ? this.createCrest(province.family, anchor)
       : undefined;
 
     const number = crest

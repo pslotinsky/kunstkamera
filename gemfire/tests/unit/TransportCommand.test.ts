@@ -15,7 +15,7 @@ function createFixture(options: { readonly rivalReceiver?: boolean } = {}) {
     makeProvince({
       number,
       name: `Province ${number}`,
-      owner: options.rivalReceiver && number === 2 ? rival : family,
+      family: options.rivalReceiver && number === 2 ? rival : family,
       gold: INITIAL_GOLD,
       food: INITIAL_FOOD,
     }),

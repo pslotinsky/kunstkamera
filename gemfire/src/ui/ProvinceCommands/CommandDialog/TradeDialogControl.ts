@@ -1,13 +1,11 @@
-import {
+import type {
   TradeCommand,
-  type TradeDirection,
+  TradeDirection,
 } from '@/core/commands/province/TradeCommand';
-import type { WorldCommand } from '@/core/commands/WorldCommand';
 import type { World } from '@/core/domain/World';
 
 import { AmountFieldControl } from '../AmountField/AmountFieldControl';
 import { CommandDialogControl } from './CommandDialogControl';
-import { ConfirmClickedEvent } from './ConfirmClickedEvent';
 import { DirectionSelectedEvent } from './DirectionSelectedEvent';
 import { TradeDialogView } from './TradeDialogView';
 
@@ -15,6 +13,7 @@ const FOOD_CEILING = 999;
 
 export class TradeDialogControl extends CommandDialogControl<
   TradeDialogView,
+  TradeCommand,
   { amount: AmountFieldControl }
 > {
   private readonly world: World;
@@ -31,7 +30,7 @@ export class TradeDialogControl extends CommandDialogControl<
     this.world = world;
   }
 
-  public override open(command: WorldCommand): void {
+  public override open(command: TradeCommand): void {
     this.direction = undefined;
     this.controls.amount.reset();
     this.update();
@@ -49,13 +48,11 @@ export class TradeDialogControl extends CommandDialogControl<
     });
 
     this.controls.amount.onChange(() => this.update());
+  }
 
-    this.subscribe(ConfirmClickedEvent, () => {
-      if (this.command instanceof TradeCommand) {
-        this.command.direction = this.direction ?? 'buy';
-        this.command.food = this.controls.amount.value;
-      }
-    });
+  protected override setupCommand(command: TradeCommand): void {
+    command.direction = this.direction ?? 'buy';
+    command.food = this.controls.amount.value;
   }
 
   private update(): void {

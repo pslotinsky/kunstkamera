@@ -40,9 +40,9 @@ The Domestic orders that grow a province month over month.
 
 Who runs your provinces: viewing and assigning the family's members.
 
-- [ ] view a general's stats and fame
-- [ ] appoint or change a province's lord, or rule it directly
-- [ ] move your home province
+- [x] view a general's stats and fame
+- [x] appoint or change a province's lord, or rule it directly
+- [ ] ~~move your home province~~ — cancelled
 
 ## 5. Armies & movement
 

@@ -8,10 +8,10 @@ describe('Province effective stats', () => {
     const lord = makeGeneral({ name: 'Anselm', intelligence: 40 });
     const family = makeFamily({ name: 'Blanche', ruler });
 
-    const home = makeProvince({ number: 1, owner: family, governor: ruler });
-    const remote = makeProvince({ number: 2, owner: family, governor: ruler });
-    const lorded = makeProvince({ number: 3, owner: family, governor: lord });
-    const empty = makeProvince({ number: 4, owner: family });
+    const home = makeProvince({ number: 1, family: family, governor: ruler });
+    const remote = makeProvince({ number: 2, family: family, governor: ruler });
+    const lorded = makeProvince({ number: 3, family: family, governor: lord });
+    const empty = makeProvince({ number: 4, family: family });
 
     family.homeProvince = home;
 

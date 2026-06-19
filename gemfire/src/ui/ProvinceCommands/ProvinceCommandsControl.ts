@@ -1,3 +1,4 @@
+import { ChangeLordCommand } from '@/core/commands/province/ChangeLordCommand';
 import type { CommandGroup } from '@/core/commands/province/catalog';
 import { DevelopCommand } from '@/core/commands/province/DevelopCommand';
 import { GiveFoodCommand } from '@/core/commands/province/GiveFoodCommand';
@@ -10,6 +11,7 @@ import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { Control } from '@/lib/Control';
 import type { EventBus } from '@/lib/EventBus';
 
+import { ChangeLordDialogControl } from './CommandDialog/ChangeLordDialogControl';
 import type { AnyCommandDialogControl } from './CommandDialog/CommandDialogControl';
 import { DevelopDialogControl } from './CommandDialog/DevelopDialogControl';
 import { GiveFoodDialogControl } from './CommandDialog/GiveFoodDialogControl';
@@ -39,6 +41,7 @@ export class ProvinceCommandsControl extends Control<
     [GiveFoodCommand.name, this.controls.giveFoodDialog],
     [TradeCommand.name, this.controls.tradeDialog],
     [TransportCommand.name, this.controls.transportDialog],
+    [ChangeLordCommand.name, this.controls.changeLordDialog],
   ]);
 
   private pending: PendingDialog | null = null;
@@ -57,6 +60,10 @@ export class ProvinceCommandsControl extends Control<
         tradeDialog: new TradeDialogControl(TradeCommand.name, world),
         transportDialog: new TransportDialogControl(
           TransportCommand.name,
+          world,
+        ),
+        changeLordDialog: new ChangeLordDialogControl(
+          ChangeLordCommand.name,
           world,
         ),
       },
@@ -106,7 +113,10 @@ export class ProvinceCommandsControl extends Control<
 
       if (command.requiresTarget) {
         this.context.events.publish(
-          new TargetingStartedEvent(command.selectableTargets),
+          new TargetingStartedEvent(
+            command.selectableTargets,
+            dialog.inspectsTarget,
+          ),
         );
       }
     } else {

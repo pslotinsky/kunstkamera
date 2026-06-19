@@ -8,16 +8,18 @@ import { ConfirmClickedEvent } from './ConfirmClickedEvent';
 
 export type AnyCommandDialogControl = CommandDialogControl<
   AnyCommandDialogView,
+  WorldCommand,
   ControlRecord
 >;
 
 export abstract class CommandDialogControl<
   TView extends AnyCommandDialogView,
+  TCommand extends WorldCommand = WorldCommand,
   TControls extends ControlRecord = Record<string, never>,
 > extends Control<TView, TControls> {
-  protected command: WorldCommand | undefined = undefined;
+  protected command: TCommand | undefined = undefined;
 
-  public open(command: WorldCommand): void {
+  public open(command: TCommand): void {
     this.command = command;
     this.view.show();
   }
@@ -26,15 +28,26 @@ export abstract class CommandDialogControl<
 
   public pickTarget(_province: Province): void {}
 
+  public get inspectsTarget(): boolean {
+    return false;
+  }
+
   public close(): void {
     this.view.hide();
   }
 
   public onConfirm(handler: () => void): void {
-    this.subscribe(ConfirmClickedEvent, handler);
+    this.subscribe(ConfirmClickedEvent, () => {
+      if (this.command) {
+        this.setupCommand(this.command);
+        handler();
+      }
+    });
   }
 
   public onCancel(handler: () => void): void {
     this.subscribe(CancelClickedEvent, handler);
   }
+
+  protected setupCommand(_command: TCommand): void {}
 }

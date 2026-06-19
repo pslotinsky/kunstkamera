@@ -1,9 +1,11 @@
 import type { Province } from '@/core/domain/Province';
+import { FamilyOverviewRequestedEvent } from '@/core/events/FamilyOverviewRequestedEvent';
 import { MonthStartedEvent } from '@/core/events/MonthStartedEvent';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
 import { Control } from '@/lib/Control';
 import type { EventClass } from '@/lib/EventBus';
+import { FamilyOverviewControl } from '@/ui/FamilyOverview/FamilyOverviewControl';
 import { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
 import { TargetingEndedEvent } from '@/ui/ProvinceCommands/TargetingEndedEvent';
 import { TargetingStartedEvent } from '@/ui/ProvinceCommands/TargetingStartedEvent';
@@ -18,6 +20,8 @@ export class GameScreenControl extends Control<
 > {
   private selected?: number | undefined;
   private selectable?: Set<number> | undefined;
+  private displayed?: number | undefined;
+  private inspectsTarget = false;
 
   public constructor(context: GameScreenContext) {
     super(GameScreenView, context, {
@@ -27,6 +31,7 @@ export class GameScreenControl extends Control<
         commands: context.commands,
         events: context.events,
       }),
+      familyOverview: new FamilyOverviewControl({ world: context.world }),
     });
   }
 
@@ -39,14 +44,17 @@ export class GameScreenControl extends Control<
     );
     this.onWorldEvent(TurnStartedEvent, (event) => this.handleTurnStart(event));
     this.onWorldEvent(ProvinceUpdatedEvent, (event) => {
-      if (this.selected === event.province.number) {
+      if (this.displayed === event.province.number) {
         this.controls.gamePanel.actualizeProvince(event.province);
       }
     });
     this.onWorldEvent(TargetingStartedEvent, (event) =>
-      this.startTargeting(event.selectable),
+      this.startTargeting(event),
     );
     this.onWorldEvent(TargetingEndedEvent, () => this.endTargeting());
+    this.onWorldEvent(FamilyOverviewRequestedEvent, () =>
+      this.controls.familyOverview.open(),
+    );
 
     const current = this.context.world.turnQueue.current;
 
@@ -74,18 +82,40 @@ export class GameScreenControl extends Control<
   private selectProvince(province: Province): void {
     if (this.selectable?.has(province.number)) {
       this.controls.gamePanel.pickTarget(province);
+
+      if (this.inspectsTarget) {
+        this.displayed = province.number;
+        this.controls.gamePanel.showProvinceInfo(province);
+      }
+
       this.renderTargeting(province.number);
     }
   }
 
-  private startTargeting(selectable: readonly number[]): void {
-    this.selectable = new Set(selectable);
+  private startTargeting(event: TargetingStartedEvent): void {
+    this.selectable = new Set(event.selectable);
+    this.inspectsTarget = event.inspectsTarget;
     this.renderTargeting();
   }
 
   private endTargeting(): void {
     this.selectable = undefined;
     this.showCurrentProvince();
+
+    if (this.inspectsTarget) {
+      this.showCurrentInfo();
+    }
+
+    this.inspectsTarget = false;
+  }
+
+  private showCurrentInfo(): void {
+    if (this.selected) {
+      this.displayed = this.selected;
+      this.controls.gamePanel.showProvinceInfo(
+        this.context.world.map.getProvince(this.selected),
+      );
+    }
   }
 
   private renderTargeting(selected?: number): void {
@@ -111,6 +141,7 @@ export class GameScreenControl extends Control<
 
   private showProvince(province: Province): void {
     this.selected = province.number;
+    this.displayed = province.number;
 
     this.controls.worldMap.showCurrent(province);
     this.controls.gamePanel.showProvince(province);

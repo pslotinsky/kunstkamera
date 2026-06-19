@@ -1,22 +1,23 @@
-import {
+import type {
   DevelopCommand,
-  type DevelopTarget,
+  DevelopTarget,
 } from '@/core/commands/province/DevelopCommand';
-import type { WorldCommand } from '@/core/commands/WorldCommand';
 
 import { CommandDialogControl } from './CommandDialogControl';
-import { ConfirmClickedEvent } from './ConfirmClickedEvent';
 import { DevelopDialogView } from './DevelopDialogView';
 import { DevelopTargetSelectedEvent } from './DevelopTargetSelectedEvent';
 
-export class DevelopDialogControl extends CommandDialogControl<DevelopDialogView> {
+export class DevelopDialogControl extends CommandDialogControl<
+  DevelopDialogView,
+  DevelopCommand
+> {
   private target: DevelopTarget | undefined = undefined;
 
   public constructor(name: string) {
     super(DevelopDialogView, { name });
   }
 
-  public override open(command: WorldCommand): void {
+  public override open(command: DevelopCommand): void {
     this.target = undefined;
     this.update();
     super.open(command);
@@ -27,12 +28,12 @@ export class DevelopDialogControl extends CommandDialogControl<DevelopDialogView
       this.target = event.target as DevelopTarget;
       this.update();
     });
+  }
 
-    this.subscribe(ConfirmClickedEvent, () => {
-      if (this.command instanceof DevelopCommand && this.target) {
-        this.command.target = this.target;
-      }
-    });
+  protected override setupCommand(command: DevelopCommand): void {
+    if (this.target) {
+      command.target = this.target;
+    }
   }
 
   private update(): void {

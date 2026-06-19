@@ -6,7 +6,7 @@ Manage the family: see your generals and their stats, choose who lords each prov
 
 In scope: view generals' stats and the ruler's fame; appoint, move, and promote lords; rule a province directly; move the home province.
 
-Out of scope: recruiting generals (only via Defection / capture — features 11, 10) and rewarding generals (no sourced mechanic; `General.loyalty` stays dead). We only seed the vassal pool those will use.
+Out of scope: recruiting generals (only via Defection / capture — features 11, 10) and rewarding generals (no sourced mechanic; hidden general loyalty isn't modeled until Defection — feature 11). We only seed the vassal pool those will use.
 
 ## Glossary
 
@@ -21,8 +21,7 @@ Out of scope: recruiting generals (only via Defection / capture — features 11,
 
 ## Functionality
 
-- View a province's lord — Intelligence / War / Charisma, plus Fame when the lord is the ruler.
-- Open the family roster: every member with stats, rank (ruler / lord / vassal), and posting.
+- Open **View** — a free, tabbed info overlay over the map (no turn, per appendix-d). **General** is a table whose first cell is an officer card (portrait, title — ruler / lord / vassal — name, and age) followed by Intelligence / War / Charisma, the ruler's Fame, and posting. **Land** lists the family's provinces: status (capital / lorded / ruled remotely), governor, and development. (**Age** = scenario year − birth year; birth years come from the DragonAtma stat guide in its year-201 epoch, which scenario 1 now uses, with the unknown birth month randomized at world creation. **Gems** comes with feature 8, **5th Unit** with feature 6.)
 - Change a province's lord: promote a **vassal**, **move** a lord in from elsewhere, or hand it to **You** (the ruler, remote at half strength). A displaced lord returns to the pool; a province a lord leaves reverts to "You".
 - Move the home province: the ruler relocates, the new seat becomes full-strength, the old reverts to "You". This alone among the feature's orders ends the turn.
 - Develop and Give Food read the province's **effective** stats, so a remotely-ruled province yields half.
@@ -32,27 +31,27 @@ Out of scope: recruiting generals (only via Defection / capture — features 11,
 ```mermaid
 flowchart LR
   player((Player))
-  player --> uc1(["See a lord's stats / the ruler's fame"])
-  player --> uc2(["Browse the family roster"])
+  player --> uc1(["View officers' stats and the ruler's fame"])
+  player --> uc2(["View the family's lands and their status"])
   player --> uc3(["Appoint a vassal, move a lord, or rule directly"])
   player --> uc4(["Move the home province (ends the turn)"])
 ```
 
 ## UI
 
-The province info panel adds the governor's Intelligence / War / Charisma (and a Fame row when the governor is the ruler), plus a tag when the seat is ruled remotely so the half penalty is visible. The `View` order opens a roster of the family's members (rank, name, stats, posting) — no turn, per appendix-d — which doubles as Change Lord's picker. `Change Lord` is ruler-only and offered only from the home province; "move the ruler here" is the turn-ending move-home path, the rest are free.
+`View` is a free overlay drawn over the map (not the command rail), with **General** and **Land** tabs and a Close button — no turn, per appendix-d. Each tab is a table: General lists officers (rank, name, posting, INT/WAR/CHA, the ruler's Fame); Land lists provinces (status — capital / lorded / ruled remotely — name, governor, development). The province info panel keeps only the governor's portrait and name — a general's stats and the ruler's Fame live in View's General tab. `Change Lord` is its own dialog in the command rail, ruler-only and offered only from the home province; the target province is **picked on the map** (the family's non-home provinces highlight as selectable, like Transport's destination), then the dialog asks who governs it. "move the ruler here" is the turn-ending move-home path, the rest are free.
 
 ```text
-+-------------------------------+   +--------------------------------+
-| Lord — Rodale                 |   | Change Lord                    |
-| [portrait] Erin (you)         |   | Province: [ 7 Rodale       v ] |
-|  INT 82   WAR 87   CHA 76     |   | New lord:                      |
-|  ruler · Fame 9               |   |  ( ) You    (rule from Cardyf) |
-|  ruled from Cardyf · half     |   |  (o) Anselm (vassal)           |
-+-------------------------------+   |  ( ) Karl   (move from Hyland) |
-                                    |  ( ) Move the ruler here (ends)|
-                                    | [ Confirm ]        [ Cancel ]  |
-                                    +--------------------------------+
++--- map overlay: View ----------------------+   +--------------------------------+
+| [General] [Land]                     Close |   | Change Lord                    |
+|  +----+ Ruler        INT WAR CHA Fame Post |   | Province 7: Rodale  (pick map) |
+|  |pic | Erin          82  87  76   9  Card |   | New lord:                      |
+|  +----+ (Age)                              |   |  ( ) You    (rule from Cardyf) |
+|  +----+ Lord                               |   |  (o) Anselm (vassal)           |
+|  |pic | Anselm        76  52  75   —  Roda |   |  ( ) Karl   (move from Hyland) |
+|  +----+ (Age)                              |   |  ( ) Move the ruler here (ends)|
++--------------------------------------------+   | [ Confirm ]        [ Cancel ]  |
+                                                 +--------------------------------+
 ```
 
 ## Research

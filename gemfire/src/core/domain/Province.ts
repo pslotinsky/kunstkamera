@@ -10,7 +10,7 @@ export interface ProvinceParams {
   readonly number: number;
   readonly name: string;
   readonly neighbors: readonly number[];
-  readonly owner?: Family | undefined;
+  readonly family?: Family | undefined;
   readonly governor?: General | undefined;
   readonly resources?: Resources;
   readonly development?: Development;
@@ -20,6 +20,8 @@ const MAX_GOODWILL = 15;
 const ACTIONS_PER_TURN = 3;
 const REMOTE_PENALTY = 0.5;
 
+export type ProvinceStatus = 'capital' | 'remote' | 'lorded' | 'unruled';
+
 export class Province {
   public readonly number: number;
   public readonly name: string;
@@ -28,14 +30,14 @@ export class Province {
   public development: Development;
   public goodwill = 0;
   public actionCount = 0;
-  public owner?: Family | undefined;
+  public family?: Family | undefined;
   public governor?: General | undefined;
 
   public constructor(params: ProvinceParams) {
     this.number = params.number;
     this.name = params.name;
     this.neighbors = params.neighbors;
-    this.owner = params.owner;
+    this.family = params.family;
     this.governor = params.governor;
     this.resources = params.resources ?? Resources.empty();
     this.development = params.development ?? Development.empty();
@@ -46,15 +48,37 @@ export class Province {
   }
 
   public ruledBy(general: General | undefined): boolean {
-    return isDefined(this.governor) && this.governor === general;
+    return (
+      isDefined(general) &&
+      isDefined(this.governor) &&
+      this.governor.isEqual(general)
+    );
   }
 
   public get isHome(): boolean {
-    return isDefined(this.owner) && this.isEqual(this.owner.homeProvince);
+    return isDefined(this.family) && this.isEqual(this.family.homeProvince);
+  }
+
+  public get hasLord(): boolean {
+    return isDefined(this.governor) && !this.family!.isRuler(this.governor);
   }
 
   public get isRemotelyRuled(): boolean {
-    return this.ruledBy(this.owner?.ruler) && !this.isHome;
+    return this.ruledBy(this.family?.ruler) && !this.isHome;
+  }
+
+  public get status(): ProvinceStatus {
+    let status: ProvinceStatus = 'unruled';
+
+    if (this.isHome) {
+      status = 'capital';
+    } else if (this.isRemotelyRuled) {
+      status = 'remote';
+    } else if (this.hasLord) {
+      status = 'lorded';
+    }
+
+    return status;
   }
 
   public get effectiveStats(): Characteristics {
@@ -91,11 +115,11 @@ export class Province {
   }
 
   public belongsTo(family: Family): boolean {
-    return this.owner?.isEqual(family) ?? false;
+    return this.family?.isEqual(family) ?? false;
   }
 
   public hasOwner(): boolean {
-    return !!this.owner;
+    return !!this.family;
   }
 
   public isNeutral(): boolean {

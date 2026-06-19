@@ -5,6 +5,7 @@ import { createCommandGroups } from '@/core/commands/province/catalog';
 import { WorldFactory } from '@/core/WorldFactory';
 import { EventBus } from '@/lib/EventBus';
 import { AmountFieldView } from '@/ui/ProvinceCommands/AmountField/AmountFieldView';
+import { ChangeLordDialogView } from '@/ui/ProvinceCommands/CommandDialog/ChangeLordDialogView';
 import { DevelopDialogView } from '@/ui/ProvinceCommands/CommandDialog/DevelopDialogView';
 import { GiveFoodDialogView } from '@/ui/ProvinceCommands/CommandDialog/GiveFoodDialogView';
 import { TradeDialogView } from '@/ui/ProvinceCommands/CommandDialog/TradeDialogView';
@@ -32,6 +33,10 @@ describe('ProvinceCommandsView', () => {
             gold: new AmountFieldView({ name: 'gold' }, {}),
             food: new AmountFieldView({ name: 'food' }, {}),
           },
+        ),
+        changeLordDialog: new ChangeLordDialogView(
+          { name: 'ChangeLordCommand' },
+          {},
         ),
       },
     );

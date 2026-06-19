@@ -1,14 +1,12 @@
-import {
+import type {
   TransportCommand,
-  type TransportDirection,
+  TransportDirection,
 } from '@/core/commands/province/TransportCommand';
-import type { WorldCommand } from '@/core/commands/WorldCommand';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
 
 import { AmountFieldControl } from '../AmountField/AmountFieldControl';
 import { CommandDialogControl } from './CommandDialogControl';
-import { ConfirmClickedEvent } from './ConfirmClickedEvent';
 import { DirectionSelectedEvent } from './DirectionSelectedEvent';
 import {
   TransportDialogView,
@@ -23,6 +21,7 @@ const RESOURCES: readonly Resource[] = ['gold', 'food'];
 
 export class TransportDialogControl extends CommandDialogControl<
   TransportDialogView,
+  TransportCommand,
   { gold: AmountFieldControl; food: AmountFieldControl }
 > {
   private readonly world: World;
@@ -41,7 +40,7 @@ export class TransportDialogControl extends CommandDialogControl<
     this.world = world;
   }
 
-  public override open(command: WorldCommand): void {
+  public override open(command: TransportCommand): void {
     this.direction = undefined;
     this.target = undefined;
     this.controls.gold.reset();
@@ -54,8 +53,8 @@ export class TransportDialogControl extends CommandDialogControl<
     const source = this.world.turnQueue.current;
 
     if (
-      source?.owner &&
-      province.belongsTo(source.owner) &&
+      source?.family &&
+      province.belongsTo(source.family) &&
       !province.isEqual(source)
     ) {
       this.target = {
@@ -77,15 +76,15 @@ export class TransportDialogControl extends CommandDialogControl<
     for (const resource of RESOURCES) {
       this.controls[resource].onChange(() => this.update());
     }
+  }
 
-    this.subscribe(ConfirmClickedEvent, () => {
-      if (this.command instanceof TransportCommand && this.target) {
-        this.command.direction = this.direction ?? 'send';
-        this.command.destination = this.target.number;
-        this.command.gold = this.controls.gold.value;
-        this.command.food = this.controls.food.value;
-      }
-    });
+  protected override setupCommand(command: TransportCommand): void {
+    if (this.target) {
+      command.direction = this.direction ?? 'send';
+      command.destination = this.target.number;
+      command.gold = this.controls.gold.value;
+      command.food = this.controls.food.value;
+    }
   }
 
   private update(): void {

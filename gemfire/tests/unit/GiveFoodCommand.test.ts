@@ -20,7 +20,7 @@ function createFixture(options: FixtureOptions = {}) {
   const family = makeFamily({ name: 'Blanche' });
   const province = makeProvince({
     number: 1,
-    owner: family,
+    family: family,
     governor,
     food: options.food ?? INITIAL_FOOD,
     loyalty: INITIAL_LOYALTY,

@@ -2,7 +2,7 @@ import type { Collection } from '@/lib/Collection';
 
 import type { CalendarDate } from './CalendarDate';
 import type { Family } from './Family';
-import type { General } from './General';
+import type { General, GeneralRank } from './General';
 import { Market } from './Market';
 import type { Province } from './Province';
 import { TurnQueue } from './TurnQueue';
@@ -38,5 +38,43 @@ export class World {
     return this.turnQueue.current
       ? province.isEqual(this.turnQueue.current)
       : false;
+  }
+
+  public getRuledProvince(general: General): Province | undefined {
+    return this.map.provinces.find((province) => province.ruledBy(general));
+  }
+
+  public getGeneralRank(family: Family, general: General): GeneralRank {
+    let rank: GeneralRank = 'vassal';
+
+    if (family.isRuler(general)) {
+      rank = 'ruler';
+    } else if (this.getRuledProvince(general)) {
+      rank = 'lord';
+    }
+
+    return rank;
+  }
+
+  public getResidence(family: Family, general: General): Province {
+    const governed = family.isRuler(general)
+      ? family.homeProvince
+      : this.getRuledProvince(general);
+
+    return governed ?? family.homeProvince;
+  }
+
+  public getFamilyProvinces(family: Family): readonly Province[] {
+    return this.map.provinces.filter((province) => province.belongsTo(family));
+  }
+
+  public getVassals(family: Family): readonly General[] {
+    const provinces = this.getFamilyProvinces(family);
+
+    return family.members.filter(
+      (member) =>
+        !family.isRuler(member) &&
+        !provinces.some((province) => province.ruledBy(member)),
+    );
   }
 }

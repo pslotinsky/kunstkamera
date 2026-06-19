@@ -2,6 +2,7 @@ import { SCENARIO_1 } from './scenario-1';
 
 export interface GeneralDefinition {
   readonly name: string;
+  readonly birth: number;
   readonly intelligence: number;
   readonly war: number;
   readonly charisma: number;
@@ -16,7 +17,7 @@ export interface FamilyDefinition {
 
 export interface ProvinceDefinition {
   readonly number: number;
-  readonly owner?: string;
+  readonly family?: string;
   readonly governor?: string;
   readonly gold: number;
   readonly food: number;
@@ -29,6 +30,7 @@ export interface ProvinceDefinition {
 export interface Scenario {
   readonly number: number;
   readonly name: string;
+  readonly year: number;
   readonly generals: readonly GeneralDefinition[];
   readonly families: readonly FamilyDefinition[];
   readonly provinces: readonly ProvinceDefinition[];

@@ -1,13 +1,17 @@
 import { html, nothing, type TemplateResult } from 'lit-html';
 
+import changeLordIconUrl from '@/assets/icons/change-lord.webp';
 import developIconUrl from '@/assets/icons/develop.webp';
 import diplomacyIconUrl from '@/assets/icons/diplomacy.webp';
 import domesticIconUrl from '@/assets/icons/domestic.webp';
+import entrustIconUrl from '@/assets/icons/entrust.webp';
 import giveFoodIconUrl from '@/assets/icons/give-food.webp';
 import militaryIconUrl from '@/assets/icons/military.webp';
+import searchIconUrl from '@/assets/icons/search.webp';
 import tradeIconUrl from '@/assets/icons/trade.webp';
 import transportIconUrl from '@/assets/icons/transport.webp';
 import vassalIconUrl from '@/assets/icons/vassal.webp';
+import viewIconUrl from '@/assets/icons/view.webp';
 import type {
   CommandGroup,
   CommandGroupTitle,
@@ -34,6 +38,10 @@ const COMMAND_ICONS: Record<string, string> = {
   Trade: tradeIconUrl,
   'Give Food': giveFoodIconUrl,
   Transport: transportIconUrl,
+  View: viewIconUrl,
+  'Change Lord': changeLordIconUrl,
+  Entrust: entrustIconUrl,
+  Search: searchIconUrl,
 };
 
 export class ProvinceCommandsView extends View<

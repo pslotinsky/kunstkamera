@@ -1,7 +1,6 @@
-import { PROVINCES, type ProvinceData } from '@/config/provinces';
+import { PROVINCES } from '@/config/provinces';
 import {
   type FamilyDefinition,
-  type ProvinceDefinition,
   SCENARIOS,
   type Scenario,
 } from '@/config/scenarios';
@@ -16,7 +15,8 @@ import { World } from '@/core/domain/World';
 import { WorldMap } from '@/core/domain/WorldMap';
 import { Collection } from '@/lib/Collection';
 
-const startDate = new CalendarDate(1186, 4);
+const START_MONTH = 1;
+const MONTHS_PER_YEAR = 12;
 
 // TODO: replaced by the family chosen at new-game setup (feature 13)
 const playerFamily = 'Blanche';
@@ -26,15 +26,20 @@ export class WorldFactory {
     const scenario = this.defaultScenario();
 
     const generals = this.createGenerals(scenario);
-    const families = this.createFamilies(scenario, generals);
-    const provinces = this.createProvinces(scenario, families, generals);
-    const map = new WorldMap(provinces);
+    const provinces = this.createProvinces(scenario);
+    const families = this.createFamilies(scenario, generals, provinces);
 
-    this.assignHomeProvinces(scenario, families, provinces);
+    this.settleProvinces(scenario, families, generals, provinces);
 
     const player = families.getOrFail(playerFamily);
 
-    return new World({ date: startDate, map, families, generals, player });
+    return new World({
+      date: new CalendarDate(scenario.year, START_MONTH),
+      map: new WorldMap(provinces),
+      families,
+      generals,
+      player,
+    });
   }
 
   private defaultScenario(): Scenario {
@@ -56,6 +61,7 @@ export class WorldFactory {
         new General({
           name: definition.name,
           stats: Characteristics.from(definition),
+          birth: new CalendarDate(definition.birth, this.randomMonth()),
         }),
       );
     }
@@ -63,36 +69,11 @@ export class WorldFactory {
     return new Collection(generals, 'general');
   }
 
-  private createFamilies(
-    scenario: Scenario,
-    generals: Collection<string, General>,
-  ): Collection<string, Family> {
-    const families = new Map<string, Family>();
-
-    for (const definition of scenario.families) {
-      families.set(definition.name, this.createFamily(definition, generals));
-    }
-
-    return new Collection(families, 'family');
+  private randomMonth(): number {
+    return Math.floor(Math.random() * MONTHS_PER_YEAR) + 1;
   }
 
-  private createFamily(
-    definition: FamilyDefinition,
-    generals: Collection<string, General>,
-  ): Family {
-    return new Family({
-      name: definition.name,
-      ruler: generals.getOrFail(definition.ruler),
-      members: definition.members.map((name) => generals.getOrFail(name)),
-      fame: definition.fame,
-    });
-  }
-
-  private createProvinces(
-    scenario: Scenario,
-    families: Collection<string, Family>,
-    generals: Collection<string, General>,
-  ): Collection<number, Province> {
+  private createProvinces(scenario: Scenario): Collection<number, Province> {
     const definitions = new Map(
       scenario.provinces.map((definition) => [definition.number, definition]),
     );
@@ -110,50 +91,85 @@ export class WorldFactory {
 
       provinces.set(
         geography.number,
-        this.createProvince(geography, definition, families, generals),
+        new Province({
+          number: geography.number,
+          name: geography.name,
+          neighbors: geography.neighbors,
+          resources: Resources.from(definition),
+          development: Development.from(definition),
+        }),
       );
     }
 
     return new Collection(provinces, 'province');
   }
 
-  private createProvince(
-    geography: ProvinceData,
-    definition: ProvinceDefinition,
-    families: Collection<string, Family>,
+  private createFamilies(
+    scenario: Scenario,
     generals: Collection<string, General>,
-  ): Province {
-    const owner = definition.owner
-      ? families.getOrFail(definition.owner)
-      : undefined;
-    const resident = definition.governor
-      ? generals.getOrFail(definition.governor)
-      : undefined;
+    provinces: Collection<number, Province>,
+  ): Collection<string, Family> {
+    const families = new Map<string, Family>();
 
-    return new Province({
-      number: geography.number,
-      name: geography.name,
-      neighbors: geography.neighbors,
-      owner,
-      governor: resident ?? owner?.ruler,
-      resources: Resources.from(definition),
-      development: Development.from(definition),
+    for (const definition of scenario.families) {
+      const home = this.findHomeProvince(definition, scenario, provinces);
+
+      families.set(
+        definition.name,
+        this.createFamily(definition, generals, home),
+      );
+    }
+
+    return new Collection(families, 'family');
+  }
+
+  private createFamily(
+    definition: FamilyDefinition,
+    generals: Collection<string, General>,
+    homeProvince: Province,
+  ): Family {
+    return new Family({
+      name: definition.name,
+      ruler: generals.getOrFail(definition.ruler),
+      members: definition.members.map((name) => generals.getOrFail(name)),
+      homeProvince,
+      fame: definition.fame,
     });
   }
 
-  private assignHomeProvinces(
+  private findHomeProvince(
+    definition: FamilyDefinition,
+    scenario: Scenario,
+    provinces: Collection<number, Province>,
+  ): Province {
+    const seat = scenario.provinces.find(
+      (province) => province.governor === definition.ruler,
+    );
+
+    if (!seat) {
+      throw new Error(`No home province for family ${definition.name}`);
+    }
+
+    return provinces.getOrFail(seat.number);
+  }
+
+  private settleProvinces(
     scenario: Scenario,
     families: Collection<string, Family>,
+    generals: Collection<string, General>,
     provinces: Collection<number, Province>,
   ): void {
-    for (const family of families.all) {
-      const seat = scenario.provinces.find(
-        (definition) => definition.governor === family.ruler?.name,
-      );
+    for (const definition of scenario.provinces) {
+      const province = provinces.getOrFail(definition.number);
+      const family = definition.family
+        ? families.getOrFail(definition.family)
+        : undefined;
+      const resident = definition.governor
+        ? generals.getOrFail(definition.governor)
+        : undefined;
 
-      if (seat) {
-        family.homeProvince = provinces.getOrFail(seat.number);
-      }
+      province.family = family;
+      province.governor = resident ?? family?.ruler;
     }
   }
 }
