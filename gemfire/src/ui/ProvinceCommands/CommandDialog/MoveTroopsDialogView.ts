@@ -7,13 +7,14 @@ import { CommandDialogView } from './CommandDialogView';
 
 import styles from './CommandDialog.module.scss';
 
-type Resource = 'troops' | 'food';
+type Resource = 'gold' | 'food' | 'troops';
 
-const RESOURCES: readonly Resource[] = ['troops', 'food'];
+const RESOURCES: readonly Resource[] = ['troops', 'food', 'gold'];
 
 const QUANTIFIERS: Record<Resource, string> = {
   troops: 'many',
   food: 'much',
+  gold: 'much',
 };
 
 interface MoveTroopsDialogContext {
@@ -22,7 +23,7 @@ interface MoveTroopsDialogContext {
 
 export class MoveTroopsDialogView extends CommandDialogView<
   MoveTroopsDialogContext,
-  { troops: AmountFieldView; food: AmountFieldView }
+  Record<Resource, AmountFieldView>
 > {
   public showTarget(target: Province | undefined): void {
     if (target) {

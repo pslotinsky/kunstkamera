@@ -6,6 +6,7 @@ import type { World } from '@/core/domain/World';
 
 import { makeFamily, makeGeneral, makeProvince, makeWorld } from './factories';
 
+const SOURCE_GOLD = 100;
 const SOURCE_TROOPS = 100;
 const SOURCE_FOOD = 100;
 
@@ -30,6 +31,7 @@ function setup() {
     name: 'Rodale',
     neighbors: [2, 3, 4],
     family,
+    gold: SOURCE_GOLD,
     troops: SOURCE_TROOPS,
     food: SOURCE_FOOD,
   });
@@ -68,11 +70,13 @@ describe('MoveTroopsCommand', () => {
   it('reinforces an adjacent province you own without changing its ownership', () => {
     const { family, source, owned, command } = setup();
 
-    command.moveTo(owned, 60, 30);
+    command.moveTo(owned, { gold: 40, food: 30, troops: 60 });
     command.execute();
 
+    expect(source.resources.gold).toBe(SOURCE_GOLD - 40);
     expect(source.resources.troops).toBe(SOURCE_TROOPS - 60);
     expect(source.resources.food).toBe(SOURCE_FOOD - 30);
+    expect(owned.resources.gold).toBe(40);
     expect(owned.resources.troops).toBe(60);
     expect(owned.resources.food).toBe(30);
     expect(owned.belongsTo(family)).toBe(true);
@@ -84,12 +88,13 @@ describe('MoveTroopsCommand', () => {
   it('claims an adjacent neutral province, ruled remotely by the ruler', () => {
     const { ruler, family, neutral, command } = setup();
 
-    command.moveTo(neutral, 60, 30);
+    command.moveTo(neutral, { gold: 40, food: 30, troops: 60 });
     command.execute();
 
     expect(neutral.belongsTo(family)).toBe(true);
     expect(neutral.ruledBy(ruler)).toBe(true);
     expect(neutral.isRemotelyRuled).toBe(true);
+    expect(neutral.resources.gold).toBe(40);
     expect(neutral.resources.troops).toBe(60);
     expect(neutral.resources.food).toBe(30);
   });

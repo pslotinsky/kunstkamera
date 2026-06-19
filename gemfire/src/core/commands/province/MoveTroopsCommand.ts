@@ -1,22 +1,25 @@
 import type { Family } from '@/core/domain/Family';
 import type { Province } from '@/core/domain/Province';
+import type { ResourceGains } from '@/core/domain/Resources';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 
 import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
 export class MoveTroopsCommand extends ProvinceCommand {
   private target: Province | undefined;
-  private troops = 0;
+  private gold = 0;
   private food = 0;
+  private troops = 0;
 
   public constructor(context: WorldCommandContext) {
     super('Move Troops', context);
   }
 
-  public moveTo(target: Province, troops: number, food: number): void {
+  public moveTo(target: Province, cargo: ResourceGains): void {
     this.target = target;
-    this.troops = troops;
-    this.food = food;
+    this.gold = cargo.gold ?? 0;
+    this.food = cargo.food ?? 0;
+    this.troops = cargo.troops ?? 0;
   }
 
   public override canExecute(): boolean {
@@ -48,8 +51,16 @@ export class MoveTroopsCommand extends ProvinceCommand {
   }
 
   private march(source: Province, owner: Family, target: Province): void {
-    source.addResources({ troops: -this.troops, food: -this.food });
-    target.addResources({ troops: this.troops, food: this.food });
+    source.addResources({
+      gold: -this.gold,
+      food: -this.food,
+      troops: -this.troops,
+    });
+    target.addResources({
+      gold: this.gold,
+      food: this.food,
+      troops: this.troops,
+    });
 
     if (target.isNeutral()) {
       this.claim(target, owner);
@@ -65,15 +76,14 @@ export class MoveTroopsCommand extends ProvinceCommand {
   }
 
   private canMove(source: Province, target: Province): boolean {
-    const moved = this.troops > 0 || this.food > 0;
-    const hasTroops = source.resources.troops >= this.troops;
-    const hasFood = source.resources.food >= this.food;
+    const moved = this.gold > 0 || this.food > 0 || this.troops > 0;
+    const affordable =
+      source.resources.gold >= this.gold &&
+      source.resources.food >= this.food &&
+      source.resources.troops >= this.troops;
 
     return (
-      this.selectableTargets.includes(target.number) &&
-      moved &&
-      hasTroops &&
-      hasFood
+      this.selectableTargets.includes(target.number) && moved && affordable
     );
   }
 }

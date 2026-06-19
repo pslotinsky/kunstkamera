@@ -7,16 +7,18 @@ import { AmountFieldControl } from '../AmountField/AmountFieldControl';
 import { CommandDialogControl } from './CommandDialogControl';
 import { MoveTroopsDialogView } from './MoveTroopsDialogView';
 
-const TROOP_CEILING = 999;
+const RESOURCE_CEILING = 999;
 
-type Resource = 'troops' | 'food';
+type Resource = 'gold' | 'food' | 'troops';
 
-const RESOURCES: readonly Resource[] = ['troops', 'food'];
+const RESOURCES: readonly Resource[] = ['troops', 'food', 'gold'];
+
+type AmountControls = Record<Resource, AmountFieldControl>;
 
 export class MoveTroopsDialogControl extends CommandDialogControl<
   MoveTroopsDialogView,
   MoveTroopsCommand,
-  { troops: AmountFieldControl; food: AmountFieldControl }
+  AmountControls
 > {
   private readonly world: World;
   private target: Province | undefined = undefined;
@@ -28,6 +30,7 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
       {
         troops: new AmountFieldControl({ name: 'troops' }),
         food: new AmountFieldControl({ name: 'food' }),
+        gold: new AmountFieldControl({ name: 'gold' }),
       },
     );
     this.world = world;
@@ -35,8 +38,11 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
 
   public override open(command: MoveTroopsCommand): void {
     this.target = undefined;
-    this.controls.troops.reset();
-    this.controls.food.reset();
+
+    for (const resource of RESOURCES) {
+      this.controls[resource].reset();
+    }
+
     this.update();
     super.open(command);
   }
@@ -56,11 +62,11 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
 
   protected override setupCommand(command: MoveTroopsCommand): void {
     if (this.target) {
-      command.moveTo(
-        this.target,
-        this.controls.troops.value,
-        this.controls.food.value,
-      );
+      command.moveTo(this.target, {
+        gold: this.controls.gold.value,
+        food: this.controls.food.value,
+        troops: this.controls.troops.value,
+      });
     }
   }
 
@@ -75,9 +81,13 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
       this.view.setRange(resource, max);
     }
 
-    this.view.enableConfirm(
-      isDefined(this.target) &&
-        this.controls.troops.value + this.controls.food.value > 0,
+    this.view.enableConfirm(isDefined(this.target) && this.committed() > 0);
+  }
+
+  private committed(): number {
+    return RESOURCES.reduce(
+      (total, resource) => total + this.controls[resource].value,
+      0,
     );
   }
 
@@ -89,7 +99,7 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
     if (this.target && source) {
       max = Math.min(
         source.resources[resource],
-        TROOP_CEILING - this.target.resources[resource],
+        RESOURCE_CEILING - this.target.resources[resource],
       );
     }
 

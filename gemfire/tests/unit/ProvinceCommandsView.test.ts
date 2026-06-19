@@ -45,6 +45,7 @@ describe('ProvinceCommandsView', () => {
           {
             troops: new AmountFieldView({ name: 'troops' }, {}),
             food: new AmountFieldView({ name: 'food' }, {}),
+            gold: new AmountFieldView({ name: 'gold' }, {}),
           },
         ),
         changeLordDialog: new ChangeLordDialogView(
