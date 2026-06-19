@@ -49,7 +49,7 @@ Who runs your provinces: viewing and assigning the family's members.
 Fielding and moving forces — bloodless expansion before any battle.
 
 - [ ] build an army from a province's generals and troops
-- [ ] recruit troops with gold
+- [x] recruit troops with gold
 - [ ] move troops and food into a neighboring province
 - [ ] claim a neutral province by moving into it
 - [ ] review army strength before battle

@@ -72,8 +72,11 @@ describe('WorldEngine', () => {
   it('records the action but leaves the turn for the orchestrator when a command executes', () => {
     const { world, events } = createFixture(new CalendarDate(1186, 4));
     const province = world.turnQueue.current!;
+    const command = new RecruitCommand({ world, events });
 
-    new RecruitCommand({ world, events }).execute();
+    province.addResources({ gold: 100 });
+    command.recruit(10);
+    command.execute();
 
     expect(world.turnQueue.current).toBe(province);
     expect(province.actionCount).toBe(1);

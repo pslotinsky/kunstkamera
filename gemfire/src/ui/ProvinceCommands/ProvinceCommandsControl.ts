@@ -2,6 +2,7 @@ import { ChangeLordCommand } from '@/core/commands/province/ChangeLordCommand';
 import type { CommandGroup } from '@/core/commands/province/catalog';
 import { DevelopCommand } from '@/core/commands/province/DevelopCommand';
 import { GiveFoodCommand } from '@/core/commands/province/GiveFoodCommand';
+import { RecruitCommand } from '@/core/commands/province/RecruitCommand';
 import { TradeCommand } from '@/core/commands/province/TradeCommand';
 import { TransportCommand } from '@/core/commands/province/TransportCommand';
 import type { WorldCommand } from '@/core/commands/WorldCommand';
@@ -15,6 +16,7 @@ import { ChangeLordDialogControl } from './CommandDialog/ChangeLordDialogControl
 import type { AnyCommandDialogControl } from './CommandDialog/CommandDialogControl';
 import { DevelopDialogControl } from './CommandDialog/DevelopDialogControl';
 import { GiveFoodDialogControl } from './CommandDialog/GiveFoodDialogControl';
+import { RecruitDialogControl } from './CommandDialog/RecruitDialogControl';
 import { TradeDialogControl } from './CommandDialog/TradeDialogControl';
 import { TransportDialogControl } from './CommandDialog/TransportDialogControl';
 import { CommandSelectedEvent } from './CommandSelectedEvent';
@@ -41,6 +43,7 @@ export class ProvinceCommandsControl extends Control<
     [GiveFoodCommand.name, this.controls.giveFoodDialog],
     [TradeCommand.name, this.controls.tradeDialog],
     [TransportCommand.name, this.controls.transportDialog],
+    [RecruitCommand.name, this.controls.recruitDialog],
     [ChangeLordCommand.name, this.controls.changeLordDialog],
   ]);
 
@@ -62,6 +65,7 @@ export class ProvinceCommandsControl extends Control<
           TransportCommand.name,
           world,
         ),
+        recruitDialog: new RecruitDialogControl(RecruitCommand.name, world),
         changeLordDialog: new ChangeLordDialogControl(
           ChangeLordCommand.name,
           world,

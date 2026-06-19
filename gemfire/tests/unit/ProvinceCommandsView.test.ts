@@ -8,6 +8,7 @@ import { AmountFieldView } from '@/ui/ProvinceCommands/AmountField/AmountFieldVi
 import { ChangeLordDialogView } from '@/ui/ProvinceCommands/CommandDialog/ChangeLordDialogView';
 import { DevelopDialogView } from '@/ui/ProvinceCommands/CommandDialog/DevelopDialogView';
 import { GiveFoodDialogView } from '@/ui/ProvinceCommands/CommandDialog/GiveFoodDialogView';
+import { RecruitDialogView } from '@/ui/ProvinceCommands/CommandDialog/RecruitDialogView';
 import { TradeDialogView } from '@/ui/ProvinceCommands/CommandDialog/TradeDialogView';
 import { TransportDialogView } from '@/ui/ProvinceCommands/CommandDialog/TransportDialogView';
 import styles from '@/ui/ProvinceCommands/ProvinceCommands.module.scss';
@@ -33,6 +34,10 @@ describe('ProvinceCommandsView', () => {
             gold: new AmountFieldView({ name: 'gold' }, {}),
             food: new AmountFieldView({ name: 'food' }, {}),
           },
+        ),
+        recruitDialog: new RecruitDialogView(
+          { name: 'RecruitCommand' },
+          { troops: new AmountFieldView({ name: 'troops' }, {}) },
         ),
         changeLordDialog: new ChangeLordDialogView(
           { name: 'ChangeLordCommand' },
