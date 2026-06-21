@@ -15,6 +15,7 @@ export interface ProvinceParams {
   readonly governor?: General | undefined;
   readonly resources?: Resources;
   readonly development?: Development;
+  readonly hirePool?: readonly string[];
 }
 
 const MAX_GOODWILL = 15;
@@ -34,6 +35,7 @@ export class Province {
   public family?: Family | undefined;
   public governor?: General | undefined;
   public hiredUnits: readonly HiredUnit[] = [];
+  public readonly hirePool: readonly string[];
 
   public constructor(params: ProvinceParams) {
     this.number = params.number;
@@ -43,6 +45,7 @@ export class Province {
     this.governor = params.governor;
     this.resources = params.resources ?? Resources.empty();
     this.development = params.development ?? Development.empty();
+    this.hirePool = params.hirePool ?? [];
   }
 
   public assignGovernor(governor: General | undefined): void {

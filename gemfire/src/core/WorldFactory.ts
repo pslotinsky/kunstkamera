@@ -97,6 +97,7 @@ export class WorldFactory {
           neighbors: geography.neighbors,
           resources: Resources.from(definition),
           development: Development.from(definition),
+          hirePool: definition.hirePool,
         }),
       );
     }

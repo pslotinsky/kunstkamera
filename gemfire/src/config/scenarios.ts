@@ -25,6 +25,7 @@ export interface ProvinceDefinition {
   readonly loyalty: number;
   readonly cultivation: number;
   readonly protection: number;
+  readonly hirePool: readonly string[];
 }
 
 export interface Scenario {
