@@ -83,7 +83,7 @@ A stationed type drops out of the Hire list (no duplicate hires). The province i
 
 **Several units per province; hiring blocks duplicate types.** A province stations multiple hired units — confirmed in play — held as a list (`hiredUnits`). The hire constraint reads straight off that list: the Hire menu is the province's `hirePool` minus the types it currently stations, so you cannot hire a type you already hold. The stationed units are the source of truth — no separate per-type flag to keep in sync. The single fifth *army* slot (§6.4) is a battle-time constraint, not a cap on what a province may station. Move Troops can still bring in another unit, even a same-type duplicate (§8.6 — out of scope here), so the holdings are a list, not a set keyed by type. (The ROM `mercenaries` data only seeds the start state: each entry's `available` flag → the province's `hirePool`, its `hired` flag → the units already stationed there at scenario start.)
 
-**Catalogue in config, battle stats deferred.** The fifteen units and their Strength / Cost are canonical in appendix-c §C.4 (e.g. Bugbear: Strength 100, 30 Gold). Config mirrors the fields this feature uses — type, category, strength, cost. Move, Range, and flying are battle-only (appendix-c §C.6/§C.7) and are added to the catalogue when feature 9 needs them, not now.
+**Catalogue in config, full unit data.** The fifteen units are canonical in appendix-c §C.4 (Strength, Cost, Move, Range) and §C.7 (flying), with their flavour descriptions in the manual's Fifth Units table (e.g. Orks: "Axe-wielding brutes"). The catalogue records all of it — type, category, description, strength, cost, move, range, flying — even though Move, Range, and flying carry no behaviour until battle (feature 9); capturing the data once at its canonical source beats a later data-entry pass. `HIRED_UNITS` rows are literally `HiredUnitParams`, so a hire is `new HiredUnit(row)`. `range` is one of Gemfire's four canonical patterns (§C.6: short, long, circular, largest); the hired units use only short/long/largest, with circular reserved for the magician Gem Guardians (feature 8), so `RangePattern` models all four.
 
 **Availability is per-scenario province data.** Each province's hire pool comes from the ROM `mercenaries[].available` flags (§8.3), which differ by scenario — so it is seeded with the rest of the scenario's province state, like ownership and resources. Dynamic availability changes (§8.3, unconfirmed) are out of scope; the pool is fixed for the campaign.
 
@@ -91,7 +91,7 @@ A stationed type drops out of the Hire list (no duplicate hires). The province i
 
 **Hire and dismiss are one command.** The FAQ is explicit: Hire Monster "allows the player to both hire and fire 5th Units" (§6.3). Since a province holds several units, the natural surface is one dialog that lists the stationed units to dismiss and the remaining types to hire — not a separate Dismiss tile (appendix-d does list a "Dismiss Fifth Unit" entry, but the FAQ and the multi-unit management view override that). Turn-consuming, goodwill 0; whether dismissal alone consumes the turn is "needs verification" in appendix-d, so it is flagged.
 
-**"Magician" is not a thing.** The roadmap bullet says "monster, skilled fighter, or magician," but §8.2 has only two categories — Monster and Elite Human (mercenary). The only magic-users in Gemfire are the lore's six wizards, who are Gem Guardians (feature 8), not hireable. The category modelled here is `'monster' | 'mercenary'`.
+**Hireable categories: Monsters and Skilled Fighters.** The manual's Fifth Units roster has three groups — Monsters, Skilled Fighters, and Magicians — but only the first two are hired through Hire Monster. The Magicians (Skulryk, Chylla, Scylla, Empyron, Zendor, Pluvius) are the six wizard Gem Guardians (feature 8), granted by gem ownership rather than hired — so this feature offers only Monsters and Skilled Fighters. The category modelled here is `'monster' | 'mercenary'` (the manual's "Skilled Fighter", spec §8.2's "Elite Human").
 
 ## Domain model
 
@@ -100,15 +100,19 @@ classDiagram
   class HiredUnit {
     +string type
     +UnitCategory category
+    +string description
     +number strength
     +number cost
+    +number move
+    +RangePattern range
+    +boolean flying
   }
   class Province {
     +HiredUnit[] hiredUnits
     +string[] hirePool
-    +station(unit) void
-    +release(unit) void
-    +stations(type) boolean
+    +addUnit(unit) void
+    +removeUnit(unit) void
+    +hasUnit(type) boolean
   }
   class HireMonsterCommand {
     +hireableTypes string[]
@@ -126,13 +130,13 @@ classDiagram
   ProvinceCommand <|-- HireMonsterCommand
   ProvinceCommand <|-- MoveTroopsCommand
   WorldCommand <|-- UpkeepCommand
-  HireMonsterCommand --> Province : hire (station) / dismiss (release)
-  MoveTroopsCommand --> Province : relocate (release + station)
-  UpkeepCommand --> Province : charge each, desert (release) unpaid
-  Province --> HiredUnit : stations many
+  HireMonsterCommand --> Province : hire (addUnit) / dismiss (removeUnit)
+  MoveTroopsCommand --> Province : relocate (removeUnit + addUnit)
+  UpkeepCommand --> Province : charge each, desert (removeUnit) unpaid
+  Province --> HiredUnit : holds many
 ```
 
-The catalogue (`HIRED_UNITS` in config) maps each type to its `category`, `strength`, and `cost`; `HiredUnit` instances are built from it at hire time. `Province.hirePool` is the list of types that province may hire, seeded per scenario; `hireableTypes` is that pool minus the types it already stations. `station` / `release` are the neutral add / remove primitives: a dismiss, a desertion, and the source side of a relocation all call `release`. `HireMonsterCommand` carries one pending action — a chosen type to hire or a stationed unit to dismiss — applied in `execute()`. `MoveTroopsCommand.carry(unit)` relocates one stationed unit by releasing it from the source and stationing it on the destination (feature 5's command, extended here). View reads `hiredUnits` for display and mutates nothing.
+The catalogue (`HIRED_UNITS` in config) maps each type to its `category`, `strength`, and `cost`; `HiredUnit` instances are built from it at hire time. `Province.hirePool` is the list of types that province may hire, seeded per scenario; `hireableTypes` is that pool minus the types it already stations. `addUnit` / `removeUnit` are the neutral add / remove primitives: a dismiss, a desertion, and the source side of a relocation all call `removeUnit`. `HireMonsterCommand` carries one pending action — a chosen type to hire or a stationed unit to dismiss — applied in `execute()`. `MoveTroopsCommand.carry(unit)` relocates one stationed unit by removing it from the source and adding it to the destination (feature 5's command, extended here). View reads `hiredUnits` for display and mutates nothing.
 
 ## Flow
 

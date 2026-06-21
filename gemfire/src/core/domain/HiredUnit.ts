@@ -1,0 +1,40 @@
+export type UnitCategory = 'monster' | 'mercenary';
+
+export type RangePattern = 'short' | 'long' | 'circular' | 'largest';
+
+export interface HiredUnitParams {
+  readonly type: string;
+  readonly category: UnitCategory;
+  readonly description: string;
+  readonly strength: number;
+  readonly cost: number;
+  readonly move: number;
+  readonly range: RangePattern;
+  readonly flying?: boolean;
+}
+
+export class HiredUnit {
+  public readonly type: string;
+  public readonly category: UnitCategory;
+  public readonly description: string;
+  public readonly strength: number;
+  public readonly cost: number;
+  public readonly move: number;
+  public readonly range: RangePattern;
+  public readonly flying: boolean;
+
+  public constructor(params: HiredUnitParams) {
+    this.type = params.type;
+    this.category = params.category;
+    this.description = params.description;
+    this.strength = params.strength;
+    this.cost = params.cost;
+    this.move = params.move;
+    this.range = params.range;
+    this.flying = params.flying ?? false;
+  }
+
+  public get portrait(): string {
+    return `/fifth-units/${this.type.toLowerCase()}.webp`;
+  }
+}
