@@ -15,7 +15,7 @@ export interface ProvinceParams {
   readonly governor?: General | undefined;
   readonly resources?: Resources;
   readonly development?: Development;
-  readonly hirePool?: readonly string[];
+  readonly hirePool?: readonly string[] | undefined;
 }
 
 const MAX_GOODWILL = 15;

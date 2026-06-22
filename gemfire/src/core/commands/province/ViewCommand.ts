@@ -1,5 +1,3 @@
-import { FamilyOverviewRequestedEvent } from '@/core/events/FamilyOverviewRequestedEvent';
-
 import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
 export class ViewCommand extends ProvinceCommand {
@@ -11,7 +9,5 @@ export class ViewCommand extends ProvinceCommand {
     return false;
   }
 
-  public execute(): void {
-    this.publish(new FamilyOverviewRequestedEvent());
-  }
+  public execute(): void {}
 }

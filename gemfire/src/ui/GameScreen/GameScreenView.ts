@@ -26,6 +26,7 @@ export class GameScreenView extends View<GameScreenContext, GameScreenViews> {
           </div>
           ${views.worldMap.template}
           ${views.familyOverview.template}
+          ${views.hireMonster.template}
         </div>
       </div>
     `;

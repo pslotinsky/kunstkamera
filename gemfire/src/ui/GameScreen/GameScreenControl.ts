@@ -1,5 +1,6 @@
+import { HireMonsterCommand } from '@/core/commands/province/HireMonsterCommand';
+import { ViewCommand } from '@/core/commands/province/ViewCommand';
 import type { Province } from '@/core/domain/Province';
-import { FamilyOverviewRequestedEvent } from '@/core/events/FamilyOverviewRequestedEvent';
 import { MonthStartedEvent } from '@/core/events/MonthStartedEvent';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
@@ -7,6 +8,7 @@ import { Control } from '@/lib/Control';
 import type { EventClass } from '@/lib/EventBus';
 import { FamilyOverviewControl } from '@/ui/FamilyOverview/FamilyOverviewControl';
 import { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
+import { HireMonsterDialogControl } from '@/ui/ProvinceCommands/CommandDialog/HireMonsterDialogControl';
 import { TargetingEndedEvent } from '@/ui/ProvinceCommands/TargetingEndedEvent';
 import { TargetingStartedEvent } from '@/ui/ProvinceCommands/TargetingStartedEvent';
 import { WorldMapControl } from '@/ui/WorldMap/WorldMapControl';
@@ -24,14 +26,25 @@ export class GameScreenControl extends Control<
   private inspectsTarget = false;
 
   public constructor(context: GameScreenContext) {
+    const hireMonster = new HireMonsterDialogControl(
+      HireMonsterCommand.name,
+      context.world,
+    );
+    const familyOverview = new FamilyOverviewControl(
+      ViewCommand.name,
+      context.world,
+    );
+
     super(GameScreenView, context, {
       worldMap: new WorldMapControl({ map: context.world.map }),
       gamePanel: new GamePanelControl({
         world: context.world,
         commands: context.commands,
         events: context.events,
+        overlayDialogs: { hireMonster, familyOverview },
       }),
-      familyOverview: new FamilyOverviewControl({ world: context.world }),
+      familyOverview,
+      hireMonster,
     });
   }
 
@@ -52,9 +65,6 @@ export class GameScreenControl extends Control<
       this.startTargeting(event),
     );
     this.onWorldEvent(TargetingEndedEvent, () => this.endTargeting());
-    this.onWorldEvent(FamilyOverviewRequestedEvent, () =>
-      this.controls.familyOverview.open(),
-    );
 
     const current = this.context.world.turnQueue.current;
 

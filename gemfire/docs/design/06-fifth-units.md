@@ -25,10 +25,10 @@ Out of scope: the battle itself and the fifth army slot it fills (feature 9 — 
 
 ## Functionality
 
-- Hire: at a province you control, pick a type from its hire pool — any available type it does not already station — and pay its Gold cost; the unit joins the province at its catalogue Strength. Ends the turn; goodwill 0.
+- Hire: at a province you control, pick a type from its hire pool — any available type it does not already station — and pay its Gold cost; the unit joins the province at its catalogue Strength. Hiring ends the province's turn (the modal closes and the turn advances), like the other gold-spending orders — one hire per visit.
 - Several per province: a province stations multiple hired units, one of each type it hires. Hiring is blocked only for a type already stationed there; a same-type duplicate can still arrive by Move Troops (§8.6, out of scope here).
 - Upkeep: every three months, each stationed unit charges its cost in Gold against its province; any the province cannot pay desert.
-- Dismiss: release a stationed unit, dropping its upkeep; no refund. Hire and dismiss are the same order (Hire Monster). Ends the turn; goodwill 0.
+- Dismiss: release a stationed unit, dropping its upkeep; no refund. A separate screen and command from Hire Monster — it manages what a province already holds, not the hire pool — and is built in its own slice (see Research).
 - Move a unit: a Move Troops order into an adjacent province may carry one of the source's stationed units along; it relocates from the source to the destination (which may be a freshly claimed neutral). It rides the same order — no extra turn, no goodwill change. Units move only via Move Troops, not Transport.
 - View units: View lists each province's stationed Fifth Units (name and Strength) in its overview, and the province info panel shows them too. Free — View consumes no turn.
 
@@ -47,21 +47,22 @@ flowchart LR
 
 ## UI
 
-One Hire Monster dialog manages a province's Fifth Units: it lists the units already stationed there (each with a Dismiss action) and, below, the types still hireable — the province's pool minus the types it already stations — each showing the static facts the game displays (name, Strength, cost), inputs and flavour only, never a predicted battle outcome. It is a Military command, under the Military tile beside Attack, Recruit, and Move Troops.
+The Military tile's Hire Monster command opens a **modal over the map** (like the View family overview), not a sidebar dialog — inspecting a unit before paying for it wants room. The modal is **hire-only**: a compact selector of the province's hireable types (its pool minus the types it already stations) across the top, and below it a prominent **detail** of the selected unit — portrait, name, category, Strength, cost, flavour description, and the attack range drawn as a 5×5 tile grid (spec §C.6), with a battlefield picture to follow. The first hireable unit is selected by default, so there is no empty "pick something" state; the Hire button commits the selected unit and is disabled when the province can't afford it. The Hire Monster command tile stays selected while the modal is open (cleared when it closes), like the View overview.
 
 ```text
-+--- Hire Monster ----------------------+
-| Stationed                             |
-|   Ogre     str 100      [ Dismiss ]   |
-| Hire                                  |
-|   [ Orks    str 100   20g ]           |
-|   [ Bugbear str 100   30g ]           |
-|   [ Wyverns str 150   60g ]           |
-| [ Done ]                              |
-+---------------------------------------+
++--- Hire Monster ------------------------------------------- [Close] -+
+|  [ Orks 20g ]  [ Bugbear 30g ]  [ Warriors 60g ]                     |
+|                                                                      |
+|  +---------+   Orks                          Attack range            |
+|  |portrait |   Monster                        · · · · ·              |
+|  |         |   Strength 100    20 gold        · · + · ·              |
+|  +---------+   "Axe-wielding brutes"          · + O + ·              |
+|                                               · · + · ·              |
+|  [ Hire ]                                     · · · · ·              |
++----------------------------------------------------------------------+
 ```
 
-A stationed type drops out of the Hire list (no duplicate hires). The province info panel also lists the units a province holds.
+Hiring closes the modal and ends the province's turn (one hire per visit); the hire publishes a province update so the sidebar gold reflects the spend — the modal shows no gold of its own. Close dismisses the modal without hiring or ending the turn. The stationed roster and dismissing a unit are **not** here: managing what a province already holds is a separate screen and command (the View overview lists them; dismiss is a later, separate order).
 
 `Move Troops` gains a Fifth-Unit picker below its Troops / Food / Gold fields: the source's stationed units, plus "none" — pick one to send along.
 
@@ -89,7 +90,7 @@ A stationed type drops out of the Hire list (no duplicate hires). The province i
 
 **Upkeep is a month-start engine tick, like Tax & Harvest.** `TaxAndHarvest` runs every month-start and self-guards on September. Upkeep follows the same shape: a `WorldCommand` run at month-start that acts only on quarter months. The spec confirms "every three months" but not the anchor month (§8.5), so the quarter months are a single config constant and the exact set is an open question. When a province stations several units and cannot pay for all, which desert (order, or all-or-nothing) is also unconfirmed; the model charges them in turn and deserts each one the remaining Gold cannot cover.
 
-**Hire and dismiss are one command.** The FAQ is explicit: Hire Monster "allows the player to both hire and fire 5th Units" (§6.3). Since a province holds several units, the natural surface is one dialog that lists the stationed units to dismiss and the remaining types to hire — not a separate Dismiss tile (appendix-d does list a "Dismiss Fifth Unit" entry, but the FAQ and the multi-unit management view override that). Turn-consuming, goodwill 0; whether dismissal alone consumes the turn is "needs verification" in appendix-d, so it is flagged.
+**Hire and dismiss are separate orders; hiring ends the turn.** The FAQ notes Hire Monster "allows the player to both hire and fire 5th Units" (§6.3), and appendix-d lists "Dismiss Fifth Unit" as its own entry. We split them: **Hire Monster** is a hire-only modal over the hire *pool*; **dismiss** belongs to the roster of what a province already *holds* — a different screen and a separate command, built in its own slice. The two are about different things (acquire vs. release), so one modal juggling both read awkwardly. Hiring **ends the turn** — it spends Gold and commits a unit, like Recruit (appendix-d marks the turn cost "needs version check"). So Hire Monster is an ordinary command dialog (`consumesTurn()` is `true`); it merely renders as an overlay over the map instead of inline in the sidebar, because inspecting a unit before paying wants room. It runs the *identical* lifecycle as the sidebar dialogs: selecting the tile opens the dialog (free — browsing costs nothing, since a dialog command does not execute until confirmed), the Hire button confirms, `HireMonsterCommand.execute()` performs the hire, and the shared command framework ends the turn with the usual pacing and clears the tile. Placement (sidebar vs. map overlay) is the only thing that differs from a command like Develop — the mechanics are one path, with no bespoke open/close events. To make that work, `ProvinceCommandsControl` drives the lifecycle while the overlay dialog is hosted in the map area by `GameScreen` (where an overlay can cover the map yet leave the sidebar tile visible); the commands control is handed the overlay dialog and registers it alongside the sidebar dialogs.
 
 **Hireable categories: Monsters and Skilled Fighters.** The manual's Fifth Units roster has three groups — Monsters, Skilled Fighters, and Magicians — but only the first two are hired through Hire Monster. The Magicians (Skulryk, Chylla, Scylla, Empyron, Zendor, Pluvius) are the six wizard Gem Guardians (feature 8), granted by gem ownership rather than hired — so this feature offers only Monsters and Skilled Fighters. The category modelled here is `'monster' | 'mercenary'` (the manual's "Skilled Fighter", spec §8.2's "Elite Human").
 
@@ -117,7 +118,9 @@ classDiagram
   class HireMonsterCommand {
     +hireableTypes string[]
     +hire(type) void
-    +dismiss(unit) void
+    +execute() void
+  }
+  class DismissFifthUnitCommand {
     +execute() void
   }
   class MoveTroopsCommand {
@@ -128,15 +131,17 @@ classDiagram
     +execute() void
   }
   ProvinceCommand <|-- HireMonsterCommand
+  ProvinceCommand <|-- DismissFifthUnitCommand
   ProvinceCommand <|-- MoveTroopsCommand
   WorldCommand <|-- UpkeepCommand
-  HireMonsterCommand --> Province : hire (addUnit) / dismiss (removeUnit)
+  HireMonsterCommand --> Province : hire (addUnit)
+  DismissFifthUnitCommand --> Province : dismiss (removeUnit)
   MoveTroopsCommand --> Province : relocate (removeUnit + addUnit)
   UpkeepCommand --> Province : charge each, desert (removeUnit) unpaid
   Province --> HiredUnit : holds many
 ```
 
-The catalogue (`HIRED_UNITS` in config) maps each type to its `category`, `strength`, and `cost`; `HiredUnit` instances are built from it at hire time. `Province.hirePool` is the list of types that province may hire, seeded per scenario; `hireableTypes` is that pool minus the types it already stations. `addUnit` / `removeUnit` are the neutral add / remove primitives: a dismiss, a desertion, and the source side of a relocation all call `removeUnit`. `HireMonsterCommand` carries one pending action — a chosen type to hire or a stationed unit to dismiss — applied in `execute()`. `MoveTroopsCommand.carry(unit)` relocates one stationed unit by removing it from the source and adding it to the destination (feature 5's command, extended here). View reads `hiredUnits` for display and mutates nothing.
+The catalogue (`HIRED_UNITS` in config) maps each type to its `category`, `strength`, and `cost`; `HiredUnit` instances are built from it at hire time. `Province.hirePool` is the list of types that province may hire, seeded per scenario; `hireableTypes` is that pool minus the types it already stations. `addUnit` / `removeUnit` are the neutral add / remove primitives: a hire calls `addUnit`; a dismiss, a desertion, and the source side of a relocation all call `removeUnit`. `HireMonsterCommand.execute()` opens the hire modal; its `hire(type)` performs the hire directly. `DismissFifthUnitCommand` (separate slice) releases a stationed unit. `MoveTroopsCommand.carry(unit)` relocates one stationed unit by removing it from the source and adding it to the destination (feature 5's command, extended here). View reads `hiredUnits` for display and mutates nothing.
 
 ## Flow
 
@@ -145,10 +150,10 @@ sequenceDiagram
   participant Player
   participant Hire as HireMonsterCommand
   participant Prov as Province
-  Player->>Hire: hire("Bugbear")
+  Player->>Hire: execute() opens the modal, then hire("Bugbear")
   Hire->>Prov: gold >= cost and not already stationing Bugbear?
-  Hire->>Prov: addResources(gold -cost), station(unit)
-  Hire->>Prov: publish ProvinceUpdated, recordAction(0)
+  Hire->>Prov: addResources(gold -cost), addUnit(unit)
+  Hire->>Prov: publish ProvinceUpdated (no turn consumed)
 ```
 
 ```mermaid
@@ -174,7 +179,8 @@ Each province contributes its `hiredUnits` (each unit's type plus current Streng
 
 ## Tests
 
-- **Hire (unit):** spends the unit's cost in Gold and stations it at the province at its catalogue Strength; lets a province hold several different types; refuses when the province lacks the Gold, when the type is not in its pool, or when it already stations that type.
+- **Hire (unit):** spends the unit's cost in Gold and stations it at the province at its catalogue Strength; lets a province hold several different types; refuses when the province lacks the Gold, when the type is not in its pool, or when it already stations that type. `execute()` opens the modal without consuming the turn.
+- **Hire flow (integration):** opening the modal selects a hireable unit by default; the Hire button stations it, closes the modal, and advances the turn.
 - **Upkeep (unit):** on a quarter month, charges each stationed unit's cost against its province; deserts a unit the province cannot pay; charges nothing on a non-quarter month.
-- **Dismiss (unit):** removes a chosen stationed unit and refunds no Gold.
+- **Dismiss (unit):** its own slice — removes a chosen stationed unit and refunds no Gold.
 - **Carry a unit (unit):** a Move Troops order carrying a stationed unit relocates it — gone from the source, stationed at the destination (including a freshly claimed neutral) — and leaves the source's other units in place.

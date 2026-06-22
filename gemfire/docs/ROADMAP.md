@@ -56,7 +56,7 @@ Raising and moving troops — bloodless expansion before any battle.
 
 The hiring economy for the allies that will fill an army's fifth slot — defined and acquired before the battles that use them.
 
-- [ ] hire a monster or elite mercenary into the fifth slot
+- [x] hire a monster or elite mercenary into the fifth slot
 - [ ] pay quarterly upkeep, or watch hired units desert
 - [ ] dismiss a hired Fifth Unit
 - [ ] carry a hired Fifth Unit to a neighbor with your troops

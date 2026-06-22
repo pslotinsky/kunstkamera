@@ -2,11 +2,9 @@ import { html, type TemplateResult } from 'lit-html';
 
 import type { General, GeneralRank } from '@/core/domain/General';
 import type { Province, ProvinceStatus } from '@/core/domain/Province';
-import { View } from '@/lib/View';
+import { CommandDialogView } from '@/ui/ProvinceCommands/CommandDialog/CommandDialogView';
 
-import { FamilyOverviewClosedEvent } from './FamilyOverviewClosedEvent';
 import { FamilyOverviewTabSelectedEvent } from './FamilyOverviewTabSelectedEvent';
-import type { FamilyOverviewContext } from './types';
 
 import styles from './FamilyOverview.module.scss';
 
@@ -37,44 +35,38 @@ const STATUS_LABELS: Record<ProvinceStatus, string> = {
   unruled: '—',
 };
 
-export class FamilyOverviewView extends View<FamilyOverviewContext> {
-  protected readonly rootClass = styles.root!;
+export class FamilyOverviewView extends CommandDialogView {
+  protected override readonly rootClass = styles.root!;
 
-  public get template(): TemplateResult {
+  protected override get hiddenClass(): string {
+    return styles.hidden!;
+  }
+
+  protected renderBody(): TemplateResult {
     return html`
-      <section class="${styles.root} ${styles.hidden}">
-        <header class=${styles.header}>
-          <div class=${styles.tabs}>
-            ${TABS.map(
-              ({ mode, label }) => html`<button
-                class=${styles.tab}
-                type="button"
-                data-mode=${mode}
-                @click=${() => this.publish(new FamilyOverviewTabSelectedEvent(mode))}
-              >
-                ${label}
-              </button>`,
-            )}
-          </div>
-          <button
-            class=${styles.close}
-            type="button"
-            @click=${() => this.publish(new FamilyOverviewClosedEvent())}
-          >
-            Close
-          </button>
-        </header>
-        <div class=${styles.body} data-body></div>
-      </section>
+      <header class=${styles.header}>
+        <div class=${styles.tabs}>
+          ${TABS.map(
+            ({ mode, label }) => html`<button
+              class=${styles.tab}
+              type="button"
+              data-mode=${mode}
+              @click=${() => this.publish(new FamilyOverviewTabSelectedEvent(mode))}
+            >
+              ${label}
+            </button>`,
+          )}
+        </div>
+        <button
+          class=${styles.close}
+          type="button"
+          @click=${() => this.cancel()}
+        >
+          Close
+        </button>
+      </header>
+      <div class=${styles.body} data-body></div>
     `;
-  }
-
-  public show(): void {
-    this.element.classList.remove(styles.hidden!);
-  }
-
-  public hide(): void {
-    this.element.classList.add(styles.hidden!);
   }
 
   public selectTab(mode: FamilyOverviewMode): void {
@@ -114,7 +106,14 @@ export class FamilyOverviewView extends View<FamilyOverviewContext> {
 
   public showLand(provinces: readonly Province[]): void {
     this.body.innerHTML = this.renderTable(
-      ['Status', 'Province', 'Governor', 'Cult', 'Prot', 'Loy'],
+      [
+        'Status',
+        'Province',
+        'Governor',
+        'Cultivation',
+        'Protection',
+        'Loyalty',
+      ],
       provinces.map((province) => [
         STATUS_LABELS[province.status],
         String(province),

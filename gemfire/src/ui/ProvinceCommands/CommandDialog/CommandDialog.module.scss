@@ -2,10 +2,6 @@
   margin-top: 0.75rem;
 }
 
-.root.hidden {
-  display: none;
-}
-
 .prompt {
   margin: 0 0 0.5rem;
   font-size: 0.8rem;
@@ -18,10 +14,6 @@
 
 .section {
   margin-top: 0.5rem;
-}
-
-.section.hidden {
-  display: none;
 }
 
 .options {
@@ -63,7 +55,7 @@
   border-color: #56649a;
 }
 
-.button.selected {
+.selected {
   border-color: #56649a;
   background: #2c3656;
 }
@@ -111,4 +103,8 @@
 .memberStats {
   grid-column: 2 / 4;
   opacity: 0.85;
+}
+
+.hidden {
+  display: none;
 }

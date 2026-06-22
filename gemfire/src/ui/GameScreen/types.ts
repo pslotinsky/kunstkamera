@@ -4,6 +4,7 @@ import type { ChildrenViews } from '@/lib/Control';
 import type { EventBus } from '@/lib/EventBus';
 import type { FamilyOverviewControl } from '@/ui/FamilyOverview/FamilyOverviewControl';
 import type { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
+import type { HireMonsterDialogControl } from '@/ui/ProvinceCommands/CommandDialog/HireMonsterDialogControl';
 import type { WorldMapControl } from '@/ui/WorldMap/WorldMapControl';
 
 export interface GameScreenContext {
@@ -16,6 +17,7 @@ export type GameScreenControls = {
   readonly worldMap: WorldMapControl;
   readonly gamePanel: GamePanelControl;
   readonly familyOverview: FamilyOverviewControl;
+  readonly hireMonster: HireMonsterDialogControl;
 };
 
 export type GameScreenViews = ChildrenViews<GameScreenControls>;

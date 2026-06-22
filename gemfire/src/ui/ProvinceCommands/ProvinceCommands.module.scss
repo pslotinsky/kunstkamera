@@ -2,19 +2,11 @@
   display: contents;
 }
 
-.root.hidden {
-  display: none;
-}
-
 .tiles {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.35rem;
   margin-top: 0.75rem;
-}
-
-.tiles.hidden {
-  display: none;
 }
 
 .tile {
@@ -45,14 +37,14 @@
   border-color: #56649a;
 }
 
-.tile.open,
-.tile.selected {
+.open,
+.selected {
   background: #2c3656;
   border-color: #56649a;
 }
 
-.tile.open span,
-.tile.selected span {
+.open span,
+.selected span {
   opacity: 1;
 }
 
@@ -90,4 +82,8 @@
 .skipTurn:disabled {
   opacity: 0.5;
   cursor: default;
+}
+
+.hidden {
+  display: none;
 }

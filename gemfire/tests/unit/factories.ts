@@ -37,6 +37,7 @@ interface ProvinceParams {
   readonly loyalty?: number | undefined;
   readonly cultivation?: number | undefined;
   readonly protection?: number | undefined;
+  readonly hirePool?: readonly string[] | undefined;
 }
 
 let generalSequence = 0;
@@ -93,6 +94,7 @@ export function makeProvince(params: ProvinceParams = {}): Province {
       cultivation: params.cultivation ?? 0,
       protection: params.protection ?? 0,
     }),
+    hirePool: params.hirePool,
   });
 }
 

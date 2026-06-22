@@ -2,10 +2,12 @@ import { ChangeLordCommand } from '@/core/commands/province/ChangeLordCommand';
 import type { CommandGroup } from '@/core/commands/province/catalog';
 import { DevelopCommand } from '@/core/commands/province/DevelopCommand';
 import { GiveFoodCommand } from '@/core/commands/province/GiveFoodCommand';
+import { HireMonsterCommand } from '@/core/commands/province/HireMonsterCommand';
 import { MoveTroopsCommand } from '@/core/commands/province/MoveTroopsCommand';
 import { RecruitCommand } from '@/core/commands/province/RecruitCommand';
 import { TradeCommand } from '@/core/commands/province/TradeCommand';
 import { TransportCommand } from '@/core/commands/province/TransportCommand';
+import { ViewCommand } from '@/core/commands/province/ViewCommand';
 import type { WorldCommand } from '@/core/commands/WorldCommand';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
@@ -25,10 +27,8 @@ import { CommandSelectedEvent } from './CommandSelectedEvent';
 import { ProvinceCommandsView } from './ProvinceCommandsView';
 import { TargetingEndedEvent } from './TargetingEndedEvent';
 import { TargetingStartedEvent } from './TargetingStartedEvent';
-import type { ProvinceCommandsControls } from './types';
+import type { OverlayDialogs, ProvinceCommandsControls } from './types';
 
-// Pause after a turn-consuming command so the player sees its result before the
-// turn advances — presentation pacing, kept out of the synchronous domain.
 const TURN_END_DELAY_MS = 800;
 
 interface PendingDialog {
@@ -56,6 +56,7 @@ export class ProvinceCommandsControl extends Control<
     world: World,
     commands: readonly CommandGroup[],
     events: EventBus,
+    overlayDialogs: OverlayDialogs,
   ) {
     super(
       ProvinceCommandsView,
@@ -79,6 +80,9 @@ export class ProvinceCommandsControl extends Control<
         ),
       },
     );
+
+    this.dialogs.set(HireMonsterCommand.name, overlayDialogs.hireMonster);
+    this.dialogs.set(ViewCommand.name, overlayDialogs.familyOverview);
   }
 
   public show(): void {

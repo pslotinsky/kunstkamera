@@ -47,12 +47,24 @@ export class ProvinceInfoView extends View<ProvinceInfoContext> {
   public showProvince(province: Province): void {
     render(this.renderProvince(province), this.element);
     this.refreshGovernor(province);
+    this.fillStats(province.resources);
+    this.fillStats(province.development);
   }
 
   public actualizeProvince(province: Province): void {
     this.refreshGovernor(province);
     this.animateStats(province.resources);
     this.animateStats(province.development);
+  }
+
+  private fillStats(stats: Stats): void {
+    for (const [key, value] of stats.entries) {
+      const valueElement = this.getStatValue(key);
+
+      if (valueElement) {
+        valueElement.textContent = String(value);
+      }
+    }
   }
 
   private animateStats(stats: Stats): void {
@@ -63,7 +75,7 @@ export class ProvinceInfoView extends View<ProvinceInfoContext> {
 
   private animateStat(key: string, to: number): void {
     const statElement = this.getStatElement(key);
-    const valueElement = statElement?.querySelector('span');
+    const valueElement = this.getStatValue(key);
 
     const from = valueElement ? Number(valueElement.textContent) : 0;
 
@@ -151,13 +163,13 @@ export class ProvinceInfoView extends View<ProvinceInfoContext> {
     `;
   }
 
-  private renderStat(key: StatKey, value: number): TemplateResult {
+  private renderStat(key: StatKey): TemplateResult {
     const { icon, label } = STATS_META[key];
 
     return html`
       <p class=${styles.stat} data-stat=${key}>
         <img class=${styles.statIcon} src=${icon} alt=${label} title=${label} />
-        <span>${value}</span>
+        <span></span>
       </p>
     `;
   }
@@ -166,15 +178,17 @@ export class ProvinceInfoView extends View<ProvinceInfoContext> {
     return html`
       <div class=${styles.column}>
         <h3>${title}</h3>
-        ${stats.entries.map(([key, value]) =>
-          this.renderStat(key as StatKey, value),
-        )}
+        ${stats.entries.map(([key]) => this.renderStat(key as StatKey))}
       </div>
     `;
   }
 
   private getStatElement(key: string): HTMLElement | null {
     return this.element.querySelector<HTMLElement>(`[data-stat="${key}"]`);
+  }
+
+  private getStatValue(key: string): HTMLElement | null {
+    return this.getStatElement(key)?.querySelector('span') ?? null;
   }
 
   private get governorElement(): HTMLElement | null {
