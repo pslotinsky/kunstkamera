@@ -88,7 +88,7 @@ Hiring closes the modal and ends the province's turn (one hire per visit); the h
 
 **Availability is per-scenario province data.** Each province's hire pool comes from the ROM `mercenaries[].available` flags (§8.3), which differ by scenario — so it is seeded with the rest of the scenario's province state, like ownership and resources. Dynamic availability changes (§8.3, unconfirmed) are out of scope; the pool is fixed for the campaign.
 
-**Upkeep is a month-start engine tick, like Tax & Harvest.** `TaxAndHarvest` runs every month-start and self-guards on September. Upkeep follows the same shape: a `WorldCommand` run at month-start that acts only on quarter months. The spec confirms "every three months" but not the anchor month (§8.5), so the quarter months are a single config constant and the exact set is an open question. When a province stations several units and cannot pay for all, which desert (order, or all-or-nothing) is also unconfirmed; the model charges them in turn and deserts each one the remaining Gold cannot cover.
+**Upkeep is charged at a province's turn-end, not in a month-start sweep.** Tax is annual and impersonal, so it stays a month-start tick; upkeep is per-province and interactive, so it falls due when that province's *turn* ends — letting the player raise Gold during the turn (e.g. sell food) before the bill lands, rather than being charged in a month-start sweep before they can act. A `WorldCommand` charges the province whose turn just ended (`turnQueue.current`, before the queue advances) and only on quarter months, so each province pays once per quarter at its own turn. The spec confirms "every three months" but not the anchor month (§8.5), so the quarter months are a single config constant and the exact set is an open question. When a province stations several units and cannot pay for all, which desert (order, or all-or-nothing) is also unconfirmed; the model charges them in turn and deserts each one the remaining Gold cannot cover.
 
 **Hire and dismiss are separate orders; hiring ends the turn.** The FAQ notes Hire Monster "allows the player to both hire and fire 5th Units" (§6.3), and appendix-d lists "Dismiss Fifth Unit" as its own entry. We split them: **Hire Monster** is a hire-only modal over the hire *pool*; **dismiss** belongs to the roster of what a province already *holds* — a different screen and a separate command, built in its own slice. The two are about different things (acquire vs. release), so one modal juggling both read awkwardly. Hiring **ends the turn** — it spends Gold and commits a unit, like Recruit (appendix-d marks the turn cost "needs version check"). So Hire Monster is an ordinary command dialog (`consumesTurn()` is `true`); it merely renders as an overlay over the map instead of inline in the sidebar, because inspecting a unit before paying wants room. It runs the *identical* lifecycle as the sidebar dialogs: selecting the tile opens the dialog (free — browsing costs nothing, since a dialog command does not execute until confirmed), the Hire button confirms, `HireMonsterCommand.execute()` performs the hire, and the shared command framework ends the turn with the usual pacing and clears the tile. Placement (sidebar vs. map overlay) is the only thing that differs from a command like Develop — the mechanics are one path, with no bespoke open/close events. To make that work, `ProvinceCommandsControl` drives the lifecycle while the overlay dialog is hosted in the map area by `GameScreen` (where an overlay can cover the map yet leave the sidebar tile visible); the commands control is handed the overlay dialog and registers it alongside the sidebar dialogs.
 
@@ -161,16 +161,16 @@ sequenceDiagram
   participant Engine
   participant Up as UpkeepCommand
   participant Prov as Province
-  Engine->>Up: execute() at month start
-  Up->>Up: quarter month? else stop
+  Engine->>Up: execute() at turn end
+  Up->>Up: quarter month & current province? else stop
   loop each stationed unit
     alt gold >= upkeep
       Up->>Prov: addResources(gold -upkeep)
     else cannot pay
-      Up->>Prov: dismiss(unit) (desertion)
+      Up->>Prov: removeUnit(unit) (desertion)
     end
   end
-  Up->>Prov: publish ProvinceUpdated (per touched province)
+  Up->>Prov: publish ProvinceUpdated
 ```
 
 ## Persistence
@@ -179,8 +179,7 @@ Each province contributes its `hiredUnits` (each unit's type plus current Streng
 
 ## Tests
 
-- **Hire (unit):** spends the unit's cost in Gold and stations it at the province at its catalogue Strength; lets a province hold several different types; refuses when the province lacks the Gold, when the type is not in its pool, or when it already stations that type. `execute()` opens the modal without consuming the turn.
-- **Hire flow (integration):** opening the modal selects a hireable unit by default; the Hire button stations it, closes the modal, and advances the turn.
+- **Hire (unit):** spends the unit's cost in Gold and stations it at the province at its catalogue Strength; lets a province hold several different types; refuses when the province lacks the Gold, when the type is not in its pool, or when it already stations that type.
 - **Upkeep (unit):** on a quarter month, charges each stationed unit's cost against its province; deserts a unit the province cannot pay; charges nothing on a non-quarter month.
 - **Dismiss (unit):** its own slice — removes a chosen stationed unit and refunds no Gold.
 - **Carry a unit (unit):** a Move Troops order carrying a stationed unit relocates it — gone from the source, stationed at the destination (including a freshly claimed neutral) — and leaves the source's other units in place.
