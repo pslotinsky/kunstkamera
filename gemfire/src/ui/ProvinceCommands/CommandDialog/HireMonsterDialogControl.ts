@@ -1,8 +1,13 @@
-import type { HireMonsterCommand } from '@/core/commands/province/HireMonsterCommand';
+import type {
+  HireMode,
+  HireMonsterCommand,
+} from '@/core/commands/province/HireMonsterCommand';
 import { HiredUnit } from '@/core/domain/HiredUnit';
 import type { World } from '@/core/domain/World';
+import { capitalize } from '@/lib/string/capitalize';
 
 import { CommandDialogControl } from './CommandDialogControl';
+import { HireModeSelectedEvent } from './HireModeSelectedEvent';
 import {
   HireMonsterDialogView,
   type UnitDetail,
@@ -14,6 +19,7 @@ export class HireMonsterDialogControl extends CommandDialogControl<
   HireMonsterCommand
 > {
   private readonly world: World;
+  private mode: HireMode = 'hire';
   private focused: string | undefined = undefined;
 
   public constructor(name: string, world: World) {
@@ -23,24 +29,32 @@ export class HireMonsterDialogControl extends CommandDialogControl<
 
   public override open(command: HireMonsterCommand): void {
     super.open(command);
-    this.populate();
+    this.setMode('hire');
   }
 
   protected override onMount(): void {
     this.subscribe(UnitFocusedEvent, (event) => this.focus(event.type));
+    this.subscribe(HireModeSelectedEvent, (event) => this.setMode(event.mode));
   }
 
   protected override setupCommand(command: HireMonsterCommand): void {
     if (this.focused) {
-      command.hire(this.focused);
+      if (this.mode === 'dismiss') {
+        command.dismiss(this.focused);
+      } else {
+        command.hire(this.focused);
+      }
     }
   }
 
-  private populate(): void {
-    const hireable = this.buildHireable();
+  private setMode(mode: HireMode): void {
+    this.mode = mode;
+    this.view.showMode(mode);
 
-    this.view.showUnits(hireable);
-    this.focus(hireable[0]?.type);
+    const units = this.units();
+
+    this.view.showUnits(units, mode);
+    this.focus(units[0]?.type);
   }
 
   private focus(type: string | undefined): void {
@@ -53,12 +67,12 @@ export class HireMonsterDialogControl extends CommandDialogControl<
     this.view.showDetail(type ? this.buildDetail(type) : undefined);
   }
 
-  private buildHireable(): HiredUnit[] {
-    const types = this.command?.hireableTypes ?? [];
-
-    return types
-      .map((type) => HiredUnit.ofType(type))
-      .filter((unit) => unit !== undefined);
+  private units(): readonly HiredUnit[] {
+    return this.mode === 'dismiss'
+      ? (this.command?.stationedUnits ?? [])
+      : (this.command?.hireableTypes ?? [])
+          .map((type) => HiredUnit.ofType(type))
+          .filter((unit) => unit !== undefined);
   }
 
   private buildDetail(type: string): UnitDetail | undefined {
@@ -68,7 +82,9 @@ export class HireMonsterDialogControl extends CommandDialogControl<
     return province && unit
       ? {
           unit,
-          affordable: province.resources.gold >= unit.cost,
+          actionLabel: capitalize(this.mode),
+          enabled:
+            this.mode === 'dismiss' || province.resources.gold >= unit.cost,
         }
       : undefined;
   }

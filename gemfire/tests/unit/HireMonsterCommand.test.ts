@@ -71,4 +71,33 @@ describe('HireMonsterCommand', () => {
     expect(province.hiredUnits).toHaveLength(1);
     expect(province.resources.gold).toBe(INITIAL_GOLD - 20);
   });
+
+  it('dismisses a stationed unit, leaving the rest and refunding no gold', () => {
+    const { province, command } = createFixture();
+
+    command.hire('Orks');
+    command.execute();
+    command.hire('Bugbear');
+    command.execute();
+
+    const goldAfterHiring = province.resources.gold;
+
+    command.dismiss('Orks');
+    command.execute();
+
+    expect(province.hiredUnits.map((unit) => unit.type)).toEqual(['Bugbear']);
+    expect(province.resources.gold).toBe(goldAfterHiring);
+  });
+
+  it('ignores a dismiss for a type the province does not station', () => {
+    const { province, command } = createFixture();
+
+    command.hire('Orks');
+    command.execute();
+
+    command.dismiss('Bugbear');
+    command.execute();
+
+    expect(province.hiredUnits.map((unit) => unit.type)).toEqual(['Orks']);
+  });
 });

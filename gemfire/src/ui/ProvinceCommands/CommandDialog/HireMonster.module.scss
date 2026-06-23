@@ -36,6 +36,25 @@
   border-color: #56649a;
 }
 
+.modes {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.mode {
+  padding: 0.3rem 1rem;
+  font: inherit;
+  color: inherit;
+  background: #1f2740;
+  border: 1px solid #2c3656;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.mode:hover {
+  border-color: #56649a;
+}
+
 .units {
   display: flex;
   flex-wrap: wrap;

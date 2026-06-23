@@ -2,11 +2,13 @@ import { html, type TemplateResult } from 'lit-html';
 
 import goldIconUrl from '@/assets/icons/gold.webp';
 import troopsIconUrl from '@/assets/icons/troops.webp';
+import type { HireMode } from '@/core/commands/province/HireMonsterCommand';
 import type { HiredUnit, RangePattern } from '@/core/domain/HiredUnit';
 import { capitalize } from '@/lib/string/capitalize';
 import { isDefined } from '@/lib/value/isDefined';
 
 import { CommandDialogView } from './CommandDialogView';
+import { HireModeSelectedEvent } from './HireModeSelectedEvent';
 import { rangeGrid } from './range-grid';
 import { UnitFocusedEvent } from './UnitFocusedEvent';
 
@@ -14,8 +16,19 @@ import styles from './HireMonster.module.scss';
 
 export interface UnitDetail {
   readonly unit: HiredUnit;
-  readonly affordable: boolean;
+  readonly actionLabel: string;
+  readonly enabled: boolean;
 }
+
+const MODES: { readonly mode: HireMode; readonly label: string }[] = [
+  { mode: 'hire', label: 'Hire' },
+  { mode: 'dismiss', label: 'Dismiss' },
+];
+
+const EMPTY: Record<HireMode, string> = {
+  hire: 'Nothing to hire here.',
+  dismiss: 'No units to dismiss.',
+};
 
 export class HireMonsterDialogView extends CommandDialogView {
   protected override readonly rootClass = styles.root!;
@@ -24,10 +37,16 @@ export class HireMonsterDialogView extends CommandDialogView {
     return styles.hidden!;
   }
 
-  public showUnits(hireable: readonly HiredUnit[]): void {
-    this.units.innerHTML = hireable.length
-      ? hireable.map((unit) => this.renderUnit(unit)).join('')
-      : `<p class=${styles.empty}>Nothing to hire here.</p>`;
+  public showMode(mode: HireMode): void {
+    for (const button of this.modeButtons) {
+      button.classList.toggle(styles.selected!, button.dataset.mode === mode);
+    }
+  }
+
+  public showUnits(units: readonly HiredUnit[], mode: HireMode): void {
+    this.units.innerHTML = units.length
+      ? units.map((unit) => this.renderUnit(unit)).join('')
+      : `<p class=${styles.empty}>${EMPTY[mode]}</p>`;
   }
 
   public focusUnit(type: string): void {
@@ -58,6 +77,17 @@ export class HireMonsterDialogView extends CommandDialogView {
           Close
         </button>
       </header>
+      <div class=${styles.modes}>
+        ${MODES.map(
+          ({ mode, label }) => html`<button
+            class=${styles.mode}
+            type="button"
+            data-mode=${mode}
+          >
+            ${label}
+          </button>`,
+        )}
+      </div>
       <div class=${styles.units} data-units></div>
       <div class=${styles.detail} data-detail></div>
     `;
@@ -75,7 +105,7 @@ export class HireMonsterDialogView extends CommandDialogView {
 
   private renderDetail(detail: UnitDetail): string {
     const { unit } = detail;
-    const disabled = detail.affordable ? '' : 'disabled';
+    const disabled = detail.enabled ? '' : 'disabled';
 
     return `
       <div class=${styles.top}>
@@ -94,7 +124,7 @@ export class HireMonsterDialogView extends CommandDialogView {
         ${this.renderRange(unit.range)}
         ${this.renderPreview(unit)}
       </div>
-      <button class=${styles.action} type="button" data-act ${disabled}>Hire</button>
+      <button class=${styles.action} type="button" data-act ${disabled}>${detail.actionLabel}</button>
     `;
   }
 
@@ -130,10 +160,13 @@ export class HireMonsterDialogView extends CommandDialogView {
 
   private onClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
+    const mode = target.closest<HTMLElement>('[data-mode]');
     const unit = target.closest<HTMLElement>('[data-type]');
 
     if (target.closest('[data-act]')) {
       this.confirm();
+    } else if (isDefined(mode?.dataset.mode)) {
+      this.publish(new HireModeSelectedEvent(mode.dataset.mode as HireMode));
     } else if (isDefined(unit?.dataset.type)) {
       this.publish(new UnitFocusedEvent(unit.dataset.type));
     }
@@ -149,5 +182,9 @@ export class HireMonsterDialogView extends CommandDialogView {
 
   private get unitButtons(): NodeListOf<HTMLElement> {
     return this.element.querySelectorAll<HTMLElement>('[data-type]');
+  }
+
+  private get modeButtons(): NodeListOf<HTMLElement> {
+    return this.element.querySelectorAll<HTMLElement>('[data-mode]');
   }
 }
