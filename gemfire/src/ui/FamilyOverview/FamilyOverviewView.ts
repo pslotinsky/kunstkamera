@@ -1,6 +1,7 @@
 import { html, type TemplateResult } from 'lit-html';
 
 import type { General, GeneralRank } from '@/core/domain/General';
+import type { HiredUnit } from '@/core/domain/HiredUnit';
 import type { Province, ProvinceStatus } from '@/core/domain/Province';
 import { CommandDialogView } from '@/ui/ProvinceCommands/CommandDialog/CommandDialogView';
 
@@ -8,7 +9,7 @@ import { FamilyOverviewTabSelectedEvent } from './FamilyOverviewTabSelectedEvent
 
 import styles from './FamilyOverview.module.scss';
 
-export type FamilyOverviewMode = 'general' | 'land';
+export type FamilyOverviewMode = 'general' | 'land' | 'units';
 
 export interface GeneralRow {
   readonly general: General;
@@ -18,9 +19,15 @@ export interface GeneralRow {
   readonly age: number;
 }
 
+export interface FifthUnitRow {
+  readonly unit: HiredUnit;
+  readonly province: Province;
+}
+
 const TABS: Tab[] = [
   { mode: 'general', label: 'General' },
   { mode: 'land', label: 'Land' },
+  { mode: 'units', label: 'Fifth Units' },
 ];
 
 interface Tab {
@@ -123,6 +130,33 @@ export class FamilyOverviewView extends CommandDialogView {
         String(province.development.loyalty),
       ]),
     );
+  }
+
+  public showFifthUnits(rows: readonly FifthUnitRow[]): void {
+    if (rows.length > 0) {
+      this.body.innerHTML = this.renderTable(
+        ['', 'Strength', 'Province'],
+        rows.map((row) => [
+          this.renderUnitCard(row.unit),
+          String(row.unit.strength),
+          String(row.province),
+        ]),
+      );
+    } else {
+      this.body.innerHTML = `<p class=${styles.empty}>No Fifth Units hired.</p>`;
+    }
+  }
+
+  private renderUnitCard(unit: HiredUnit): string {
+    return `
+      <div class="${styles.card}">
+        <img class="${styles.unitPortrait}" src="${unit.portrait}" alt="${unit.type}" />
+        <div class="${styles.identity}">
+          <span class="${styles.title}">${unit.category}</span>
+          <span class="${styles.name}">${unit.type}</span>
+        </div>
+      </div>
+    `;
   }
 
   private renderTable(

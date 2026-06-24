@@ -60,7 +60,7 @@ The hiring economy for the allies that will fill an army's fifth slot — define
 - [x] pay quarterly upkeep, or watch hired units desert
 - [x] dismiss a hired Fifth Unit
 - [x] carry a hired Fifth Unit to a neighbor with your troops
-- [ ] see a province's hired Fifth Units
+- [x] see a province's hired Fifth Units
 - [ ] watch hired units lose faith and desert
 
 ## 7. Search & treasure

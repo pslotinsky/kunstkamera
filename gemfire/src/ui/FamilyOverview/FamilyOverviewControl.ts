@@ -7,6 +7,7 @@ import { FamilyOverviewTabSelectedEvent } from './FamilyOverviewTabSelectedEvent
 import {
   type FamilyOverviewMode,
   FamilyOverviewView,
+  type FifthUnitRow,
   type GeneralRow,
 } from './FamilyOverviewView';
 
@@ -42,6 +43,9 @@ export class FamilyOverviewControl extends CommandDialogControl<
       case 'land':
         this.view.showLand(this.buildLand());
         break;
+      case 'units':
+        this.view.showFifthUnits(this.buildFifthUnits());
+        break;
     }
   }
 
@@ -60,5 +64,13 @@ export class FamilyOverviewControl extends CommandDialogControl<
 
   private buildLand(): readonly Province[] {
     return this.world.getFamilyProvinces(this.world.player);
+  }
+
+  private buildFifthUnits(): FifthUnitRow[] {
+    return this.world
+      .getFamilyProvinces(this.world.player)
+      .flatMap((province) =>
+        province.hiredUnits.map((unit) => ({ unit, province })),
+      );
   }
 }

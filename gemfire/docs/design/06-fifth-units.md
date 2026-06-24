@@ -30,7 +30,7 @@ Out of scope: the battle itself and the fifth army slot it fills (feature 9 — 
 - Upkeep: every three months, each stationed unit charges its cost in Gold against its province; any the province cannot pay desert.
 - Dismiss: release a stationed unit, dropping its upkeep; no refund. The same Hire Monster screen switched to its Dismiss mode — it lists the roster a province already holds instead of the hire pool (FAQ §6.3: one order both hires and fires).
 - Move a unit: a Move Troops order into an adjacent province may carry one of the source's stationed units along; it relocates from the source to the destination (which may be a freshly claimed neutral). It rides the same order — no extra turn, no goodwill change. Units move only via Move Troops, not Transport.
-- View units: View lists each province's stationed Fifth Units (name and Strength) in its overview, and the province info panel shows them too. Free — View consumes no turn.
+- View units: the View command gains a Fifth Units tab (beside General and Land) listing each stationed unit with its Strength and the province holding it. Free — View consumes no turn.
 
 ## Use cases
 
@@ -77,7 +77,7 @@ Confirming (Hire or Dismiss) closes the modal and ends the province's turn (one 
 +------------------------------+
 ```
 
-`View` lists each province's stationed Fifth Units (name, Strength) in the family overview, beside the lord and stats already shown there.
+`View` gains a third tab, **Fifth Units**, beside General and Land — a table of each stationed unit (portrait, category, name, Strength) and the province holding it.
 
 ## Research
 
