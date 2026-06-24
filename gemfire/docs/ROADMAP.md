@@ -59,7 +59,7 @@ The hiring economy for the allies that will fill an army's fifth slot — define
 - [x] hire a monster or elite mercenary into the fifth slot
 - [x] pay quarterly upkeep, or watch hired units desert
 - [x] dismiss a hired Fifth Unit
-- [ ] carry a hired Fifth Unit to a neighbor with your troops
+- [x] carry a hired Fifth Unit to a neighbor with your troops
 - [ ] see a province's hired Fifth Units
 - [ ] watch hired units lose faith and desert
 

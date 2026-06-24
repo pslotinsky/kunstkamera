@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { MoveTroopsCommand } from '@/core/commands/province/MoveTroopsCommand';
+import { HiredUnit } from '@/core/domain/HiredUnit';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
 
@@ -103,5 +104,55 @@ describe('MoveTroopsCommand', () => {
     const { command } = setup();
 
     expect([...command.selectableTargets].sort()).toEqual([2, 3]);
+  });
+
+  it('carries a stationed unit to a province you own, leaving the rest', () => {
+    const { source, owned, command } = setup();
+    source.addUnit(HiredUnit.ofType('Orks')!);
+    source.addUnit(HiredUnit.ofType('Bugbear')!);
+
+    command.moveTo(owned, { troops: 10 });
+    command.carry(source.hiredUnits[0]);
+    command.execute();
+
+    expect(owned.hiredUnits.map((unit) => unit.type)).toEqual(['Orks']);
+    expect(source.hiredUnits.map((unit) => unit.type)).toEqual(['Bugbear']);
+  });
+
+  it('relocates a carried unit even when no resources move', () => {
+    const { source, owned, command } = setup();
+    source.addUnit(HiredUnit.ofType('Orks')!);
+
+    command.moveTo(owned, {});
+    command.carry(source.hiredUnits[0]);
+    command.execute();
+
+    expect(owned.hiredUnits.map((unit) => unit.type)).toEqual(['Orks']);
+    expect(source.hiredUnits).toHaveLength(0);
+  });
+
+  it('carries a unit into a freshly claimed neutral province', () => {
+    const { family, neutral, source, command } = setup();
+    source.addUnit(HiredUnit.ofType('Orks')!);
+
+    command.moveTo(neutral, { troops: 10 });
+    command.carry(source.hiredUnits[0]);
+    command.execute();
+
+    expect(neutral.belongsTo(family)).toBe(true);
+    expect(neutral.hiredUnits.map((unit) => unit.type)).toEqual(['Orks']);
+  });
+
+  it('allows a carried unit to join a destination already stationing its type', () => {
+    const { source, owned, command } = setup();
+    source.addUnit(HiredUnit.ofType('Orks')!);
+    owned.addUnit(HiredUnit.ofType('Orks')!);
+
+    command.moveTo(owned, { troops: 10 });
+    command.carry(source.hiredUnits[0]);
+    command.execute();
+
+    expect(owned.hiredUnits.map((unit) => unit.type)).toEqual(['Orks', 'Orks']);
+    expect(source.hiredUnits).toHaveLength(0);
   });
 });

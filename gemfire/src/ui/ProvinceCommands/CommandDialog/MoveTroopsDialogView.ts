@@ -3,6 +3,7 @@ import { html, type TemplateResult } from 'lit-html';
 import type { Province } from '@/core/domain/Province';
 
 import type { AmountFieldView } from '../AmountField/AmountFieldView';
+import type { DropdownView } from '../Dropdown/DropdownView';
 import { CommandDialogView } from './CommandDialogView';
 
 import styles from './CommandDialog.module.scss';
@@ -21,9 +22,13 @@ interface MoveTroopsDialogContext {
   readonly name: string;
 }
 
+type MoveTroopsViews = Record<Resource, AmountFieldView> & {
+  readonly carry: DropdownView;
+};
+
 export class MoveTroopsDialogView extends CommandDialogView<
   MoveTroopsDialogContext,
-  Record<Resource, AmountFieldView>
+  MoveTroopsViews
 > {
   public showTarget(target: Province | undefined): void {
     if (target) {
@@ -45,6 +50,10 @@ export class MoveTroopsDialogView extends CommandDialogView<
       `How ${QUANTIFIERS[resource]} ${resource} (0-${max})?`;
   }
 
+  public showCarry(visible: boolean): void {
+    this.carrySection.classList.toggle(styles.hidden!, !visible);
+  }
+
   public enableConfirm(enabled: boolean): void {
     this.confirmButton.disabled = !enabled;
   }
@@ -56,6 +65,10 @@ export class MoveTroopsDialogView extends CommandDialogView<
       </p>
       <div class="${styles.section} ${styles.hidden}" data-amounts>
         ${RESOURCES.map((resource) => this.renderAmount(resource))}
+      </div>
+      <div class="${styles.section} ${styles.hidden}" data-carry-section>
+        <p class=${styles.prompt}>Bring a 5th unit?</p>
+        ${this.views.carry.template}
       </div>
       <div
         class="${styles.actions} ${styles.section} ${styles.hidden}"
@@ -102,6 +115,10 @@ export class MoveTroopsDialogView extends CommandDialogView<
 
   private get footer(): HTMLElement {
     return this.element.querySelector<HTMLElement>('[data-footer]')!;
+  }
+
+  private get carrySection(): HTMLElement {
+    return this.element.querySelector<HTMLElement>('[data-carry-section]')!;
   }
 
   private get targetPrompt(): HTMLElement {

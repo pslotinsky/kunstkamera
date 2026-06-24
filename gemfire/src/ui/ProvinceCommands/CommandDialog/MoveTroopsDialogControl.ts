@@ -1,9 +1,12 @@
 import type { MoveTroopsCommand } from '@/core/commands/province/MoveTroopsCommand';
+import type { HiredUnit } from '@/core/domain/HiredUnit';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
 import { isDefined } from '@/lib/value/isDefined';
 
 import { AmountFieldControl } from '../AmountField/AmountFieldControl';
+import { DropdownControl } from '../Dropdown/DropdownControl';
+import type { DropdownOption } from '../Dropdown/DropdownView';
 import { CommandDialogControl } from './CommandDialogControl';
 import { MoveTroopsDialogView } from './MoveTroopsDialogView';
 
@@ -13,12 +16,17 @@ type Resource = 'gold' | 'food' | 'troops';
 
 const RESOURCES: readonly Resource[] = ['troops', 'food', 'gold'];
 
-type AmountControls = Record<Resource, AmountFieldControl>;
+type MoveTroopsControls = {
+  readonly troops: AmountFieldControl;
+  readonly food: AmountFieldControl;
+  readonly gold: AmountFieldControl;
+  readonly carry: DropdownControl;
+};
 
 export class MoveTroopsDialogControl extends CommandDialogControl<
   MoveTroopsDialogView,
   MoveTroopsCommand,
-  AmountControls
+  MoveTroopsControls
 > {
   private readonly world: World;
   private target: Province | undefined = undefined;
@@ -31,6 +39,7 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
         troops: new AmountFieldControl({ name: 'troops' }),
         food: new AmountFieldControl({ name: 'food' }),
         gold: new AmountFieldControl({ name: 'gold' }),
+        carry: new DropdownControl({ name: 'carry' }),
       },
     );
     this.world = world;
@@ -43,6 +52,7 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
       this.controls[resource].reset();
     }
 
+    this.controls.carry.reset();
     this.update();
     super.open(command);
   }
@@ -58,6 +68,8 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
     for (const resource of RESOURCES) {
       this.controls[resource].onChange(() => this.update());
     }
+
+    this.controls.carry.onChange(() => this.update());
   }
 
   protected override setupCommand(command: MoveTroopsCommand): void {
@@ -67,12 +79,17 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
         food: this.controls.food.value,
         troops: this.controls.troops.value,
       });
+      command.carry(this.carriedUnit());
     }
   }
 
   private update(): void {
+    const units = this.carriableUnits();
+
     this.view.showTarget(this.target);
     this.view.showAmounts(isDefined(this.target));
+    this.view.showCarry(units.length > 0);
+    this.controls.carry.setOptions(this.carryOptions(units));
 
     for (const resource of RESOURCES) {
       const max = this.getMax(resource);
@@ -81,7 +98,37 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
       this.view.setRange(resource, max);
     }
 
-    this.view.enableConfirm(isDefined(this.target) && this.committed() > 0);
+    this.view.enableConfirm(isDefined(this.target) && this.movesSomething());
+  }
+
+  private movesSomething(): boolean {
+    return this.committed() > 0 || isDefined(this.carriedUnit());
+  }
+
+  private carriableUnits(): readonly HiredUnit[] {
+    return this.target ? this.stationedUnits() : [];
+  }
+
+  private carryOptions(units: readonly HiredUnit[]): DropdownOption[] {
+    return [
+      { value: '', label: 'None' },
+      ...units.map((unit) => ({
+        value: unit.type,
+        label: unit.type,
+        icon: unit.portrait,
+        note: String(unit.strength),
+      })),
+    ];
+  }
+
+  private stationedUnits(): readonly HiredUnit[] {
+    return this.world.turnQueue.current?.hiredUnits ?? [];
+  }
+
+  private carriedUnit(): HiredUnit | undefined {
+    return this.stationedUnits().find(
+      (unit) => unit.type === this.controls.carry.value,
+    );
   }
 
   private committed(): number {
