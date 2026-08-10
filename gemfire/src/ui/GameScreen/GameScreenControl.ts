@@ -6,6 +6,7 @@ import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
 import { Control } from '@/lib/Control';
 import type { EventClass } from '@/lib/EventBus';
+import { AnnouncementsControl } from '@/ui/Announcements/AnnouncementsControl';
 import { FamilyOverviewControl } from '@/ui/FamilyOverview/FamilyOverviewControl';
 import { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
 import { HireMonsterDialogControl } from '@/ui/ProvinceCommands/CommandDialog/HireMonsterDialogControl';
@@ -45,6 +46,10 @@ export class GameScreenControl extends Control<
       }),
       familyOverview,
       hireMonster,
+      announcements: new AnnouncementsControl({
+        world: context.world,
+        events: context.events,
+      }),
     });
   }
 

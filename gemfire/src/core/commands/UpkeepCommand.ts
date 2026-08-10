@@ -1,5 +1,10 @@
+import type { HiredUnit } from '@/core/domain/HiredUnit';
 import type { Province } from '@/core/domain/Province';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
+import {
+  type DesertionReason,
+  UnitDesertedEvent,
+} from '@/core/events/UnitDesertedEvent';
 
 import { WorldCommand, type WorldCommandContext } from './WorldCommand';
 
@@ -24,13 +29,30 @@ export class UpkeepCommand extends WorldCommand {
 
   private chargeProvince(province: Province): void {
     for (const unit of province.hiredUnits) {
-      if (province.resources.gold >= unit.cost) {
-        province.addResources({ gold: -unit.cost });
+      if (province.resources.gold < unit.cost) {
+        this.desert(province, unit, 'unpaid');
+      } else if (this.losesFaith(province, unit)) {
+        this.desert(province, unit, 'faithless');
       } else {
-        province.removeUnit(unit);
+        province.addResources({ gold: -unit.cost });
       }
     }
 
     this.context.events.publish(new ProvinceUpdatedEvent(province));
+  }
+
+  private losesFaith(province: Province, unit: HiredUnit): boolean {
+    const fame = province.family?.fame ?? 0;
+
+    return Math.random() < unit.getDesertionRisk(fame);
+  }
+
+  private desert(
+    province: Province,
+    unit: HiredUnit,
+    reason: DesertionReason,
+  ): void {
+    province.removeUnit(unit);
+    this.context.events.publish(new UnitDesertedEvent(province, unit, reason));
   }
 }

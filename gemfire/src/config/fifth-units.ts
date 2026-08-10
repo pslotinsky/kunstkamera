@@ -37,6 +37,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     cost: 40,
     move: 3,
     range: 'long',
+    fameToKeep: 20,
   },
   {
     type: 'Lancers',
@@ -46,6 +47,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     cost: 50,
     move: 3,
     range: 'short',
+    fameToKeep: 50,
   },
   {
     type: 'Orks',
@@ -73,6 +75,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     cost: 35,
     move: 3,
     range: 'long',
+    fameToKeep: 20,
   },
   {
     type: 'Spearmen',
@@ -82,6 +85,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     cost: 20,
     move: 3,
     range: 'long',
+    fameToKeep: 20,
   },
   {
     type: 'Warriors',
@@ -91,6 +95,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     cost: 60,
     move: 3,
     range: 'short',
+    fameToKeep: 50,
   },
   {
     type: 'Wyverns',
@@ -137,5 +142,6 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     cost: 40,
     move: 3,
     range: 'short',
+    fameToKeep: 20,
   },
 ];

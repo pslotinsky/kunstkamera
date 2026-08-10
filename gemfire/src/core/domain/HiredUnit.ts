@@ -13,6 +13,7 @@ export interface HiredUnitParams {
   readonly move: number;
   readonly range: RangePattern;
   readonly flying?: boolean;
+  readonly fameToKeep?: number;
 }
 
 export class HiredUnit {
@@ -30,6 +31,7 @@ export class HiredUnit {
   public readonly move: number;
   public readonly range: RangePattern;
   public readonly flying: boolean;
+  public readonly fameToKeep: number;
 
   public constructor(params: HiredUnitParams) {
     this.type = params.type;
@@ -40,6 +42,7 @@ export class HiredUnit {
     this.move = params.move;
     this.range = params.range;
     this.flying = params.flying ?? false;
+    this.fameToKeep = params.fameToKeep ?? 0;
   }
 
   public get portrait(): string {
@@ -48,5 +51,11 @@ export class HiredUnit {
 
   public get preview(): string {
     return `/unit/${this.type.toLowerCase()}.webp`;
+  }
+
+  public getDesertionRisk(fame: number): number {
+    return fame < this.fameToKeep
+      ? (this.fameToKeep - fame) / this.fameToKeep
+      : 0;
   }
 }

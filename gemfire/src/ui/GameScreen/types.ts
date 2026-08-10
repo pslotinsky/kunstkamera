@@ -2,6 +2,7 @@ import type { CommandGroup } from '@/core/commands/province/catalog';
 import type { World } from '@/core/domain/World';
 import type { ChildrenViews } from '@/lib/Control';
 import type { EventBus } from '@/lib/EventBus';
+import type { AnnouncementsControl } from '@/ui/Announcements/AnnouncementsControl';
 import type { FamilyOverviewControl } from '@/ui/FamilyOverview/FamilyOverviewControl';
 import type { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
 import type { HireMonsterDialogControl } from '@/ui/ProvinceCommands/CommandDialog/HireMonsterDialogControl';
@@ -18,6 +19,7 @@ export type GameScreenControls = {
   readonly gamePanel: GamePanelControl;
   readonly familyOverview: FamilyOverviewControl;
   readonly hireMonster: HireMonsterDialogControl;
+  readonly announcements: AnnouncementsControl;
 };
 
 export type GameScreenViews = ChildrenViews<GameScreenControls>;

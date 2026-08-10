@@ -61,7 +61,8 @@ The hiring economy for the allies that will fill an army's fifth slot — define
 - [x] dismiss a hired Fifth Unit
 - [x] carry a hired Fifth Unit to a neighbor with your troops
 - [x] see a province's hired Fifth Units
-- [ ] watch hired units lose faith and desert
+- [x] watch hired units lose faith and desert
+- [x] be told when a hired unit deserts (unpaid upkeep or low fame)
 
 ## 7. Search & treasure
 
@@ -143,7 +144,6 @@ Good and bad events, seasonal disasters, and Pastha.
 - [ ] suffer seasonal disasters by region (snow, fire, flood, quake, plague)
 - [ ] trigger special events like Pastha
 - [ ] hear the banshee when a ruler dies
-- [ ] be told when a hired unit deserts (unpaid upkeep or low fame)
 - [ ] suffer a hired unit's rampage (loyalty, cultivation, and protection drop)
 
 ## 16. New game & advisors

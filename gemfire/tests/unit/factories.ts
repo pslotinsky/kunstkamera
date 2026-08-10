@@ -23,6 +23,7 @@ interface FamilyParams {
   readonly ruler?: General | undefined;
   readonly members?: readonly General[] | undefined;
   readonly homeProvince?: Province | undefined;
+  readonly fame?: number | undefined;
 }
 
 interface ProvinceParams {
@@ -66,6 +67,7 @@ export function makeFamily(params: FamilyParams = {}): Family {
     ruler,
     members: params.members ?? [ruler],
     homeProvince: params.homeProvince ?? makePlaceholderHome(),
+    fame: params.fame ?? 100,
   });
 }
 

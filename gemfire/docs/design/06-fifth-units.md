@@ -2,13 +2,13 @@
 
 ## Description
 
-The hiring economy for the special units that fill an army's fifth slot: hire province-based monsters or elite mercenaries with Gold, keep them alive by paying quarterly upkeep (or watch them desert), and dismiss any no longer worth the cost.
+The hiring economy for the special units that fill an army's fifth slot: hire province-based monsters or elite mercenaries with Gold, keep them by paying quarterly upkeep and staying famous enough to hold them, and dismiss any no longer worth the cost.
 
 `HireMonsterCommand` already exists as a turn-burning stub. This feature gives it behaviour — the one command both hires and dismisses (FAQ §6.3) — introduces the `HiredUnit` domain entity and its catalogue, and adds a quarterly upkeep tick to the turn engine.
 
-In scope: hire available Fifth Units for Gold (a province stations several — one of each type it hires); pay their upkeep every three months or lose them to desertion; dismiss a stationed unit; carry one stationed unit along when moving troops into a neighbour (§8.6); and see a province's stationed units through View. The last two reach back into feature 5's Move Troops and the View command, which had nothing to carry or show until Fifth Units existed.
+In scope: hire available Fifth Units for Gold (a province stations several — one of each type it hires); pay their upkeep every three months or lose them to desertion; risk losing a mercenary an obscure family cannot hold, and be told when one leaves; dismiss a stationed unit; carry one stationed unit along when moving troops into a neighbour (§8.6); and see a province's stationed units through View. The last two reach back into feature 5's Move Troops and the View command, which had nothing to carry or show until Fifth Units existed.
 
-Out of scope: the battle itself and the fifth army slot it fills (feature 9 — so a hired unit's Move, Range, flying, and Strength loss are recorded for later but unused here); Gem Guardians (feature 8) and Pastha (feature 15), the other two things that can fill the fifth slot; rampage and mercenary loss-of-faith (§8.10 — rules unconfirmed, so desertion-on-unpaid is the only loss modelled); and dynamic changes to a province's hire pool over time (§8.3 — unconfirmed, so availability is static per scenario).
+Out of scope: the battle itself and the fifth army slot it fills (feature 9 — so a hired unit's Move, Range, flying, and Strength loss are recorded for later but unused here); Gem Guardians (feature 8) and Pastha (feature 15), the other two things that can fill the fifth slot; monster rampage (§8.10 — no observed rate to model, so it waits for the random-events feature); and dynamic changes to a province's hire pool over time (§8.3 — unconfirmed, so availability is static per scenario).
 
 ## Glossary
 
@@ -20,7 +20,9 @@ Out of scope: the battle itself and the fifth army slot it fills (feature 9 — 
 | Hire pool    | The set of unit types a given province may hire, seeded per scenario from the ROM `mercenaries` data (§8.3).             |
 | Cost         | A unit's Gold price — paid once to hire, and again as upkeep each quarter (they are the same number, §8.5).              |
 | Upkeep       | The recurring Gold charge per hired unit, every three months; non-payment causes desertion.                              |
-| Desertion    | Automatic loss of a hired unit when its province cannot pay upkeep.                                                      |
+| Desertion    | Automatic loss of a hired unit at upkeep time — the province cannot pay it, or the family is too obscure to hold it.     |
+| Fame to keep | The family Fame at which a mercenary is content; short of it, each quarter risks it losing faith (§8.10). Monsters ask for none. |
+| Announcement | A message shown over the map telling the player something happened in their domain — a unit deserting, for now.               |
 | Dismiss      | Voluntarily releasing a hired unit; no Gold is refunded (§8.11).                                                         |
 
 ## Functionality
@@ -28,6 +30,8 @@ Out of scope: the battle itself and the fifth army slot it fills (feature 9 — 
 - Hire: at a province you control, pick a type from its hire pool — any available type it does not already station — and pay its Gold cost; the unit joins the province at its catalogue Strength. Hiring ends the province's turn (the modal closes and the turn advances), like the other gold-spending orders — one hire per visit.
 - Several per province: a province stations multiple hired units, one of each type it hires. Hiring is blocked only for a type already stationed there; a same-type duplicate can still arrive by Move Troops (§8.6, out of scope here).
 - Upkeep: every three months, each stationed unit charges its cost in Gold against its province; any the province cannot pay desert.
+- Loss of faith: a mercenary may also desert at that same quarterly check if its owning family's Fame falls short of what the unit wants — never a certainty, but likelier the further short the family falls, and an unknown house loses them at once. The stronger the mercenary, the more Fame it wants; a deserter takes no pay with it. Monsters serve any family, however obscure.
+- Be told: when a unit leaves one of the player's own provinces, an announcement over the map says which unit, from where, and why — unpaid or faithless. Announcements queue, one at a time, and wait for the player rather than fading; a rival's losses go unreported, since the player has no window into another house's payroll.
 - Dismiss: release a stationed unit, dropping its upkeep; no refund. The same Hire Monster screen switched to its Dismiss mode — it lists the roster a province already holds instead of the hire pool (FAQ §6.3: one order both hires and fires).
 - Move a unit: a Move Troops order into an adjacent province may carry one of the source's stationed units along; it relocates from the source to the destination (which may be a freshly claimed neutral). It rides the same order — no extra turn, no goodwill change. Units move only via Move Troops, not Transport.
 - View units: the View command gains a Fifth Units tab (beside General and Land) listing each stationed unit with its Strength and the province holding it. Free — View consumes no turn.
@@ -42,7 +46,8 @@ flowchart LR
   player --> uc4(["Carry a Fifth Unit along when moving troops"])
   player --> uc5(["View a province's stationed Fifth Units"])
   clock((Quarter))
-  clock --> uc3(["Charge upkeep, or desert the unit if unpaid"])
+  clock --> uc3(["Charge upkeep; desert the unit if unpaid or faithless"])
+  uc3 --> uc6(["Announce the desertion to its owner"])
 ```
 
 ## UI
@@ -79,6 +84,17 @@ Confirming (Hire or Dismiss) closes the modal and ends the province's turn (one 
 
 `View` gains a third tab, **Fifth Units**, beside General and Land — a table of each stationed unit (portrait, category, name, Strength) and the province holding it.
 
+A desertion in the player's own domain raises an **announcement** over the map — the deserter's portrait, one line of news, and a Continue button. It sits low over the map so the sidebar and the turn banner stay readable, and it holds until dismissed; when several land together, Continue walks through them and a note counts what is still waiting.
+
+```text
++--- over the map -----------------------------+
+|  +-------+  The Spearmen of Lorraine lost    |
+|  | pic   |  faith in your house and          |
+|  +-------+  deserted.                        |
+|  1 more to come                 [ Continue ] |
++----------------------------------------------+
+```
+
 ## Research
 
 **`HiredUnit` now, not a `FifthUnit` hierarchy yet.** Only hired units exist in this feature; Gem Guardians (8) and Pastha (15) also fill the fifth slot but arrive later. We model the concrete `HiredUnit` and add a shared `FifthUnit` seam when the second occupant lands, rather than abstracting speculatively.
@@ -90,6 +106,12 @@ Confirming (Hire or Dismiss) closes the modal and ends the province's turn (one 
 **Availability is per-scenario province data.** Each province's hire pool comes from the ROM `mercenaries[].available` flags (§8.3), which differ by scenario — so it is seeded with the rest of the scenario's province state, like ownership and resources. Dynamic availability changes (§8.3, unconfirmed) are out of scope; the pool is fixed for the campaign.
 
 **Upkeep is charged at a province's turn-end, not in a month-start sweep.** Tax is annual and impersonal, so it stays a month-start tick; upkeep is per-province and interactive, so it falls due when that province's *turn* ends — letting the player raise Gold during the turn (e.g. sell food) before the bill lands, rather than being charged in a month-start sweep before they can act. A `WorldCommand` charges the province whose turn just ended (`turnQueue.current`, before the queue advances) and only on quarter months, so each province pays once per quarter at its own turn. The spec confirms "every three months" but not the anchor month (§8.5), so the quarter months are a single config constant and the exact set is an open question. When a province stations several units and cannot pay for all, which desert (order, or all-or-nothing) is also unconfirmed; the model charges them in turn and deserts each one the remaining Gold cannot cover.
+
+**Loss of faith is a Fame-weighted risk on mercenaries only; rampage is a monster problem and waits.** The spec calls the loss-of-faith formula unknown (§8.10), but the player guide is unambiguous about the mechanic and which units it touches: mercenaries desert an unknown family — Lancers "early in the game when your ruler's fame is low they will probably desert you immediately after you hire them", Pikemen "until late in the game when your family has more fame", Warriors "eager to desert you … if you have high fame", Spearmen "if you have the fame to keep them" — while the monsters instead "go on a rampage (damaging your state)" (Orks, Olog-Hai). So the two categories fail differently, and only the mercenary half is modelled here. Player testing places the point where mercenaries settle down at roughly 20 Fame for the Strength-150 units and 50 for the Strength-180 ones, which is why the catalogue's `fameToKeep` tracks Strength rather than cost; Gunners and Shooters were untested and are assumed to sit with their Strength peers at 20 — the lowest-confidence rows. These numbers are observed, not read off the ROM, so they live as one catalogue field per unit and are cheap to retune.
+
+**Desertion is a roll, not a cutoff.** Reading `fameToKeep` as a hard line would make a house at 19 Fame lose its Spearmen every quarter and a house at 20 keep them forever, which contradicts the softness in every source: "probably desert", "eager to desert", "just as easily as any other mercenary group". So the unit carries its own risk — `getDesertionRisk(fame)` is the shortfall as a fraction of what it wants, `(fameToKeep - fame) / fameToKeep`, and zero once the family is famous enough. An unknown house (0 Fame) loses a mercenary the first quarter it holds one, matching "desert you immediately after you hire them"; a house halfway there is a coin flip each quarter; the observed "sometimes" in the 40s for Strength-180 units falls out as a 1-in-5 risk rather than being special-cased. The roll happens at the quarterly upkeep tick, where the other desertion already lives, and a faithless mercenary is not charged before it leaves — it takes no pay with it. Rampage stays out: the guide describes bad events as random and gives no per-monster rate, so it belongs with the random-events feature (15) rather than being invented here.
+
+**Desertion is reported through an announcement, not a silent removal.** A unit vanishing from a roster the player only sees on request is a mechanic they cannot learn, so the domain publishes a `UnitDesertedEvent` (province, unit, and whether it went unpaid or faithless) and the UI turns it into a message over the map. The event is the general shape future news will take — the engine states what happened, the UI decides who is told and how it reads. The control queues the events and filters them to the player's own provinces (no visibility into a rival's payroll); the view turns one into a sentence from a copy table keyed by reason, the way the overview labels province status. Announcements queue and wait for a click instead of fading on a timer: turns resolve in a burst, several quarters' news can land at once, and a message that ends the game's only feedback on a rule should not be missable. When the events feature (15) lands, its good and bad events publish their own domain events and gain their own phrasing here; nothing else about the mechanism should need to change.
 
 **Hire and dismiss are one order; it ends the turn.** The FAQ notes Hire Monster "allows the player to both hire and fire 5th Units" (§6.3) — so they are two directions of one transaction, like Trade's Buy/Sell, sharing one command, one tile, and one modal with a **Hire/Dismiss toggle** (appendix-d's separate "Dismiss Fifth Unit" entry is the same screen reached through the toggle). Hire works over the province's hire *pool*; Dismiss over the roster it already *holds*; the toggle swaps which list the modal shows and what the action button does (Hire is disabled when unaffordable; Dismiss is always available). Either direction **ends the turn** — it commits a Gold spend or a release, like Recruit (appendix-d marks the turn cost "needs version check"). So Hire Monster is an ordinary command dialog (`consumesTurn()` is `true`); it merely renders as an overlay over the map instead of inline in the sidebar, because inspecting a unit before paying wants room. It runs the *identical* lifecycle as the sidebar dialogs: selecting the tile opens the dialog (free — browsing costs nothing, since a dialog command does not execute until confirmed), the action button confirms, `HireMonsterCommand.execute()` performs the hire or release, and the shared command framework ends the turn with the usual pacing and clears the tile. Placement (sidebar vs. map overlay) is the only thing that differs from a command like Develop — the mechanics are one path, with no bespoke open/close events. To make that work, `ProvinceCommandsControl` drives the lifecycle while the overlay dialog is hosted in the map area by `GameScreen` (where an overlay can cover the map yet leave the sidebar tile visible); the commands control is handed the overlay dialog and registers it alongside the sidebar dialogs.
 
@@ -108,6 +130,8 @@ classDiagram
     +number move
     +RangePattern range
     +boolean flying
+    +number fameToKeep
+    +getDesertionRisk(fame) number
   }
   class Province {
     +HiredUnit[] hiredUnits
@@ -135,7 +159,8 @@ classDiagram
   WorldCommand <|-- UpkeepCommand
   HireMonsterCommand --> Province : hire (addUnit) / dismiss (removeUnit)
   MoveTroopsCommand --> Province : relocate (removeUnit + addUnit)
-  UpkeepCommand --> Province : charge each, desert (removeUnit) unpaid
+  UpkeepCommand --> Province : charge each, desert (removeUnit) the unpaid and the faithless
+  UpkeepCommand --> UnitDesertedEvent : publish per desertion
   Province --> HiredUnit : holds many
 ```
 
@@ -163,16 +188,22 @@ sequenceDiagram
   participant Engine
   participant Up as UpkeepCommand
   participant Prov as Province
+  participant UI as AnnouncementsControl
   Engine->>Up: execute() at turn end
   Up->>Up: quarter month & current province? else stop
   loop each stationed unit
-    alt gold >= upkeep
+    alt cannot pay upkeep
+      Up->>Prov: removeUnit(unit)
+      Up->>UI: UnitDesertedEvent(unpaid)
+    else roll under getDesertionRisk(family fame)
+      Up->>Prov: removeUnit(unit)
+      Up->>UI: UnitDesertedEvent(faithless)
+    else
       Up->>Prov: addResources(gold -upkeep)
-    else cannot pay
-      Up->>Prov: removeUnit(unit) (desertion)
     end
   end
   Up->>Prov: publish ProvinceUpdated
+  UI->>UI: queue an announcement per own province
 ```
 
 ## Persistence
@@ -183,5 +214,7 @@ Each province contributes its `hiredUnits` (each unit's type plus current Streng
 
 - **Hire (unit):** spends the unit's cost in Gold and stations it at the province at its catalogue Strength; lets a province hold several different types; refuses when the province lacks the Gold, when the type is not in its pool, or when it already stations that type.
 - **Upkeep (unit):** on a quarter month, charges each stationed unit's cost against its province; deserts a unit the province cannot pay; charges nothing on a non-quarter month.
+- **Loss of faith (unit):** at the same tick, a mercenary serving a family with no Fame always deserts and takes no pay with it; one whose family meets its `fameToKeep` never does and is charged; halfway short, the desertion follows the roll either way; a monster stays whatever the family's Fame. Each desertion reports why it happened — unpaid or faithless.
+- **Announcements (control):** a desertion in the player's own province shows a message naming the unit and the province; one in a rival's province shows nothing; several desertions queue, Continue advances through them, and the panel hides after the last.
 - **Dismiss (unit):** Hire Monster in Dismiss mode removes a chosen stationed unit, leaves the rest, and refunds no Gold.
 - **Carry a unit (unit):** a Move Troops order carrying a stationed unit relocates it — gone from the source, stationed at the destination (including a freshly claimed neutral) — and leaves the source's other units in place.
