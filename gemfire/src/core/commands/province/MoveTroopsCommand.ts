@@ -1,4 +1,5 @@
 import type { Family } from '@/core/domain/Family';
+import type { HiredUnit } from '@/core/domain/HiredUnit';
 import type { Province } from '@/core/domain/Province';
 import type { ResourceGains } from '@/core/domain/Resources';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
@@ -10,6 +11,7 @@ export class MoveTroopsCommand extends ProvinceCommand {
   private gold = 0;
   private food = 0;
   private troops = 0;
+  private carried: HiredUnit | undefined;
 
   public constructor(context: WorldCommandContext) {
     super('Move Troops', context);
@@ -20,6 +22,10 @@ export class MoveTroopsCommand extends ProvinceCommand {
     this.gold = cargo.gold ?? 0;
     this.food = cargo.food ?? 0;
     this.troops = cargo.troops ?? 0;
+  }
+
+  public carry(unit: HiredUnit | undefined): void {
+    this.carried = unit;
   }
 
   public override canExecute(): boolean {
@@ -66,8 +72,17 @@ export class MoveTroopsCommand extends ProvinceCommand {
       this.claim(target, owner);
     }
 
+    this.relocateUnit(source, target);
+
     this.publish(new ProvinceUpdatedEvent(target));
     this.complete(source);
+  }
+
+  private relocateUnit(source: Province, target: Province): void {
+    if (this.isCarrying(source)) {
+      source.removeUnit(this.carried!);
+      target.addUnit(this.carried!);
+    }
   }
 
   private claim(target: Province, owner: Family): void {
@@ -76,7 +91,11 @@ export class MoveTroopsCommand extends ProvinceCommand {
   }
 
   private canMove(source: Province, target: Province): boolean {
-    const moved = this.gold > 0 || this.food > 0 || this.troops > 0;
+    const moved =
+      this.gold > 0 ||
+      this.food > 0 ||
+      this.troops > 0 ||
+      this.isCarrying(source);
     const affordable =
       source.resources.gold >= this.gold &&
       source.resources.food >= this.food &&
@@ -84,6 +103,12 @@ export class MoveTroopsCommand extends ProvinceCommand {
 
     return (
       this.selectableTargets.includes(target.number) && moved && affordable
+    );
+  }
+
+  private isCarrying(source: Province): boolean {
+    return (
+      this.carried !== undefined && source.hiredUnits.includes(this.carried)
     );
   }
 }

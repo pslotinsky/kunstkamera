@@ -1,16 +1,15 @@
 import { html, type TemplateResult } from 'lit-html';
 
 import type { General, GeneralRank } from '@/core/domain/General';
+import type { HiredUnit } from '@/core/domain/HiredUnit';
 import type { Province, ProvinceStatus } from '@/core/domain/Province';
-import { View } from '@/lib/View';
+import { CommandDialogView } from '@/ui/ProvinceCommands/CommandDialog/CommandDialogView';
 
-import { FamilyOverviewClosedEvent } from './FamilyOverviewClosedEvent';
 import { FamilyOverviewTabSelectedEvent } from './FamilyOverviewTabSelectedEvent';
-import type { FamilyOverviewContext } from './types';
 
 import styles from './FamilyOverview.module.scss';
 
-export type FamilyOverviewMode = 'general' | 'land';
+export type FamilyOverviewMode = 'general' | 'land' | 'units';
 
 export interface GeneralRow {
   readonly general: General;
@@ -20,9 +19,15 @@ export interface GeneralRow {
   readonly age: number;
 }
 
+export interface FifthUnitRow {
+  readonly unit: HiredUnit;
+  readonly province: Province;
+}
+
 const TABS: Tab[] = [
   { mode: 'general', label: 'General' },
   { mode: 'land', label: 'Land' },
+  { mode: 'units', label: 'Fifth Units' },
 ];
 
 interface Tab {
@@ -37,44 +42,38 @@ const STATUS_LABELS: Record<ProvinceStatus, string> = {
   unruled: '—',
 };
 
-export class FamilyOverviewView extends View<FamilyOverviewContext> {
-  protected readonly rootClass = styles.root!;
+export class FamilyOverviewView extends CommandDialogView {
+  protected override readonly rootClass = styles.root!;
 
-  public get template(): TemplateResult {
+  protected override get hiddenClass(): string {
+    return styles.hidden!;
+  }
+
+  protected renderBody(): TemplateResult {
     return html`
-      <section class="${styles.root} ${styles.hidden}">
-        <header class=${styles.header}>
-          <div class=${styles.tabs}>
-            ${TABS.map(
-              ({ mode, label }) => html`<button
-                class=${styles.tab}
-                type="button"
-                data-mode=${mode}
-                @click=${() => this.publish(new FamilyOverviewTabSelectedEvent(mode))}
-              >
-                ${label}
-              </button>`,
-            )}
-          </div>
-          <button
-            class=${styles.close}
-            type="button"
-            @click=${() => this.publish(new FamilyOverviewClosedEvent())}
-          >
-            Close
-          </button>
-        </header>
-        <div class=${styles.body} data-body></div>
-      </section>
+      <header class=${styles.header}>
+        <div class=${styles.tabs}>
+          ${TABS.map(
+            ({ mode, label }) => html`<button
+              class=${styles.tab}
+              type="button"
+              data-mode=${mode}
+              @click=${() => this.publish(new FamilyOverviewTabSelectedEvent(mode))}
+            >
+              ${label}
+            </button>`,
+          )}
+        </div>
+        <button
+          class=${styles.close}
+          type="button"
+          @click=${() => this.cancel()}
+        >
+          Close
+        </button>
+      </header>
+      <div class=${styles.body} data-body></div>
     `;
-  }
-
-  public show(): void {
-    this.element.classList.remove(styles.hidden!);
-  }
-
-  public hide(): void {
-    this.element.classList.add(styles.hidden!);
   }
 
   public selectTab(mode: FamilyOverviewMode): void {
@@ -114,7 +113,14 @@ export class FamilyOverviewView extends View<FamilyOverviewContext> {
 
   public showLand(provinces: readonly Province[]): void {
     this.body.innerHTML = this.renderTable(
-      ['Status', 'Province', 'Governor', 'Cult', 'Prot', 'Loy'],
+      [
+        'Status',
+        'Province',
+        'Governor',
+        'Cultivation',
+        'Protection',
+        'Loyalty',
+      ],
       provinces.map((province) => [
         STATUS_LABELS[province.status],
         String(province),
@@ -124,6 +130,33 @@ export class FamilyOverviewView extends View<FamilyOverviewContext> {
         String(province.development.loyalty),
       ]),
     );
+  }
+
+  public showFifthUnits(rows: readonly FifthUnitRow[]): void {
+    if (rows.length > 0) {
+      this.body.innerHTML = this.renderTable(
+        ['', 'Strength', 'Province'],
+        rows.map((row) => [
+          this.renderUnitCard(row.unit),
+          String(row.unit.strength),
+          String(row.province),
+        ]),
+      );
+    } else {
+      this.body.innerHTML = `<p class=${styles.empty}>No Fifth Units hired.</p>`;
+    }
+  }
+
+  private renderUnitCard(unit: HiredUnit): string {
+    return `
+      <div class="${styles.card}">
+        <img class="${styles.unitPortrait}" src="${unit.portrait}" alt="${unit.type}" />
+        <div class="${styles.identity}">
+          <span class="${styles.title}">${unit.category}</span>
+          <span class="${styles.name}">${unit.type}</span>
+        </div>
+      </div>
+    `;
   }
 
   private renderTable(

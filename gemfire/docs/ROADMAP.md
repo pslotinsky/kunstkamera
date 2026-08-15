@@ -56,9 +56,13 @@ Raising and moving troops — bloodless expansion before any battle.
 
 The hiring economy for the allies that will fill an army's fifth slot — defined and acquired before the battles that use them.
 
-- [ ] hire a monster, skilled fighter, or magician into the fifth slot
-- [ ] pay quarterly upkeep, or watch hired units desert
-- [ ] dismiss a hired Fifth Unit
+- [x] hire a monster or elite mercenary into the fifth slot
+- [x] pay quarterly upkeep, or watch hired units desert
+- [x] dismiss a hired Fifth Unit
+- [x] carry a hired Fifth Unit to a neighbor with your troops
+- [x] see a province's hired Fifth Units
+- [x] watch hired units lose faith and desert
+- [x] be told when a hired unit deserts (unpaid upkeep or low fame)
 
 ## 7. Search & treasure
 
@@ -140,6 +144,7 @@ Good and bad events, seasonal disasters, and Pastha.
 - [ ] suffer seasonal disasters by region (snow, fire, flood, quake, plague)
 - [ ] trigger special events like Pastha
 - [ ] hear the banshee when a ruler dies
+- [ ] suffer a hired unit's rampage (loyalty, cultivation, and protection drop)
 
 ## 16. New game & advisors
 

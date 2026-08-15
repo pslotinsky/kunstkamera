@@ -113,6 +113,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 0,
       cultivation: 31,
       protection: 20,
+      hirePool: ['Orks', 'Bugbear', 'Warriors'],
     },
     {
       number: 2,
@@ -124,6 +125,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 58,
       cultivation: 38,
       protection: 50,
+      hirePool: ['Orks', 'Fachan'],
     },
     {
       number: 3,
@@ -135,6 +137,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 55,
       cultivation: 36,
       protection: 45,
+      hirePool: ['Orks', 'Fachan'],
     },
     {
       number: 4,
@@ -146,6 +149,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 45,
       cultivation: 40,
       protection: 41,
+      hirePool: ['Orks', 'Fachan'],
     },
     {
       number: 5,
@@ -157,6 +161,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 60,
       cultivation: 41,
       protection: 48,
+      hirePool: ['Orks', 'Bugbear'],
     },
     {
       number: 6,
@@ -168,6 +173,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 43,
       cultivation: 36,
       protection: 44,
+      hirePool: ['Orks', 'Fachan', 'Spearmen'],
     },
     {
       number: 7,
@@ -179,6 +185,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 44,
       cultivation: 39,
       protection: 42,
+      hirePool: ['Ogre', 'Lizards'],
     },
     {
       number: 8,
@@ -190,6 +197,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 42,
       cultivation: 35,
       protection: 35,
+      hirePool: ['Ogre', 'Lizards', 'Warriors'],
     },
     {
       number: 9,
@@ -199,6 +207,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 0,
       cultivation: 36,
       protection: 23,
+      hirePool: ['Ogre', 'Lizards'],
     },
     {
       number: 10,
@@ -208,6 +217,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 0,
       cultivation: 38,
       protection: 22,
+      hirePool: ['Ogre', 'Skeletons', 'Shooters'],
     },
     {
       number: 11,
@@ -219,6 +229,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 74,
       cultivation: 49,
       protection: 35,
+      hirePool: ['Olog-Hai', 'Skeletons'],
     },
     {
       number: 12,
@@ -230,6 +241,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 69,
       cultivation: 45,
       protection: 38,
+      hirePool: ['Olog-Hai', 'Skeletons', 'Pikemen'],
     },
     {
       number: 13,
@@ -241,6 +253,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 51,
       cultivation: 39,
       protection: 41,
+      hirePool: ['Ogre', 'Bugbear'],
     },
     {
       number: 14,
@@ -252,6 +265,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 42,
       cultivation: 36,
       protection: 40,
+      hirePool: ['Ogre', 'Bugbear', 'Spearmen'],
     },
     {
       number: 15,
@@ -263,6 +277,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 52,
       cultivation: 58,
       protection: 39,
+      hirePool: ['Ogre', 'Wyverns'],
     },
     {
       number: 16,
@@ -273,6 +288,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 50,
       cultivation: 52,
       protection: 33,
+      hirePool: ['Ogre', 'Bugbear', 'Pikemen'],
     },
     {
       number: 17,
@@ -284,6 +300,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 51,
       cultivation: 49,
       protection: 40,
+      hirePool: ['Ogre', 'Skeletons'],
     },
     {
       number: 18,
@@ -294,6 +311,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 49,
       cultivation: 51,
       protection: 33,
+      hirePool: ['Olog-Hai', 'Skeletons'],
     },
     {
       number: 19,
@@ -305,6 +323,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 53,
       cultivation: 53,
       protection: 39,
+      hirePool: ['Olog-Hai', 'Skeletons', 'Lancers'],
     },
     {
       number: 20,
@@ -315,6 +334,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 48,
       cultivation: 46,
       protection: 35,
+      hirePool: ['Orks', 'Skeletons'],
     },
     {
       number: 21,
@@ -325,6 +345,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 54,
       cultivation: 56,
       protection: 32,
+      hirePool: ['Orks', 'Skeletons'],
     },
     {
       number: 22,
@@ -336,6 +357,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 81,
       cultivation: 62,
       protection: 66,
+      hirePool: ['Gargoyles', 'Skeletons', 'Shooters'],
     },
     {
       number: 23,
@@ -347,6 +369,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 56,
       cultivation: 59,
       protection: 35,
+      hirePool: ['Ogre', 'Skeletons'],
     },
     {
       number: 24,
@@ -357,6 +380,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 53,
       cultivation: 51,
       protection: 38,
+      hirePool: ['Orks', 'Wyverns'],
     },
     {
       number: 25,
@@ -368,6 +392,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 52,
       cultivation: 43,
       protection: 41,
+      hirePool: ['Gargoyles', 'Lizards', 'Lancers'],
     },
     {
       number: 26,
@@ -379,6 +404,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 44,
       cultivation: 38,
       protection: 39,
+      hirePool: ['Orks', 'Wyverns'],
     },
     {
       number: 27,
@@ -390,6 +416,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 49,
       cultivation: 49,
       protection: 40,
+      hirePool: ['Orks', 'Skeletons', 'Gunners'],
     },
     {
       number: 28,
@@ -400,6 +427,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 52,
       cultivation: 56,
       protection: 34,
+      hirePool: ['Gargoyles', 'Wyverns'],
     },
     {
       number: 29,
@@ -411,6 +439,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 55,
       cultivation: 58,
       protection: 37,
+      hirePool: ['Orks', 'Gargoyles'],
     },
     {
       number: 30,
@@ -421,6 +450,7 @@ export const SCENARIO_1: Scenario = {
       loyalty: 61,
       cultivation: 43,
       protection: 33,
+      hirePool: ['Gargoyles', 'Skeletons', 'Gunners'],
     },
   ],
 };

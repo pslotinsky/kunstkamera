@@ -4,6 +4,7 @@ import { Characteristics } from './Characteristics';
 import { Development, type DevelopmentGains } from './Development';
 import type { Family } from './Family';
 import type { General } from './General';
+import type { HiredUnit } from './HiredUnit';
 import { type ResourceGains, Resources } from './Resources';
 
 export interface ProvinceParams {
@@ -14,6 +15,7 @@ export interface ProvinceParams {
   readonly governor?: General | undefined;
   readonly resources?: Resources;
   readonly development?: Development;
+  readonly hirePool?: readonly string[] | undefined;
 }
 
 const MAX_GOODWILL = 15;
@@ -32,6 +34,8 @@ export class Province {
   public actionCount = 0;
   public family?: Family | undefined;
   public governor?: General | undefined;
+  public hiredUnits: readonly HiredUnit[] = [];
+  public readonly hirePool: readonly string[];
 
   public constructor(params: ProvinceParams) {
     this.number = params.number;
@@ -41,10 +45,23 @@ export class Province {
     this.governor = params.governor;
     this.resources = params.resources ?? Resources.empty();
     this.development = params.development ?? Development.empty();
+    this.hirePool = params.hirePool ?? [];
   }
 
   public assignGovernor(governor: General | undefined): void {
     this.governor = governor;
+  }
+
+  public addUnit(unit: HiredUnit): void {
+    this.hiredUnits = [...this.hiredUnits, unit];
+  }
+
+  public removeUnit(unit: HiredUnit): void {
+    this.hiredUnits = this.hiredUnits.filter((stationed) => stationed !== unit);
+  }
+
+  public hasUnit(type: string): boolean {
+    return this.hiredUnits.some((unit) => unit.type === type);
   }
 
   public ruledBy(general: General | undefined): boolean {

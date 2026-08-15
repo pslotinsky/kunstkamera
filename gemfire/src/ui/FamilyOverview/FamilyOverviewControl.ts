@@ -1,30 +1,36 @@
+import type { ViewCommand } from '@/core/commands/province/ViewCommand';
 import type { Province } from '@/core/domain/Province';
-import { Control } from '@/lib/Control';
+import type { World } from '@/core/domain/World';
+import { CommandDialogControl } from '@/ui/ProvinceCommands/CommandDialog/CommandDialogControl';
 
-import { FamilyOverviewClosedEvent } from './FamilyOverviewClosedEvent';
 import { FamilyOverviewTabSelectedEvent } from './FamilyOverviewTabSelectedEvent';
 import {
   type FamilyOverviewMode,
   FamilyOverviewView,
+  type FifthUnitRow,
   type GeneralRow,
 } from './FamilyOverviewView';
-import type { FamilyOverviewContext } from './types';
 
-export class FamilyOverviewControl extends Control<FamilyOverviewView> {
-  public constructor(context: FamilyOverviewContext) {
-    super(FamilyOverviewView, context);
+export class FamilyOverviewControl extends CommandDialogControl<
+  FamilyOverviewView,
+  ViewCommand
+> {
+  private readonly world: World;
+
+  public constructor(name: string, world: World) {
+    super(FamilyOverviewView, { name });
+    this.world = world;
   }
 
-  public open(): void {
+  public override open(command: ViewCommand): void {
+    super.open(command);
     this.showMode('general');
-    this.view.show();
   }
 
   protected override onMount(): void {
     this.subscribe(FamilyOverviewTabSelectedEvent, (event) =>
       this.showMode(event.mode),
     );
-    this.subscribe(FamilyOverviewClosedEvent, () => this.view.hide());
   }
 
   private showMode(mode: FamilyOverviewMode): void {
@@ -37,11 +43,14 @@ export class FamilyOverviewControl extends Control<FamilyOverviewView> {
       case 'land':
         this.view.showLand(this.buildLand());
         break;
+      case 'units':
+        this.view.showFifthUnits(this.buildFifthUnits());
+        break;
     }
   }
 
   private buildGeneral(): GeneralRow[] {
-    const { world } = this.context;
+    const { world } = this;
     const family = world.player;
 
     return family.members.map((member) => ({
@@ -54,8 +63,14 @@ export class FamilyOverviewControl extends Control<FamilyOverviewView> {
   }
 
   private buildLand(): readonly Province[] {
-    const { world } = this.context;
+    return this.world.getFamilyProvinces(this.world.player);
+  }
 
-    return world.getFamilyProvinces(world.player);
+  private buildFifthUnits(): FifthUnitRow[] {
+    return this.world
+      .getFamilyProvinces(this.world.player)
+      .flatMap((province) =>
+        province.hiredUnits.map((unit) => ({ unit, province })),
+      );
   }
 }

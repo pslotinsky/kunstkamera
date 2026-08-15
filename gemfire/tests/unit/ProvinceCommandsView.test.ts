@@ -12,6 +12,7 @@ import { MoveTroopsDialogView } from '@/ui/ProvinceCommands/CommandDialog/MoveTr
 import { RecruitDialogView } from '@/ui/ProvinceCommands/CommandDialog/RecruitDialogView';
 import { TradeDialogView } from '@/ui/ProvinceCommands/CommandDialog/TradeDialogView';
 import { TransportDialogView } from '@/ui/ProvinceCommands/CommandDialog/TransportDialogView';
+import { DropdownView } from '@/ui/ProvinceCommands/Dropdown/DropdownView';
 import styles from '@/ui/ProvinceCommands/ProvinceCommands.module.scss';
 import { ProvinceCommandsView } from '@/ui/ProvinceCommands/ProvinceCommandsView';
 
@@ -46,6 +47,7 @@ describe('ProvinceCommandsView', () => {
             troops: new AmountFieldView({ name: 'troops' }, {}),
             food: new AmountFieldView({ name: 'food' }, {}),
             gold: new AmountFieldView({ name: 'gold' }, {}),
+            carry: new DropdownView({ name: 'carry' }, {}),
           },
         ),
         changeLordDialog: new ChangeLordDialogView(

@@ -376,15 +376,21 @@ Unlike Gem Guardians, they do not return after a cooldown.
 
 ## Rampage / Loss of Faith
 
-There is player-observed evidence that monsters may rampage and mercenary units may lose faith.
+Beyond unpaid upkeep, the two categories fail in different ways: mercenaries lose faith and desert, monsters stay but rampage.
 
-Possible contributing factors include:
+Loss of faith is gated on the hiring family's Fame.
 
-- low Fame;
-- long-term possession;
-- unpaid or unstable conditions.
+The player guide is explicit that a low-Fame family cannot hold mercenaries at all: Lancers "early in the game when your ruler's fame is low they will probably desert you immediately after you hire them"; Pikemen "will desert you just as easily as any other mercenary group … until late in the game when your family has more fame"; Warriors are "costly and eager to desert you", qualified by "if you have high fame"; Spearmen are recommended "if you have the fame to keep them".
 
-Unpaid upkeep causes desertion; beyond that, monsters may rampage and mercenary units may lose faith, though the exact rules are unknown.
+Player testing puts the threshold at roughly 20 Fame for the Strength-150 mercenaries (Spearmen, Pikemen) and roughly 50 Fame for the Strength-180 mercenaries (Lancers, Warriors), with the two ranged Strength-150 units (Gunners, Shooters) untested.
+
+These numbers are observed, not verified against the ROM; the correlation with Strength rather than cost is the most defensible reading of the tested points.
+
+Monsters have no Fame requirement but can turn on their owner: Orks are "most likely to go on a rampage (damaging your state)" and Olog-Hai are "quite likely to terrorize your state by rampaging".
+
+Rampage surfaces as a bad event — "X went on a rampage, ravaging the land" — that lowers all developmental values of the province, and the guide describes such events as random rather than triggered.
+
+The Fame-gated desertion is modelled; the per-monster rampage chance is not, since no observed rate exists for it.
 
 ---
 
@@ -488,9 +494,9 @@ flowchart TD
 The following Hired Fifth Unit details remain unresolved:
 
 1. Exact logic for changes in province-level Hired Fifth Unit availability.
-2. Exact rampage / loss-of-faith formula.
+2. Exact Fame thresholds per mercenary, and whether the check is a hard cutoff or a probability that softens as Fame rises.
 3. Exact Strength threshold at which a Hired Fifth Unit is destroyed.
-4. Whether Fame directly affects rampage, desertion, or mercenary loyalty.
+4. Per-monster rampage chance, and whether Fame or length of possession feeds into it.
 5. Whether Dismiss refunds any resources in any version.
 6. Version differences in Hired Fifth Unit names, stats, and availability.
 

@@ -23,6 +23,7 @@ interface FamilyParams {
   readonly ruler?: General | undefined;
   readonly members?: readonly General[] | undefined;
   readonly homeProvince?: Province | undefined;
+  readonly fame?: number | undefined;
 }
 
 interface ProvinceParams {
@@ -37,6 +38,7 @@ interface ProvinceParams {
   readonly loyalty?: number | undefined;
   readonly cultivation?: number | undefined;
   readonly protection?: number | undefined;
+  readonly hirePool?: readonly string[] | undefined;
 }
 
 let generalSequence = 0;
@@ -65,6 +67,7 @@ export function makeFamily(params: FamilyParams = {}): Family {
     ruler,
     members: params.members ?? [ruler],
     homeProvince: params.homeProvince ?? makePlaceholderHome(),
+    fame: params.fame ?? 100,
   });
 }
 
@@ -93,6 +96,7 @@ export function makeProvince(params: ProvinceParams = {}): Province {
       cultivation: params.cultivation ?? 0,
       protection: params.protection ?? 0,
     }),
+    hirePool: params.hirePool,
   });
 }
 
