@@ -10,7 +10,7 @@ In scope: recruit troops with gold; move gold, food, and troops into an adjacent
 
 There is no separate "review army strength" screen — you review a force by setting the gold, food, and troops it carries in the action's own dialog (Move here, Attack later); the spec keeps troops as one abstract province value, so a force is just those resource amounts.
 
-Out of scope: attacking an enemy province and the battle it triggers (feature 9 — so Move never targets an enemy); choosing a commander and assembling an army (that selection lives in the Attack flow, feature 9 — recruiting here only raises the troops an army is later built from); Fifth Units (6); Gem Guardians (8); in-field food consumption and deployment cost (battle); and the tactical split of troops into Horsemen/Knights/Archers (battle).
+Out of scope: attacking an enemy province and the battle it triggers (feature 8 — so Move never targets an enemy); choosing a commander and assembling an army (that selection lives in the Attack flow, feature 8 — recruiting here only raises the troops an army is later built from); Fifth Units (6); Gem Guardians (7); in-field food consumption and deployment cost (battle); and the tactical split of troops into Horsemen/Knights/Archers (battle).
 
 ## Glossary
 
@@ -59,7 +59,7 @@ Every order here is the standard command-dialog model already used by Give Food 
 
 **Recruit costs 2 gold per troop.** This is canonical (spec §4.3, §4.5); there is no confirmed population or food cost, so gold is the only limiter. The dialog caps troops at min(⌊gold / 2⌋, 999 − troops). Turn-consuming with goodwill −1 (appendix-d §D.2, §D.5).
 
-**Move Troops stays separate from Transport.** Appendix-d lists "Transport / Move" as one logistics command, but the manual and codebase split them: Transport (Domestic; gold + food; any province you own, however distant) and Move Troops (Military; gold + food + troops; adjacent only). Both carry gold and food (manual §281, §305), but Move Troops also carries troops, reaches only adjacent provinces, and is the only way to claim a neutral — whereas Transport "differs from MOVE TROOPS in that you can send goods to distant provinces." An enemy neighbor is an Attack (feature 9) and is not offered here. Turn-consuming, goodwill 0.
+**Move Troops stays separate from Transport.** Appendix-d lists "Transport / Move" as one logistics command, but the manual and codebase split them: Transport (Domestic; gold + food; any province you own, however distant) and Move Troops (Military; gold + food + troops; adjacent only). Both carry gold and food (manual §281, §305), but Move Troops also carries troops, reaches only adjacent provinces, and is the only way to claim a neutral — whereas Transport "differs from MOVE TROOPS in that you can send goods to distant provinces." An enemy neighbor is an Attack (feature 8) and is not offered here. Turn-consuming, goodwill 0.
 
 **Claiming is part of Move.** Entering a neutral province sets its `family` to the player and its `governor` to the ruler — which is feature 4's "ruled remotely" (half-strength) state, so Move writes those two fields and needs no new ownership machinery. A claimed province needs a governor, and the remote ruler is the default; installing a resident lord is a separate, later Change Lord order. Move itself never picks a commander.
 
@@ -105,7 +105,7 @@ sequenceDiagram
 
 ## Persistence
 
-Nothing new to persist: troops are already part of `Province.resources`, and a claim writes the same `family` / `governor` fields feature 4 already saves. (Save/load itself is feature 17.)
+Nothing new to persist: troops are already part of `Province.resources`, and a claim writes the same `family` / `governor` fields feature 4 already saves. (Save/load itself is feature 16.)
 
 ## Tests
 

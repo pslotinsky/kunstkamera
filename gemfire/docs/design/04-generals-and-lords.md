@@ -6,7 +6,7 @@ Manage the family: see your generals and their stats, choose who lords each prov
 
 In scope: view generals' stats and the ruler's fame; appoint, move, and promote lords; rule a province directly; move the home province.
 
-Out of scope: recruiting generals (only via Defection / capture — features 11, 10) and rewarding generals (no sourced mechanic; hidden general loyalty isn't modeled until Defection — feature 11). We only seed the vassal pool those will use.
+Out of scope: recruiting generals (only via Defection / capture — features 10, 9) and rewarding generals (no sourced mechanic; hidden general loyalty isn't modeled until Defection — feature 10). We only seed the vassal pool those will use.
 
 ## Glossary
 
@@ -21,7 +21,7 @@ Out of scope: recruiting generals (only via Defection / capture — features 11,
 
 ## Functionality
 
-- Open **View** — a free, tabbed info overlay over the map (no turn, per appendix-d). **General** is a table whose first cell is an officer card (portrait, title — ruler / lord / vassal — name, and age) followed by Intelligence / War / Charisma, the ruler's Fame, and posting. **Land** lists the family's provinces: status (capital / lorded / ruled remotely), governor, and development. (**Age** = scenario year − birth year; birth years come from the DragonAtma stat guide in its year-201 epoch, which scenario 1 now uses, with the unknown birth month randomized at world creation. **Gems** comes with feature 8, **5th Unit** with feature 6.)
+- Open **View** — a free, tabbed info overlay over the map (no turn, per appendix-d). **General** is a table whose first cell is an officer card (portrait, title — ruler / lord / vassal — name, and age) followed by Intelligence / War / Charisma, the ruler's Fame, and posting. **Land** lists the family's provinces: status (capital / lorded / ruled remotely), governor, and development. (**Age** = scenario year − birth year; birth years come from the DragonAtma stat guide in its year-201 epoch, which scenario 1 now uses, with the unknown birth month randomized at world creation. **Gems** comes with feature 7, **5th Unit** with feature 6.)
 - Change a province's lord: promote a **vassal**, **move** a lord in from elsewhere, or hand it to **You** (the ruler, remote at half strength). A displaced lord returns to the pool; a province a lord leaves reverts to "You".
 - Move the home province: the ruler relocates, the new seat becomes full-strength, the old reverts to "You". This alone among the feature's orders ends the turn.
 - Develop and Give Food read the province's **effective** stats, so a remotely-ruled province yields half.
