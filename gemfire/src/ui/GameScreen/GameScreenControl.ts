@@ -12,6 +12,7 @@ import { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
 import { HireMonsterDialogControl } from '@/ui/ProvinceCommands/CommandDialog/HireMonsterDialogControl';
 import { TargetingEndedEvent } from '@/ui/ProvinceCommands/TargetingEndedEvent';
 import { TargetingStartedEvent } from '@/ui/ProvinceCommands/TargetingStartedEvent';
+import { SearchReportControl } from '@/ui/SearchReport/SearchReportControl';
 import { WorldMapControl } from '@/ui/WorldMap/WorldMapControl';
 
 import { GameScreenView } from './GameScreenView';
@@ -46,6 +47,7 @@ export class GameScreenControl extends Control<
       }),
       familyOverview,
       hireMonster,
+      searchReport: new SearchReportControl({ events: context.events }),
       announcements: new AnnouncementsControl({
         world: context.world,
         events: context.events,

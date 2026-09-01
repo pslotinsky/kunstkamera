@@ -14,8 +14,6 @@ import type { Stats } from '@/core/domain/Stats';
 import { countTo } from '@/lib/dom/countTo';
 import { View } from '@/lib/View';
 
-import type { ProvinceInfoContext } from './types';
-
 import styles from './ProvinceInfo.module.scss';
 
 type StatKey = ResourceKey | DevelopmentKey;
@@ -29,7 +27,7 @@ const STATS_META: Record<StatKey, { label: string; icon: string }> = {
   protection: { label: 'Protection', icon: protectionIconUrl },
 };
 
-export class ProvinceInfoView extends View<ProvinceInfoContext> {
+export class ProvinceInfoView extends View {
   protected readonly rootClass = styles.root!;
 
   public get template(): TemplateResult {
@@ -101,15 +99,9 @@ export class ProvinceInfoView extends View<ProvinceInfoContext> {
   private renderProvince(province: Province): TemplateResult {
     return html`
       ${this.renderHeader(province)}
-      ${
-        province.belongsTo(this.context.player)
-          ? html`
-              <hr class=${styles.divider} />
-              ${this.renderDetails(province)}
-              <hr class=${styles.divider} />
-            `
-          : nothing
-      }
+      <hr class=${styles.divider} />
+      ${this.renderDetails(province)}
+      <hr class=${styles.divider} />
     `;
   }
 

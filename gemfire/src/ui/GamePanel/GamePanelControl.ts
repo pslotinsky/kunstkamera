@@ -12,7 +12,7 @@ export class GamePanelControl extends Control<
 > {
   public constructor(context: GamePanelContext) {
     super(GamePanelView, context, {
-      provinceInfo: new ProvinceInfoControl(context.world.player),
+      provinceInfo: new ProvinceInfoControl(),
       provinceCommands: new ProvinceCommandsControl(
         context.world,
         context.commands,

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { SCENARIO_1 } from '@/config/scenario-1';
 import { WorldFactory } from '@/core/WorldFactory';
 
 const world = new WorldFactory().create();
@@ -46,6 +47,17 @@ describe('WorldFactory', () => {
       if (province.family) {
         expect(province.governor, `province ${province.number}`).toBeDefined();
       }
+    }
+  });
+
+  it('gives each house the gems its scenario names, and nothing derives them', () => {
+    for (const definition of SCENARIO_1.families) {
+      const family = world.families.getOrFail(definition.name);
+
+      expect(
+        family.gems.map((gem) => gem.name),
+        definition.name,
+      ).toEqual([...definition.gems]);
     }
   });
 });

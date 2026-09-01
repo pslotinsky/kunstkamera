@@ -1,5 +1,8 @@
 import { html, type TemplateResult } from 'lit-html';
 
+import type { Family } from '@/core/domain/Family';
+import type { FifthUnit } from '@/core/domain/FifthUnit';
+import type { Gem } from '@/core/domain/Gem';
 import type { General, GeneralRank } from '@/core/domain/General';
 import type { HiredUnit } from '@/core/domain/HiredUnit';
 import type { Province, ProvinceStatus } from '@/core/domain/Province';
@@ -9,7 +12,7 @@ import { FamilyOverviewTabSelectedEvent } from './FamilyOverviewTabSelectedEvent
 
 import styles from './FamilyOverview.module.scss';
 
-export type FamilyOverviewMode = 'general' | 'land' | 'units';
+export type FamilyOverviewMode = 'general' | 'land' | 'units' | 'gems';
 
 export interface GeneralRow {
   readonly general: General;
@@ -28,6 +31,7 @@ const TABS: Tab[] = [
   { mode: 'general', label: 'General' },
   { mode: 'land', label: 'Land' },
   { mode: 'units', label: 'Fifth Units' },
+  { mode: 'gems', label: 'Gems' },
 ];
 
 interface Tab {
@@ -52,6 +56,7 @@ export class FamilyOverviewView extends CommandDialogView {
   protected renderBody(): TemplateResult {
     return html`
       <header class=${styles.header}>
+        <h2 class=${styles.crest} data-family></h2>
         <div class=${styles.tabs}>
           ${TABS.map(
             ({ mode, label }) => html`<button
@@ -74,6 +79,10 @@ export class FamilyOverviewView extends CommandDialogView {
       </header>
       <div class=${styles.body} data-body></div>
     `;
+  }
+
+  public showFamily(family: Family): void {
+    this.familyName.textContent = family.name;
   }
 
   public selectTab(mode: FamilyOverviewMode): void {
@@ -132,12 +141,14 @@ export class FamilyOverviewView extends CommandDialogView {
     );
   }
 
-  public showFifthUnits(rows: readonly FifthUnitRow[]): void {
-    if (rows.length > 0) {
+  public showFifthUnits(rows: readonly FifthUnitRow[], own: boolean): void {
+    if (!own) {
+      this.body.innerHTML = `<p class="${styles.empty}">Only a spy can count another house's Fifth Units. Send one with Search.</p>`;
+    } else if (rows.length > 0) {
       this.body.innerHTML = this.renderTable(
         ['', 'Strength', 'Province'],
         rows.map((row) => [
-          this.renderUnitCard(row.unit),
+          this.renderUnitCard(row.unit, row.unit.category),
           String(row.unit.strength),
           String(row.province),
         ]),
@@ -147,13 +158,27 @@ export class FamilyOverviewView extends CommandDialogView {
     }
   }
 
-  private renderUnitCard(unit: HiredUnit): string {
+  public showGems(gems: readonly Gem[]): void {
+    if (gems.length > 0) {
+      this.body.innerHTML = this.renderTable(
+        ['', 'Strength'],
+        gems.map((gem) => [
+          this.renderUnitCard(gem.guardian, gem.gemstone),
+          String(gem.guardian.strength),
+        ]),
+      );
+    } else {
+      this.body.innerHTML = `<p class="${styles.empty}">No gems held.</p>`;
+    }
+  }
+
+  private renderUnitCard(unit: FifthUnit, kind: string): string {
     return `
       <div class="${styles.card}">
-        <img class="${styles.unitPortrait}" src="${unit.portrait}" alt="${unit.type}" />
+        <img class="${styles.unitPortrait}" src="${unit.portrait}" alt="${unit.name}" />
         <div class="${styles.identity}">
-          <span class="${styles.title}">${unit.category}</span>
-          <span class="${styles.name}">${unit.type}</span>
+          <span class="${styles.title}">${kind}</span>
+          <span class="${styles.name}">${unit.name}</span>
         </div>
       </div>
     `;
@@ -172,6 +197,10 @@ export class FamilyOverviewView extends CommandDialogView {
       .join('');
 
     return `<table class="${styles.table}"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+  }
+
+  private get familyName(): HTMLElement {
+    return this.element.querySelector<HTMLElement>('[data-family]')!;
   }
 
   private get tabButtons(): NodeListOf<HTMLButtonElement> {

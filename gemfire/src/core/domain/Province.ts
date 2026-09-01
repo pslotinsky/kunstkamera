@@ -60,8 +60,8 @@ export class Province {
     this.hiredUnits = this.hiredUnits.filter((stationed) => stationed !== unit);
   }
 
-  public hasUnit(type: string): boolean {
-    return this.hiredUnits.some((unit) => unit.type === type);
+  public hasUnit(name: string): boolean {
+    return this.hiredUnits.some((unit) => unit.name === name);
   }
 
   public ruledBy(general: General | undefined): boolean {

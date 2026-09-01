@@ -33,7 +33,7 @@ export class HireMonsterDialogControl extends CommandDialogControl<
   }
 
   protected override onMount(): void {
-    this.subscribe(UnitFocusedEvent, (event) => this.focus(event.type));
+    this.subscribe(UnitFocusedEvent, (event) => this.focus(event.name));
     this.subscribe(HireModeSelectedEvent, (event) => this.setMode(event.mode));
   }
 
@@ -54,30 +54,30 @@ export class HireMonsterDialogControl extends CommandDialogControl<
     const units = this.units();
 
     this.view.showUnits(units, mode);
-    this.focus(units[0]?.type);
+    this.focus(units[0]?.name);
   }
 
-  private focus(type: string | undefined): void {
-    this.focused = type;
+  private focus(name: string | undefined): void {
+    this.focused = name;
 
-    if (type) {
-      this.view.focusUnit(type);
+    if (name) {
+      this.view.focusUnit(name);
     }
 
-    this.view.showDetail(type ? this.buildDetail(type) : undefined);
+    this.view.showDetail(name ? this.buildDetail(name) : undefined);
   }
 
   private units(): readonly HiredUnit[] {
     return this.mode === 'dismiss'
       ? (this.command?.stationedUnits ?? [])
-      : (this.command?.hireableTypes ?? [])
-          .map((type) => HiredUnit.ofType(type))
+      : (this.command?.hireableNames ?? [])
+          .map((name) => HiredUnit.ofName(name))
           .filter((unit) => unit !== undefined);
   }
 
-  private buildDetail(type: string): UnitDetail | undefined {
+  private buildDetail(name: string): UnitDetail | undefined {
     const province = this.world.turnQueue.current;
-    const unit = HiredUnit.ofType(type);
+    const unit = HiredUnit.ofName(name);
 
     return province && unit
       ? {

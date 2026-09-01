@@ -84,7 +84,7 @@ Confirming (Hire or Dismiss) closes the modal and ends the province's turn (one 
 
 `View` gains a third tab, **Fifth Units**, beside General and Land — a table of each stationed unit (portrait, category, name, Strength) and the province holding it.
 
-A desertion in the player's own domain raises an **announcement** over the map — the deserter's portrait, one line of news, and a Continue button. It sits low over the map so the sidebar and the turn banner stay readable, and it holds until dismissed; when several land together, Continue walks through them and a note counts what is still waiting.
+A desertion in the player's own domain raises an **announcement** over the map — the deserter's portrait, one line of news, and a Continue button. It sits centred over the map, where the eye already is, and it holds until dismissed; when several land together, Continue walks through them and a note counts what is still waiting.
 
 ```text
 +--- over the map -----------------------------+

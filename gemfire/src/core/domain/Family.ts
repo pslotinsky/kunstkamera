@@ -1,5 +1,6 @@
 import { isDefined } from '@/lib/value/isDefined';
 
+import type { Gem } from './Gem';
 import type { General } from './General';
 import type { Province } from './Province';
 
@@ -9,6 +10,7 @@ export interface FamilyParams {
   readonly members: readonly General[];
   readonly homeProvince: Province;
   readonly fame?: number;
+  readonly gems?: readonly Gem[];
 }
 
 export class Family {
@@ -17,6 +19,7 @@ export class Family {
   public readonly members: readonly General[];
   public homeProvince: Province;
   public fame: number;
+  public gems: readonly Gem[];
   public ally?: Family;
 
   public constructor(params: FamilyParams) {
@@ -25,6 +28,7 @@ export class Family {
     this.members = params.members;
     this.homeProvince = params.homeProvince;
     this.fame = params.fame ?? 0;
+    this.gems = params.gems ?? [];
   }
 
   public get crest(): string {

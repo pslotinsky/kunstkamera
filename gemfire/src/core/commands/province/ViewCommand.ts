@@ -9,5 +9,9 @@ export class ViewCommand extends ProvinceCommand {
     return false;
   }
 
+  public override get selectableTargets(): readonly number[] {
+    return this.context.world.map.provinces.map((province) => province.number);
+  }
+
   public execute(): void {}
 }

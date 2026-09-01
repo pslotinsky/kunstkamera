@@ -3,10 +3,10 @@ import type { HiredUnit } from '@/core/domain/HiredUnit';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
 import { isDefined } from '@/lib/value/isDefined';
+import { DropdownControl } from '@/ui/Dropdown/DropdownControl';
+import type { DropdownOption } from '@/ui/Dropdown/DropdownView';
 
 import { AmountFieldControl } from '../AmountField/AmountFieldControl';
-import { DropdownControl } from '../Dropdown/DropdownControl';
-import type { DropdownOption } from '../Dropdown/DropdownView';
 import { CommandDialogControl } from './CommandDialogControl';
 import { MoveTroopsDialogView } from './MoveTroopsDialogView';
 
@@ -113,8 +113,8 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
     return [
       { value: '', label: 'None' },
       ...units.map((unit) => ({
-        value: unit.type,
-        label: unit.type,
+        value: unit.name,
+        label: unit.name,
         icon: unit.portrait,
         note: String(unit.strength),
       })),
@@ -127,7 +127,7 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
 
   private carriedUnit(): HiredUnit | undefined {
     return this.stationedUnits().find(
-      (unit) => unit.type === this.controls.carry.value,
+      (unit) => unit.name === this.controls.carry.value,
     );
   }
 

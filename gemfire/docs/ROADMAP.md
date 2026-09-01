@@ -68,12 +68,12 @@ The hiring economy for the allies that will fill an army's fifth slot — define
 
 What spying into a province turns up — the scouting that readies an attack, the treasure a spy stumbles on, and the gems that mark a house's power. A gem is never found or bought: Search only tells you who holds one, and it changes hands when its house falls.
 
-- [ ] scout a rival province before attacking
-- [ ] spy on a rival province's Fifth Unit
-- [ ] search a province for artifacts
-- [ ] equip artifacts to boost a general
-- [ ] learn which houses hold which gems
-- [ ] hold several gems at once
+- [x] scout a rival province before attacking
+- [x] spy on a rival province's Fifth Unit
+- [x] search a province for artifacts
+- [x] equip artifacts to boost a general
+- [x] learn which houses hold which gems
+- [x] hold several gems at once
 
 ## 8. Battle
 

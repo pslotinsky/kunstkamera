@@ -4,15 +4,16 @@ import { describe, expect, it } from 'vitest';
 import { createCommandGroups } from '@/core/commands/province/catalog';
 import { WorldFactory } from '@/core/WorldFactory';
 import { EventBus } from '@/lib/EventBus';
+import { DropdownView } from '@/ui/Dropdown/DropdownView';
 import { AmountFieldView } from '@/ui/ProvinceCommands/AmountField/AmountFieldView';
 import { ChangeLordDialogView } from '@/ui/ProvinceCommands/CommandDialog/ChangeLordDialogView';
 import { DevelopDialogView } from '@/ui/ProvinceCommands/CommandDialog/DevelopDialogView';
 import { GiveFoodDialogView } from '@/ui/ProvinceCommands/CommandDialog/GiveFoodDialogView';
 import { MoveTroopsDialogView } from '@/ui/ProvinceCommands/CommandDialog/MoveTroopsDialogView';
 import { RecruitDialogView } from '@/ui/ProvinceCommands/CommandDialog/RecruitDialogView';
+import { SearchDialogView } from '@/ui/ProvinceCommands/CommandDialog/SearchDialogView';
 import { TradeDialogView } from '@/ui/ProvinceCommands/CommandDialog/TradeDialogView';
 import { TransportDialogView } from '@/ui/ProvinceCommands/CommandDialog/TransportDialogView';
-import { DropdownView } from '@/ui/ProvinceCommands/Dropdown/DropdownView';
 import styles from '@/ui/ProvinceCommands/ProvinceCommands.module.scss';
 import { ProvinceCommandsView } from '@/ui/ProvinceCommands/ProvinceCommandsView';
 
@@ -54,6 +55,7 @@ describe('ProvinceCommandsView', () => {
           { name: 'ChangeLordCommand' },
           {},
         ),
+        searchDialog: new SearchDialogView({ name: 'SearchCommand' }, {}),
       },
     );
 

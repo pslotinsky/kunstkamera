@@ -43,7 +43,7 @@ flowchart LR
 
 ## UI
 
-**Scouting** rides the targeting machinery that already exists: the View tile lights every province, and the selected one fills the info panel with full detail while the order is open — the same trick Change Lord uses to show a target while you choose. Closing the order returns the panel to your own province.
+**Scouting** rides the targeting machinery that already exists: the View tile lights every province, and the selected one fills the info panel with full detail while the order is open — the same trick Change Lord uses to show a target while you choose. The overview stays shut until a province is picked, because it covers the map it would otherwise be picked from, and then opens on that province's house; picking neutral land leaves it shut, since no house rules there. Closing the order returns the panel to your own province.
 
 **Search** is a targeting command like Move Troops: selecting the tile lights the searchable provinces, and confirming spends the Gold and the turn. The result is a **report over the map** (like the Hire Monster modal), because a list of enemy units wants room and the player should read it before the turn moves on.
 
@@ -57,14 +57,14 @@ flowchart LR
 
 When the province stations nothing, the list reads "No Fifth Units stationed there." The report says nothing about artifacts either way — it is the intelligence the 5 Gold bought, and nothing else.
 
-**A find is announced**, through the queue feature 6 built for a deserting unit, once the report is closed. It is the first announcement that asks for something rather than only telling the player: the artifact's picture, what it raises, and a picker of the house's members. Continue is not offered until one of them takes it, so nothing is carried home unclaimed.
+**A find is announced**, through the queue feature 6 built for a deserting unit, once the report is closed. It is the first announcement that asks for something rather than only telling the player: the artifact's name, what it raises, and a picker of the house's members, each shown with the characteristic the artifact would raise. Continue is not offered until one of them takes it, so nothing is carried home unclaimed. The picker defaults to the searching province's governor, so the fast path is one confirm.
 
 ```text
 +--- over the map -----------------------------+
-|  +-------+  Your spy came back from Anjou    |
-|  | pic   |  with the Sword of Fire.          |
-|  +-------+  War +30                          |
-|  It goes to  [ Erin        v ]      [ Take ] |
+|  Your spy came back from Anjou               |
+|  with the Sword of Fire.                     |
+|  War +30                                     |
+|  It goes to  [ Erin  50    v ]      [ Take ] |
 +----------------------------------------------+
 ```
 
@@ -84,7 +84,7 @@ When the province stations nothing, the list reads "No Fifth Units stationed the
 
 **Search costs the turn and 5 Gold.** Every source agrees it ends the turn: appendix-d lists it among the turn-consuming actions, and the FAQ calls it "the only Player command that ends the player's turn" — so much so that it advises saving first and reloading to get the turn back. Hartman supplies the price: "It costs 5 gold to use this command, and it expends the current state's turn." The FAQ corroborates that Gold pays for Search without giving a figure (§3.1). Goodwill is 0 (appendix-d D.5), so spying on a neighbour costs no standing.
 
-**The target is a rival house's land — not your own, and not neutral.** Both sources say *enemy*: Hartman has Search investigate "another enemy controlled province", the FAQ has the player "Searching enemy territories". Neutral land is nobody's, so it is not a target, and the rule reads the same way from the other end — everything a search reports belongs to a house rather than to the ground. The Fifth Units are the owner's, the gems are the owner's, and a province with no owner would leave a spy with nothing to bring home but the artifact. Your own land is excluded for the same reason it needs no spy: you already see it. Neither source mentions adjacency, and a spy is not an army, so any rival province is reachable however distant. That is the weakest part of the rule: if a version limits Search to neighbours, only `searchableTargets` changes.
+**The target is a rival house's land — not your own, and not neutral.** Both sources say *enemy*: Hartman has Search investigate "another enemy controlled province", the FAQ has the player "Searching enemy territories". Neutral land is nobody's, so it is not a target, and the rule reads the same way from the other end — everything a search reports belongs to a house rather than to the ground. The Fifth Units are the owner's, the gems are the owner's, and a province with no owner would leave a spy with nothing to bring home but the artifact. Your own land is excluded for the same reason it needs no spy: you already see it. Neither source mentions adjacency, and a spy is not an army, so any rival province is reachable however distant. That is the weakest part of the rule: if a version limits Search to neighbours, only `selectableTargets` changes.
 
 **The eight artifacts, and what a find means.** The catalogue is canonical in spec §5.10 and repeated verbatim in the FAQ: Silver Sword (War +25), Sword of Fire (+30), Sword of Victory (+40), Scroll of the Planets (Intelligence +25), Scroll of Knowledge (+30), Scroll of the Sages (+40), Moonstone (Charisma +30), Dragon Jewel (Charisma +40). They matter more than their numbers suggest, because the FAQ says a characteristic "can be increased only through good events on the territory where he or she rules or a Search item" — artifacts and events are the only growth in the game. Two things the sources do not give: how often a search finds one ("sometimes randomly", no rate) and whether an item can turn up twice. Neither guide says the eight are one-of-a-kind, so we do not pretend they are: a search rolls its chance and, on success, draws any of the eight, the Sword of Fire as readily the second time as the first. That keeps the world free of a found-so-far ledger — nothing to seed, save, or reconcile — and it is self-limiting anyway, since a characteristic stops at 100 and a house runs out of generals worth raising long before it runs out of searches. The chance itself is one flagged config constant, a probability rolled per search (0.25 to start) rather than a countdown to a guaranteed find — a spy who has come back empty four times is owed nothing.
 
@@ -114,6 +114,7 @@ classDiagram
     +string name
     +CharacteristicsKey characteristic
     +number bonus
+    +effect
   }
   class FifthUnit {
     +string name
@@ -142,7 +143,7 @@ classDiagram
     +Gem[] gems
   }
   class SearchCommand {
-    +searchableTargets number[]
+    +selectableTargets number[]
     +searchAt(province) void
     +execute() void
   }
@@ -183,7 +184,7 @@ sequenceDiagram
   end
   Search->>UI: SearchReportedEvent(target, units)
   opt an artifact was taken
-    Search->>UI: ArtifactFoundEvent(source, artifact)
+    Search->>UI: ArtifactFoundEvent(source, target, artifact)
   end
   Search->>Source: publish ProvinceUpdated, end the turn
 ```

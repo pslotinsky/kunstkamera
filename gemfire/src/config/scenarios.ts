@@ -13,6 +13,7 @@ export interface FamilyDefinition {
   readonly ruler: string;
   readonly members: readonly string[];
   readonly fame: number;
+  readonly gems: readonly string[];
 }
 
 export interface ProvinceDefinition {

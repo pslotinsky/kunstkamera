@@ -1,4 +1,5 @@
 import type { ViewCommand } from '@/core/commands/province/ViewCommand';
+import type { Family } from '@/core/domain/Family';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
 import { CommandDialogControl } from '@/ui/ProvinceCommands/CommandDialog/CommandDialogControl';
@@ -16,21 +17,42 @@ export class FamilyOverviewControl extends CommandDialogControl<
   ViewCommand
 > {
   private readonly world: World;
+  private viewed: Family;
 
   public constructor(name: string, world: World) {
     super(FamilyOverviewView, { name });
     this.world = world;
+    this.viewed = world.player;
   }
 
   public override open(command: ViewCommand): void {
-    super.open(command);
-    this.showMode('general');
+    this.command = command;
+    this.viewed = this.world.player;
+  }
+
+  public override get inspectsTarget(): boolean {
+    return true;
+  }
+
+  public override pickTarget(province: Province): void {
+    if (province.family) {
+      this.showFamily(province.family);
+    } else {
+      this.view.hide();
+    }
   }
 
   protected override onMount(): void {
     this.subscribe(FamilyOverviewTabSelectedEvent, (event) =>
       this.showMode(event.mode),
     );
+  }
+
+  private showFamily(family: Family): void {
+    this.viewed = family;
+    this.view.show();
+    this.view.showFamily(family);
+    this.showMode('general');
   }
 
   private showMode(mode: FamilyOverviewMode): void {
@@ -44,33 +66,41 @@ export class FamilyOverviewControl extends CommandDialogControl<
         this.view.showLand(this.buildLand());
         break;
       case 'units':
-        this.view.showFifthUnits(this.buildFifthUnits());
+        this.view.showFifthUnits(this.buildFifthUnits(), this.viewsOwnHouse());
+        break;
+      case 'gems':
+        this.view.showGems(this.viewed.gems);
         break;
     }
   }
 
-  private buildGeneral(): GeneralRow[] {
-    const { world } = this;
-    const family = world.player;
+  private viewsOwnHouse(): boolean {
+    return this.viewed.isEqual(this.world.player);
+  }
 
-    return family.members.map((member) => ({
+  private buildGeneral(): GeneralRow[] {
+    const { world, viewed } = this;
+
+    return viewed.members.map((member) => ({
       general: member,
-      province: world.getResidence(family, member),
-      rank: world.getGeneralRank(family, member),
-      fame: family.isRuler(member) ? family.fame : undefined,
+      province: world.getResidence(viewed, member),
+      rank: world.getGeneralRank(viewed, member),
+      fame: viewed.isRuler(member) ? viewed.fame : undefined,
       age: member.getAgeAt(world.date),
     }));
   }
 
   private buildLand(): readonly Province[] {
-    return this.world.getFamilyProvinces(this.world.player);
+    return this.world.getFamilyProvinces(this.viewed);
   }
 
   private buildFifthUnits(): FifthUnitRow[] {
-    return this.world
-      .getFamilyProvinces(this.world.player)
-      .flatMap((province) =>
-        province.hiredUnits.map((unit) => ({ unit, province })),
-      );
+    return this.viewsOwnHouse()
+      ? this.world
+          .getFamilyProvinces(this.viewed)
+          .flatMap((province) =>
+            province.hiredUnits.map((unit) => ({ unit, province })),
+          )
+      : [];
   }
 }
