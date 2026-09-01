@@ -21,16 +21,16 @@ The Gem system connects:
 
 ## Overview
 
-Gemfire is a magical crown containing seven Gems.
-
-The crown contains:
+Gemfire is a magical crown in which the king inlaid seven Gems:
 
 - six wizard Gems;
 - the Dragon Gem.
 
-After the six wizard Gems are removed from the crown, they scatter across Ishmeria and come into the possession of noble houses.
+Only six of them are loose in Ishmeria. Princess Robyn "worked the magical gems out of the crown and hurled them into the midnight sky", and her father caught her as she struggled with "the very last stone, the red ruby of the dragon", which never left the crown (manual, The Legend of Gemfire).
 
-The Dragon remains associated with Eselred and Lankshire.
+The six scattered across Ishmeria and came into the possession of noble houses.
+
+The Dragon is therefore the crown itself, still in Eselred's hands at Lankshire — not a seventh scattered stone.
 
 ---
 
