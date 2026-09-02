@@ -1,3 +1,4 @@
+import type { Artifact } from './Artifact';
 import type { CalendarDate } from './CalendarDate';
 import type { Characteristics } from './Characteristics';
 
@@ -11,7 +12,7 @@ export interface GeneralParams {
 
 export class General {
   public readonly name: string;
-  public readonly stats: Characteristics;
+  public stats: Characteristics;
   public readonly birth: CalendarDate;
 
   public constructor(params: GeneralParams) {
@@ -22,6 +23,10 @@ export class General {
 
   public get portrait(): string {
     return `/portraits/${this.name.toLowerCase()}.png`;
+  }
+
+  public receive(artifact: Artifact): void {
+    this.stats = this.stats.add({ [artifact.characteristic]: artifact.bonus });
   }
 
   public getAgeAt(date: CalendarDate): number {

@@ -26,7 +26,7 @@ function createFixture(
   });
 
   for (const type of options.units ?? ['Orks', 'Bugbear']) {
-    province.addUnit(HiredUnit.ofType(type)!);
+    province.addUnit(HiredUnit.ofName(type)!);
   }
 
   const { world, events } = makeWorld(
@@ -73,7 +73,7 @@ describe('UpkeepCommand', () => {
 
     // Orks (20) is paid, leaving 20; Bugbear (30) is unaffordable and deserts.
     expect(province.resources.gold).toBe(20);
-    expect(province.hiredUnits.map((unit) => unit.type)).toEqual(['Orks']);
+    expect(province.hiredUnits.map((unit) => unit.name)).toEqual(['Orks']);
   });
 
   it('risks a mercenary in proportion to the fame it still wants', () => {
@@ -132,7 +132,7 @@ describe('UpkeepCommand', () => {
     });
 
     events.subscribe(UnitDesertedEvent, (event) =>
-      desertions.push([event.unit.type, event.reason]),
+      desertions.push([event.unit.name, event.reason]),
     );
     command.execute();
 

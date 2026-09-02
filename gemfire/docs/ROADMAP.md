@@ -64,23 +64,18 @@ The hiring economy for the allies that will fill an army's fifth slot — define
 - [x] watch hired units lose faith and desert
 - [x] be told when a hired unit deserts (unpaid upkeep or low fame)
 
-## 7. Search & treasure
+## 7. Search, treasure & gems
 
-What spying into a province turns up, and the scouting that readies an attack.
+What spying into a province turns up — the scouting that readies an attack, the treasure a spy stumbles on, and the gems that mark a house's power. A gem is never found or bought: Search only tells you who holds one, and it changes hands when its house falls.
 
-- [ ] search a province for artifacts and gems
-- [ ] scout a rival province before attacking
-- [ ] spy on a rival province's Fifth Unit
-- [ ] equip artifacts to boost a general
+- [x] scout a rival province before attacking
+- [x] spy on a rival province's Fifth Unit
+- [x] search a province for artifacts
+- [x] equip artifacts to boost a general
+- [x] learn which houses hold which gems
+- [x] hold several gems at once
 
-## 8. Gems
-
-Gems as family-level assets — finding, claiming, and holding them; the path to Crown Gemfire. Their Guardians fight in Battle.
-
-- [ ] find and claim gems
-- [ ] hold several gems at once
-
-## 9. Battle
+## 8. Battle
 
 The whole tactical layer, built once — and last in the war chain, so it consumes every combatant already defined: generals' troops, hired Fifth Units, and Gem Guardians, with the enemy run by a tactical AI.
 
@@ -94,16 +89,17 @@ The whole tactical layer, built once — and last in the war chain, so it consum
 - [ ] win by flag, food timer, or rout — across the sunrise-to-midnight day cycle
 - [ ] retreat from a losing battle, risking capture
 
-## 10. Conquest & captives
+## 9. Conquest & captives
 
 The immediate fruits of a won battle.
 
 - [ ] claim gold, food, and land as war spoils
 - [ ] knock a rival family out of the game
+- [ ] take a fallen house's gems
 - [ ] ransom, recruit, release, or banish a captured leader
 - [ ] buy a captured ruler's freedom
 
-## 11. Diplomacy
+## 10. Diplomacy
 
 The Diplomacy orders: alliance, defection, sabotage, plunder, and surrender.
 
@@ -112,7 +108,7 @@ The Diplomacy orders: alliance, defection, sabotage, plunder, and surrender.
 - [ ] sabotage and plunder rival provinces
 - [ ] accept a family's surrender
 
-## 12. Character lifecycle
+## 11. Character lifecycle
 
 Generals age, grow, and die; a fallen ruler's family passes to an heir.
 
@@ -121,14 +117,14 @@ Generals age, grow, and die; a fallen ruler's family passes to an heir.
 - [ ] pass a fallen ruler's family to an heir
 - [ ] see a heirless family disband — its gems and lands scatter
 
-## 13. Strategic AI
+## 12. Strategic AI
 
 Rival families that take their own monthly turns, plus handing your own work to the computer. (Tactical AI lives with Battle.)
 
 - [ ] face rival families that act on their own
 - [ ] entrust a province to its lord, freeing you from its orders
 
-## 14. Victory & defeat
+## 13. Victory & defeat
 
 How the campaign ends.
 
@@ -136,7 +132,7 @@ How the campaign ends.
 - [ ] be knocked out when your last province falls
 - [ ] see the campaign's ending
 
-## 15. Events
+## 14. Events
 
 Good and bad events, seasonal disasters, and Pastha.
 
@@ -146,7 +142,7 @@ Good and bad events, seasonal disasters, and Pastha.
 - [ ] hear the banshee when a ruler dies
 - [ ] suffer a hired unit's rampage (loyalty, cultivation, and protection drop)
 
-## 16. New game & advisors
+## 15. New game & advisors
 
 Starting a campaign: title screen, scenario and family choice, and an advisor to consult.
 
@@ -156,14 +152,14 @@ Starting a campaign: title screen, scenario and family choice, and an advisor to
 - [ ] pick one of four advisors at setup
 - [ ] get advice on your next move during play
 
-## 17. Save / load
+## 16. Save / load
 
 Persistence of game state between sessions.
 
 - [ ] save a game in progress
 - [ ] load and resume a saved game
 
-## 18. Options / settings
+## 17. Options / settings
 
 Game settings and session control.
 
@@ -172,14 +168,14 @@ Game settings and session control.
 - [ ] toggle sound
 - [ ] quit, or hand the game to the computer to finish
 
-## 19. Audio
+## 18. Audio
 
 Music and sound effects across the game.
 
 - [ ] hear music across menus, map, and battle
 - [ ] hear sound effects for actions and combat
 
-## 20. Multiplayer
+## 19. Multiplayer
 
 Hot-seat play: multiple human players sharing one game.
 

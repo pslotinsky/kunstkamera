@@ -13,7 +13,7 @@ This feature owns the _view and selection_ layer: rendering provinces, showing o
 | World (Ishmeria) | The top-level aggregate: the fixed island kingdom; one 30-province map shared by all four scenarios (geography never changes — only the political state does). |
 | Province         | Primary territorial unit (numbered 1–30, named). Holds an owner, local economy, a governor, adjacency, and hireable Fifth Units.                               |
 | Family           | A political actor that owns provinces, generals, and Gems.                                                                                                     |
-| Player           | The family you control — full detail and commands apply to its provinces. Hardcoded for now; chosen at setup (feature 16).                                     |
+| Player           | The family you control — full detail and commands apply to its provinces. Hardcoded for now; chosen at setup (feature 15).                                     |
 | Ownership        | Each province belongs to one family, or is **neutral** (unclaimed).                                                                                            |
 | Adjacency        | Which provinces border each other — the _only_ routes for movement and invasion.                                                                               |
 | Governor         | The general administering a province (distinct from a family's ruler).                                                                                         |
@@ -25,9 +25,9 @@ This feature owns the _view and selection_ layer: rendering provinces, showing o
 - Select a province and inspect its details.
 - Full detail for the provinces you own; limited detail (owner and name) for rival and neutral provinces — the scout that reveals a rival is feature 7.
 - Open the command menu for a province you control — the entry surface for its monthly orders. The menu only _launches_ commands; each command's behaviour is owned by its feature and resolved there. Rival and neutral provinces show no menu.
-- Mark the ruler-only commands (◆ — Diplomacy, Change Lord, Entrust) apart from those any resident lord repeats (◇); with one player family the player is always ruler, so this is recorded now and enforced when vassal autonomy (feature 13) lands.
+- Mark the ruler-only commands (◆ — Diplomacy, Change Lord, Entrust) apart from those any resident lord repeats (◇); with one player family the player is always ruler, so this is recorded now and enforced when vassal autonomy (feature 12) lands.
 - Render the command menu inert at first — visible, non-interactive placeholders — so the surface exists before any command behaviour does.
-- Highlight the selected province's adjacent provinces; acting on them (move/claim → feature 5, attack → feature 9) is entered here, resolved there.
+- Highlight the selected province's adjacent provinces; acting on them (move/claim → feature 5, attack → feature 8) is entered here, resolved there.
 
 ## Use cases
 
@@ -109,7 +109,7 @@ The map must do three things to a province _region_: **tint** it by owner, **hig
 
 **Choice: SVG as an interaction overlay over the bitmap.** The map _is_ the original artwork — a raster image, not vector — so SVG doesn't draw the map. A single `<svg>` holds the art as a base `<image>`, with one province `<path>` overlaid in the same coordinate space (they align and scale together). Those paths are normally transparent and carry the dynamic state declaratively: a **translucent `fill`** for ownership tint (the art shows through), a **CSS class** for adjacency highlight, and a **DOM `click`** for selection — with **no library**, fitting Vite + vanilla TS and keeping the renderer a thin state → DOM adapter over the pure core (per Tests). Image maps give the same hit-testing but can't fill/highlight; Canvas and Pixi are more machinery than a static strategic map earns.
 
-The **tactical battle** board (feature 9) is a different problem — animated unit sprites, facing, attacks — so it gets its own rendering research then (SVG vs Canvas vs Pixi weighed for _that_); we're deliberately not committing globally here.
+The **tactical battle** board (feature 8) is a different problem — animated unit sprites, facing, attacks — so it gets its own rendering research then (SVG vs Canvas vs Pixi weighed for _that_); we're deliberately not committing globally here.
 
 ## Domain model
 
@@ -192,7 +192,7 @@ classDiagram
   Family "1" --> "1" Province : homeProvince
 ```
 
-_Shape only: `name / INT / WAR / CHA / birth` follow the canonical record in appendix-b §B.2; `loyalty` is the hidden general loyalty (≠ a province's public loyalty), and `fame` lives on the ruler, not the general. `player` is the family you control — hardcoded now, chosen at setup (feature 16). Aging, stat growth/decline, and death belong to feature 12 (Character lifecycle)._
+_Shape only: `name / INT / WAR / CHA / birth` follow the canonical record in appendix-b §B.2; `loyalty` is the hidden general loyalty (≠ a province's public loyalty), and `fame` lives on the ruler, not the general. `player` is the family you control — hardcoded now, chosen at setup (feature 15). Aging, stat growth/decline, and death belong to feature 11 (Character lifecycle)._
 
 ## Tests
 

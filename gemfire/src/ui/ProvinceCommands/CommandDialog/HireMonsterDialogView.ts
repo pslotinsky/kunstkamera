@@ -3,7 +3,8 @@ import { html, type TemplateResult } from 'lit-html';
 import goldIconUrl from '@/assets/icons/gold.webp';
 import troopsIconUrl from '@/assets/icons/troops.webp';
 import type { HireMode } from '@/core/commands/province/HireMonsterCommand';
-import type { HiredUnit, RangePattern } from '@/core/domain/HiredUnit';
+import type { RangePattern } from '@/core/domain/FifthUnit';
+import type { HiredUnit } from '@/core/domain/HiredUnit';
 import { capitalize } from '@/lib/string/capitalize';
 import { isDefined } from '@/lib/value/isDefined';
 
@@ -49,9 +50,9 @@ export class HireMonsterDialogView extends CommandDialogView {
       : `<p class=${styles.empty}>${EMPTY[mode]}</p>`;
   }
 
-  public focusUnit(type: string): void {
+  public focusUnit(name: string): void {
     for (const unit of this.unitButtons) {
-      unit.classList.toggle(styles.selected!, unit.dataset.type === type);
+      unit.classList.toggle(styles.selected!, unit.dataset.unit === name);
     }
   }
 
@@ -95,9 +96,9 @@ export class HireMonsterDialogView extends CommandDialogView {
 
   private renderUnit(unit: HiredUnit): string {
     return `
-      <button class=${styles.unit} type="button" data-type="${unit.type}">
+      <button class=${styles.unit} type="button" data-unit="${unit.name}">
         <img class=${styles.thumb} src="${unit.portrait}" alt="" />
-        <span class=${styles.unitName}>${unit.type}</span>
+        <span class=${styles.unitName}>${unit.name}</span>
         <span class=${styles.cost}><img class=${styles.costIcon} src="${goldIconUrl}" alt="gold" />${unit.cost}</span>
       </button>
     `;
@@ -109,9 +110,9 @@ export class HireMonsterDialogView extends CommandDialogView {
 
     return `
       <div class=${styles.top}>
-        <img class=${styles.portrait} src="${unit.portrait}" alt="${unit.type}" />
+        <img class=${styles.portrait} src="${unit.portrait}" alt="${unit.name}" />
         <div class=${styles.info}>
-          <h2 class=${styles.name}>${unit.type}</h2>
+          <h2 class=${styles.name}>${unit.name}</h2>
           <span class=${styles.kind}>${capitalize(unit.category)}</span>
           <div class=${styles.facts}>
             <span class=${styles.fact}><img class=${styles.factIcon} src="${troopsIconUrl}" alt="Strength" />${unit.strength}</span>
@@ -153,7 +154,7 @@ export class HireMonsterDialogView extends CommandDialogView {
     return `
       <div class=${styles.previewBox}>
         <span class=${styles.label}>Preview</span>
-        <img class=${styles.preview} src="${unit.preview}" alt="${unit.type}" />
+        <img class=${styles.preview} src="${unit.preview}" alt="${unit.name}" />
       </div>
     `;
   }
@@ -161,14 +162,14 @@ export class HireMonsterDialogView extends CommandDialogView {
   private onClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     const mode = target.closest<HTMLElement>('[data-mode]');
-    const unit = target.closest<HTMLElement>('[data-type]');
+    const unit = target.closest<HTMLElement>('[data-unit]');
 
     if (target.closest('[data-act]')) {
       this.confirm();
     } else if (isDefined(mode?.dataset.mode)) {
       this.publish(new HireModeSelectedEvent(mode.dataset.mode as HireMode));
-    } else if (isDefined(unit?.dataset.type)) {
-      this.publish(new UnitFocusedEvent(unit.dataset.type));
+    } else if (isDefined(unit?.dataset.unit)) {
+      this.publish(new UnitFocusedEvent(unit.dataset.unit));
     }
   }
 
@@ -181,7 +182,7 @@ export class HireMonsterDialogView extends CommandDialogView {
   }
 
   private get unitButtons(): NodeListOf<HTMLElement> {
-    return this.element.querySelectorAll<HTMLElement>('[data-type]');
+    return this.element.querySelectorAll<HTMLElement>('[data-unit]');
   }
 
   private get modeButtons(): NodeListOf<HTMLElement> {

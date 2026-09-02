@@ -12,21 +12,21 @@ export class HireMonsterCommand extends ProvinceCommand {
     super('Hire Monster', context);
   }
 
-  public hire(type: string): void {
+  public hire(name: string): void {
     this.mode = 'hire';
-    this.chosen = type;
+    this.chosen = name;
   }
 
-  public dismiss(type: string): void {
+  public dismiss(name: string): void {
     this.mode = 'dismiss';
-    this.chosen = type;
+    this.chosen = name;
   }
 
-  public get hireableTypes(): readonly string[] {
+  public get hireableNames(): readonly string[] {
     const province = this.currentProvince;
 
     return province
-      ? province.hirePool.filter((type) => !province.hasUnit(type))
+      ? province.hirePool.filter((name) => !province.hasUnit(name))
       : [];
   }
 
@@ -44,13 +44,13 @@ export class HireMonsterCommand extends ProvinceCommand {
 
   private runHire(): void {
     const province = this.currentProvince;
-    const unit = this.chosen ? HiredUnit.ofType(this.chosen) : undefined;
+    const unit = this.chosen ? HiredUnit.ofName(this.chosen) : undefined;
 
     if (
       province &&
       unit &&
-      province.hirePool.includes(unit.type) &&
-      !province.hasUnit(unit.type) &&
+      province.hirePool.includes(unit.name) &&
+      !province.hasUnit(unit.name) &&
       province.resources.gold >= unit.cost
     ) {
       province.addResources({ gold: -unit.cost });
@@ -62,7 +62,7 @@ export class HireMonsterCommand extends ProvinceCommand {
   private runDismiss(): void {
     const province = this.currentProvince;
     const unit = this.stationedUnits.find(
-      (stationed) => stationed.type === this.chosen,
+      (stationed) => stationed.name === this.chosen,
     );
 
     if (province && unit) {

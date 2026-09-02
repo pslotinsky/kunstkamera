@@ -82,7 +82,7 @@ Pastha is therefore not merely a special battlefield unit. Narratively, Pastha i
 
 ## E.6 The Gemfire Crown
 
-Gemfire is a crown containing seven magical Gems (six wizard Gems + the Dragon).
+Gemfire is a crown in which seven magical Gems were inlaid: six wizard Gems, which Princess Robyn loosed, and the Dragon's ruby, the one she never got out (see §7.1).
 Each guardian's gemstone and element:
 
 | Guardian | Gemstone | Element            |

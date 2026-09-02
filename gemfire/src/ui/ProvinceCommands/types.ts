@@ -10,6 +10,7 @@ import type { GiveFoodDialogControl } from './CommandDialog/GiveFoodDialogContro
 import type { HireMonsterDialogControl } from './CommandDialog/HireMonsterDialogControl';
 import type { MoveTroopsDialogControl } from './CommandDialog/MoveTroopsDialogControl';
 import type { RecruitDialogControl } from './CommandDialog/RecruitDialogControl';
+import type { SearchDialogControl } from './CommandDialog/SearchDialogControl';
 import type { TradeDialogControl } from './CommandDialog/TradeDialogControl';
 import type { TransportDialogControl } from './CommandDialog/TransportDialogControl';
 
@@ -32,6 +33,7 @@ export type ProvinceCommandsControls = {
   readonly recruitDialog: RecruitDialogControl;
   readonly moveTroopsDialog: MoveTroopsDialogControl;
   readonly changeLordDialog: ChangeLordDialogControl;
+  readonly searchDialog: SearchDialogControl;
 };
 
 export type ProvinceCommandsViews = ChildrenViews<ProvinceCommandsControls>;

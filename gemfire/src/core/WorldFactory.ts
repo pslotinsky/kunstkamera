@@ -8,6 +8,7 @@ import { CalendarDate } from '@/core/domain/CalendarDate';
 import { Characteristics } from '@/core/domain/Characteristics';
 import { Development } from '@/core/domain/Development';
 import { Family } from '@/core/domain/Family';
+import { Gem } from '@/core/domain/Gem';
 import { General } from '@/core/domain/General';
 import { Province } from '@/core/domain/Province';
 import { Resources } from '@/core/domain/Resources';
@@ -135,6 +136,7 @@ export class WorldFactory {
       members: definition.members.map((name) => generals.getOrFail(name)),
       homeProvince,
       fame: definition.fame,
+      gems: definition.gems.map((name) => Gem.ofName(name)),
     });
   }
 

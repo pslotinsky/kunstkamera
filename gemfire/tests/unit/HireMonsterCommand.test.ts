@@ -28,7 +28,7 @@ describe('HireMonsterCommand', () => {
     command.execute();
 
     expect(province.hiredUnits).toHaveLength(1);
-    expect(province.hiredUnits[0]?.type).toBe('Orks');
+    expect(province.hiredUnits[0]?.name).toBe('Orks');
     expect(province.hiredUnits[0]?.strength).toBe(100);
     expect(province.resources.gold).toBe(INITIAL_GOLD - 20);
   });
@@ -39,7 +39,7 @@ describe('HireMonsterCommand', () => {
     command.hire('Orks');
     command.execute();
 
-    expect([...command.hireableTypes]).toEqual(['Bugbear']);
+    expect([...command.hireableNames]).toEqual(['Bugbear']);
   });
 
   it('refuses to hire a type the province cannot afford', () => {
@@ -85,7 +85,7 @@ describe('HireMonsterCommand', () => {
     command.dismiss('Orks');
     command.execute();
 
-    expect(province.hiredUnits.map((unit) => unit.type)).toEqual(['Bugbear']);
+    expect(province.hiredUnits.map((unit) => unit.name)).toEqual(['Bugbear']);
     expect(province.resources.gold).toBe(goldAfterHiring);
   });
 
@@ -98,6 +98,6 @@ describe('HireMonsterCommand', () => {
     command.dismiss('Bugbear');
     command.execute();
 
-    expect(province.hiredUnits.map((unit) => unit.type)).toEqual(['Orks']);
+    expect(province.hiredUnits.map((unit) => unit.name)).toEqual(['Orks']);
   });
 });

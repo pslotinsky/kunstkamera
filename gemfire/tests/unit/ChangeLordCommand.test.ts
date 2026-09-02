@@ -1,23 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
 import { ChangeLordCommand } from '@/core/commands/province/ChangeLordCommand';
-import type { Province } from '@/core/domain/Province';
-import type { World } from '@/core/domain/World';
 
-import { makeFamily, makeGeneral, makeProvince, makeWorld } from './factories';
+import {
+  advanceTo,
+  makeFamily,
+  makeGeneral,
+  makeProvince,
+  makeWorld,
+} from './factories';
 
 const RULER_INTELLIGENCE = 82;
-
-function advanceTo(world: World, province: Province): void {
-  world.turnQueue.reset();
-
-  while (
-    world.turnQueue.current &&
-    !world.turnQueue.current.isEqual(province)
-  ) {
-    world.turnQueue.next();
-  }
-}
 
 function setup() {
   const ruler = makeGeneral({ name: 'Erin', intelligence: RULER_INTELLIGENCE });

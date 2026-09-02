@@ -1,4 +1,4 @@
-import type { RangePattern } from '@/core/domain/HiredUnit';
+import type { RangePattern } from '@/core/domain/FifthUnit';
 
 export type RangeCell = 'center' | 'hit' | 'empty';
 

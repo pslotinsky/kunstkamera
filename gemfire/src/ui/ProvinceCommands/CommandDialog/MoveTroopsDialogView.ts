@@ -1,9 +1,9 @@
 import { html, type TemplateResult } from 'lit-html';
 
 import type { Province } from '@/core/domain/Province';
+import type { DropdownView } from '@/ui/Dropdown/DropdownView';
 
 import type { AmountFieldView } from '../AmountField/AmountFieldView';
-import type { DropdownView } from '../Dropdown/DropdownView';
 import { CommandDialogView } from './CommandDialogView';
 
 import styles from './CommandDialog.module.scss';

@@ -1,12 +1,11 @@
-import type { Family } from '@/core/domain/Family';
 import type { Province } from '@/core/domain/Province';
 import { Control } from '@/lib/Control';
 
 import { ProvinceInfoView } from './ProvinceInfoView';
 
 export class ProvinceInfoControl extends Control<ProvinceInfoView> {
-  public constructor(player: Family) {
-    super(ProvinceInfoView, { player });
+  public constructor() {
+    super(ProvinceInfoView, {});
   }
 
   public showHint(): void {

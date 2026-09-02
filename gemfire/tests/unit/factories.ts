@@ -138,3 +138,14 @@ export function makeWorld(
 
   return { world, events: new EventBus() };
 }
+
+export function advanceTo(world: World, province: Province): void {
+  world.turnQueue.reset();
+
+  while (
+    world.turnQueue.current &&
+    !world.turnQueue.current.isEqual(province)
+  ) {
+    world.turnQueue.next();
+  }
+}

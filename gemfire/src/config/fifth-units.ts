@@ -2,7 +2,7 @@ import type { HiredUnitParams } from '@/core/domain/HiredUnit';
 
 export const HIRED_UNITS: readonly HiredUnitParams[] = [
   {
-    type: 'Bugbear',
+    name: 'Bugbear',
     category: 'monster',
     description: 'Throws enemy into a panic',
     strength: 100,
@@ -11,7 +11,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     range: 'short',
   },
   {
-    type: 'Fachan',
+    name: 'Fachan',
     category: 'monster',
     description: 'Rock-throwing cyclops',
     strength: 100,
@@ -20,7 +20,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     range: 'largest',
   },
   {
-    type: 'Gargoyles',
+    name: 'Gargoyles',
     category: 'monster',
     description: 'Winged monsters',
     strength: 120,
@@ -30,7 +30,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     flying: true,
   },
   {
-    type: 'Gunners',
+    name: 'Gunners',
     category: 'mercenary',
     description: 'Expert cannoneers',
     strength: 150,
@@ -40,7 +40,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     fameToKeep: 20,
   },
   {
-    type: 'Lancers',
+    name: 'Lancers',
     category: 'mercenary',
     description: 'Fighting foot-soldiers',
     strength: 180,
@@ -50,7 +50,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     fameToKeep: 50,
   },
   {
-    type: 'Orks',
+    name: 'Orks',
     category: 'monster',
     description: 'Axe-wielding brutes',
     strength: 100,
@@ -59,7 +59,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     range: 'short',
   },
   {
-    type: 'Skeletons',
+    name: 'Skeletons',
     category: 'monster',
     description: 'Sword-bearing skeletons',
     strength: 100,
@@ -68,7 +68,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     range: 'short',
   },
   {
-    type: 'Shooters',
+    name: 'Shooters',
     category: 'mercenary',
     description: 'Sharp-shooting mercenaries',
     strength: 150,
@@ -78,7 +78,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     fameToKeep: 20,
   },
   {
-    type: 'Spearmen',
+    name: 'Spearmen',
     category: 'mercenary',
     description: 'Spear-throwing mercenaries',
     strength: 150,
@@ -88,7 +88,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     fameToKeep: 20,
   },
   {
-    type: 'Warriors',
+    name: 'Warriors',
     category: 'mercenary',
     description: 'Elite Highlanders',
     strength: 180,
@@ -98,7 +98,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     fameToKeep: 50,
   },
   {
-    type: 'Wyverns',
+    name: 'Wyverns',
     category: 'monster',
     description: 'Dragon with deadly wings',
     strength: 150,
@@ -108,7 +108,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     flying: true,
   },
   {
-    type: 'Ogre',
+    name: 'Ogre',
     category: 'monster',
     description: 'Club-swinging giant',
     strength: 100,
@@ -117,7 +117,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     range: 'short',
   },
   {
-    type: 'Lizards',
+    name: 'Lizards',
     category: 'monster',
     description: 'Legendary fire beasts',
     strength: 110,
@@ -126,7 +126,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     range: 'short',
   },
   {
-    type: 'Olog-Hai',
+    name: 'Olog-Hai',
     category: 'monster',
     description: 'Sharp-clawed savages',
     strength: 110,
@@ -135,7 +135,7 @@ export const HIRED_UNITS: readonly HiredUnitParams[] = [
     range: 'short',
   },
   {
-    type: 'Pikemen',
+    name: 'Pikemen',
     category: 'mercenary',
     description: 'Zealous crusaders',
     strength: 150,

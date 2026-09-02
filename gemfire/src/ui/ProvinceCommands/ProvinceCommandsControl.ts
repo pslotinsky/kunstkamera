@@ -5,6 +5,7 @@ import { GiveFoodCommand } from '@/core/commands/province/GiveFoodCommand';
 import { HireMonsterCommand } from '@/core/commands/province/HireMonsterCommand';
 import { MoveTroopsCommand } from '@/core/commands/province/MoveTroopsCommand';
 import { RecruitCommand } from '@/core/commands/province/RecruitCommand';
+import { SearchCommand } from '@/core/commands/province/SearchCommand';
 import { TradeCommand } from '@/core/commands/province/TradeCommand';
 import { TransportCommand } from '@/core/commands/province/TransportCommand';
 import { ViewCommand } from '@/core/commands/province/ViewCommand';
@@ -21,6 +22,7 @@ import { DevelopDialogControl } from './CommandDialog/DevelopDialogControl';
 import { GiveFoodDialogControl } from './CommandDialog/GiveFoodDialogControl';
 import { MoveTroopsDialogControl } from './CommandDialog/MoveTroopsDialogControl';
 import { RecruitDialogControl } from './CommandDialog/RecruitDialogControl';
+import { SearchDialogControl } from './CommandDialog/SearchDialogControl';
 import { TradeDialogControl } from './CommandDialog/TradeDialogControl';
 import { TransportDialogControl } from './CommandDialog/TransportDialogControl';
 import { CommandSelectedEvent } from './CommandSelectedEvent';
@@ -48,6 +50,7 @@ export class ProvinceCommandsControl extends Control<
     [RecruitCommand.name, this.controls.recruitDialog],
     [MoveTroopsCommand.name, this.controls.moveTroopsDialog],
     [ChangeLordCommand.name, this.controls.changeLordDialog],
+    [SearchCommand.name, this.controls.searchDialog],
   ]);
 
   private pending: PendingDialog | null = null;
@@ -78,6 +81,7 @@ export class ProvinceCommandsControl extends Control<
           ChangeLordCommand.name,
           world,
         ),
+        searchDialog: new SearchDialogControl(SearchCommand.name),
       },
     );
 
