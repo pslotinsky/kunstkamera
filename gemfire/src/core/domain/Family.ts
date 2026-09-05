@@ -1,5 +1,6 @@
 import { isDefined } from '@/lib/value/isDefined';
 
+import type { FifthUnit } from './FifthUnit';
 import type { Gem } from './Gem';
 import type { General } from './General';
 import type { Province } from './Province';
@@ -29,6 +30,10 @@ export class Family {
     this.homeProvince = params.homeProvince;
     this.fame = params.fame ?? 0;
     this.gems = params.gems ?? [];
+  }
+
+  public get guardians(): readonly FifthUnit[] {
+    return this.gems.map((gem) => gem.guardian);
   }
 
   public get crest(): string {

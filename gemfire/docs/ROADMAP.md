@@ -77,17 +77,51 @@ What spying into a province turns up — the scouting that readies an attack, th
 
 ## 8. Battle
 
-The whole tactical layer, built once — and last in the war chain, so it consumes every combatant already defined: generals' troops, hired Fifth Units, and Gem Guardians, with the enemy run by a tactical AI.
+The whole tactical layer — last in the war chain, so it consumes every combatant already defined: generals' troops, hired Fifth Units, and Gem Guardians, with the enemy run by a tactical AI.
 
-- [ ] attack an adjacent rival province, choosing a commander and committing troops and food
-- [ ] when your land is attacked, choose to fight, retreat, or surrender
+Too large to land in one pass, so it is built in five stages. Each one is playable on its own, and each is ordered so the stage above it exists first.
+
+### 8.1 Launching a war
+
+The strategic order and its settlement — war without a battlefield, the fight settled by auto-resolution.
+
+- [x] attack an adjacent rival province, choosing a commander and committing troops and food
+- [x] bring a Fifth Unit along — a hired unit or a Gem's Guardian — and pay the deployment gold
+- [x] have the defender fight, retreat, or surrender
+- [x] take the province when you win, and come home beaten when you lose
+
+### 8.2 The battlefield
+
+The screen itself: a field, an army split into units, and a race for the flag.
+
+- [ ] split an army into Horsemen, Knights, Knights, and Archers
 - [ ] fight on a 10×8 field of plains, woods, rivers, boulders, bridges, and walls
-- [ ] maneuver by position and facing; strike from front, flank, or rear
+- [ ] take side-based turns across the sunrise-to-midnight day cycle
+- [ ] maneuver by position and facing
+- [ ] win by capturing the flag, by the food timer, or — as defender — by holding five days
+
+### 8.3 Blows and casualties
+
+What happens when units meet.
+
+- [ ] strike in range: short, long, circular, and largest
+- [ ] strike from front, flank, or rear, and take backlash in melee
+- [ ] let the commander's WAR sharpen the troops he leads
+- [ ] win by rout when nothing of the enemy stands
+- [ ] retreat from a losing battle
+
+### 8.4 Fences & the fifth slot
+
+The two things that make a battlefield more than a brawl.
+
 - [ ] build and break fences (flying units ignore them)
-- [ ] field a Fifth Unit and summon a Gem's Guardian, resting or cooling them between battles
-- [ ] face an enemy army run by a tactical AI, or auto-resolve the fight
-- [ ] win by flag, food timer, or rout — across the sunrise-to-midnight day cycle
-- [ ] retreat from a losing battle, risking capture
+- [ ] field a Fifth Unit on the battlefield, hired or summoned
+- [ ] rest and cool a Gem's Guardian between battles
+
+### 8.5 The tactical AI
+
+- [ ] face an enemy army run by a tactical AI
+- [ ] hand your own army to it and auto-resolve the fight
 
 ## 9. Conquest & captives
 
@@ -96,6 +130,7 @@ The immediate fruits of a won battle.
 - [ ] claim gold, food, and land as war spoils
 - [ ] knock a rival family out of the game
 - [ ] take a fallen house's gems
+- [ ] capture the losing commander, in defeat or in retreat
 - [ ] ransom, recruit, release, or banish a captured leader
 - [ ] buy a captured ruler's freedom
 
@@ -122,6 +157,7 @@ Generals age, grow, and die; a fallen ruler's family passes to an heir.
 Rival families that take their own monthly turns, plus handing your own work to the computer. (Tactical AI lives with Battle.)
 
 - [ ] face rival families that act on their own
+- [ ] when your land is attacked, choose to fight, retreat, or surrender
 - [ ] entrust a province to its lord, freeing you from its orders
 
 ## 13. Victory & defeat

@@ -3,6 +3,7 @@ import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 
 import worldMapSvgMarkup from '@/assets/map.svg?raw';
 import worldMapImageUrl from '@/assets/map.webp';
+import type { Province } from '@/core/domain/Province';
 import { View } from '@/lib/View';
 
 import { ProvinceMarkers } from './ProvinceMarkers';
@@ -23,6 +24,7 @@ export class WorldMapView extends View<WorldMapContext> {
   protected readonly rootClass = styles.root!;
 
   private provinceElements = new Map<number, SVGGeometryElement>();
+  private markers: ProvinceMarkers | undefined;
 
   public addHighlighting(
     provinceNumber: number,
@@ -31,6 +33,10 @@ export class WorldMapView extends View<WorldMapContext> {
     const element = this.provinceElements.get(provinceNumber);
 
     element?.classList.add(highlighting);
+  }
+
+  public actualizeProvince(province: Province): void {
+    this.markers?.actualize(province);
   }
 
   public clearHighlighting(): void {
@@ -61,13 +67,13 @@ export class WorldMapView extends View<WorldMapContext> {
       return;
     }
 
-    const markers = new ProvinceMarkers(svg);
+    this.markers = new ProvinceMarkers(svg);
 
     for (const province of this.context.map.provinces) {
-      markers.add(province);
+      this.markers.add(province);
     }
 
-    markers.mount();
+    this.markers.mount();
   }
 
   private createProvinceElements(): Map<number, SVGGeometryElement> {

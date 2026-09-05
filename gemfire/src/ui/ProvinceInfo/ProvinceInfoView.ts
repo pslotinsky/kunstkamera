@@ -44,12 +44,14 @@ export class ProvinceInfoView extends View {
 
   public showProvince(province: Province): void {
     render(this.renderProvince(province), this.element);
+    this.refreshHeader(province);
     this.refreshGovernor(province);
     this.fillStats(province.resources);
     this.fillStats(province.development);
   }
 
   public actualizeProvince(province: Province): void {
+    this.refreshHeader(province);
     this.refreshGovernor(province);
     this.animateStats(province.resources);
     this.animateStats(province.development);
@@ -98,7 +100,7 @@ export class ProvinceInfoView extends View {
 
   private renderProvince(province: Province): TemplateResult {
     return html`
-      ${this.renderHeader(province)}
+      <header class=${styles.header}></header>
       <hr class=${styles.divider} />
       ${this.renderDetails(province)}
       <hr class=${styles.divider} />
@@ -112,26 +114,32 @@ export class ProvinceInfoView extends View {
     `;
   }
 
-  private renderHeader(province: Province): TemplateResult {
+  private refreshHeader(province: Province): void {
+    const element = this.headerElement;
+
+    if (element) {
+      render(this.renderHeaderContent(province), element);
+    }
+  }
+
+  private renderHeaderContent(province: Province): TemplateResult {
     const family = province.family;
     const familyName = family?.name ?? 'Neutral';
 
     return html`
-      <header class=${styles.header}>
-        ${
-          family
-            ? html`<img
-                class=${styles.crest}
-                src=${family.crest}
-                alt="${familyName} crest"
-              />`
-            : nothing
-        }
-        <div>
-          <h2>${familyName}</h2>
-          <h2>${String(province)}</h2>
-        </div>
-      </header>
+      ${
+        family
+          ? html`<img
+              class=${styles.crest}
+              src=${family.crest}
+              alt="${familyName} crest"
+            />`
+          : nothing
+      }
+      <div>
+        <h2>${familyName}</h2>
+        <h2>${String(province)}</h2>
+      </div>
     `;
   }
 
@@ -181,6 +189,10 @@ export class ProvinceInfoView extends View {
 
   private getStatValue(key: string): HTMLElement | null {
     return this.getStatElement(key)?.querySelector('span') ?? null;
+  }
+
+  private get headerElement(): HTMLElement | null {
+    return this.element.querySelector<HTMLElement>(`.${styles.header}`);
   }
 
   private get governorElement(): HTMLElement | null {

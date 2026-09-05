@@ -2,10 +2,12 @@ import { GrantArtifactCommand } from '@/core/commands/GrantArtifactCommand';
 import type { CharacteristicsKey } from '@/core/domain/Characteristics';
 import type { General } from '@/core/domain/General';
 import { ArtifactFoundEvent } from '@/core/events/ArtifactFoundEvent';
+import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
 import { SearchReportedEvent } from '@/core/events/SearchReportedEvent';
 import { UnitDesertedEvent } from '@/core/events/UnitDesertedEvent';
 import { Control } from '@/lib/Control';
 import type { EventClass } from '@/lib/EventBus';
+import { BattleReportClosedEvent } from '@/ui/BattleReport/BattleReportClosedEvent';
 import { DropdownControl } from '@/ui/Dropdown/DropdownControl';
 import type { DropdownOption } from '@/ui/Dropdown/DropdownView';
 import { SearchReportClosedEvent } from '@/ui/SearchReport/SearchReportClosedEvent';
@@ -40,6 +42,8 @@ export class AnnouncementsControl extends Control<
     this.onWorldEvent(ArtifactFoundEvent, (event) => this.announce(event));
     this.onWorldEvent(SearchReportedEvent, () => this.holdForReport(true));
     this.onWorldEvent(SearchReportClosedEvent, () => this.holdForReport(false));
+    this.onWorldEvent(BattleReportedEvent, () => this.holdForReport(true));
+    this.onWorldEvent(BattleReportClosedEvent, () => this.holdForReport(false));
     this.subscribe(AnnouncementDismissedEvent, () => this.dismiss());
     this.subscribe(ArtifactTakenEvent, () => this.takeArtifact());
   }

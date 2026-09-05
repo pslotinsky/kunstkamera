@@ -94,12 +94,14 @@ Conventions for the Gemfire TypeScript codebase. Biome (formatter, linter, and i
 ## Types & values
 
 - **Prefer `undefined` over `null`.** Use optional properties (`owner?: Family`), not `owner: Family | null = null`.
+- **A concept is a class, not a plain structure.** We model with entities, so anything the domain has a name for — an outcome, a report, a battle — is a class with its own behaviour, even when it starts as pure data: `BattleOutcome` answers `isWonBy(side)`, `InvasionReport` answers `isFought` / `isTaken`, so callers ask the object instead of re-deriving the same test from its fields. Interfaces and type aliases are for **shapes that are not concepts** — a parameter bag (`ProvinceParams`, `InvasionReportParams`), a config record, a render-model. If you find yourself writing the same `outcome?.isWonBy('attacker') ?? true` in two places, the structure wanted to be a class.
+
 - **No trivial primitive type aliases.** `type ProvinceNumber = number` or `type ImageRef = string` adds indirection without safety — use the primitive. If a concept needs its own identity, make it a **real Value Object** (a class with behavior — helpers, validation, equality); otherwise use the primitive directly. Nothing in between.
 
 ## Naming & comments
 
 - **No one-letter variable names** — including map/filter callbacks, sort comparators, and generic type parameters (`province`, `neighbor`, `left`/`right`, `index`, `ElementType`; `_unused` for a discard).
-- **Self-documenting code over comments.** Encode intent in names and named constants (a `startDate` constant, not a `// placeholder` comment) rather than narrating the code.
+- **Self-documenting code over comments.** Encode intent in names and named constants (a `startDate` constant, not a `// placeholder` comment) rather than narrating the code. Provenance and rationale — where a number comes from, which source a formula reconstructs, why a value was chosen — belong in the feature's design doc under `docs/design/`, not in a code comment.
 
 ## Control flow
 
@@ -125,6 +127,16 @@ Conventions for the Gemfire TypeScript codebase. Biome (formatter, linter, and i
   ```
 
   An expression `return` inside a `.map()`/`.filter()` callback is fine — that returns from the callback, it is not a loop jump.
+
+- **A call that does work gets its own line.** Bind it to a named local, then pass the local — never bury a side-effecting or domain call inside another call's argument list:
+
+  ```ts
+  const result = invasion.launch();
+
+  this.report(source, target, army, result);
+  ```
+
+  not `this.report(source, target, army, invasion.launch())` — the nested form hides where the work happens and reads in the wrong order (the reporting first, the war that produced it second). Cheap pure expressions (`String(date)`, `province.number`, a literal) stay inline. Same reasoning as the Law of Demeter rule above: name the thing you just produced.
 
 ## UI & DOM
 

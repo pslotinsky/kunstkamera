@@ -4,6 +4,7 @@ import type { ChildrenViews } from '@/lib/Control';
 import type { EventBus } from '@/lib/EventBus';
 
 import type { FamilyOverviewControl } from '../FamilyOverview/FamilyOverviewControl';
+import type { AttackDialogControl } from './CommandDialog/AttackDialogControl';
 import type { ChangeLordDialogControl } from './CommandDialog/ChangeLordDialogControl';
 import type { DevelopDialogControl } from './CommandDialog/DevelopDialogControl';
 import type { GiveFoodDialogControl } from './CommandDialog/GiveFoodDialogControl';
@@ -26,6 +27,7 @@ export interface ProvinceCommandsContext {
 }
 
 export type ProvinceCommandsControls = {
+  readonly attackDialog: AttackDialogControl;
   readonly developDialog: DevelopDialogControl;
   readonly giveFoodDialog: GiveFoodDialogControl;
   readonly tradeDialog: TradeDialogControl;

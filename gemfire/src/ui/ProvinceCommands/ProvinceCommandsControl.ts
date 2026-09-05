@@ -1,3 +1,4 @@
+import { AttackCommand } from '@/core/commands/province/AttackCommand';
 import { ChangeLordCommand } from '@/core/commands/province/ChangeLordCommand';
 import type { CommandGroup } from '@/core/commands/province/catalog';
 import { DevelopCommand } from '@/core/commands/province/DevelopCommand';
@@ -16,6 +17,7 @@ import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { Control } from '@/lib/Control';
 import type { EventBus } from '@/lib/EventBus';
 
+import { AttackDialogControl } from './CommandDialog/AttackDialogControl';
 import { ChangeLordDialogControl } from './CommandDialog/ChangeLordDialogControl';
 import type { AnyCommandDialogControl } from './CommandDialog/CommandDialogControl';
 import { DevelopDialogControl } from './CommandDialog/DevelopDialogControl';
@@ -43,6 +45,7 @@ export class ProvinceCommandsControl extends Control<
   ProvinceCommandsControls
 > {
   private readonly dialogs = new Map<string, AnyCommandDialogControl>([
+    [AttackCommand.name, this.controls.attackDialog],
     [DevelopCommand.name, this.controls.developDialog],
     [GiveFoodCommand.name, this.controls.giveFoodDialog],
     [TradeCommand.name, this.controls.tradeDialog],
@@ -65,6 +68,7 @@ export class ProvinceCommandsControl extends Control<
       ProvinceCommandsView,
       { world, commands, events },
       {
+        attackDialog: new AttackDialogControl(AttackCommand.name, world),
         developDialog: new DevelopDialogControl(DevelopCommand.name),
         giveFoodDialog: new GiveFoodDialogControl(GiveFoodCommand.name, world),
         tradeDialog: new TradeDialogControl(TradeCommand.name, world),
