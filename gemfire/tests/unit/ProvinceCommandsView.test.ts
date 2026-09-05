@@ -6,6 +6,7 @@ import { WorldFactory } from '@/core/WorldFactory';
 import { EventBus } from '@/lib/EventBus';
 import { DropdownView } from '@/ui/Dropdown/DropdownView';
 import { AmountFieldView } from '@/ui/ProvinceCommands/AmountField/AmountFieldView';
+import { AttackDialogView } from '@/ui/ProvinceCommands/CommandDialog/AttackDialogView';
 import { ChangeLordDialogView } from '@/ui/ProvinceCommands/CommandDialog/ChangeLordDialogView';
 import { DevelopDialogView } from '@/ui/ProvinceCommands/CommandDialog/DevelopDialogView';
 import { GiveFoodDialogView } from '@/ui/ProvinceCommands/CommandDialog/GiveFoodDialogView';
@@ -25,6 +26,15 @@ describe('ProvinceCommandsView', () => {
     const view = new ProvinceCommandsView(
       { world, commands, events },
       {
+        attackDialog: new AttackDialogView(
+          { name: 'AttackCommand' },
+          {
+            commander: new DropdownView({ name: 'commander' }, {}),
+            troops: new AmountFieldView({ name: 'troops' }, {}),
+            food: new AmountFieldView({ name: 'food' }, {}),
+            unit: new DropdownView({ name: 'unit' }, {}),
+          },
+        ),
         developDialog: new DevelopDialogView({ name: 'DevelopCommand' }, {}),
         giveFoodDialog: new GiveFoodDialogView({ name: 'GiveFoodCommand' }, {}),
         tradeDialog: new TradeDialogView(

@@ -28,6 +28,10 @@ export class HiredUnit extends FifthUnit {
     this.fameToKeep = params.fameToKeep ?? 0;
   }
 
+  public override get consumesFood(): boolean {
+    return true;
+  }
+
   public getDesertionRisk(fame: number): number {
     return fame < this.fameToKeep
       ? (this.fameToKeep - fame) / this.fameToKeep

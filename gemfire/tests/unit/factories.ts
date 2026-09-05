@@ -2,6 +2,7 @@ import { CalendarDate } from '@/core/domain/CalendarDate';
 import { Characteristics } from '@/core/domain/Characteristics';
 import { Development } from '@/core/domain/Development';
 import { Family } from '@/core/domain/Family';
+import type { Gem } from '@/core/domain/Gem';
 import { General } from '@/core/domain/General';
 import { Province } from '@/core/domain/Province';
 import { Resources } from '@/core/domain/Resources';
@@ -24,6 +25,7 @@ interface FamilyParams {
   readonly members?: readonly General[] | undefined;
   readonly homeProvince?: Province | undefined;
   readonly fame?: number | undefined;
+  readonly gems?: readonly Gem[] | undefined;
 }
 
 interface ProvinceParams {
@@ -68,6 +70,7 @@ export function makeFamily(params: FamilyParams = {}): Family {
     members: params.members ?? [ruler],
     homeProvince: params.homeProvince ?? makePlaceholderHome(),
     fame: params.fame ?? 100,
+    gems: params.gems ?? [],
   });
 }
 

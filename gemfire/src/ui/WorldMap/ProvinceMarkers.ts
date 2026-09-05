@@ -13,6 +13,7 @@ const NUMBER_OFFSET = BLOCK_WIDTH / 2 - NUMBER_SIZE / 2;
 
 export class ProvinceMarkers {
   private readonly group: SVGGElement;
+  private readonly markers = new Map<number, SVGGElement>();
 
   public constructor(private readonly svg: SVGSVGElement) {
     this.group = document.createElementNS(SVG_NAMESPACE, 'g');
@@ -23,7 +24,20 @@ export class ProvinceMarkers {
     const anchor = MARKER_ANCHORS[province.number];
 
     if (anchor) {
-      this.group.append(...this.createMarker(province, anchor));
+      const marker = document.createElementNS(SVG_NAMESPACE, 'g');
+
+      marker.append(...this.createMarker(province, anchor));
+      this.markers.set(province.number, marker);
+      this.group.append(marker);
+    }
+  }
+
+  public actualize(province: Province): void {
+    const marker = this.markers.get(province.number);
+    const anchor = MARKER_ANCHORS[province.number];
+
+    if (marker && anchor) {
+      marker.replaceChildren(...this.createMarker(province, anchor));
     }
   }
 

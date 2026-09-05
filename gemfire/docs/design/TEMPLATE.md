@@ -8,7 +8,7 @@ _What we're building and what we want to achieve._
 
 ## Glossary
 
-_The entities involved and what each one means._
+_The domain entities the feature works in — what each one is in the domain, not the class that will implement it (a class exists because the entity does, never the other way round). Define each so a reader can tell it apart from the entity beside it without opening the code, and name a class only where the term does not already carry it._
 
 ## Functionality
 

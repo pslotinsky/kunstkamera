@@ -26,6 +26,10 @@ export class FifthUnit {
     this.flying = params.flying ?? false;
   }
 
+  public get consumesFood(): boolean {
+    return false;
+  }
+
   public get portrait(): string {
     return `/fifth-units/${this.name.toLowerCase()}.webp`;
   }

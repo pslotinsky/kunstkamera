@@ -7,6 +7,7 @@ import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
 import { Control } from '@/lib/Control';
 import type { EventClass } from '@/lib/EventBus';
 import { AnnouncementsControl } from '@/ui/Announcements/AnnouncementsControl';
+import { BattleReportControl } from '@/ui/BattleReport/BattleReportControl';
 import { FamilyOverviewControl } from '@/ui/FamilyOverview/FamilyOverviewControl';
 import { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
 import { HireMonsterDialogControl } from '@/ui/ProvinceCommands/CommandDialog/HireMonsterDialogControl';
@@ -48,6 +49,10 @@ export class GameScreenControl extends Control<
       familyOverview,
       hireMonster,
       searchReport: new SearchReportControl({ events: context.events }),
+      battleReport: new BattleReportControl({
+        world: context.world,
+        events: context.events,
+      }),
       announcements: new AnnouncementsControl({
         world: context.world,
         events: context.events,
@@ -64,6 +69,8 @@ export class GameScreenControl extends Control<
     );
     this.onWorldEvent(TurnStartedEvent, (event) => this.handleTurnStart(event));
     this.onWorldEvent(ProvinceUpdatedEvent, (event) => {
+      this.controls.worldMap.actualizeProvince(event.province);
+
       if (this.displayed === event.province.number) {
         this.controls.gamePanel.actualizeProvince(event.province);
       }

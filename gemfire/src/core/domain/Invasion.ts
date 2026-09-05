@@ -1,0 +1,181 @@
+import { Army } from './Army';
+import { AutoResolver } from './AutoResolver';
+import { Battle } from './Battle';
+import type { BattleOutcome } from './BattleOutcome';
+import { DefensePolicy } from './DefensePolicy';
+import type { Family } from './Family';
+import type { FifthUnit } from './FifthUnit';
+import type { General } from './General';
+import { InvasionReport } from './InvasionReport';
+import type { Province } from './Province';
+import type { World } from './World';
+
+export interface InvasionParams {
+  readonly world: World;
+  readonly source: Province;
+  readonly target: Province;
+  readonly attacker: Army;
+}
+
+export class Invasion {
+  private readonly world: World;
+  private readonly source: Province;
+  private readonly target: Province;
+  private readonly attacker: Army;
+  private readonly policy: DefensePolicy;
+  private readonly resolver = new AutoResolver();
+
+  private displaced: readonly Province[] = [];
+
+  public constructor(params: InvasionParams) {
+    this.world = params.world;
+    this.source = params.source;
+    this.target = params.target;
+    this.attacker = params.attacker;
+    this.policy = new DefensePolicy(params.world);
+  }
+
+  public get affected(): readonly Province[] {
+    return [this.source, this.target, ...this.displaced];
+  }
+
+  public launch(): InvasionReport {
+    this.deploy();
+
+    const defender = this.muster();
+    const answer = this.policy.decide(this.target);
+    const outcome = answer === 'fight' ? this.fight(defender) : undefined;
+    const refuge = answer === 'retreat' ? this.flee() : undefined;
+    const report = new InvasionReport({
+      target: this.target,
+      attacker: this.attacker,
+      defender,
+      answer,
+      outcome,
+      refuge,
+    });
+
+    this.settle(report);
+
+    return report;
+  }
+
+  private deploy(): void {
+    this.source.addResources({
+      gold: -this.attacker.deploymentCost,
+      troops: -this.attacker.troops,
+      food: -this.attacker.food,
+    });
+  }
+
+  private muster(): Army {
+    const family = this.target.family!;
+
+    return new Army({
+      commander: this.target.governor ?? family.ruler,
+      troops: this.target.resources.troops,
+      food: this.target.resources.food,
+      unit: this.chooseDefendingUnit(family),
+    });
+  }
+
+  private chooseDefendingUnit(family: Family): FifthUnit | undefined {
+    return [...this.target.hiredUnits, ...family.guardians].sort(
+      (left, right) => right.strength - left.strength,
+    )[0];
+  }
+
+  private flee(): Province | undefined {
+    return this.policy.chooseRetreat(this.target);
+  }
+
+  private fight(defender: Army): BattleOutcome {
+    const battle = new Battle({ attacker: this.attacker, defender });
+
+    return this.resolver.resolve(battle);
+  }
+
+  private settle(report: InvasionReport): void {
+    if (report.isFought) {
+      this.applyLosses(report.defender);
+    }
+
+    if (report.refuge) {
+      this.evacuate(report.refuge);
+    }
+
+    this.displaced = report.isTaken ? this.capture() : this.comeHome();
+  }
+
+  private applyLosses(defender: Army): void {
+    this.target.addResources({
+      troops: defender.troops - this.target.resources.troops,
+      food: defender.food - this.target.resources.food,
+    });
+  }
+
+  private evacuate(refuge: Province): void {
+    const lord = this.target.governor;
+    const fleeing = this.target.resources.troops;
+
+    this.target.addResources({ troops: -fleeing });
+    refuge.addResources({ troops: fleeing });
+
+    if (lord && !refuge.governor) {
+      refuge.assignGovernor(lord);
+    }
+  }
+
+  private capture(): readonly Province[] {
+    const owner = this.source.family!;
+
+    this.target.family = owner;
+
+    const vacated = this.seat(this.attacker.commander, owner);
+
+    this.garrison();
+    this.relocateUnit();
+
+    return vacated ? [vacated] : [];
+  }
+
+  private seat(commander: General, owner: Family): Province | undefined {
+    const vacated = owner.isRuler(commander)
+      ? undefined
+      : this.world.getRuledProvince(commander);
+
+    this.target.assignGovernor(commander);
+    vacated?.assignGovernor(owner.ruler);
+
+    return vacated;
+  }
+
+  private garrison(): void {
+    const routed = this.target.resources.troops;
+
+    this.target.addResources({
+      troops: this.attacker.troops - routed,
+      food: this.attacker.food,
+    });
+  }
+
+  private relocateUnit(): void {
+    const marched = this.source.hiredUnits.find(
+      (unit) => unit === this.attacker.unit,
+    );
+
+    if (marched) {
+      this.source.removeUnit(marched);
+      this.target.addUnit(marched);
+    }
+  }
+
+  private comeHome(): readonly Province[] {
+    this.source.addResources({
+      troops: this.attacker.troops,
+      food: this.attacker.food,
+    });
+
+    return [];
+  }
+}

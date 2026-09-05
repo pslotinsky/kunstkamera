@@ -21,6 +21,10 @@ export class WorldMapControl extends Control<WorldMapView> {
     this.view.addHighlighting(province.number, 'current');
   }
 
+  public actualizeProvince(province: Province): void {
+    this.view.actualizeProvince(province);
+  }
+
   public showSelectable(provinceNumbers: readonly number[]): void {
     for (const provinceNumber of provinceNumbers) {
       this.view.addHighlighting(provinceNumber, 'selectable');
