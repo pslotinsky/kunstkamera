@@ -1,7 +1,8 @@
 import { Army } from './Army';
-import { AutoResolver } from './AutoResolver';
 import { Battle } from './Battle';
+import { Battlefield } from './Battlefield';
 import type { BattleOutcome } from './BattleOutcome';
+import type { DefenderAnswer } from './DefensePolicy';
 import { DefensePolicy } from './DefensePolicy';
 import type { Family } from './Family';
 import type { FifthUnit } from './FifthUnit';
@@ -23,9 +24,10 @@ export class Invasion {
   private readonly target: Province;
   private readonly attacker: Army;
   private readonly policy: DefensePolicy;
-  private readonly resolver = new AutoResolver();
 
   private displaced: readonly Province[] = [];
+  private defender?: Army;
+  private answer?: DefenderAnswer;
 
   public constructor(params: InvasionParams) {
     this.world = params.world;
@@ -39,20 +41,49 @@ export class Invasion {
     return [this.source, this.target, ...this.displaced];
   }
 
-  public launch(): InvasionReport {
+  public begin(): Battle | InvasionReport {
     this.deploy();
 
     const defender = this.muster();
     const answer = this.policy.decide(this.target);
-    const outcome = answer === 'fight' ? this.fight(defender) : undefined;
+
+    this.defender = defender;
+    this.answer = answer;
+
+    if (answer === 'fight') {
+      const field = Battlefield.ofProvince(this.target.number);
+
+      return new Battle({ attacker: this.attacker, defender, field });
+    }
+
     const refuge = answer === 'retreat' ? this.flee() : undefined;
     const report = new InvasionReport({
       target: this.target,
       attacker: this.attacker,
       defender,
       answer,
-      outcome,
       refuge,
+    });
+
+    this.settle(report);
+
+    return report;
+  }
+
+  public conclude(outcome: BattleOutcome): InvasionReport {
+    const defender = this.defender;
+    const answer = this.answer;
+
+    if (!defender || !answer) {
+      throw new Error('conclude() called before begin()');
+    }
+
+    const report = new InvasionReport({
+      target: this.target,
+      attacker: this.attacker,
+      defender,
+      answer,
+      outcome,
     });
 
     this.settle(report);
@@ -87,12 +118,6 @@ export class Invasion {
 
   private flee(): Province | undefined {
     return this.policy.chooseRetreat(this.target);
-  }
-
-  private fight(defender: Army): BattleOutcome {
-    const battle = new Battle({ attacker: this.attacker, defender });
-
-    return this.resolver.resolve(battle);
   }
 
   private settle(report: InvasionReport): void {

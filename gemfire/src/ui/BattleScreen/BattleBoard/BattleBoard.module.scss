@@ -1,0 +1,99 @@
+.root {
+  display: grid;
+  grid-template-columns: repeat(var(--columns), 1fr);
+  grid-template-rows: repeat(var(--rows), 1fr);
+  width: 100%;
+  aspect-ratio: var(--columns) / var(--rows);
+  isolation: isolate;
+  border: 1px solid #2c3656;
+}
+
+.cell {
+  position: relative;
+  background-position: center;
+  background-size: 100% 100%;
+}
+
+.reachable::after {
+  position: absolute;
+  inset: 12%;
+  background: rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 2px;
+  content: '';
+}
+
+.selected::before {
+  position: absolute;
+  inset: 0;
+  border: 2px solid #ffd166;
+  content: '';
+}
+
+.piece {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  min-height: 0;
+  pointer-events: none;
+}
+
+.portrait {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.count {
+  position: absolute;
+  right: 4%;
+  bottom: 2%;
+  padding: 0 0.2em;
+  font-size: 0.62rem;
+  line-height: 1.25;
+  color: #f2f5ff;
+  font-variant-numeric: tabular-nums;
+  background: rgba(10, 14, 26, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 2px;
+}
+
+.spent .portrait {
+  filter: grayscale(1);
+}
+
+.mirrored {
+  scale: -1 1;
+}
+
+.daylight {
+  position: relative;
+  z-index: 2;
+  grid-area: 1 / 1 / -1 / -1;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  transition: background-color 700ms ease;
+}
+
+.sunrise {
+  background-color: rgba(176, 196, 255, 0.26);
+}
+
+.noon {
+  background-color: rgba(255, 255, 255, 0);
+}
+
+.sunset {
+  background-color: rgba(255, 122, 58, 0.3);
+}
+
+.midnight {
+  background-color: rgba(60, 80, 170, 0.46);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .daylight {
+    transition: none;
+  }
+}

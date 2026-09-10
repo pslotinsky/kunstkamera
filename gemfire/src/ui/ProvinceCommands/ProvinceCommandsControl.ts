@@ -145,7 +145,7 @@ export class ProvinceCommandsControl extends Control<
     } else {
       command.execute();
 
-      if (command.consumesTurn()) {
+      if (command.consumesTurn() && !command.suspendsTurn()) {
         this.finishTurn();
       }
     }
@@ -166,7 +166,17 @@ export class ProvinceCommandsControl extends Control<
   private commitTurn(pending: PendingDialog): void {
     this.closeDialog();
     pending.command.execute();
-    this.finishTurn();
+
+    if (pending.command.suspendsTurn()) {
+      this.holdTurn();
+    } else {
+      this.finishTurn();
+    }
+  }
+
+  private holdTurn(): void {
+    this.view.closeGroups();
+    this.view.disableActions();
   }
 
   private finishTurn(): void {

@@ -1,6 +1,6 @@
 export type BattleSide = 'attacker' | 'defender';
 
-export type OutcomeReason = 'rout' | 'starvation' | 'endurance';
+export type OutcomeReason = 'flag' | 'rout' | 'starvation' | 'endurance';
 
 export interface BattleOutcomeParams {
   readonly winner: BattleSide;

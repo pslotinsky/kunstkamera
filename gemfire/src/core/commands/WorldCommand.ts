@@ -28,6 +28,10 @@ export abstract class WorldCommand {
     return true;
   }
 
+  public suspendsTurn(): boolean {
+    return false;
+  }
+
   public get selectableTargets(): readonly number[] {
     return [];
   }
