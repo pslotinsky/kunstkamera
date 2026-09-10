@@ -114,15 +114,20 @@ Capturing the enemy flag is one way to win the battle immediately.
 
 ## Province-Specific Battlefields
 
-Battlefield layout depends on the province.
+Battlefield layout depends on the province, and all thirty layouts are known: each is
+eighty tiles, ten columns by eight rows, canonical in `data/battlefields.json`.
 
-Different battlefields may include different:
+The tile kinds are the manual's own two lists — Plains, Woods, River, Boulder as terrain,
+and Fence, Bridge, Castle Wall as the features that obstruct and protect — plus one flag
+tile per side. Fences appear pre-placed on the field as well as being buildable in battle
+(§9.13), and the castle wall encloses the defending flag on three sides, leaving one
+approach. The attacker's flag stands in column 0 on every board; the defender's in
+columns 6 to 9.
 
-- obstacles;
-- defensive positions;
-- fences;
-- paths to the flag;
-- terrain layouts.
+Layouts follow the regional character §11 uses for seasonal disasters: the woodland
+region's fields average 12.2 woods cells and no water or stone, the wetland region's
+10.4 river cells, the volcanic region's 12.5 boulders, and the northern region's are open
+plains — against whole-map averages of 5.6 woods, 2.8 river and 1.7 boulder.
 
 ---
 
@@ -766,7 +771,7 @@ The following tactical battle details remain unresolved:
 5. Exact build / break fence formula.
 6. Exact rounding for deployment cost and Food per day.
 7. Exact influence of commander WAR on damage and casualties.
-8. Full battlefield layouts for all provinces.
+8. (Resolved) All thirty battlefield layouts are in `data/battlefields.json`; see §9.2.
 9. Exact tactical AI decision rules.
 
 ---

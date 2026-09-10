@@ -27,10 +27,16 @@ flowchart LR
 
 _The screens and components needed — mocks in pseudocode._
 
+_Draw frames with box-drawing characters and fill a grid cell rather than lettering it, so the mock is read at a glance instead of decoded against its legend. Keep to box-drawing, block, geometric and arrow glyphs: every default monospace font has them, and none of them is double-width, which is what shears a grid. No emoji inside a mock — they render double-width in some hosts and misalign. Where a mock shows real data, derive it from the data file and check it back against it — a hand-drawn grid drifts, and a mock that contradicts the data teaches the wrong thing._
+
 ```text
-+-----------------------------+
-|  screen mock                |
-+-----------------------------+
+┌─ Screen ────────────────────┐
+│  Title - state              │
+├─────────────────────────────┤
+│   ·  empty     █ blocked    │
+│                             │
+│  Prompt?          [ Done ]  │
+└─────────────────────────────┘
 ```
 
 ## Research

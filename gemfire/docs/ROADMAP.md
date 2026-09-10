@@ -95,6 +95,7 @@ The strategic order and its settlement — war without a battlefield, the fight 
 The screen itself: a field, an army split into units, and a race for the flag.
 
 - [ ] split an army into Horsemen, Knights, Knights, and Archers
+- [ ] field the committed Fifth Unit, flying over what stops the rest
 - [ ] fight on a 10×8 field of plains, woods, rivers, boulders, bridges, and walls
 - [ ] take side-based turns across the sunrise-to-midnight day cycle
 - [ ] maneuver by position and facing
@@ -110,12 +111,11 @@ What happens when units meet.
 - [ ] win by rout when nothing of the enemy stands
 - [ ] retreat from a losing battle
 
-### 8.4 Fences & the fifth slot
+### 8.4 Fences & cooldowns
 
-The two things that make a battlefield more than a brawl.
+The two limits on a battlefield: obstacles you raise yourself, and a Guardian you cannot summon twice.
 
 - [ ] build and break fences (flying units ignore them)
-- [ ] field a Fifth Unit on the battlefield, hired or summoned
 - [ ] rest and cool a Gem's Guardian between battles
 
 ### 8.5 The tactical AI
