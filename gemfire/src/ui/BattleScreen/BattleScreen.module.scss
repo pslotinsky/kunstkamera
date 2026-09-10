@@ -1,0 +1,152 @@
+.root {
+  --columns: 10;
+  --rows: 8;
+  --pad-x: 1rem;
+  --pad-y: 0.75rem;
+  --gap: 0.5rem;
+  --header: 2.7rem;
+  --footer: 2.1rem;
+  --sky: calc(
+    100dvh - 2 * var(--pad-y) - var(--header) - var(--footer) - 2 * var(--gap)
+  );
+  --frame: min(
+    calc(100dvw - 2 * var(--pad-x)),
+    calc(var(--sky) * var(--columns) / var(--rows)),
+    calc(var(--columns) * 6rem)
+  );
+
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  grid-template-rows: var(--header) minmax(0, 1fr) var(--footer);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gap);
+  padding: var(--pad-y) var(--pad-x);
+  overflow: hidden;
+  background: #101420;
+}
+
+.hidden {
+  display: none;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 1rem;
+  align-items: center;
+  width: var(--frame);
+  margin: 0 auto;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.army {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  line-height: 1.3;
+}
+
+.theirs {
+  align-items: flex-end;
+}
+
+.commander {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.mine .commander {
+  color: #ff8a72;
+}
+
+.theirs .commander {
+  color: #7fa8ff;
+}
+
+.supply {
+  color: #9fb0d8;
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes supplySpent {
+  from {
+    color: #ffd166;
+  }
+
+  to {
+    color: #9fb0d8;
+  }
+}
+
+.changed {
+  animation: supplySpent 800ms ease;
+}
+
+.almanac {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.when {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  line-height: 1.3;
+  text-align: right;
+}
+
+.clock {
+  font-variant-numeric: tabular-nums;
+}
+
+.place {
+  color: #9fb0d8;
+}
+
+.field {
+  display: grid;
+  place-items: center;
+  width: var(--frame);
+  min-height: 0;
+  margin: 0 auto;
+}
+
+.footer {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+  width: var(--frame);
+  margin: 0 auto;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.prompt {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+button {
+  padding: 0.3rem 0.9rem;
+  color: inherit;
+  font: inherit;
+  background: #1b2237;
+  border: 1px solid #2c3656;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}

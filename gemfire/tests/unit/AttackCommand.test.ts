@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import { AttackCommand } from '@/core/commands/province/AttackCommand';
 import { Army, type ArmyParams } from '@/core/domain/Army';
+import { BattleOutcome, type BattleSide } from '@/core/domain/BattleOutcome';
 import { Gem } from '@/core/domain/Gem';
 import { HiredUnit } from '@/core/domain/HiredUnit';
 import type { InvasionReport } from '@/core/domain/InvasionReport';
 import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
+import { BattleStartedEvent } from '@/core/events/BattleStartedEvent';
 
 import {
   advanceTo,
@@ -95,9 +97,13 @@ function setup(params: SetupParams = {}) {
   advanceTo(world, source);
 
   let report: InvasionReport | undefined;
+  let started: BattleStartedEvent | undefined;
 
   events.subscribe(BattleReportedEvent, (event) => {
     report = event.report;
+  });
+  events.subscribe(BattleStartedEvent, (event) => {
+    started = event;
   });
 
   const attack = (order: Partial<ArmyParams>) => {
@@ -112,6 +118,24 @@ function setup(params: SetupParams = {}) {
     command.execute();
   };
 
+  const finish = (winner: BattleSide) => {
+    const battle = started;
+
+    if (!battle) {
+      throw new Error('no battle was begun');
+    }
+
+    const outcome = new BattleOutcome({
+      winner,
+      reason: 'flag',
+      days: 1,
+      attackerSurvivors: battle.battle.attacker.troops,
+      defenderSurvivors: battle.battle.defender.troops,
+    });
+
+    report = battle.invasion.conclude(outcome);
+  };
+
   return {
     erin,
     pender,
@@ -124,6 +148,8 @@ function setup(params: SetupParams = {}) {
     refuge,
     command,
     attack,
+    finish,
+    started: () => started,
     report: () => report,
   };
 }
@@ -166,9 +192,11 @@ describe('AttackCommand', () => {
   });
 
   it('hands the province to the winner, garrisoned under its commander', () => {
-    const { erin, pender, mine, source, enemy, attack, report } = setup();
+    const { erin, pender, mine, source, enemy, attack, finish, report } =
+      setup();
 
     attack({ commander: pender });
+    finish('attacker');
 
     const outcome = report()!.outcome!;
 
@@ -180,21 +208,23 @@ describe('AttackCommand', () => {
   });
 
   it('rules a province taken by the ruler himself at a distance', () => {
-    const { erin, enemy, attack } = setup();
+    const { erin, enemy, attack, finish } = setup();
 
     attack({ commander: erin });
+    finish('attacker');
 
     expect(enemy.ruledBy(erin)).toBe(true);
     expect(enemy.isRemotelyRuled).toBe(true);
   });
 
   it('sends a beaten army home and leaves the province where it was', () => {
-    const { rival, seth, source, enemy, attack, report } = setup({
+    const { rival, seth, source, enemy, attack, finish, report } = setup({
       defenders: 400,
       defenderFood: 400,
     });
 
     attack({ troops: 20, food: 120 });
+    finish('defender');
 
     const outcome = report()!.outcome!;
 
@@ -224,19 +254,21 @@ describe('AttackCommand', () => {
   });
 
   it('stations a marching hired unit in the province it took', () => {
-    const { source, enemy, attack } = setup();
+    const { source, enemy, attack, finish } = setup();
     source.addUnit(HiredUnit.ofName('Orks')!);
 
     attack({ unit: source.hiredUnits[0] });
+    finish('attacker');
 
     expect(enemy.hiredUnits.map((unit) => unit.name)).toEqual(['Orks']);
     expect(source.hiredUnits).toHaveLength(0);
   });
 
   it('leaves a summoned guardian stationed nowhere', () => {
-    const { mine, enemy, attack } = setup();
+    const { mine, enemy, attack, finish } = setup();
 
     attack({ unit: mine.guardians[0] });
+    finish('attacker');
 
     expect(enemy.hiredUnits).toHaveLength(0);
     expect(mine.guardians.map((guardian) => guardian.name)).toEqual(['Zendor']);

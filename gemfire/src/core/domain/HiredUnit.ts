@@ -21,6 +21,10 @@ export class HiredUnit extends FifthUnit {
   public readonly cost: number;
   public readonly fameToKeep: number;
 
+  public override get hasLivery(): boolean {
+    return true;
+  }
+
   public constructor(params: HiredUnitParams) {
     super(params);
     this.category = params.category;

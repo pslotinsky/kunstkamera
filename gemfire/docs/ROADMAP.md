@@ -94,12 +94,12 @@ The strategic order and its settlement — war without a battlefield, the fight 
 
 The screen itself: a field, an army split into units, and a race for the flag.
 
-- [ ] split an army into Horsemen, Knights, Knights, and Archers
-- [ ] field the committed Fifth Unit, flying over what stops the rest
-- [ ] fight on a 10×8 field of plains, woods, rivers, boulders, bridges, and walls
-- [ ] take side-based turns across the sunrise-to-midnight day cycle
-- [ ] maneuver by position and facing
-- [ ] win by capturing the flag, by the food timer, or — as defender — by holding five days
+- [x] split an army into Horsemen, Knights, Knights, and Archers
+- [x] field the committed Fifth Unit, flying over what stops the rest
+- [x] fight on a 10×8 field of plains, woods, rivers, boulders, bridges, and walls
+- [x] take side-based turns across the sunrise-to-midnight day cycle
+- [x] maneuver by position and facing
+- [x] win by capturing the flag, by the food timer, or — as defender — by holding five days
 
 ### 8.3 Blows and casualties
 

@@ -3,7 +3,7 @@ import { createCommandGroups } from '@/core/commands/province/catalog';
 import { WorldEngine } from '@/core/WorldEngine';
 import { WorldFactory } from '@/core/WorldFactory';
 import { EventBus } from '@/lib/EventBus';
-import { GameScreenControl } from '@/ui/GameScreen/GameScreenControl';
+import { AppControl } from '@/ui/App/AppControl';
 
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) {
@@ -23,5 +23,5 @@ if (import.meta.env.DEV) {
 
 engine.start();
 
-const screen = new GameScreenControl({ world, events, commands });
-screen.mount(app);
+const shell = new AppControl({ world, events, commands });
+shell.mount(app);

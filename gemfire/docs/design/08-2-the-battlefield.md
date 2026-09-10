@@ -47,12 +47,14 @@ flowchart LR
 
 The battle takes the whole screen, because the map it replaces is the thing being fought over. The layout follows the manual's own battlefield legend (§On the Field), which numbers twelve elements: both commanders with their food and days of supply, the terrain, both sides' units, the day, the time of day, the place of war, both flags, and the command line.
 
+The header is read across, as the original's is: your commander and supply on the left, theirs on the right, and between them the day, the place, and the sky. Header and command line are exactly as wide as the field, so the three read as one panel; the field itself is sized to fit whatever is left, never cropped and never upscaled past its native cell.
+
 The field below is Londre's, exactly as `data/battlefields.json` has it — Eselred's capital and the one the campaign ends on, and by some distance the most difficult board in the set: sixteen river cells where no other field has more than seven, four bridges making three crossings, and an eleven-cell castle whose only opening faces east. Terrain fills its cell, a unit shows its kind and the way it looks, and a hollow mark is a cell the selected unit may step onto.
 
 ```text
 ┌─ Battle ──────────────────────────────────────────────────────┐
-│ Londre - day 2, noon                                          │
-│ Erin (you)   food 88, 5 days      Eselred   food 240, 8 days  │
+│ Erin                     Day 2                      Eselred   │
+│ food 88, 5 days       Londre  (☀)          food 240, 8 days   │
 ├───────────────────────────────────────────────────────────────┤
 │                  A  B  C  D  E  F  G  H  I  J                 │
 │              1  ♠♠♠ ▫  ▫ ≈≈≈≈≈≈ ·  · ♠♠♠ ·  ·                 │
@@ -69,12 +71,21 @@ The field below is Londre's, exactly as `data/battlefields.json` has it — Esel
 │ ▫  a cell the selected unit can step onto                     │
 │ H  horsemen  K knights   A archers    ☆ Fifth Unit            │
 │ yours  H K A ☆ ◇         theirs  h k a ★ ◆                    │
+│ each piece carries its strength, and greys out once ordered   │
 │                                                               │
-│ Horsemen at A2 - move where?          [ Wait ]  [ Done ]      │
+│ Horsemen at A2 — move where?          [ Wait ]  [ Done ]      │
 └───────────────────────────────────────────────────────────────┘
 ```
 
-Ordering follows the manual: select a unit, answer "Move where?", then pick a command — which in this stage is only Wait, since attacking arrives in 8.3 and fence work in 8.4. A unit that has been ordered is marked done and cannot be ordered again until the next turn, and Done hands over to the other side without requiring every unit to have moved.
+Ordering follows the manual: select a unit — the command line names the one you picked and where it stands, as the original's does — answer where it should go, then pick a command — which in this stage is only Wait, since attacking arrives in 8.3 and fence work in 8.4. A unit that has been ordered is drained to grey and cannot be ordered again until the next turn, and Done hands over to the other side without requiring every unit to have moved. The command line names one of four states — choose a unit, move where, moving, or the enemy's turn — and the buttons follow from the state rather than being switched on and off by hand.
+
+**A unit's strength rides on its tile.** Every piece is drawn with its troop count in the corner, the way a stack is labelled in Heroes of Might and Magic, so the board answers "how strong is that" without a roster down the side. The header therefore carries no army totals: five numbers on the field say more than one sum in the corner, and the original's side panels were a concession to a screen that could not draw a number over a sprite.
+
+**The sky tells the time.** The indicator in the header is a wheel with the sun and the moon at opposite ends of one diameter, its centre on the horizon, and it turns a little further with every phase — the sun low in the east at sunrise, overhead at noon, low in the west at sunset, and below the horizon at midnight, when the moon has taken its place overhead. It only ever turns forwards, so a day reads as one continuous sweep rather than a set of four pictures, and exactly one body is ever in the sky. The sky's colour turns with it: cool at dawn, blue at noon, warm at dusk, near-black at midnight.
+
+**The field is lit by the same clock.** A tint over the board multiplies the terrain and the pieces down towards the hour's colour — barely there at noon, warm at sunset, deep blue at midnight — so the time of day is legible from the field itself and not only from the corner. It is deliberately light: the board has to stay readable at midnight, which is a playing surface first and a picture second.
+
+**Food is spent visibly.** A new day charges both armies, and the header counts the number down rather than swapping it, flashing the line as it goes. Starvation is one of the three ways this battle ends, so the moment supply drops is worth a beat of the player's attention.
 
 The picture is a fair one for day two on this board. The attacker is still bottled up west of the river, which is why the Horsemen can reach the bridge at D2 and nothing past it; the defender keeps three units inside the castle screening the flag at H4, H5 and H6, with two more out on the eastern edge.
 
@@ -86,6 +97,8 @@ A2 → B2 → C2 → C1    last step north, ends facing ↑
 ```
 
 There is no facing command and no way to turn on the spot, so a player who wants a unit to end up looking a particular way has to walk it there the long way round.
+
+**The walk is shown, cell by cell.** An ordered unit does not appear at its destination: it slides along the route it actually took, one cell at a time, turning at each step to face the way it is going — so the route above is watched rather than inferred, and the unit's final facing is the last thing it does. The move itself is instant in the domain; only the picture takes the journey, which keeps the rules and the animation from ever disagreeing about where a unit is.
 
 ## Research
 
@@ -129,6 +142,26 @@ What goes quiet is `AutoResolver`: with every battle now fought on the field, no
 
 **Three of the five victory conditions work without a single blow.** Of the sources' five ways to win — flag, rout, starvation, forced retreat, defender endurance (§9.14) — flag capture, starvation and the defender's five days need no combat at all, and they are the three that make the field a game rather than a diorama: an attacker who cannot find a way over Londre's river and round its castle loses to the food timer as surely as to a sword. Reaching the flag is immediate, with no requirement to hold it — "capturing the enemy flag is an immediate victory condition. There is no confirmed requirement to hold the flag for multiple turns" (§9.14) — and units block that route by standing in it, which the FAQ makes explicit: both sides "can only use the bodies of their units and built Fences along with natural obstacles of the terrain to block the path for the enemy to capture their flag." Rout and retreat arrive with the blows in 8.3.
 
+## Overview
+
+The screen is three components. `BattleScreenControl` owns the battle, the turn loop and the enemy's pacing, and draws the chrome — commanders, supply, clock, place and the command line. `BattleBoard` owns the field: the eighty cells, the pieces, the daylight layer, the reach marks and the walk. `Sky` owns the time-of-day wheel. Both children are ordinary Control/View pairs — the parent tells them what to show and hears back one event, `CellPickedEvent`, carrying the `Cell` the player clicked.
+
+Only a View touches the DOM. The board's view builds its cells and pieces imperatively, because eighty data-shaped tiles are not markup a template can declare, and keys them by the domain objects they stand for — `Map<Cell, HTMLElement>` and `Map<BattleUnit, HTMLElement>` — so nothing is ever found by index. Its control owns the parts that happen over time: the walk's stepping, its cancellation, and the pause between the enemy's orders.
+
+Asset paths are presentation, not domain. `src/ui/art/unitPiece.ts` builds a piece's file from a unit's kind, side and facing; `unitPreview.ts` builds the dialog portrait. The domain contributes only the facts they are made of — a unit's name, whether it `hasLivery`, and which way it faces — and never a `.webp` in sight.
+
+```mermaid
+flowchart TD
+  Screen[BattleScreenControl] --> Sky[SkyControl]
+  Screen --> Board[BattleBoardControl]
+  Screen -.->|orders| Battle
+  Board -->|CellPickedEvent| Screen
+  Board --> BoardView[BattleBoardView<br/>cells, pieces, light, marks]
+  Sky --> SkyView[SkyView<br/>sun and moon on one wheel]
+  Screen --> ScreenView[BattleScreenView<br/>commanders, supply, clock, prompt]
+  BoardView -.->|reads| Art[ui/art/unitPiece]
+```
+
 ## Domain model
 
 ```mermaid
@@ -145,6 +178,10 @@ classDiagram
     +BattleClock clock
     +BattleSide turn
     +isOver
+    +getArmy(side) Army
+    +getUnits(side) BattleUnit[]
+    +getUnit(cell) BattleUnit
+    +getMoveRange(unit) MoveRange
     +endTurn() void
     +findOutcome() BattleOutcome
   }
@@ -174,17 +211,31 @@ classDiagram
     +RangePattern range
     +boolean flying
     +consumesFood
-    +clears(terrain) boolean
+    +hasLivery
+    +canClear(terrain) boolean
   }
   class StandardUnit {
     +consumesFood
   }
   class Battlefield {
+    +string name
+    +number columns
+    +number rows
     +Cell attackerFlag
     +Cell defenderFlag
-    +cellAt(column, row) Cell
-    +neighbour(cell, facing) Cell
-    +getReachable(unit) Cell[]
+    +Cell[] allCells
+    +getFlag(side) Cell
+    +getCell(column, row) Cell
+    +getNeighbor(cell, facing) Cell
+    +getSprite(cell) string
+  }
+  class MoveRange {
+    +Cell[] cells
+    +includes(cell) boolean
+    +findPath(destination) Cell[]
+  }
+  class BattleDeployment {
+    +form(army, side) BattleUnit[]
   }
   class Cell {
     +number column
@@ -196,10 +247,12 @@ classDiagram
     +number day
     +Phase phase
     +isDayEnd
+    +isSpent
+    +daysFought
     +next() BattleClock
   }
   class TacticalPolicy {
-    +orderUnit(unit, battle) void
+    +orderUnit(unit, battle) Cell[]
   }
   class Terrain {
     <<enumeration>>
@@ -212,11 +265,13 @@ classDiagram
     wall
   }
   class Facing {
-    <<enumeration>>
-    north
-    east
-    south
-    west
+    +string name
+    +number columnStep
+    +number rowStep
+    +Aspect aspect
+    +isMirrored
+    +between(previous, next) Facing
+    +towardEnemy(side) Facing
   }
   class Phase {
     <<enumeration>>
@@ -242,7 +297,12 @@ classDiagram
   Battlefield --> Cell : made of
   Cell --> Terrain : is
   BattleClock --> Phase : names
+  Battle --> MoveRange : asks where a unit may go
+  MoveRange --> Cell : walks the field
+  Battle --> BattleDeployment : forms up by
+  BattleDeployment --> BattleUnit : stations five
   TacticalPolicy --> Battle : plays the enemy side
+  TacticalPolicy --> MoveRange : chooses a step from
 ```
 
 ## Flow
@@ -286,6 +346,7 @@ A battle contributes nothing to a save. It begins and ends inside one province's
 - **Passability (unit):** ground units are stopped by woods, rivers, fences, boulders and walls; a bridge carries them over a river; a flying unit clears woods, rivers and fences but not boulders or walls; no unit enters an occupied cell; nothing moves further than its move value.
 - **Facing (unit):** a unit ends facing the direction of its last step, so two paths to one cell leave it looking two ways — and its facing cannot be changed once the move is done.
 - **The clock (unit):** four turns a side make a day, the phases run sunrise to midnight, each new day charges both sides their daily food, and a unit that has been ordered cannot be ordered again until the next turn.
-- **Victory (unit):** a unit reaching the enemy flag ends the battle at once; a side whose food runs out loses; the defender wins when the fifth day closes with its flag unreached.
+- **Victory (unit):** a unit reaching the enemy flag ends the battle at once; a side whose food runs out loses; the defender wins when the fifth day closes with its flag unreached, reported as five days fought and not six.
 - **Splitting the invasion (unit):** `begin()` charges the deployment cost, musters the defender and returns a battle when the answer is Fight, and a finished report with no battle when it is Retreat or Surrender; `conclude()` settles the same way 8.1's tests already assert, so those tests keep passing against the split.
+- **Deploying a short army (unit):** an army too small to split four ways fields only the units it can fill, never a body of zero strength.
 - **The screen (control):** the battle takes the root from the map when it starts and gives it back when it ends, and the acting province's turn stays open until the outcome arrives.

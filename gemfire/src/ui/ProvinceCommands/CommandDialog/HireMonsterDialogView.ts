@@ -7,6 +7,7 @@ import type { RangePattern } from '@/core/domain/FifthUnit';
 import type { HiredUnit } from '@/core/domain/HiredUnit';
 import { capitalize } from '@/lib/string/capitalize';
 import { isDefined } from '@/lib/value/isDefined';
+import { unitPreview } from '@/ui/art/unitPreview';
 
 import { CommandDialogView } from './CommandDialogView';
 import { HireModeSelectedEvent } from './HireModeSelectedEvent';
@@ -154,7 +155,7 @@ export class HireMonsterDialogView extends CommandDialogView {
     return `
       <div class=${styles.previewBox}>
         <span class=${styles.label}>Preview</span>
-        <img class=${styles.preview} src="${unit.preview}" alt="${unit.name}" />
+        <img class=${styles.preview} src="${unitPreview(unit)}" alt="${unit.name}" />
       </div>
     `;
   }

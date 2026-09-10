@@ -1,8 +1,10 @@
 import type { Army } from '@/core/domain/Army';
+import { Battle } from '@/core/domain/Battle';
 import type { Family } from '@/core/domain/Family';
 import { Invasion } from '@/core/domain/Invasion';
 import type { Province } from '@/core/domain/Province';
 import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
+import { BattleStartedEvent } from '@/core/events/BattleStartedEvent';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 
 import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
@@ -12,6 +14,7 @@ const ATTACK_GOODWILL = -1;
 export class AttackCommand extends ProvinceCommand {
   private target: Province | undefined;
   private attacker: Army | undefined;
+  private suspended = false;
 
   public constructor(context: WorldCommandContext) {
     super('Attack', context);
@@ -24,6 +27,10 @@ export class AttackCommand extends ProvinceCommand {
 
   public override canExecute(): boolean {
     return this.requiresTarget;
+  }
+
+  public override suspendsTurn(): boolean {
+    return this.suspended;
   }
 
   public override get selectableTargets(): readonly number[] {
@@ -39,6 +46,8 @@ export class AttackCommand extends ProvinceCommand {
   }
 
   public execute(): void {
+    this.suspended = false;
+
     const source = this.currentProvince;
     const target = this.target;
     const attacker = this.attacker;
@@ -85,11 +94,17 @@ export class AttackCommand extends ProvinceCommand {
       target,
       attacker,
     });
-    const report = invasion.launch();
+    const started = invasion.begin();
 
-    this.publish(new BattleReportedEvent(report));
-    this.announce(invasion.affected);
     this.recordAction(ATTACK_GOODWILL);
+    this.suspended = started instanceof Battle;
+
+    if (started instanceof Battle) {
+      this.publish(new BattleStartedEvent(invasion, started));
+    } else {
+      this.publish(new BattleReportedEvent(started));
+      this.announce(invasion.affected);
+    }
   }
 
   private announce(provinces: readonly Province[]): void {
