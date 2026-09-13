@@ -28,7 +28,6 @@ export class Battlefield {
 
   private readonly cells: readonly (readonly Cell[])[];
   private readonly flags = new Map<string, Cell>();
-  private readonly sprites = new Map<Cell, string>();
 
   public constructor(params: BattlefieldParams) {
     this.name = params.name;
@@ -73,7 +72,7 @@ export class Battlefield {
   }
 
   public getSprite(cell: Cell): string {
-    return this.sprites.get(cell) ?? 'plains';
+    return cell.sprite;
   }
 
   public getCell(column: number, row: number): Cell | undefined {
@@ -89,9 +88,7 @@ export class Battlefield {
 
   private buildCell(id: number, column: number, row: number): Cell {
     const tile = BATTLE_TILES[id] ?? BATTLE_TILES[0]!;
-    const cell = new Cell(column, row, tile.terrain);
-
-    this.sprites.set(cell, tile.sprite);
+    const cell = new Cell(column, row, tile.terrain, tile.sprite);
 
     if (tile.flag) {
       this.flags.set(tile.flag, cell);

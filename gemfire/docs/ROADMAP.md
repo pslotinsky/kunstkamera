@@ -115,8 +115,8 @@ What happens when units meet.
 
 The two limits on a battlefield: obstacles you raise yourself, and a Guardian you cannot summon twice.
 
-- [ ] build and break fences (flying units ignore them)
-- [ ] rest and cool a Gem's Guardian between battles
+- [x] build and break fences (flying units ignore them)
+- [x] rest and cool a Gem's Guardian between battles
 
 ### 8.5 The tactical AI
 

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { Army } from '@/core/domain/Army';
 import { Battle } from '@/core/domain/Battle';
 import { BattleOutcome } from '@/core/domain/BattleOutcome';
+import { Gem } from '@/core/domain/Gem';
 import { HiredUnit } from '@/core/domain/HiredUnit';
 import { Invasion } from '@/core/domain/Invasion';
 import { InvasionReport } from '@/core/domain/InvasionReport';
@@ -48,7 +49,7 @@ function setup(params: SetupParams = {}) {
   const attacker = new Army({ commander: erin, troops: 100, food: 120 });
   const invasion = new Invasion({ world, source, target, attacker });
 
-  return { invasion, source, target, attacker, mine, rival };
+  return { invasion, source, target, attacker, mine, rival, world };
 }
 
 describe('Invasion', () => {
@@ -156,5 +157,81 @@ describe('Invasion', () => {
     );
 
     expect(target.hiredUnits).toContain(orks);
+  });
+  it('rests the gem it summoned a Guardian from', () => {
+    const { invasion, rival, attacker, world } = setup();
+    const gem = Gem.ofName('Pluvius');
+
+    rival.gems = [gem];
+
+    invasion.begin();
+    invasion.conclude(
+      new BattleOutcome({
+        winner: 'attacker',
+        reason: 'flag',
+        days: 2,
+        attackerSurvivors: attacker.troops,
+        defenderSurvivors: 0,
+      }),
+    );
+
+    expect(gem.isReadyOn(world.date)).toBe(false);
+    expect(gem.countMonthsLeft(world.date)).toBe(3);
+  });
+
+  it('rests it longer when the Guardian was destroyed', () => {
+    const { invasion, rival, attacker, world } = setup();
+    const gem = Gem.ofName('Pluvius');
+
+    rival.gems = [gem];
+
+    invasion.begin();
+    invasion.conclude(
+      new BattleOutcome({
+        winner: 'attacker',
+        reason: 'rout',
+        days: 2,
+        attackerSurvivors: attacker.troops,
+        defenderSurvivors: 0,
+        lostUnits: ['defender'],
+      }),
+    );
+
+    expect(gem.countMonthsLeft(world.date)).toBe(5);
+  });
+
+  it('does not muster a Guardian whose gem is resting', () => {
+    const { invasion, rival, target, world } = setup();
+    const gem = Gem.ofName('Pluvius');
+
+    rival.gems = [gem];
+    gem.rest(world.date, 3);
+    target.addResources({ troops: -target.resources.troops + 10 });
+
+    const started = invasion.begin();
+
+    expect(started).toBeInstanceOf(Battle);
+    expect((started as Battle).defender.unit).toBeUndefined();
+  });
+  it('gives a house one Guardian-backed battle, not two in a month', () => {
+    const { invasion, rival, world } = setup();
+    const gem = Gem.ofName('Pluvius');
+
+    rival.gems = [gem];
+
+    expect(rival.getReadyGuardians(world.date)).toHaveLength(1);
+
+    invasion.begin();
+    invasion.conclude(
+      new BattleOutcome({
+        winner: 'defender',
+        reason: 'endurance',
+        days: 5,
+        attackerSurvivors: 0,
+        defenderSurvivors: 90,
+      }),
+    );
+
+    expect(rival.getReadyGuardians(world.date)).toHaveLength(0);
   });
 });

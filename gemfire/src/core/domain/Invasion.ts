@@ -1,7 +1,9 @@
+import { GEM_REST_MONTHS, GEM_REST_MONTHS_DEFEATED } from '@/config/battle';
+
 import { Army } from './Army';
 import { Battle } from './Battle';
 import { Battlefield } from './Battlefield';
-import type { BattleOutcome } from './BattleOutcome';
+import type { BattleOutcome, BattleSide } from './BattleOutcome';
 import type { DefenderAnswer } from './DefensePolicy';
 import { DefensePolicy } from './DefensePolicy';
 import type { Family } from './Family';
@@ -111,7 +113,9 @@ export class Invasion {
   }
 
   private chooseDefendingUnit(family: Family): FifthUnit | undefined {
-    return [...this.target.hiredUnits, ...family.guardians].sort(
+    const rested = family.getReadyGuardians(this.world.date);
+
+    return [...this.target.hiredUnits, ...rested].sort(
       (left, right) => right.strength - left.strength,
     )[0];
   }
@@ -124,6 +128,7 @@ export class Invasion {
     if (report.isFought) {
       this.applyLosses(report.defender);
       this.buryUnits(report);
+      this.restGems(report);
     }
 
     if (report.refuge) {
@@ -149,6 +154,30 @@ export class Invasion {
 
     if (outcome.hasLostUnit('defender')) {
       this.dismiss(report.defender.unit, this.target);
+    }
+  }
+
+  private restGems(report: InvasionReport): void {
+    const outcome = report.outcome!;
+
+    this.restGem(this.source.family, this.attacker.unit, outcome, 'attacker');
+    this.restGem(this.target.family, report.defender.unit, outcome, 'defender');
+  }
+
+  private restGem(
+    family: Family | undefined,
+    unit: FifthUnit | undefined,
+    outcome: BattleOutcome,
+    side: BattleSide,
+  ): void {
+    const gem = unit && family?.findGem(unit);
+
+    if (gem) {
+      const months = outcome.hasLostUnit(side)
+        ? GEM_REST_MONTHS_DEFEATED
+        : GEM_REST_MONTHS;
+
+      gem.rest(this.world.date, months);
     }
   }
 

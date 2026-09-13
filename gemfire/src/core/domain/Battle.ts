@@ -12,6 +12,7 @@ import {
 import type { BattleUnit } from './BattleUnit';
 import type { Cell } from './Cell';
 import type { Clash } from './Clash';
+import { Facing } from './Facing';
 import { MoveRange } from './MoveRange';
 
 export interface BattleParams {
@@ -102,6 +103,31 @@ export class Battle {
     return clash;
   }
 
+  public getBuildSites(unit: BattleUnit): readonly Cell[] {
+    return this.findBeside(unit).filter(
+      (cell) =>
+        cell.terrain === 'plains' &&
+        !this.isFlag(cell) &&
+        this.getUnit(cell) === undefined,
+    );
+  }
+
+  public getBreakable(unit: BattleUnit): readonly Cell[] {
+    return this.findBeside(unit).filter((cell) => cell.terrain === 'fence');
+  }
+
+  public build(unit: BattleUnit, cell: Cell): boolean {
+    return this.work(unit, cell, this.getBuildSites(unit), () =>
+      cell.raiseFence(),
+    );
+  }
+
+  public breakDown(unit: BattleUnit, cell: Cell): boolean {
+    return this.work(unit, cell, this.getBreakable(unit), () =>
+      cell.breakFence(),
+    );
+  }
+
   public retreat(side: BattleSide): void {
     this.abandonedBy = side;
   }
@@ -140,6 +166,42 @@ export class Battle {
     }
 
     return this.findStarved() ?? this.findEndured();
+  }
+
+  private findBeside(unit: BattleUnit): readonly Cell[] {
+    const neighbors = Facing.all.map((facing) =>
+      this.field.getNeighbor(unit.cell, facing),
+    );
+
+    return neighbors.filter((cell): cell is Cell => cell !== undefined);
+  }
+
+  private isFlag(cell: Cell): boolean {
+    return (
+      cell.isEqual(this.field.attackerFlag) ||
+      cell.isEqual(this.field.defenderFlag)
+    );
+  }
+
+  private work(
+    unit: BattleUnit,
+    cell: Cell,
+    allowed: readonly Cell[],
+    change: () => void,
+  ): boolean {
+    if (!allowed.some((open) => open.isEqual(cell))) {
+      return false;
+    }
+
+    const done = Math.random() < unit.fenceOdds;
+
+    if (done) {
+      change();
+    }
+
+    unit.finishTurn();
+
+    return done;
   }
 
   private chargeCasualties(unit: BattleUnit, losses: number): void {

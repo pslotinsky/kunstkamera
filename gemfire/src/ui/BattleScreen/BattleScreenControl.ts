@@ -11,6 +11,7 @@ import { ActionCancelledEvent } from './ActionCancelledEvent';
 import { BattleBoardControl } from './BattleBoard/BattleBoardControl';
 import { BattleScreenView } from './BattleScreenView';
 import { ClashControl } from './Clash/ClashControl';
+import { FenceChosenEvent } from './FenceChosenEvent';
 import { RetreatChosenEvent } from './RetreatChosenEvent';
 import { RetreatConfirmedEvent } from './RetreatConfirmedEvent';
 import { SkyControl } from './Sky/SkyControl';
@@ -31,6 +32,8 @@ export class BattleScreenControl extends Control<
   private selected?: BattleUnit | undefined;
   private range?: MoveRange | undefined;
   private targets: readonly BattleUnit[] = [];
+  private breakable: readonly Cell[] = [];
+  private siting = false;
   private ordering?: ReturnType<typeof setTimeout> | undefined;
   private leaving = false;
   private busy = false;
@@ -70,6 +73,7 @@ export class BattleScreenControl extends Control<
 
   protected override onMount(): void {
     this.controls.board.onCellPicked((cell) => this.pickCell(cell));
+    this.subscribe(FenceChosenEvent, () => this.siteFence());
     this.subscribe(UnitWaitedEvent, () => this.holdSelected());
     this.subscribe(ActionCancelledEvent, () => this.stepBack());
     this.subscribe(RetreatChosenEvent, () => this.askToLeave());
@@ -89,8 +93,12 @@ export class BattleScreenControl extends Control<
     const standing = battle.getUnit(cell);
     const ordered = this.selected;
 
-    if (standing && this.targets.includes(standing)) {
+    if (this.siting) {
+      this.buildAt(battle, cell);
+    } else if (standing && this.targets.includes(standing)) {
       this.strikeAt(battle, standing);
+    } else if (this.breakable.includes(cell)) {
+      this.breakAt(battle, cell);
     } else if (standing?.side === PLAYER_SIDE && !standing.hasActed) {
       this.turnTo(battle, standing);
     } else if (ordered && this.range?.includes(cell)) {
@@ -98,48 +106,73 @@ export class BattleScreenControl extends Control<
     }
   }
 
-  private turnTo(battle: Battle, unit: BattleUnit): void {
-    const ordered = this.selected;
+  private siteFence(): void {
+    const battle = this.battle;
+    const unit = this.selected;
 
-    if (ordered === unit) {
-      this.dropSelection(unit);
+    if (battle && unit?.canBuild) {
+      this.siting = true;
+      this.controls.board.showChoices(unit, [], battle.getBuildSites(unit));
+      this.view.askForSite(unit);
+    }
+  }
+
+  private buildAt(battle: Battle, cell: Cell): void {
+    const unit = this.selected;
+
+    if (unit) {
+      const done = battle.build(unit, cell);
+
+      this.finishWork(battle, unit, cell);
+      this.view.showWork(unit, done);
+    }
+  }
+
+  private breakAt(battle: Battle, cell: Cell): void {
+    const unit = this.selected;
+
+    if (unit) {
+      const done = battle.breakDown(unit, cell);
+
+      this.finishWork(battle, unit, cell);
+      this.view.showBreaking(unit, done);
+    }
+  }
+
+  private finishWork(battle: Battle, unit: BattleUnit, cell: Cell): void {
+    this.controls.board.redraw(battle, cell);
+    this.controls.board.place(unit);
+    this.clearOrder();
+  }
+
+  private turnTo(battle: Battle, unit: BattleUnit): void {
+    if (this.selected === unit) {
+      this.clearOrder();
+      this.view.askForUnit();
     } else {
-      this.holdOrdered();
       this.select(battle, unit);
     }
   }
 
-  private dropSelection(unit: BattleUnit): void {
-    if (!unit.hasMoved) {
-      this.clearOrder();
-      this.view.askForUnit();
-    }
-  }
-
-  private holdOrdered(): void {
-    const ordered = this.selected;
-
-    if (ordered?.hasMoved && !ordered.hasActed) {
-      this.holdUnit(ordered);
-    }
-  }
-
   private select(battle: Battle, unit: BattleUnit): void {
-    const range = unit.hasMoved ? undefined : battle.getMoveRange(unit);
+    const range = unit.stepsLeft > 0 ? battle.getMoveRange(unit) : undefined;
 
     this.selected = unit;
     this.range = range;
     this.targets = battle.getTargets(unit);
-    this.controls.board.showChoices(
-      unit,
-      range?.cells ?? [],
-      this.targets.map((target) => target.cell),
-    );
+    this.breakable = battle.getBreakable(unit);
+    this.siting = false;
+    this.controls.board.showChoices(unit, range?.cells ?? [], [
+      ...this.targets.map((target) => target.cell),
+      ...this.breakable,
+    ]);
+
+    const builds = unit.canBuild && battle.getBuildSites(unit).length > 0;
 
     if (range) {
-      this.view.askForOrder(unit, this.targets.length > 0);
+      this.view.askForOrder(unit, this.targets.length > 0, builds);
     } else {
-      this.view.askForStrike(unit);
+      this.view.askForStrike(unit, builds);
     }
   }
 
@@ -166,15 +199,22 @@ export class BattleScreenControl extends Control<
   }
 
   private landOrder(battle: Battle, unit: BattleUnit): void {
-    const targets = battle.getTargets(unit);
-
-    if (targets.length > 0) {
+    if (this.hasMoreToDo(battle, unit)) {
       this.select(battle, unit);
     } else {
       this.holdUnit(unit);
       this.clearOrder();
       this.view.askForUnit();
     }
+  }
+
+  private hasMoreToDo(battle: Battle, unit: BattleUnit): boolean {
+    return (
+      unit.stepsLeft > 0 ||
+      battle.getTargets(unit).length > 0 ||
+      battle.getBreakable(unit).length > 0 ||
+      (unit.canBuild && battle.getBuildSites(unit).length > 0)
+    );
   }
 
   private strikeAt(battle: Battle, standing: BattleUnit): void {
@@ -207,9 +247,14 @@ export class BattleScreenControl extends Control<
   }
 
   private stepBack(): void {
+    const battle = this.battle;
+    const unit = this.selected;
+
     if (this.leaving) {
       this.leaving = false;
       this.view.askForUnit();
+    } else if (this.siting && battle && unit) {
+      this.select(battle, unit);
     }
   }
 
@@ -238,6 +283,8 @@ export class BattleScreenControl extends Control<
   private clearMarks(): void {
     this.range = undefined;
     this.targets = [];
+    this.breakable = [];
+    this.siting = false;
     this.controls.board.clearRange();
   }
 

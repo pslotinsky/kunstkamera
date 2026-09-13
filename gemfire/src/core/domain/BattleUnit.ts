@@ -2,6 +2,10 @@ import {
   BACKLASH_RATE,
   BLOW_RATE,
   BLOW_WEIGHT,
+  FENCE_ODDS_BASE,
+  FENCE_ODDS_CEILING,
+  FENCE_ODDS_FLOOR,
+  FENCE_ODDS_PER_STRENGTH,
   MAX_WAR,
   RANGE_WEIGHT,
   RETALIATION,
@@ -35,7 +39,7 @@ export class BattleUnit {
   public strength: number;
   public cell: Cell;
   public facing: Facing;
-  public hasMoved = false;
+  public stepsTaken = 0;
   public hasActed = false;
 
   public constructor(params: BattleUnitParams) {
@@ -54,6 +58,14 @@ export class BattleUnit {
 
   public get move(): number {
     return this.unit.move;
+  }
+
+  public get stepsLeft(): number {
+    return Math.max(this.move - this.stepsTaken, 0);
+  }
+
+  public get hasMoved(): boolean {
+    return this.stepsTaken > 0;
   }
 
   public get range(): RangePattern {
@@ -78,6 +90,16 @@ export class BattleUnit {
 
   public get isStanding(): boolean {
     return this.strength > 0;
+  }
+
+  public get canBuild(): boolean {
+    return this.unit.buildsFences;
+  }
+
+  public get fenceOdds(): number {
+    const odds = FENCE_ODDS_BASE + this.strength * FENCE_ODDS_PER_STRENGTH;
+
+    return Math.min(Math.max(odds, FENCE_ODDS_FLOOR), FENCE_ODDS_CEILING);
   }
 
   public get sharpness(): number {
@@ -122,7 +144,7 @@ export class BattleUnit {
       this.cell = arrival;
     }
 
-    this.hasMoved = true;
+    this.stepsTaken += path.length;
   }
 
   public turnTo(cell: Cell): void {
@@ -149,12 +171,12 @@ export class BattleUnit {
   }
 
   public finishTurn(): void {
-    this.hasMoved = true;
+    this.stepsTaken = this.move;
     this.hasActed = true;
   }
 
   public refresh(): void {
-    this.hasMoved = false;
+    this.stepsTaken = 0;
     this.hasActed = false;
   }
 

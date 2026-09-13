@@ -9,6 +9,7 @@ import { countTo } from '@/lib/dom/countTo';
 import { View } from '@/lib/View';
 
 import { ActionCancelledEvent } from './ActionCancelledEvent';
+import { FenceChosenEvent } from './FenceChosenEvent';
 import { RetreatChosenEvent } from './RetreatChosenEvent';
 import { RetreatConfirmedEvent } from './RetreatConfirmedEvent';
 import { ENEMY_SIDE, PLAYER_SIDE } from './sides';
@@ -18,10 +19,19 @@ import { UnitWaitedEvent } from './UnitWaitedEvent';
 
 import styles from './BattleScreen.module.scss';
 
-type Order = 'retreat' | 'confirm' | 'stay' | 'wait' | 'done';
+type Order =
+  | 'retreat'
+  | 'confirm'
+  | 'stay'
+  | 'fence'
+  | 'cancel'
+  | 'wait'
+  | 'done';
 
 const IDLE: readonly Order[] = ['retreat', 'done'];
 const ORDERING: readonly Order[] = ['retreat', 'wait', 'done'];
+const BUILDING: readonly Order[] = ['retreat', 'fence', 'wait', 'done'];
+const SITING: readonly Order[] = ['cancel'];
 const LEAVING: readonly Order[] = ['confirm', 'stay'];
 const WATCHING: readonly Order[] = [];
 
@@ -86,6 +96,20 @@ export class BattleScreenView extends View<
           <span class=${styles.actions}>
             <button
               type="button"
+              data-order="fence"
+              @click=${() => this.publish(new FenceChosenEvent())}
+            >
+              Fence
+            </button>
+            <button
+              type="button"
+              data-order="cancel"
+              @click=${() => this.publish(new ActionCancelledEvent())}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
               data-order="wait"
               @click=${() => this.publish(new UnitWaitedEvent())}
             >
@@ -134,14 +158,40 @@ export class BattleScreenView extends View<
     this.ask('Choose a unit to order.', IDLE);
   }
 
-  public askForOrder(unit: BattleUnit, armed: boolean): void {
+  public askForOrder(unit: BattleUnit, armed: boolean, builds: boolean): void {
     const asked = armed ? 'move, or strike whom?' : 'move where?';
 
-    this.ask(`${unit.name} at ${unit.cell.name} — ${asked}`, ORDERING);
+    this.ask(
+      `${unit.name} at ${unit.cell.name} — ${asked}`,
+      builds ? BUILDING : ORDERING,
+    );
   }
 
-  public askForStrike(unit: BattleUnit): void {
-    this.ask(`${unit.name} at ${unit.cell.name} — strike whom?`, ORDERING);
+  public askForStrike(unit: BattleUnit, builds: boolean): void {
+    this.ask(
+      `${unit.name} at ${unit.cell.name} — strike whom?`,
+      builds ? BUILDING : ORDERING,
+    );
+  }
+
+  public askForSite(unit: BattleUnit): void {
+    this.ask(`${unit.name} at ${unit.cell.name} — fence where?`, SITING);
+  }
+
+  public showWork(unit: BattleUnit, done: boolean): void {
+    const told = done
+      ? 'The fence is up.'
+      : `${unit.name} could not manage it.`;
+
+    this.ask(told, IDLE);
+  }
+
+  public showBreaking(unit: BattleUnit, done: boolean): void {
+    const told = done
+      ? 'The fence comes down.'
+      : `${unit.name} could not manage it.`;
+
+    this.ask(told, IDLE);
   }
 
   public askToRetreat(): void {

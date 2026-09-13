@@ -16,10 +16,11 @@ import {
 
 function setup(gold = 100) {
   const erin = makeGeneral({ name: 'Erin', war: 87 });
+  const gem = Gem.ofName('Zendor');
   const mine = makeFamily({
     name: 'Blanche',
     ruler: erin,
-    gems: [Gem.ofName('Zendor')],
+    gems: [gem],
   });
   const rival = makeFamily({ name: 'Lyle' });
 
@@ -69,6 +70,12 @@ function setup(gold = 100) {
   };
 
   return {
+    gem,
+    world,
+    reopen: () => {
+      control.open(new AttackCommand({ world, events }));
+      control.pickTarget(enemy);
+    },
     commit,
     bring: (name: string) =>
       root
@@ -101,6 +108,15 @@ describe('AttackDialogControl', () => {
 
     expect(dialog.commander()).toContain('Erin');
     expect(dialog.slotOptions()).toEqual(['', 'Orks', 'Zendor']);
+  });
+
+  it('leaves out a Guardian whose gem is still resting', () => {
+    const dialog = setup();
+
+    dialog.gem.rest(dialog.world.date, 3);
+    dialog.reopen();
+
+    expect(dialog.slotOptions()).toEqual(['', 'Orks']);
   });
 
   it('moves the deployment gold and the supply days with the commitment', () => {
