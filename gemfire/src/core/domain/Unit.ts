@@ -10,6 +10,7 @@ export interface UnitParams {
   readonly move: number;
   readonly range: RangePattern;
   readonly flying?: boolean;
+  readonly builds?: boolean;
 }
 
 export abstract class Unit {
@@ -17,12 +18,14 @@ export abstract class Unit {
   public readonly move: number;
   public readonly range: RangePattern;
   public readonly flying: boolean;
+  public readonly buildsFences: boolean;
 
   public constructor(params: UnitParams) {
     this.name = params.name;
     this.move = params.move;
     this.range = params.range;
     this.flying = params.flying ?? false;
+    this.buildsFences = params.builds ?? false;
   }
 
   public abstract get consumesFood(): boolean;

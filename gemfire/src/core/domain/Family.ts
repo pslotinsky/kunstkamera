@@ -1,5 +1,6 @@
 import { isDefined } from '@/lib/value/isDefined';
 
+import type { CalendarDate } from './CalendarDate';
 import type { FifthUnit } from './FifthUnit';
 import type { Gem } from './Gem';
 import type { General } from './General';
@@ -34,6 +35,16 @@ export class Family {
 
   public get guardians(): readonly FifthUnit[] {
     return this.gems.map((gem) => gem.guardian);
+  }
+
+  public getReadyGuardians(date: CalendarDate): readonly FifthUnit[] {
+    return this.gems
+      .filter((gem) => gem.isReadyOn(date))
+      .map((gem) => gem.guardian);
+  }
+
+  public findGem(guardian: FifthUnit): Gem | undefined {
+    return this.gems.find((gem) => gem.guardian === guardian);
   }
 
   public get crest(): string {

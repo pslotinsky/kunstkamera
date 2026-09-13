@@ -1,5 +1,6 @@
 import { GEMS } from '@/config/gems';
 
+import type { CalendarDate } from './CalendarDate';
 import { FifthUnit, type FifthUnitParams } from './FifthUnit';
 
 export interface GemParams {
@@ -21,6 +22,8 @@ export class Gem {
   public readonly gemstone: string;
   public readonly guardian: FifthUnit;
 
+  public readyOn?: CalendarDate | undefined;
+
   public constructor(params: GemParams) {
     this.gemstone = params.gemstone;
     this.guardian = new FifthUnit(params.guardian);
@@ -28,5 +31,17 @@ export class Gem {
 
   public get name(): string {
     return this.guardian.name;
+  }
+
+  public rest(from: CalendarDate, months: number): void {
+    this.readyOn = from.plus(months);
+  }
+
+  public isReadyOn(date: CalendarDate): boolean {
+    return this.readyOn === undefined || !date.isBefore(this.readyOn);
+  }
+
+  public countMonthsLeft(date: CalendarDate): number {
+    return this.readyOn ? date.countMonthsUntil(this.readyOn) : 0;
   }
 }

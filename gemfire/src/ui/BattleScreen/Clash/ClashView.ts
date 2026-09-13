@@ -118,7 +118,11 @@ export class ClashView extends View {
       return 0;
     }
 
-    return unit.standsAlone ? 1 : Math.max(1, Math.round(share));
+    if (unit.standsAlone) {
+      return 1;
+    }
+
+    return Math.min(Math.max(1, Math.round(share)), strength);
   }
 
   private fillRank(corner: Corner, unit: BattleUnit, figures: number): void {

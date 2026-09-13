@@ -43,6 +43,12 @@ function isOffered(root: HTMLElement, order: string): boolean {
   return !orderButton(root, order).classList.contains(styles.gone!);
 }
 
+function parkDefenders(battle: Battle): void {
+  for (const guard of battle.getUnits('defender')) {
+    guard.cell = battle.field.getCell(9, 7)!;
+  }
+}
+
 function cellAt(root: HTMLElement, column: number, row: number): HTMLElement {
   return root.querySelector<HTMLElement>(
     `[data-column="${column}"][data-row="${row}"]`,
@@ -212,12 +218,13 @@ describe('BattleScreenControl', () => {
 
     control.play(battle);
 
+    // the whole allowance in one go: A2 to D2 is its three steps
     cellAt(root, 0, 1).click();
-    cellAt(root, 1, 1).click();
+    cellAt(root, 3, 1).click();
 
     vi.runAllTimers();
 
-    expect(rider.cell.name).toBe('B2');
+    expect(rider.cell.name).toBe('D2');
     expect(rider.hasActed).toBe(true);
     expect(isOffered(root, 'wait')).toBe(false);
   });
@@ -246,8 +253,92 @@ describe('BattleScreenControl', () => {
 
     cellAt(root, 0, 1).click();
 
-    expect(rider!.hasActed).toBe(true);
+    // the one you left keeps what it had not spent
+    expect(rider!.hasActed).toBe(false);
+    expect(rider!.stepsLeft).toBeGreaterThan(0);
     expect(isOffered(root, 'wait')).toBe(true);
+  });
+
+  it('walks the rest of the way after a short first move', () => {
+    const { control, root } = mountScreen();
+    const { attacker, defender } = makeArmies();
+    const field = Battlefield.ofProvince(LONDRE);
+    const battle = new Battle({ attacker, defender, field });
+    const rider = battle.getUnits('attacker')[0]!;
+
+    parkDefenders(battle);
+    rider.cell = field.getCell(0, 1)!;
+
+    control.play(battle);
+
+    cellAt(root, 0, 1).click();
+    cellAt(root, 1, 1).click();
+    vi.runAllTimers();
+
+    expect(rider.hasActed).toBe(false);
+    expect(rider.stepsLeft).toBe(2);
+
+    cellAt(root, 3, 1).click();
+    vi.runAllTimers();
+
+    expect(rider.cell.name).toBe('D2');
+    expect(rider.stepsLeft).toBe(0);
+    expect(rider.hasActed).toBe(true);
+  });
+
+  it('breaks a fence it has walked up to', () => {
+    const { control, root } = mountScreen();
+    const { attacker, defender } = makeArmies();
+    const field = Battlefield.ofProvince(LONDRE);
+    const battle = new Battle({ attacker, defender, field });
+    const rider = battle.getUnits('attacker')[0]!;
+    const fence = field.getCell(8, 3)!;
+
+    parkDefenders(battle);
+    rider.cell = field.getCell(9, 1)!;
+
+    control.play(battle);
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
+    cellAt(root, 9, 1).click();
+    cellAt(root, 9, 3).click();
+    vi.runAllTimers();
+
+    expect(rider.cell.name).toBe('J4');
+    expect(rider.hasActed).toBe(false);
+
+    cellAt(root, 8, 3).click();
+
+    expect(fence.terrain).toBe('plains');
+    expect(rider.hasActed).toBe(true);
+  });
+
+  it('builds a fence after walking, when the unit is a Knights', () => {
+    const { control, root } = mountScreen();
+    const { attacker, defender } = makeArmies();
+    const field = Battlefield.ofProvince(LONDRE);
+    const battle = new Battle({ attacker, defender, field });
+    const knights = battle.getUnits('attacker')[1]!;
+
+    parkDefenders(battle);
+    knights.cell = field.getCell(6, 0)!;
+
+    control.play(battle);
+
+    cellAt(root, 6, 0).click();
+    cellAt(root, 6, 1).click();
+    vi.runAllTimers();
+
+    expect(knights.cell.name).toBe('G2');
+    expect(knights.hasActed).toBe(false);
+    expect(isOffered(root, 'fence')).toBe(true);
+
+    orderButton(root, 'fence').click();
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    cellAt(root, 5, 1).click();
+
+    expect(field.getCell(5, 1)!.terrain).toBe('fence');
+    expect(knights.hasActed).toBe(true);
   });
 
   it('asks before it abandons the field, and stays when told to', () => {
@@ -330,5 +421,74 @@ describe('BattleScreenControl', () => {
 
     expect(rider.strength).toBeLessThan(whole);
     expect(attacker.troops).toBeLessThan(156);
+  });
+  it('breaks a fence beside a unit with one click, no command between', () => {
+    const { control, root } = mountScreen();
+    const { attacker, defender } = makeArmies();
+    const field = Battlefield.ofProvince(LONDRE);
+    const battle = new Battle({ attacker, defender, field });
+    const rider = battle.getUnits('attacker')[0]!;
+    const fence = field.getCell(8, 3)!;
+
+    rider.cell = field.getCell(9, 3)!;
+    expect(fence.terrain).toBe('fence');
+
+    control.play(battle);
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
+    cellAt(root, 9, 3).click();
+    cellAt(root, 8, 3).click();
+
+    expect(fence.terrain).toBe('plains');
+    expect(rider.hasActed).toBe(true);
+  });
+
+  it('offers Fence only to a Knights, and sites it behind the button', () => {
+    const { control, root } = mountScreen();
+    const { attacker, defender } = makeArmies();
+    const field = Battlefield.ofProvince(LONDRE);
+    const battle = new Battle({ attacker, defender, field });
+    const rider = battle.getUnits('attacker')[0]!;
+    const knights = battle.getUnits('attacker')[1]!;
+
+    rider.cell = field.getCell(6, 0)!;
+    knights.cell = field.getCell(6, 1)!;
+
+    control.play(battle);
+
+    cellAt(root, 6, 0).click();
+    expect(isOffered(root, 'fence')).toBe(false);
+
+    cellAt(root, 6, 1).click();
+    expect(isOffered(root, 'fence')).toBe(true);
+
+    orderButton(root, 'fence').click();
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    cellAt(root, 5, 1).click();
+
+    expect(field.getCell(5, 1)!.terrain).toBe('fence');
+    expect(knights.hasActed).toBe(true);
+  });
+
+  it('leaves siting without spending the turn', () => {
+    const { control, root } = mountScreen();
+    const { attacker, defender } = makeArmies();
+    const field = Battlefield.ofProvince(LONDRE);
+    const battle = new Battle({ attacker, defender, field });
+    const knights = battle.getUnits('attacker')[1]!;
+
+    knights.cell = field.getCell(6, 1)!;
+
+    control.play(battle);
+
+    cellAt(root, 6, 1).click();
+    orderButton(root, 'fence').click();
+
+    expect(isOffered(root, 'cancel')).toBe(true);
+
+    orderButton(root, 'cancel').click();
+
+    expect(knights.hasActed).toBe(false);
+    expect(isOffered(root, 'fence')).toBe(true);
   });
 });

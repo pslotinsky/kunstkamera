@@ -47,7 +47,7 @@ export class MoveRange {
     const cameFrom = new Map<Cell, Cell | undefined>([[unit.cell, undefined]]);
     let frontier: readonly Cell[] = [unit.cell];
 
-    for (let step = 0; step < unit.move; step += 1) {
+    for (let step = 0; step < unit.stepsLeft; step += 1) {
       const next: Cell[] = [];
 
       for (const cell of frontier) {

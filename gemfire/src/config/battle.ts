@@ -12,6 +12,14 @@ export const BATTLE_DAY_LIMIT = 5;
 export const WAR_LEVERAGE = 0.5;
 export const MAX_WAR = 100;
 
+export const GEM_REST_MONTHS = 3;
+export const GEM_REST_MONTHS_DEFEATED = 5;
+
+export const FENCE_ODDS_BASE = 0.4;
+export const FENCE_ODDS_PER_STRENGTH = 0.005;
+export const FENCE_ODDS_FLOOR = 0.3;
+export const FENCE_ODDS_CEILING = 0.9;
+
 export const BLOW_RATE = 0.25;
 export const BACKLASH_RATE = 0.2;
 

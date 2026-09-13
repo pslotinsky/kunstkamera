@@ -41,6 +41,10 @@ export class BattleBoardControl extends Control<BattleBoardView> {
     this.view.showPhase(phase);
   }
 
+  public redraw(battle: Battle, cell: Cell): void {
+    this.view.redraw(cell, battle.field.getSprite(cell));
+  }
+
   public place(unit: BattleUnit): void {
     this.view.place(unit);
   }

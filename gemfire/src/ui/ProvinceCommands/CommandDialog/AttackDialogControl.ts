@@ -178,7 +178,7 @@ export class AttackDialogControl extends CommandDialogControl<
 
     return [
       ...(province?.hiredUnits ?? []),
-      ...(province?.family?.guardians ?? []),
+      ...(province?.family?.getReadyGuardians(this.world.date) ?? []),
     ];
   }
 }

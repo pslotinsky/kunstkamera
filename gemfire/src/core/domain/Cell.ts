@@ -11,11 +11,28 @@ export type Terrain =
   | 'wall';
 
 export class Cell {
+  public terrain: Terrain;
+  public sprite: string;
+
   public constructor(
     public readonly column: number,
     public readonly row: number,
-    public readonly terrain: Terrain,
-  ) {}
+    terrain: Terrain,
+    sprite: string = terrain,
+  ) {
+    this.terrain = terrain;
+    this.sprite = sprite;
+  }
+
+  public raiseFence(): void {
+    this.terrain = 'fence';
+    this.sprite = 'fence';
+  }
+
+  public breakFence(): void {
+    this.terrain = 'plains';
+    this.sprite = 'fence-broken';
+  }
 
   public get name(): string {
     const letter = String.fromCharCode(FIRST_COLUMN_LETTER + this.column);

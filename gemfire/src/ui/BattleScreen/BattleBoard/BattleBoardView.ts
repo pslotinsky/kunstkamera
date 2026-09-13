@@ -78,6 +78,14 @@ export class BattleBoardView extends View {
     this.daylight.className = `${styles.daylight!} ${TINTS[phase]}`;
   }
 
+  public redraw(cell: Cell, sprite: string): void {
+    const element = this.cellElements.get(cell);
+
+    if (element) {
+      element.style.backgroundImage = `url(/battle-map/${sprite}.webp)`;
+    }
+  }
+
   public place(unit: BattleUnit): void {
     const piece = this.pieces.get(unit);
 
