@@ -39,6 +39,7 @@ export class BattleBoardView extends View {
   private readonly cellElements = new Map<Cell, HTMLElement>();
   private readonly cellsByElement = new Map<HTMLElement, Cell>();
   private readonly pieces = new Map<BattleUnit, HTMLElement>();
+  private readonly standings = new Map<BattleUnit, Cell>();
   private readonly daylight = document.createElement('div');
   private readonly marked = new Set<HTMLElement>();
   private readonly sliding = new Map<BattleUnit, Animation>();
@@ -83,9 +84,15 @@ export class BattleBoardView extends View {
     if (piece) {
       this.turn(unit, unit.facing);
       this.putOn(piece, unit.cell);
+      this.standings.set(unit, unit.cell);
       this.countOf(piece).textContent = String(unit.strength);
       piece.classList.toggle(styles.spent!, unit.hasActed);
+      piece.classList.toggle(styles.fallen!, !unit.isStanding);
     }
+  }
+
+  public findStanding(unit: BattleUnit): Cell | undefined {
+    return this.standings.get(unit);
   }
 
   public turn(unit: BattleUnit, facing: Facing): void {
@@ -130,18 +137,30 @@ export class BattleBoardView extends View {
     this.sliding.delete(unit);
   }
 
-  public markRange(standing: Cell, reachable: readonly Cell[]): void {
+  public markChoices(
+    standing: Cell,
+    reachable: readonly Cell[],
+    targets: readonly Cell[],
+  ): void {
     this.clearMarks();
     this.mark(standing, styles.selected!);
 
     for (const cell of reachable) {
       this.mark(cell, styles.reachable!);
     }
+
+    for (const cell of targets) {
+      this.mark(cell, styles.target!);
+    }
   }
 
   public clearMarks(): void {
     for (const element of this.marked) {
-      element.classList.remove(styles.selected!, styles.reachable!);
+      element.classList.remove(
+        styles.selected!,
+        styles.reachable!,
+        styles.target!,
+      );
     }
 
     this.marked.clear();
@@ -173,6 +192,7 @@ export class BattleBoardView extends View {
     this.cellElements.clear();
     this.cellsByElement.clear();
     this.pieces.clear();
+    this.standings.clear();
     this.marked.clear();
   }
 

@@ -3,11 +3,16 @@ import type { BattleUnit } from '@/core/domain/BattleUnit';
 import type { Cell } from '@/core/domain/Cell';
 import type { MoveRange } from '@/core/domain/MoveRange';
 import { TacticalPolicy } from '@/core/domain/TacticalPolicy';
+import type { UnitOrder } from '@/core/domain/UnitOrder';
 import { BattleEndedEvent } from '@/core/events/BattleEndedEvent';
 import { Control } from '@/lib/Control';
 
+import { ActionCancelledEvent } from './ActionCancelledEvent';
 import { BattleBoardControl } from './BattleBoard/BattleBoardControl';
 import { BattleScreenView } from './BattleScreenView';
+import { ClashControl } from './Clash/ClashControl';
+import { RetreatChosenEvent } from './RetreatChosenEvent';
+import { RetreatConfirmedEvent } from './RetreatConfirmedEvent';
 import { SkyControl } from './Sky/SkyControl';
 import { ENEMY_SIDE, PLAYER_SIDE } from './sides';
 import { TurnDoneEvent } from './TurnDoneEvent';
@@ -25,26 +30,29 @@ export class BattleScreenControl extends Control<
   private battle?: Battle | undefined;
   private selected?: BattleUnit | undefined;
   private range?: MoveRange | undefined;
+  private targets: readonly BattleUnit[] = [];
   private ordering?: ReturnType<typeof setTimeout> | undefined;
-  private walking = false;
+  private leaving = false;
+  private busy = false;
 
   public constructor(context: BattleScreenContext) {
     super(BattleScreenView, context, {
       sky: new SkyControl(),
       board: new BattleBoardControl(),
+      clash: new ClashControl(),
     });
   }
 
   public play(battle: Battle): void {
     this.battle = battle;
-    this.selected = undefined;
-    this.range = undefined;
+    this.clearOrder();
 
     if (battle.isOver) {
       this.endBattle(battle);
     } else {
       this.view.showBattle(battle);
       this.controls.board.showBattle(battle);
+      this.controls.clash.showLandscape(battle.field.landscape);
       this.startPlayerTurn(battle);
       this.view.show();
     }
@@ -63,34 +71,76 @@ export class BattleScreenControl extends Control<
   protected override onMount(): void {
     this.controls.board.onCellPicked((cell) => this.pickCell(cell));
     this.subscribe(UnitWaitedEvent, () => this.holdSelected());
+    this.subscribe(ActionCancelledEvent, () => this.stepBack());
+    this.subscribe(RetreatChosenEvent, () => this.askToLeave());
+    this.subscribe(RetreatConfirmedEvent, () => this.leave());
     this.subscribe(TurnDoneEvent, () => this.finishTurn());
   }
 
   private pickCell(cell: Cell): void {
     const battle = this.battle;
 
-    if (battle && !this.walking && battle.turn === PLAYER_SIDE) {
+    if (battle && !this.busy && battle.turn === PLAYER_SIDE) {
       this.actOn(battle, cell);
     }
   }
 
   private actOn(battle: Battle, cell: Cell): void {
     const standing = battle.getUnit(cell);
+    const ordered = this.selected;
 
-    if (standing?.side === PLAYER_SIDE && !standing.hasActed) {
-      this.select(battle, standing);
-    } else if (this.selected && this.range?.includes(cell)) {
+    if (standing && this.targets.includes(standing)) {
+      this.strikeAt(battle, standing);
+    } else if (standing?.side === PLAYER_SIDE && !standing.hasActed) {
+      this.turnTo(battle, standing);
+    } else if (ordered && this.range?.includes(cell)) {
       this.moveSelected(battle, cell);
     }
   }
 
+  private turnTo(battle: Battle, unit: BattleUnit): void {
+    const ordered = this.selected;
+
+    if (ordered === unit) {
+      this.dropSelection(unit);
+    } else {
+      this.holdOrdered();
+      this.select(battle, unit);
+    }
+  }
+
+  private dropSelection(unit: BattleUnit): void {
+    if (!unit.hasMoved) {
+      this.clearOrder();
+      this.view.askForUnit();
+    }
+  }
+
+  private holdOrdered(): void {
+    const ordered = this.selected;
+
+    if (ordered?.hasMoved && !ordered.hasActed) {
+      this.holdUnit(ordered);
+    }
+  }
+
   private select(battle: Battle, unit: BattleUnit): void {
-    const range = battle.getMoveRange(unit);
+    const range = unit.hasMoved ? undefined : battle.getMoveRange(unit);
 
     this.selected = unit;
     this.range = range;
-    this.controls.board.showRange(unit, range);
-    this.view.askForMove(unit);
+    this.targets = battle.getTargets(unit);
+    this.controls.board.showChoices(
+      unit,
+      range?.cells ?? [],
+      this.targets.map((target) => target.cell),
+    );
+
+    if (range) {
+      this.view.askForOrder(unit, this.targets.length > 0);
+    } else {
+      this.view.askForStrike(unit);
+    }
   }
 
   private moveSelected(battle: Battle, cell: Cell): void {
@@ -98,15 +148,48 @@ export class BattleScreenControl extends Control<
     const range = this.range;
 
     if (unit && range) {
-      const from = unit.cell;
       const path = range.findPath(cell);
 
-      unit.moveAlong(path);
-      this.clearSelection();
+      this.clearMarks();
+      this.busy = true;
       this.view.showWalking();
-      this.walking = true;
-      this.controls.board.walk(unit, from, path, () => {
-        this.walking = false;
+      unit.moveAlong(path);
+      this.controls.board.walk(unit, path, () => {
+        this.busy = false;
+        this.settleOrEnd(battle);
+
+        if (this.battle === battle) {
+          this.landOrder(battle, unit);
+        }
+      });
+    }
+  }
+
+  private landOrder(battle: Battle, unit: BattleUnit): void {
+    const targets = battle.getTargets(unit);
+
+    if (targets.length > 0) {
+      this.select(battle, unit);
+    } else {
+      this.holdUnit(unit);
+      this.clearOrder();
+      this.view.askForUnit();
+    }
+  }
+
+  private strikeAt(battle: Battle, standing: BattleUnit): void {
+    const unit = this.selected;
+
+    if (unit) {
+      this.clearOrder();
+      this.busy = true;
+      this.view.showClashing();
+
+      const clash = battle.strike(unit, standing);
+
+      this.controls.clash.play(clash, () => {
+        this.busy = false;
+        this.showRound(battle);
         this.view.askForUnit();
         this.settleOrEnd(battle);
       });
@@ -117,25 +200,59 @@ export class BattleScreenControl extends Control<
     const unit = this.selected;
 
     if (this.battle && unit) {
-      unit.wait();
-      this.controls.board.place(unit);
-      this.clearSelection();
+      this.holdUnit(unit);
+      this.clearOrder();
       this.view.askForUnit();
     }
   }
 
-  private clearSelection(): void {
-    this.selected = undefined;
+  private stepBack(): void {
+    if (this.leaving) {
+      this.leaving = false;
+      this.view.askForUnit();
+    }
+  }
+
+  private askToLeave(): void {
+    if (this.battle && this.battle.turn === PLAYER_SIDE) {
+      this.leaving = true;
+      this.view.askToRetreat();
+    }
+  }
+
+  private leave(): void {
+    const battle = this.battle;
+
+    if (battle) {
+      this.leaving = false;
+      battle.retreat(PLAYER_SIDE);
+      this.endBattle(battle);
+    }
+  }
+
+  private holdUnit(unit: BattleUnit): void {
+    unit.wait();
+    this.controls.board.place(unit);
+  }
+
+  private clearMarks(): void {
     this.range = undefined;
+    this.targets = [];
     this.controls.board.clearRange();
+  }
+
+  private clearOrder(): void {
+    this.selected = undefined;
+    this.leaving = false;
+    this.clearMarks();
   }
 
   private finishTurn(): void {
     const battle = this.battle;
 
-    if (battle && !this.walking && battle.turn === PLAYER_SIDE) {
+    if (battle && !this.busy && battle.turn === PLAYER_SIDE) {
       battle.endTurn();
-      this.clearSelection();
+      this.clearOrder();
       this.startEnemyTurn(battle);
     }
   }
@@ -155,6 +272,7 @@ export class BattleScreenControl extends Control<
     this.view.showClock(battle.clock);
     this.view.showArmies(battle);
     this.controls.sky.showPhase(battle.clock.phase);
+    this.controls.clash.showPhase(battle.clock.phase);
     this.controls.board.showPhase(battle.clock.phase);
     this.controls.board.placeAll(battle.units);
   }
@@ -179,14 +297,47 @@ export class BattleScreenControl extends Control<
       this.ordering = undefined;
 
       if (this.battle === battle) {
-        const from = unit.cell;
-        const walked = this.enemy.orderUnit(unit, battle);
+        const order = this.enemy.orderUnit(unit, battle);
 
-        this.controls.board.walk(unit, from, walked, () =>
-          this.resumeEnemy(battle),
-        );
+        this.followOrder(battle, unit, order);
       }
     }, ENEMY_ORDER_DELAY_MS);
+  }
+
+  private followOrder(
+    battle: Battle,
+    unit: BattleUnit,
+    order: UnitOrder,
+  ): void {
+    const path = battle.getMoveRange(unit).findPath(order.destination);
+
+    unit.moveAlong(path);
+    this.controls.board.walk(unit, path, () =>
+      this.actOnOrder(battle, unit, order),
+    );
+  }
+
+  private actOnOrder(battle: Battle, unit: BattleUnit, order: UnitOrder): void {
+    const target = order.target;
+
+    if (this.battle !== battle) {
+      this.stopOrdering();
+    } else if (battle.isOver) {
+      this.endBattle(battle);
+    } else if (target?.isStanding) {
+      this.view.showClashing();
+
+      const clash = battle.strike(unit, target);
+
+      this.controls.clash.play(clash, () => {
+        this.showRound(battle);
+        this.view.showEnemyTurn();
+        this.resumeEnemy(battle);
+      });
+    } else {
+      this.holdUnit(unit);
+      this.resumeEnemy(battle);
+    }
   }
 
   private resumeEnemy(battle: Battle): void {
@@ -200,8 +351,9 @@ export class BattleScreenControl extends Control<
   }
 
   private stopOrdering(): void {
-    this.walking = false;
+    this.busy = false;
     this.controls.board.stopWalking();
+    this.controls.clash.stop();
 
     if (this.ordering !== undefined) {
       clearTimeout(this.ordering);

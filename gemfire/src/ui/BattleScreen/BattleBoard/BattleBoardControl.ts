@@ -3,7 +3,6 @@ import type { Phase } from '@/core/domain/BattleClock';
 import type { BattleUnit } from '@/core/domain/BattleUnit';
 import type { Cell } from '@/core/domain/Cell';
 import { Facing } from '@/core/domain/Facing';
-import type { MoveRange } from '@/core/domain/MoveRange';
 import { Control } from '@/lib/Control';
 
 import { BattleBoardView, type Offset } from './BattleBoardView';
@@ -52,8 +51,12 @@ export class BattleBoardControl extends Control<BattleBoardView> {
     }
   }
 
-  public showRange(unit: BattleUnit, range: MoveRange): void {
-    this.view.markRange(unit.cell, range.cells);
+  public showChoices(
+    unit: BattleUnit,
+    reachable: readonly Cell[],
+    targets: readonly Cell[],
+  ): void {
+    this.view.markChoices(unit.cell, reachable, targets);
   }
 
   public clearRange(): void {
@@ -62,10 +65,11 @@ export class BattleBoardControl extends Control<BattleBoardView> {
 
   public walk(
     unit: BattleUnit,
-    from: Cell,
     path: readonly Cell[],
     onArrive: () => void,
   ): void {
+    const from = this.view.findStanding(unit) ?? unit.cell;
+
     this.stopWalking();
 
     if (path.length > 0 && !this.prefersStill) {

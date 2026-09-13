@@ -7,10 +7,13 @@ import type { General } from './General';
 import type { HiredUnit } from './HiredUnit';
 import { type ResourceGains, Resources } from './Resources';
 
+export type Landscape = 'snow' | 'woods' | 'river' | 'mountain';
+
 export interface ProvinceParams {
   readonly number: number;
   readonly name: string;
   readonly neighbors: readonly number[];
+  readonly landscape?: Landscape;
   readonly family?: Family | undefined;
   readonly governor?: General | undefined;
   readonly resources?: Resources;
@@ -28,6 +31,7 @@ export class Province {
   public readonly number: number;
   public readonly name: string;
   public readonly neighbors: readonly number[];
+  public readonly landscape: Landscape;
   public resources: Resources;
   public development: Development;
   public goodwill = 0;
@@ -41,6 +45,7 @@ export class Province {
     this.number = params.number;
     this.name = params.name;
     this.neighbors = params.neighbors;
+    this.landscape = params.landscape ?? 'woods';
     this.family = params.family;
     this.governor = params.governor;
     this.resources = params.resources ?? Resources.empty();

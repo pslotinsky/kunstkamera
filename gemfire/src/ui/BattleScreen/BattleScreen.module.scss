@@ -6,6 +6,10 @@
   --gap: 0.5rem;
   --header: 2.7rem;
   --footer: 2.1rem;
+  --sky-sunrise: #e08a53;
+  --sky-noon: #6cadee;
+  --sky-sunset: #bf4d2b;
+  --sky-midnight: #0e1631;
   --sky: calc(
     100dvh - 2 * var(--pad-y) - var(--header) - var(--footer) - 2 * var(--gap)
   );
@@ -149,4 +153,14 @@ button {
 button:disabled {
   opacity: 0.45;
   cursor: default;
+}
+
+.orders {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.gone {
+  display: none;
 }

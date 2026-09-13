@@ -3,10 +3,12 @@ import {
   BATTLEFIELDS,
   type BattlefieldParams,
 } from '@/config/battlefields';
+import { PROVINCES } from '@/config/provinces';
 
 import type { BattleSide } from './BattleOutcome';
 import { Cell } from './Cell';
 import type { Facing } from './Facing';
+import type { Landscape } from './Province';
 
 export class Battlefield {
   public static ofProvince(province: number): Battlefield {
@@ -20,6 +22,7 @@ export class Battlefield {
   }
 
   public readonly name: string;
+  public readonly province: number;
   public readonly columns: number;
   public readonly rows: number;
 
@@ -29,11 +32,22 @@ export class Battlefield {
 
   public constructor(params: BattlefieldParams) {
     this.name = params.name;
+    this.province = params.province;
     this.rows = params.rows.length;
     this.columns = params.rows[0]?.length ?? 0;
     this.cells = params.rows.map((row, rowIndex) =>
       row.map((id, column) => this.buildCell(id, column, rowIndex)),
     );
+  }
+
+  public get landscape(): Landscape {
+    const place = PROVINCES.find((data) => data.number === this.province);
+
+    if (!place) {
+      throw new Error(`no province ${this.province}`);
+    }
+
+    return place.landscape;
   }
 
   public get attackerFlag(): Cell {

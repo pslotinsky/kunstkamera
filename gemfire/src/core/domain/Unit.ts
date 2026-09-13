@@ -31,6 +31,14 @@ export abstract class Unit {
     return true;
   }
 
+  public get isTroops(): boolean {
+    return true;
+  }
+
+  public get standsAlone(): boolean {
+    return false;
+  }
+
   public canClear(terrain: Terrain): boolean {
     return (
       OPEN_GROUND.includes(terrain) ||

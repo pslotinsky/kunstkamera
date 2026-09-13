@@ -42,19 +42,19 @@
 }
 
 .sunrise {
-  background-color: #e08a53;
+  background-color: var(--sky-sunrise);
 }
 
 .noon {
-  background-color: #6cadee;
+  background-color: var(--sky-noon);
 }
 
 .sunset {
-  background-color: #bf4d2b;
+  background-color: var(--sky-sunset);
 }
 
 .midnight {
-  background-color: #0e1631;
+  background-color: var(--sky-midnight);
 }
 
 @media (prefers-reduced-motion: reduce) {

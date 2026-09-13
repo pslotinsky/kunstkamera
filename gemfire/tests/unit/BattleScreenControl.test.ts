@@ -35,6 +35,20 @@ function makeArmies() {
   return { attacker, defender };
 }
 
+function orderButton(root: HTMLElement, order: string): HTMLButtonElement {
+  return root.querySelector<HTMLButtonElement>(`[data-order="${order}"]`)!;
+}
+
+function isOffered(root: HTMLElement, order: string): boolean {
+  return !orderButton(root, order).classList.contains(styles.gone!);
+}
+
+function cellAt(root: HTMLElement, column: number, row: number): HTMLElement {
+  return root.querySelector<HTMLElement>(
+    `[data-column="${column}"][data-row="${row}"]`,
+  )!;
+}
+
 function mountScreen() {
   const erin = makeGeneral({ name: 'Erin' });
   const mine = makeFamily({ name: 'Blanche', ruler: erin });
@@ -161,5 +175,160 @@ describe('BattleScreenControl', () => {
 
     expect(started).toBeDefined();
     expect(command.suspendsTurn()).toBe(true);
+  });
+  it('strikes what it can reach without a command in between', () => {
+    const { control, root } = mountScreen();
+    const { attacker, defender } = makeArmies();
+    const field = Battlefield.ofProvince(LONDRE);
+    const battle = new Battle({ attacker, defender, field });
+    const rider = battle.getUnits('attacker')[0]!;
+    const knight = battle.getUnits('defender')[0]!;
+
+    rider.cell = field.getCell(6, 1)!;
+    knight.cell = field.getCell(7, 1)!;
+
+    control.play(battle);
+
+    const whole = knight.strength;
+
+    cellAt(root, 6, 1).click();
+    cellAt(root, 7, 1).click();
+
+    vi.runAllTimers();
+
+    expect(knight.strength).toBeLessThan(whole);
+    expect(rider.hasActed).toBe(true);
+    expect(defender.troops).toBeLessThan(200);
+  });
+
+  it('finishes a unit that walks somewhere with nothing to strike', () => {
+    const { control, root } = mountScreen();
+    const { attacker, defender } = makeArmies();
+    const field = Battlefield.ofProvince(LONDRE);
+    const battle = new Battle({ attacker, defender, field });
+    const rider = battle.getUnits('attacker')[0]!;
+
+    rider.cell = field.getCell(0, 1)!;
+
+    control.play(battle);
+
+    cellAt(root, 0, 1).click();
+    cellAt(root, 1, 1).click();
+
+    vi.runAllTimers();
+
+    expect(rider.cell.name).toBe('B2');
+    expect(rider.hasActed).toBe(true);
+    expect(isOffered(root, 'wait')).toBe(false);
+  });
+
+  it('lets another unit be picked up after the first has moved', () => {
+    const { control, root } = mountScreen();
+    const { attacker, defender } = makeArmies();
+    const field = Battlefield.ofProvince(LONDRE);
+    const battle = new Battle({ attacker, defender, field });
+    const [rider, knight] = battle.getUnits('attacker');
+    const enemy = battle.getUnits('defender')[0]!;
+
+    rider!.cell = field.getCell(5, 1)!;
+    knight!.cell = field.getCell(0, 1)!;
+    enemy.cell = field.getCell(7, 1)!;
+
+    control.play(battle);
+
+    cellAt(root, 5, 1).click();
+    cellAt(root, 6, 1).click();
+
+    vi.runAllTimers();
+
+    expect(rider!.hasMoved).toBe(true);
+    expect(rider!.hasActed).toBe(false);
+
+    cellAt(root, 0, 1).click();
+
+    expect(rider!.hasActed).toBe(true);
+    expect(isOffered(root, 'wait')).toBe(true);
+  });
+
+  it('asks before it abandons the field, and stays when told to', () => {
+    const { control, events, root } = mountScreen();
+    const { attacker, defender } = makeArmies();
+    const battle = new Battle({
+      attacker,
+      defender,
+      field: Battlefield.ofProvince(LONDRE),
+    });
+
+    let ended: BattleEndedEvent | undefined;
+    events.subscribe(BattleEndedEvent, (event) => {
+      ended = event;
+    });
+
+    control.play(battle);
+
+    orderButton(root, 'retreat').click();
+
+    expect(isOffered(root, 'confirm')).toBe(true);
+
+    orderButton(root, 'stay').click();
+
+    expect(ended).toBeUndefined();
+
+    orderButton(root, 'retreat').click();
+    orderButton(root, 'confirm').click();
+
+    expect(ended?.outcome.reason).toBe('retreat');
+    expect(ended?.outcome.isWonBy('defender')).toBe(true);
+  });
+  it('hands the turn over and lets the enemy take its own orders', () => {
+    const { control, root } = mountScreen();
+    const { attacker, defender } = makeArmies();
+    const field = Battlefield.ofProvince(LONDRE);
+    const battle = new Battle({ attacker, defender, field });
+
+    control.play(battle);
+
+    const before = battle
+      .getUnits('defender')
+      .map((unit) => `${unit.name}${unit.cell.name}`)
+      .join('|');
+
+    orderButton(root, 'done').click();
+
+    vi.runAllTimers();
+
+    const after = battle
+      .getUnits('defender')
+      .map((unit) => `${unit.name}${unit.cell.name}`)
+      .join('|');
+
+    expect(after).not.toBe(before);
+    expect(battle.turn).toBe('attacker');
+    expect(battle.getUnits('attacker').every((unit) => !unit.hasActed)).toBe(
+      true,
+    );
+  });
+
+  it('has the enemy strike when its order names a target', () => {
+    const { control, root } = mountScreen();
+    const { attacker, defender } = makeArmies();
+    const field = Battlefield.ofProvince(LONDRE);
+    const battle = new Battle({ attacker, defender, field });
+    const rider = battle.getUnits('attacker')[0]!;
+    const guard = battle.getUnits('defender')[0]!;
+
+    rider.cell = field.getCell(6, 1)!;
+    guard.cell = field.getCell(7, 1)!;
+
+    control.play(battle);
+
+    const whole = rider.strength;
+
+    orderButton(root, 'done').click();
+
+    vi.runAllTimers();
+
+    expect(rider.strength).toBeLessThan(whole);
+    expect(attacker.troops).toBeLessThan(156);
   });
 });

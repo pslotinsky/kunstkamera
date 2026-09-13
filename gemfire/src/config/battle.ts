@@ -1,3 +1,6 @@
+import type { Approach } from '@/core/domain/BattleUnit';
+import type { RangePattern } from '@/core/domain/Unit';
+
 export const DEPLOYMENT_TROOPS_PER_GOLD = 8;
 export const DEPLOYMENT_BASE_GOLD = 10;
 
@@ -6,6 +9,27 @@ export const DAILY_FOOD_BASE = 1;
 
 export const BATTLE_DAY_LIMIT = 5;
 
-export const DAILY_CASUALTY_RATE = 0.3;
 export const WAR_LEVERAGE = 0.5;
 export const MAX_WAR = 100;
+
+export const BLOW_RATE = 0.25;
+export const BACKLASH_RATE = 0.2;
+
+export const BLOW_WEIGHT: Readonly<Record<Approach, number>> = {
+  front: 1,
+  flank: 1.4,
+  rear: 2,
+};
+
+export const RETALIATION: Readonly<Record<Approach, number>> = {
+  front: 1,
+  flank: 0.6,
+  rear: 0.3,
+};
+
+export const RANGE_WEIGHT: Readonly<Record<RangePattern, number>> = {
+  short: 1,
+  long: 0.6,
+  circular: 1,
+  largest: 1,
+};
