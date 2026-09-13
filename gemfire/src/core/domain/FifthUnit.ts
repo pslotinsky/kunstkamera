@@ -25,6 +25,14 @@ export class FifthUnit extends Unit {
     return false;
   }
 
+  public override get isTroops(): boolean {
+    return false;
+  }
+
+  public override get standsAlone(): boolean {
+    return true;
+  }
+
   public get portrait(): string {
     return `/fifth-units/${this.name.toLowerCase()}.webp`;
   }

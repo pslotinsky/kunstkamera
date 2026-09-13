@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { Army } from '@/core/domain/Army';
 import { Battle } from '@/core/domain/Battle';
 import { BattleOutcome } from '@/core/domain/BattleOutcome';
+import { HiredUnit } from '@/core/domain/HiredUnit';
 import { Invasion } from '@/core/domain/Invasion';
 import { InvasionReport } from '@/core/domain/InvasionReport';
 
@@ -117,5 +118,43 @@ describe('Invasion', () => {
         }),
       ),
     ).toThrow('conclude() called before begin()');
+  });
+  it('leaves a hired Fifth Unit destroyed on the field behind', () => {
+    const { invasion, target, attacker } = setup();
+    const orks = HiredUnit.ofName('Orks')!;
+
+    target.addUnit(orks);
+    invasion.begin();
+    invasion.conclude(
+      new BattleOutcome({
+        winner: 'attacker',
+        reason: 'rout',
+        days: 2,
+        attackerSurvivors: attacker.troops,
+        defenderSurvivors: 0,
+        lostUnits: ['defender'],
+      }),
+    );
+
+    expect(target.hiredUnits).not.toContain(orks);
+  });
+
+  it('brings a hired Fifth Unit that survived back with the province', () => {
+    const { invasion, target, attacker } = setup();
+    const orks = HiredUnit.ofName('Orks')!;
+
+    target.addUnit(orks);
+    invasion.begin();
+    invasion.conclude(
+      new BattleOutcome({
+        winner: 'attacker',
+        reason: 'flag',
+        days: 2,
+        attackerSurvivors: attacker.troops,
+        defenderSurvivors: 0,
+      }),
+    );
+
+    expect(target.hiredUnits).toContain(orks);
   });
 });

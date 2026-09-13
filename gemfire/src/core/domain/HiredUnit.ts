@@ -36,6 +36,10 @@ export class HiredUnit extends FifthUnit {
     return true;
   }
 
+  public override get standsAlone(): boolean {
+    return false;
+  }
+
   public getDesertionRisk(fame: number): number {
     return fame < this.fameToKeep
       ? (this.fameToKeep - fame) / this.fameToKeep

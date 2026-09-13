@@ -8,6 +8,8 @@ import { Facing } from '@/core/domain/Facing';
 import { StandardUnit } from '@/core/domain/StandardUnit';
 import { Unit } from '@/core/domain/Unit';
 
+import { makeGeneral } from './factories';
+
 class TestUnit extends Unit {
   public override get consumesFood(): boolean {
     return true;
@@ -18,6 +20,7 @@ function place(unit: Unit, cell: Cell): BattleUnit {
   return new BattleUnit({
     unit,
     side: 'attacker',
+    commander: makeGeneral(),
     strength: 10,
     cell,
     facing: Facing.east,

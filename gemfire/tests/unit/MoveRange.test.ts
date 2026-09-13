@@ -8,12 +8,15 @@ import { MoveRange } from '@/core/domain/MoveRange';
 import { StandardUnit } from '@/core/domain/StandardUnit';
 import type { Unit } from '@/core/domain/Unit';
 
+import { makeGeneral } from './factories';
+
 const LONDRE = 22;
 
 function place(unit: Unit, cell: Cell): BattleUnit {
   return new BattleUnit({
     unit,
     side: 'attacker',
+    commander: makeGeneral(),
     strength: 10,
     cell,
     facing: Facing.east,

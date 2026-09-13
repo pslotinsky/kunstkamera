@@ -8,12 +8,22 @@ import type { BattleUnit } from '@/core/domain/BattleUnit';
 import { countTo } from '@/lib/dom/countTo';
 import { View } from '@/lib/View';
 
+import { ActionCancelledEvent } from './ActionCancelledEvent';
+import { RetreatChosenEvent } from './RetreatChosenEvent';
+import { RetreatConfirmedEvent } from './RetreatConfirmedEvent';
 import { ENEMY_SIDE, PLAYER_SIDE } from './sides';
 import { TurnDoneEvent } from './TurnDoneEvent';
 import type { BattleScreenContext, BattleScreenViews } from './types';
 import { UnitWaitedEvent } from './UnitWaitedEvent';
 
 import styles from './BattleScreen.module.scss';
+
+type Order = 'retreat' | 'confirm' | 'stay' | 'wait' | 'done';
+
+const IDLE: readonly Order[] = ['retreat', 'done'];
+const ORDERING: readonly Order[] = ['retreat', 'wait', 'done'];
+const LEAVING: readonly Order[] = ['confirm', 'stay'];
+const WATCHING: readonly Order[] = [];
 
 export class BattleScreenView extends View<
   BattleScreenContext,
@@ -49,24 +59,48 @@ export class BattleScreenView extends View<
         </header>
         <div class=${styles.field}>${this.views.board.template}</div>
         <footer class=${styles.footer}>
+          <span class=${styles.orders}>
+            <button
+              type="button"
+              data-order="retreat"
+              @click=${() => this.publish(new RetreatChosenEvent())}
+            >
+              Retreat
+            </button>
+            <button
+              type="button"
+              data-order="confirm"
+              @click=${() => this.publish(new RetreatConfirmedEvent())}
+            >
+              Retreat
+            </button>
+            <button
+              type="button"
+              data-order="stay"
+              @click=${() => this.publish(new ActionCancelledEvent())}
+            >
+              Stay
+            </button>
+          </span>
           <span class=${styles.prompt} data-prompt></span>
           <span class=${styles.actions}>
             <button
               type="button"
-              data-wait
+              data-order="wait"
               @click=${() => this.publish(new UnitWaitedEvent())}
             >
               Wait
             </button>
             <button
               type="button"
-              data-done
+              data-order="done"
               @click=${() => this.publish(new TurnDoneEvent())}
             >
               Done
             </button>
           </span>
         </footer>
+        ${this.views.clash.template}
       </section>
     `;
   }
@@ -97,27 +131,43 @@ export class BattleScreenView extends View<
   }
 
   public askForUnit(): void {
-    this.prompt.textContent = 'Choose a unit to order.';
-    this.waitButton.disabled = true;
-    this.doneButton.disabled = false;
+    this.ask('Choose a unit to order.', IDLE);
   }
 
-  public askForMove(unit: BattleUnit): void {
-    this.prompt.textContent = `${unit.name} at ${unit.cell.name} — move where?`;
-    this.waitButton.disabled = false;
-    this.doneButton.disabled = false;
+  public askForOrder(unit: BattleUnit, armed: boolean): void {
+    const asked = armed ? 'move, or strike whom?' : 'move where?';
+
+    this.ask(`${unit.name} at ${unit.cell.name} — ${asked}`, ORDERING);
+  }
+
+  public askForStrike(unit: BattleUnit): void {
+    this.ask(`${unit.name} at ${unit.cell.name} — strike whom?`, ORDERING);
+  }
+
+  public askToRetreat(): void {
+    this.ask('Abandon the field and go home?', LEAVING);
   }
 
   public showWalking(): void {
-    this.prompt.textContent = 'Moving…';
-    this.waitButton.disabled = true;
-    this.doneButton.disabled = true;
+    this.ask('Moving…', WATCHING);
+  }
+
+  public showClashing(): void {
+    this.ask('Blows fall…', WATCHING);
   }
 
   public showEnemyTurn(): void {
-    this.prompt.textContent = 'The enemy is moving…';
-    this.waitButton.disabled = true;
-    this.doneButton.disabled = true;
+    this.ask('The enemy is moving…', WATCHING);
+  }
+
+  private ask(prompt: string, offered: readonly Order[]): void {
+    this.prompt.textContent = prompt;
+
+    for (const button of this.orderButtons) {
+      const order = button.dataset.order as Order;
+
+      button.classList.toggle(styles.gone!, !offered.includes(order));
+    }
   }
 
   private showCommander(side: BattleSide, army: Army): void {
@@ -169,6 +219,12 @@ export class BattleScreenView extends View<
     return this.element.querySelector<HTMLElement>(`[data-days="${side}"]`)!;
   }
 
+  private get orderButtons(): readonly HTMLButtonElement[] {
+    return [
+      ...this.element.querySelectorAll<HTMLButtonElement>('[data-order]'),
+    ];
+  }
+
   private get place(): HTMLElement {
     return this.element.querySelector<HTMLElement>('[data-place]')!;
   }
@@ -179,13 +235,5 @@ export class BattleScreenView extends View<
 
   private get prompt(): HTMLElement {
     return this.element.querySelector<HTMLElement>('[data-prompt]')!;
-  }
-
-  private get waitButton(): HTMLButtonElement {
-    return this.element.querySelector<HTMLButtonElement>('[data-wait]')!;
-  }
-
-  private get doneButton(): HTMLButtonElement {
-    return this.element.querySelector<HTMLButtonElement>('[data-done]')!;
   }
 }

@@ -60,4 +60,18 @@ describe('WorldFactory', () => {
       ).toEqual([...definition.gems]);
     }
   });
+  it('says what kind of country each province is', () => {
+    const world = new WorldFactory().create();
+    const grouped = (kind: string) =>
+      world.map.provinces
+        .filter((province) => province.landscape === kind)
+        .map((province) => province.number);
+
+    expect(grouped('snow')).toEqual([1, 2, 3, 4, 5]);
+    expect(grouped('mountain')).toEqual([24, 25, 26, 27]);
+    expect(grouped('river')).toEqual([17, 18, 19, 20, 21, 22, 28, 29]);
+    expect(grouped('woods')).toEqual([
+      6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 23, 30,
+    ]);
+  });
 });

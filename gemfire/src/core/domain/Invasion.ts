@@ -123,6 +123,7 @@ export class Invasion {
   private settle(report: InvasionReport): void {
     if (report.isFought) {
       this.applyLosses(report.defender);
+      this.buryUnits(report);
     }
 
     if (report.refuge) {
@@ -137,6 +138,26 @@ export class Invasion {
       troops: defender.troops - this.target.resources.troops,
       food: defender.food - this.target.resources.food,
     });
+  }
+
+  private buryUnits(report: InvasionReport): void {
+    const outcome = report.outcome!;
+
+    if (outcome.hasLostUnit('attacker')) {
+      this.dismiss(this.attacker.unit, this.source);
+    }
+
+    if (outcome.hasLostUnit('defender')) {
+      this.dismiss(report.defender.unit, this.target);
+    }
+  }
+
+  private dismiss(unit: FifthUnit | undefined, province: Province): void {
+    const stationed = province.hiredUnits.find((hired) => hired === unit);
+
+    if (stationed) {
+      province.removeUnit(stationed);
+    }
   }
 
   private evacuate(refuge: Province): void {

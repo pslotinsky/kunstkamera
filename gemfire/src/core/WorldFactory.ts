@@ -96,6 +96,7 @@ export class WorldFactory {
           number: geography.number,
           name: geography.name,
           neighbors: geography.neighbors,
+          landscape: geography.landscape,
           resources: Resources.from(definition),
           development: Development.from(definition),
           hirePool: definition.hirePool,

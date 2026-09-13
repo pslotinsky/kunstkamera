@@ -1,0 +1,195 @@
+.root {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+.sky {
+  position: absolute;
+  inset: 0;
+  transition: background-color 700ms ease;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  image-rendering: pixelated;
+}
+
+.banner {
+  position: absolute;
+  top: 4vh;
+  left: 50%;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.5rem 1.4rem;
+  font-size: 1.15rem;
+  white-space: nowrap;
+  background: rgba(16, 22, 44, 0.88);
+  border: 1px solid #4a5990;
+  border-radius: 8px;
+  box-shadow: 0 0.4rem 1.6rem rgba(0, 0, 0, 0.45);
+  translate: -50% 0;
+}
+
+.face {
+  width: 3rem;
+  height: 3rem;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.name {
+  font-weight: 600;
+}
+
+.tally {
+  min-width: 3.2rem;
+  color: #ffd166;
+  font-size: 1.4rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.versus {
+  color: #9fb0d8;
+}
+
+.rank {
+  position: absolute;
+  bottom: 8%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.file {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.file + .file {
+  margin-left: -3vh;
+}
+
+.striker {
+  left: 11%;
+}
+
+.target {
+  right: 11%;
+}
+
+.figure {
+  width: 19vh;
+  height: 19vh;
+  object-fit: contain;
+  filter: drop-shadow(0 0.2rem 0.3rem rgba(0, 0, 0, 0.5));
+  image-rendering: pixelated;
+  transition:
+    opacity 420ms ease,
+    translate 420ms ease;
+}
+
+.figure + .figure {
+  margin-top: -7.5vh;
+}
+
+.alone {
+  width: 38vh;
+  height: 38vh;
+  margin-bottom: 6vh;
+}
+
+.mirrored {
+  scale: -1 1;
+}
+
+.falling {
+  opacity: 0;
+  translate: 0 -1.4vh;
+}
+
+@keyframes lunge {
+  0% {
+    translate: 0 0;
+  }
+
+  40% {
+    translate: 9vw 0;
+  }
+
+  100% {
+    translate: 0 0;
+  }
+}
+
+@keyframes flinch {
+  0% {
+    translate: 0 0;
+  }
+
+  15% {
+    translate: 2vw 0;
+    filter: brightness(2.6) saturate(0.25);
+  }
+
+  35% {
+    translate: -1.2vw 0;
+  }
+
+  60% {
+    translate: 0.6vw 0;
+    filter: brightness(1.4);
+  }
+
+  100% {
+    translate: 0 0;
+  }
+}
+
+.striking {
+  animation: lunge 900ms ease-in-out;
+}
+
+.struck {
+  animation: flinch 760ms ease-out;
+}
+
+.sunrise {
+  background-color: var(--sky-sunrise);
+}
+
+.noon {
+  background-color: var(--sky-noon);
+}
+
+.sunset {
+  background-color: var(--sky-sunset);
+}
+
+.midnight {
+  background-color: var(--sky-midnight);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sky,
+  .figure {
+    transition: none;
+  }
+
+  .striking,
+  .struck {
+    animation: none;
+  }
+}

@@ -105,11 +105,11 @@ The screen itself: a field, an army split into units, and a race for the flag.
 
 What happens when units meet.
 
-- [ ] strike in range: short, long, circular, and largest
-- [ ] strike from front, flank, or rear, and take backlash in melee
-- [ ] let the commander's WAR sharpen the troops he leads
-- [ ] win by rout when nothing of the enemy stands
-- [ ] retreat from a losing battle
+- [x] strike in range: short, long, circular, and largest
+- [x] strike from front, flank, or rear, and take backlash in melee
+- [x] let the commander's WAR sharpen the troops he leads
+- [x] win by rout when nothing of the enemy stands
+- [x] retreat from a losing battle
 
 ### 8.4 Fences & cooldowns
 

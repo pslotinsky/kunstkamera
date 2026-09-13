@@ -26,7 +26,7 @@ export class BattleDeployment {
     return roster.flatMap((body, index) => {
       const cell = cells[index];
 
-      return cell ? [this.station(body, side, cell)] : [];
+      return cell ? [this.station(body, army, side, cell)] : [];
     });
   }
 
@@ -62,10 +62,16 @@ export class BattleDeployment {
     return kind;
   }
 
-  private station(body: Body, side: BattleSide, cell: Cell): BattleUnit {
+  private station(
+    body: Body,
+    army: Army,
+    side: BattleSide,
+    cell: Cell,
+  ): BattleUnit {
     return new BattleUnit({
       unit: body.unit,
       side,
+      commander: army.commander,
       strength: body.strength,
       cell,
       facing: Facing.towardEnemy(side),

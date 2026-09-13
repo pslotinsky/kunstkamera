@@ -20,6 +20,17 @@ export class Facing {
     return side === 'attacker' ? Facing.east : Facing.west;
   }
 
+  public static toward(from: Cell, to: Cell): Facing {
+    const columns = to.column - from.column;
+    const rows = to.row - from.row;
+
+    if (Math.abs(columns) >= Math.abs(rows)) {
+      return columns < 0 ? Facing.west : Facing.east;
+    }
+
+    return rows < 0 ? Facing.north : Facing.south;
+  }
+
   public static between(previous: Cell, next: Cell): Facing {
     const rows = next.row - previous.row;
 
@@ -36,6 +47,14 @@ export class Facing {
     public readonly rowStep: number,
     public readonly aspect: Aspect,
   ) {}
+
+  public get opposite(): Facing {
+    return Facing.all.find(
+      (facing) =>
+        facing.columnStep === -this.columnStep &&
+        facing.rowStep === -this.rowStep,
+    )!;
+  }
 
   public get isMirrored(): boolean {
     return this === Facing.west;
