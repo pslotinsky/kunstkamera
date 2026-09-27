@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { AttackRange } from '@/core/domain/AttackRange';
 import { Battlefield } from '@/core/domain/Battlefield';
+import { BattleSide } from '@/core/domain/BattleSide';
 import { BattleUnit } from '@/core/domain/BattleUnit';
 import type { Cell } from '@/core/domain/Cell';
 import { Facing } from '@/core/domain/Facing';
@@ -27,7 +28,7 @@ function guardian(range: RangePattern): FifthUnit {
 function station(unit: Unit, column: number, row: number): BattleUnit {
   return new BattleUnit({
     unit,
-    side: 'attacker',
+    side: BattleSide.attacker,
     commander: makeGeneral(),
     strength: 40,
     cell: field.getCell(column, row)!,

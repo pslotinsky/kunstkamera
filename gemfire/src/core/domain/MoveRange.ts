@@ -17,7 +17,9 @@ export class MoveRange {
   }
 
   public get cells(): readonly Cell[] {
-    return [...this.cameFrom.keys()].filter((cell) => cell !== this.origin);
+    return [...this.cameFrom.keys()].filter(
+      (cell) => !cell.isEqual(this.origin),
+    );
   }
 
   public includes(cell: Cell): boolean {
@@ -28,12 +30,12 @@ export class MoveRange {
     const path: Cell[] = [];
     let step: Cell | undefined = destination;
 
-    while (step && step !== this.origin) {
+    while (step && !step.isEqual(this.origin)) {
       path.unshift(step);
       step = this.cameFrom.get(step);
     }
 
-    return step === this.origin ? path : [];
+    return step?.isEqual(this.origin) ? path : [];
   }
 
   private walk(

@@ -47,7 +47,6 @@ describe('a spent gem', () => {
 
     gem.rest(MARCH, 3);
 
-    // no turns played, no months ticked — only a later date asked about
     expect(gem.isReadyOn(new CalendarDate(1250, 1))).toBe(true);
   });
 });

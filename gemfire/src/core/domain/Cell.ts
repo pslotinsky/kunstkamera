@@ -29,6 +29,11 @@ export class Cell {
     this.sprite = 'fence';
   }
 
+  public copyGround(from: Cell): void {
+    this.terrain = from.terrain;
+    this.sprite = from.sprite;
+  }
+
   public breakFence(): void {
     this.terrain = 'plains';
     this.sprite = 'fence-broken';

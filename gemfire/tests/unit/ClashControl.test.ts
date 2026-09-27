@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest';
 
+import { BattleSide } from '@/core/domain/BattleSide';
 import { BattleUnit } from '@/core/domain/BattleUnit';
 import { Cell } from '@/core/domain/Cell';
 import { Clash } from '@/core/domain/Clash';
@@ -13,13 +14,13 @@ import { ClashControl } from '@/ui/BattleScreen/Clash/ClashControl';
 
 import { makeGeneral } from './factories';
 
-function muster(unit: Unit, strength: number, side: 'attacker' | 'defender') {
+function muster(unit: Unit, strength: number, side: BattleSide) {
   return new BattleUnit({
     unit,
     side,
     commander: makeGeneral(),
     strength,
-    cell: new Cell(side === 'attacker' ? 0 : 1, 0, 'plains'),
+    cell: new Cell(side.isAttacker ? 0 : 1, 0, 'plains'),
     facing: Facing.east,
   });
 }
@@ -46,7 +47,10 @@ describe('ClashControl', () => {
 
   it('never draws more figures than the unit has troops', () => {
     expect(
-      play(muster(knights, 5, 'attacker'), muster(knights, 1, 'defender')),
+      play(
+        muster(knights, 5, BattleSide.attacker),
+        muster(knights, 1, BattleSide.defender),
+      ),
     ).toEqual({
       striker: 5,
       target: 1,
@@ -55,7 +59,10 @@ describe('ClashControl', () => {
 
   it('draws a full block for a body of troops that can fill one', () => {
     expect(
-      play(muster(knights, 48, 'attacker'), muster(knights, 48, 'defender')),
+      play(
+        muster(knights, 48, BattleSide.attacker),
+        muster(knights, 48, BattleSide.defender),
+      ),
     ).toEqual({
       striker: 12,
       target: 12,
@@ -72,7 +79,10 @@ describe('ClashControl', () => {
     });
 
     expect(
-      play(muster(knights, 48, 'attacker'), muster(zendor, 150, 'defender')),
+      play(
+        muster(knights, 48, BattleSide.attacker),
+        muster(zendor, 150, BattleSide.defender),
+      ),
     ).toEqual({
       striker: 12,
       target: 1,

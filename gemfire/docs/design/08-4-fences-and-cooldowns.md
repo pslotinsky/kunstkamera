@@ -45,6 +45,7 @@ flowchart LR
 
 The board is already the menu, and breaking fits it without a word of explanation: a fence you can pull down is marked exactly like an enemy you can strike, because from the player's side of the screen it is the same act — something is in the way, you are next to it, you click it.
 
+```text
 ┌─ Battle ──────────────────────────────────────────────────────┐
 │ Erin                     Day 4                      Eselred   │
 │ food 54, 3 days        Londre  (☀)          food 180, 6 days  │
@@ -65,6 +66,7 @@ The board is already the menu, and breaking fits it without a word of explanatio
 │ [ Retreat ]  Knights at J4      [ Fence ][ Wait ][ Done ]     │
 └───────────────────────────────────────────────────────────────┘
 
+```
 The Knights at J4 has come round the castle's blind side. Londre's two authored fences sit at I4 and I6, and they are not decoration: the castle's wall runs along the north, west and south, so its only approach is from the east, and those two fences narrow that approach to the single cell at I5. Pulling one down widens the gate the defenders are counting on. That is the tactical shape of this stage in one picture — fences are where a board's geometry is negotiable.
 
 **Building is the one command that earns a button back.** 8.3 took away Attack and Cancel because the board could say everything: a cell you may step onto is empty, a unit you may strike is not, and one click told them apart. A fence has no such tell. The cells you could build on are exactly the cells you could walk to, so one click on an empty square beside a Knights would mean two things at once. `[ Fence ]` is offered only to a Knights that has not yet acted; pressing it swaps the step-marks for build-marks and asks where.

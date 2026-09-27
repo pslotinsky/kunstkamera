@@ -1,6 +1,12 @@
+import { Army, type ArmyParams } from '@/core/domain/Army';
+import { Battle, type BattleParams } from '@/core/domain/Battle';
+import { Battlefield } from '@/core/domain/Battlefield';
+import { BattleSide } from '@/core/domain/BattleSide';
+import { BattleUnit, type BattleUnitParams } from '@/core/domain/BattleUnit';
 import { CalendarDate } from '@/core/domain/CalendarDate';
 import { Characteristics } from '@/core/domain/Characteristics';
 import { Development } from '@/core/domain/Development';
+import { Facing } from '@/core/domain/Facing';
 import { Family } from '@/core/domain/Family';
 import type { Gem } from '@/core/domain/Gem';
 import { General } from '@/core/domain/General';
@@ -74,8 +80,6 @@ export function makeFamily(params: FamilyParams = {}): Family {
   });
 }
 
-// A family always has a seat; tests that don't exercise it get a placeholder
-// with a negative number that can never match a real province.
 function makePlaceholderHome(): Province {
   placeholderHomeNumber -= 1;
 
@@ -151,4 +155,67 @@ export function advanceTo(world: World, province: Province): void {
   ) {
     world.turnQueue.next();
   }
+}
+
+type MakeBattleParams = Partial<Omit<BattleParams, 'field'>> & {
+  readonly province?: number | undefined;
+};
+
+type MakeBattleUnitParams = Partial<BattleUnitParams> &
+  Pick<BattleUnitParams, 'unit' | 'cell'>;
+
+const LONDRE = 22;
+
+export function makeArmy(params: Partial<ArmyParams> = {}): Army {
+  return new Army({
+    commander: params.commander ?? makeGeneral(),
+    troops: params.troops ?? 200,
+    food: params.food ?? 400,
+    unit: params.unit,
+  });
+}
+
+export function makeBattle(params: MakeBattleParams = {}): Battle {
+  return new Battle({
+    attacker:
+      params.attacker ?? makeArmy({ commander: makeGeneral({ name: 'Erin' }) }),
+    defender:
+      params.defender ??
+      makeArmy({ commander: makeGeneral({ name: 'Eselred' }) }),
+    field: Battlefield.ofProvince(params.province ?? LONDRE),
+  });
+}
+
+export function makeBattleUnit(params: MakeBattleUnitParams): BattleUnit {
+  return new BattleUnit({
+    unit: params.unit,
+    side: params.side ?? BattleSide.attacker,
+    commander: params.commander ?? makeGeneral(),
+    strength: params.strength ?? 40,
+    cell: params.cell,
+    facing: params.facing ?? Facing.east,
+  });
+}
+
+export function station(
+  battle: Battle,
+  unit: BattleUnit,
+  column: number,
+  row: number,
+): BattleUnit {
+  const cell = battle.field.getCell(column, row);
+
+  if (cell) {
+    unit.cell = cell;
+  }
+
+  return unit;
+}
+
+export function runOutTheClock(battle: Battle): Battle {
+  while (!battle.isOver) {
+    battle.endTurn();
+  }
+
+  return battle;
 }

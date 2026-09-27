@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { Army } from '@/core/domain/Army';
 import { Battle } from '@/core/domain/Battle';
 import { BattleOutcome } from '@/core/domain/BattleOutcome';
+import { BattleSide } from '@/core/domain/BattleSide';
 import { Invasion } from '@/core/domain/Invasion';
 import type { InvasionReport } from '@/core/domain/InvasionReport';
 import { BattleEndedEvent } from '@/core/events/BattleEndedEvent';
@@ -83,7 +84,7 @@ describe('WorldEngine settling a battle', () => {
     events.publish(
       new BattleEndedEvent(
         new BattleOutcome({
-          winner: 'attacker',
+          winner: BattleSide.attacker,
           reason: 'flag',
           days: 2,
           attackerSurvivors: attacker.troops,
@@ -109,7 +110,7 @@ describe('WorldEngine settling a battle', () => {
     events.publish(
       new BattleEndedEvent(
         new BattleOutcome({
-          winner: 'attacker',
+          winner: BattleSide.attacker,
           reason: 'flag',
           days: 1,
           attackerSurvivors: attacker.troops,

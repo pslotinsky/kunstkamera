@@ -3,15 +3,18 @@ import { html, type TemplateResult } from 'lit-html';
 import type { Army } from '@/core/domain/Army';
 import type { Battle } from '@/core/domain/Battle';
 import type { BattleClock } from '@/core/domain/BattleClock';
-import type { BattleSide } from '@/core/domain/BattleOutcome';
+import { BattleSide } from '@/core/domain/BattleSide';
 import type { BattleUnit } from '@/core/domain/BattleUnit';
 import { countTo } from '@/lib/dom/countTo';
 import { View } from '@/lib/View';
 
 import { ActionCancelledEvent } from './ActionCancelledEvent';
+import { AutoChosenEvent } from './AutoChosenEvent';
+import { AutoConfirmedEvent } from './AutoConfirmedEvent';
 import { FenceChosenEvent } from './FenceChosenEvent';
 import { RetreatChosenEvent } from './RetreatChosenEvent';
 import { RetreatConfirmedEvent } from './RetreatConfirmedEvent';
+import { SkipChosenEvent } from './SkipChosenEvent';
 import { ENEMY_SIDE, PLAYER_SIDE } from './sides';
 import { TurnDoneEvent } from './TurnDoneEvent';
 import type { BattleScreenContext, BattleScreenViews } from './types';
@@ -21,18 +24,23 @@ import styles from './BattleScreen.module.scss';
 
 type Order =
   | 'retreat'
+  | 'auto'
   | 'confirm'
+  | 'hand-over'
   | 'stay'
   | 'fence'
   | 'cancel'
   | 'wait'
-  | 'done';
+  | 'done'
+  | 'skip';
 
-const IDLE: readonly Order[] = ['retreat', 'done'];
-const ORDERING: readonly Order[] = ['retreat', 'wait', 'done'];
-const BUILDING: readonly Order[] = ['retreat', 'fence', 'wait', 'done'];
+const IDLE: readonly Order[] = ['retreat', 'auto', 'done'];
+const ORDERING: readonly Order[] = ['retreat', 'auto', 'wait', 'done'];
+const BUILDING: readonly Order[] = ['retreat', 'auto', 'fence', 'wait', 'done'];
 const SITING: readonly Order[] = ['cancel'];
 const LEAVING: readonly Order[] = ['confirm', 'stay'];
+const HANDING_OVER: readonly Order[] = ['hand-over', 'stay'];
+const PLAYING_ITSELF: readonly Order[] = ['skip'];
 const WATCHING: readonly Order[] = [];
 
 export class BattleScreenView extends View<
@@ -86,6 +94,20 @@ export class BattleScreenView extends View<
             </button>
             <button
               type="button"
+              data-order="auto"
+              @click=${() => this.publish(new AutoChosenEvent())}
+            >
+              Auto
+            </button>
+            <button
+              type="button"
+              data-order="hand-over"
+              @click=${() => this.publish(new AutoConfirmedEvent())}
+            >
+              Auto
+            </button>
+            <button
+              type="button"
               data-order="stay"
               @click=${() => this.publish(new ActionCancelledEvent())}
             >
@@ -121,6 +143,13 @@ export class BattleScreenView extends View<
               @click=${() => this.publish(new TurnDoneEvent())}
             >
               Done
+            </button>
+            <button
+              type="button"
+              data-order="skip"
+              @click=${() => this.publish(new SkipChosenEvent())}
+            >
+              Skip
             </button>
           </span>
         </footer>
@@ -178,24 +207,32 @@ export class BattleScreenView extends View<
     this.ask(`${unit.name} at ${unit.cell.name} — fence where?`, SITING);
   }
 
-  public showWork(unit: BattleUnit, done: boolean): void {
+  public showWork(unit: BattleUnit, done: boolean, watching = false): void {
     const told = done
       ? 'The fence is up.'
       : `${unit.name} could not manage it.`;
 
-    this.ask(told, IDLE);
+    this.ask(told, watching ? WATCHING : IDLE);
   }
 
-  public showBreaking(unit: BattleUnit, done: boolean): void {
+  public showBreaking(unit: BattleUnit, done: boolean, watching = false): void {
     const told = done
       ? 'The fence comes down.'
       : `${unit.name} could not manage it.`;
 
-    this.ask(told, IDLE);
+    this.ask(told, watching ? WATCHING : IDLE);
   }
 
   public askToRetreat(): void {
     this.ask('Abandon the field and go home?', LEAVING);
+  }
+
+  public askToHandOver(): void {
+    this.ask('Let the computer fight the rest of this battle?', HANDING_OVER);
+  }
+
+  public showHandedOver(commander: string): void {
+    this.ask(`${commander} fights on alone…`, PLAYING_ITSELF);
   }
 
   public showWalking(): void {
