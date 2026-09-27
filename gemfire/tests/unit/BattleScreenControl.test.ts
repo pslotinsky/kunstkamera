@@ -1,9 +1,11 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { BATTLE_DAY_LIMIT } from '@/config/battle';
 import { AttackCommand } from '@/core/commands/province/AttackCommand';
 import { Army } from '@/core/domain/Army';
 import { Battle } from '@/core/domain/Battle';
+import { BattleClock } from '@/core/domain/BattleClock';
 import { BattleSide } from '@/core/domain/BattleSide';
 import { BattleEndedEvent } from '@/core/events/BattleEndedEvent';
 import { BattleStartedEvent } from '@/core/events/BattleStartedEvent';
@@ -21,7 +23,6 @@ import {
 } from './factories';
 
 const LONDRE = 22;
-const WHOLE_BATTLE_TIMEOUT_MS = 60000;
 
 function makeBattle(attacker = makeArmy({ troops: 156 })): Battle {
   return makeShared({
@@ -385,28 +386,26 @@ describe('BattleScreenControl', () => {
     expect(rider.strength).toBeLessThan(whole);
     expect(battle.getArmy(BattleSide.attacker).troops).toBeLessThan(156);
   });
-  it(
-    'reports a battle that runs out exactly once, and as endurance',
-    () => {
-      const { control, events, root } = mountScreen();
-      const battle = makeBattle();
-      const endings: BattleEndedEvent[] = [];
+  it('reports a battle that runs out exactly once, and as endurance', () => {
+    const { control, events, root } = mountScreen();
+    const battle = makeBattle();
+    const endings: BattleEndedEvent[] = [];
 
-      events.subscribe(BattleEndedEvent, (event) => {
-        endings.push(event);
-      });
-      control.play(battle);
-      orderButton(root, 'auto').click();
-      orderButton(root, 'hand-over').click();
-      orderButton(root, 'skip').click();
+    battle.clock = new BattleClock(BATTLE_DAY_LIMIT, 'midnight');
 
-      vi.runAllTimers();
+    events.subscribe(BattleEndedEvent, (event) => {
+      endings.push(event);
+    });
+    control.play(battle);
+    orderButton(root, 'auto').click();
+    orderButton(root, 'hand-over').click();
+    orderButton(root, 'skip').click();
 
-      expect(endings).toHaveLength(1);
-      expect(endings[0]?.outcome.reason).not.toBe('retreat');
-    },
-    WHOLE_BATTLE_TIMEOUT_MS,
-  );
+    vi.runAllTimers();
+
+    expect(endings).toHaveLength(1);
+    expect(endings[0]?.outcome.reason).toBe('endurance');
+  });
 
   it('offers Auto beside Retreat, and asks before it fires', () => {
     const { control, root } = mountScreen();
@@ -450,32 +449,34 @@ describe('BattleScreenControl', () => {
     ).toBe(true);
   });
 
-  it(
-    'finishes a handed-over battle by itself and settles it',
-    () => {
-      const { control, events, root } = mountScreen();
-      const battle = makeBattle(makeArmy({ troops: 156, food: 20 }));
-      let ended: BattleEndedEvent | undefined;
+  it('finishes a handed-over battle by itself and settles it', () => {
+    const { control, events, root } = mountScreen();
+    const battle = makeShared({
+      province: LONDRE,
+      attacker: makeArmy({ troops: 3, food: 1 }),
+      defender: makeArmy({ troops: 3 }),
+    });
+    let ended: BattleEndedEvent | undefined;
 
-      events.subscribe(BattleEndedEvent, (event) => {
-        ended = event;
-      });
-      control.play(battle);
+    battle.clock = new BattleClock(1, 'midnight');
 
-      orderButton(root, 'auto').click();
-      orderButton(root, 'hand-over').click();
-      orderButton(root, 'skip').click();
+    events.subscribe(BattleEndedEvent, (event) => {
+      ended = event;
+    });
+    control.play(battle);
 
-      vi.runAllTimers();
+    orderButton(root, 'auto').click();
+    orderButton(root, 'hand-over').click();
+    orderButton(root, 'skip').click();
 
-      expect(ended).toBeDefined();
-      expect(ended?.outcome.winner).toBe(BattleSide.defender);
-      expect(['retreat', 'starvation', 'rout', 'flag']).toContain(
-        ended?.outcome.reason,
-      );
-    },
-    WHOLE_BATTLE_TIMEOUT_MS,
-  );
+    vi.runAllTimers();
+
+    expect(ended).toBeDefined();
+    expect(ended?.outcome.winner).toBe(BattleSide.defender);
+    expect(['retreat', 'starvation', 'rout', 'flag']).toContain(
+      ended?.outcome.reason,
+    );
+  });
 
   it('breaks a fence beside a unit with one click, no command between', () => {
     const { control, root } = mountScreen();
