@@ -5,7 +5,7 @@ import {
 } from '@/config/battlefields';
 import { PROVINCES } from '@/config/provinces';
 
-import type { BattleSide } from './BattleOutcome';
+import { BattleSide, type BattleSideName } from './BattleSide';
 import { Cell } from './Cell';
 import type { Facing } from './Facing';
 import type { Landscape } from './Province';
@@ -26,10 +26,12 @@ export class Battlefield {
   public readonly columns: number;
   public readonly rows: number;
 
+  private readonly layout: BattlefieldParams;
   private readonly cells: readonly (readonly Cell[])[];
-  private readonly flags = new Map<string, Cell>();
+  private readonly flags = new Map<BattleSideName, Cell>();
 
   public constructor(params: BattlefieldParams) {
+    this.layout = params;
     this.name = params.name;
     this.province = params.province;
     this.rows = params.rows.length;
@@ -50,21 +52,36 @@ export class Battlefield {
   }
 
   public get attackerFlag(): Cell {
-    return this.getFlag('attacker');
+    return this.getFlag(BattleSide.attacker);
   }
 
   public get defenderFlag(): Cell {
-    return this.getFlag('defender');
+    return this.getFlag(BattleSide.defender);
   }
 
   public getFlag(side: BattleSide): Cell {
-    const cell = this.flags.get(side);
+    const cell = this.flags.get(side.name);
 
     if (!cell) {
       throw new Error(`${this.name} has no ${side} flag`);
     }
 
     return cell;
+  }
+
+  public clone(): Battlefield {
+    const copy = new Battlefield(this.layout);
+    const ground = this.allCells;
+
+    copy.allCells.forEach((cell, index) => {
+      const original = ground[index];
+
+      if (original) {
+        cell.copyGround(original);
+      }
+    });
+
+    return copy;
   }
 
   public get allCells(): readonly Cell[] {

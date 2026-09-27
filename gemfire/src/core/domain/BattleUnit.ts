@@ -12,7 +12,7 @@ import {
   WAR_LEVERAGE,
 } from '@/config/battle';
 
-import type { BattleSide } from './BattleOutcome';
+import { BattleSide } from './BattleSide';
 import type { Cell } from './Cell';
 import { Clash } from './Clash';
 import { Facing } from './Facing';
@@ -52,6 +52,23 @@ export class BattleUnit {
     this.facing = params.facing;
   }
 
+  public clone(cell: Cell): BattleUnit {
+    const copy = new BattleUnit({
+      unit: this.unit,
+      side: this.side,
+      commander: this.commander,
+      strength: this.committedStrength,
+      cell,
+      facing: this.facing,
+    });
+
+    copy.strength = this.strength;
+    copy.stepsTaken = this.stepsTaken;
+    copy.hasActed = this.hasActed;
+
+    return copy;
+  }
+
   public get name(): string {
     return this.unit.name;
   }
@@ -80,6 +97,10 @@ export class BattleUnit {
     return this.unit.isTroops;
   }
 
+  public get isFifthUnit(): boolean {
+    return !this.unit.isTroops;
+  }
+
   public get standsAlone(): boolean {
     return this.unit.standsAlone;
   }
@@ -94,6 +115,10 @@ export class BattleUnit {
 
   public get canBuild(): boolean {
     return this.unit.buildsFences;
+  }
+
+  public get isFlying(): boolean {
+    return this.unit.flying;
   }
 
   public get fenceOdds(): number {

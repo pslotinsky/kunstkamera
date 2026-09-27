@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { Army } from '@/core/domain/Army';
 import { Battle } from '@/core/domain/Battle';
 import { BattleOutcome } from '@/core/domain/BattleOutcome';
+import { BattleSide } from '@/core/domain/BattleSide';
 import { Gem } from '@/core/domain/Gem';
 import { HiredUnit } from '@/core/domain/HiredUnit';
 import { Invasion } from '@/core/domain/Invasion';
@@ -92,7 +93,7 @@ describe('Invasion', () => {
 
     const report = invasion.conclude(
       new BattleOutcome({
-        winner: 'attacker',
+        winner: BattleSide.attacker,
         reason: 'flag',
         days: 2,
         attackerSurvivors: attacker.troops,
@@ -111,7 +112,7 @@ describe('Invasion', () => {
     expect(() =>
       invasion.conclude(
         new BattleOutcome({
-          winner: 'attacker',
+          winner: BattleSide.attacker,
           reason: 'flag',
           days: 1,
           attackerSurvivors: attacker.troops,
@@ -128,12 +129,12 @@ describe('Invasion', () => {
     invasion.begin();
     invasion.conclude(
       new BattleOutcome({
-        winner: 'attacker',
+        winner: BattleSide.attacker,
         reason: 'rout',
         days: 2,
         attackerSurvivors: attacker.troops,
         defenderSurvivors: 0,
-        lostUnits: ['defender'],
+        lostUnits: [BattleSide.defender],
       }),
     );
 
@@ -148,7 +149,7 @@ describe('Invasion', () => {
     invasion.begin();
     invasion.conclude(
       new BattleOutcome({
-        winner: 'attacker',
+        winner: BattleSide.attacker,
         reason: 'flag',
         days: 2,
         attackerSurvivors: attacker.troops,
@@ -167,7 +168,7 @@ describe('Invasion', () => {
     invasion.begin();
     invasion.conclude(
       new BattleOutcome({
-        winner: 'attacker',
+        winner: BattleSide.attacker,
         reason: 'flag',
         days: 2,
         attackerSurvivors: attacker.troops,
@@ -188,12 +189,12 @@ describe('Invasion', () => {
     invasion.begin();
     invasion.conclude(
       new BattleOutcome({
-        winner: 'attacker',
+        winner: BattleSide.attacker,
         reason: 'rout',
         days: 2,
         attackerSurvivors: attacker.troops,
         defenderSurvivors: 0,
-        lostUnits: ['defender'],
+        lostUnits: [BattleSide.defender],
       }),
     );
 
@@ -224,7 +225,7 @@ describe('Invasion', () => {
     invasion.begin();
     invasion.conclude(
       new BattleOutcome({
-        winner: 'defender',
+        winner: BattleSide.defender,
         reason: 'endurance',
         days: 5,
         attackerSurvivors: 0,

@@ -1,49 +1,33 @@
 // @vitest-environment node
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { Army } from '@/core/domain/Army';
-import { Battle } from '@/core/domain/Battle';
-import { Battlefield } from '@/core/domain/Battlefield';
+import type { Battle } from '@/core/domain/Battle';
+import { BattleSide } from '@/core/domain/BattleSide';
 import type { BattleUnit } from '@/core/domain/BattleUnit';
 import { HiredUnit } from '@/core/domain/HiredUnit';
 
-import { makeGeneral } from './factories';
+import { makeArmy, makeBattle as makeShared, station } from './factories';
 
 const LONDRE = 22;
 
-// one defender, parked in the corner, so nobody stands where the work happens
 function makeBattle(unit?: HiredUnit) {
-  const battle = new Battle({
-    attacker: new Army({
-      commander: makeGeneral(),
-      troops: 160,
-      food: 400,
-      unit,
-    }),
-    defender: new Army({ commander: makeGeneral(), troops: 1, food: 400 }),
-    field: Battlefield.ofProvince(LONDRE),
+  const battle = makeShared({
+    province: LONDRE,
+    attacker: makeArmy({ troops: 160, unit }),
+    defender: makeArmy({ troops: 1 }),
   });
 
-  for (const guard of battle.getUnits('defender')) {
+  for (const guard of battle.getUnits(BattleSide.defender)) {
     guard.cell = battle.field.getCell(9, 7)!;
   }
 
   return battle;
 }
 
-function station(
-  battle: Battle,
-  unit: BattleUnit,
-  column: number,
-  row: number,
-) {
-  unit.cell = battle.field.getCell(column, row)!;
-
-  return unit;
-}
-
 function findKind(battle: Battle, name: string): BattleUnit {
-  return battle.getUnits('attacker').find((unit) => unit.name === name)!;
+  return battle
+    .getUnits(BattleSide.attacker)
+    .find((unit) => unit.name === name)!;
 }
 
 function luck(roll: number) {
@@ -69,7 +53,6 @@ describe('fences', () => {
     const knights = station(battle, findKind(battle, 'Knights'), 9, 3);
     const sites = battle.getBuildSites(knights).map((cell) => cell.name);
 
-    // I4 is a fence, J3 and J5 are open, and nothing diagonal is beside it
     expect(battle.field.getCell(8, 3)!.terrain).toBe('fence');
     expect(sites).toEqual(['J3', 'J5']);
   });
@@ -134,7 +117,6 @@ describe('fences', () => {
     expect(battle.breakDown(rider, fence)).toBe(true);
     expect(fence.terrain).toBe('plains');
     expect(fence.sprite).toBe('fence-broken');
-    // the work spent its turn, so the ground is walked on the next one
     rider.refresh();
 
     expect(battle.getMoveRange(rider).includes(fence)).toBe(true);

@@ -1,5 +1,6 @@
 import type { Army } from './Army';
 import type { BattleOutcome } from './BattleOutcome';
+import { BattleSide } from './BattleSide';
 import type { DefenderAnswer } from './DefensePolicy';
 import type { Province } from './Province';
 
@@ -34,6 +35,6 @@ export class InvasionReport {
   }
 
   public get isTaken(): boolean {
-    return this.outcome?.isWonBy('attacker') ?? true;
+    return this.outcome?.isWonBy(BattleSide.attacker) ?? true;
   }
 }

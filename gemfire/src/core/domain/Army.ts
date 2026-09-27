@@ -30,6 +30,19 @@ export class Army {
     this.unit = params.unit;
   }
 
+  public clone(): Army {
+    const copy = new Army({
+      commander: this.commander,
+      troops: this.committedTroops,
+      food: this.food,
+      unit: this.unit,
+    });
+
+    copy.troops = this.troops;
+
+    return copy;
+  }
+
   public get strength(): number {
     return this.troops + (this.unit?.strength ?? 0);
   }

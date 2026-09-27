@@ -3,13 +3,10 @@ import { AttackRange } from './AttackRange';
 import { BattleClock } from './BattleClock';
 import { BattleDeployment } from './BattleDeployment';
 import type { Battlefield } from './Battlefield';
-import {
-  BATTLE_SIDES,
-  BattleOutcome,
-  type BattleSide,
-  type OutcomeReason,
-} from './BattleOutcome';
+import { type BattleOutcome } from './BattleOutcome';
+import { BattleSide } from './BattleSide';
 import type { BattleUnit } from './BattleUnit';
+import { BattleVerdict } from './BattleVerdict';
 import type { Cell } from './Cell';
 import type { Clash } from './Clash';
 import { Facing } from './Facing';
@@ -19,6 +16,7 @@ export interface BattleParams {
   readonly attacker: Army;
   readonly defender: Army;
   readonly field: Battlefield;
+  readonly units?: readonly BattleUnit[] | undefined;
 }
 
 export class Battle {
@@ -28,7 +26,7 @@ export class Battle {
   public readonly units: readonly BattleUnit[];
 
   public clock = new BattleClock();
-  public turn: BattleSide = 'attacker';
+  public turn: BattleSide = BattleSide.attacker;
 
   private abandonedBy?: BattleSide | undefined;
 
@@ -37,12 +35,25 @@ export class Battle {
     this.defender = params.defender;
     this.field = params.field;
 
-    const deployment = new BattleDeployment(params.field);
+    this.units = params.units ?? this.deploy(params.field);
+  }
 
-    this.units = [
-      ...deployment.form(this.attacker, 'attacker'),
-      ...deployment.form(this.defender, 'defender'),
-    ];
+  public clone(): Battle {
+    const field = this.field.clone();
+    const copy = new Battle({
+      attacker: this.attacker.clone(),
+      defender: this.defender.clone(),
+      field,
+      units: this.units.map((unit) =>
+        unit.clone(field.getCell(unit.cell.column, unit.cell.row) ?? unit.cell),
+      ),
+    });
+
+    copy.clock = this.clock;
+    copy.turn = this.turn;
+    copy.abandonedBy = this.abandonedBy;
+
+    return copy;
   }
 
   public get isOver(): boolean {
@@ -54,11 +65,11 @@ export class Battle {
   }
 
   public getArmy(side: BattleSide): Army {
-    return side === 'attacker' ? this.attacker : this.defender;
+    return side.isAttacker ? this.attacker : this.defender;
   }
 
   public getUnits(side: BattleSide): readonly BattleUnit[] {
-    return this.standing.filter((unit) => unit.side === side);
+    return this.standing.filter((unit) => unit.side.isEqual(side));
   }
 
   public getUnit(cell: Cell): BattleUnit | undefined {
@@ -87,7 +98,7 @@ export class Battle {
     const range = this.getAttackRange(unit, from);
 
     return this.standing.filter(
-      (other) => other.side !== unit.side && range.includes(other.cell),
+      (other) => !other.side.isEqual(unit.side) && range.includes(other.cell),
     );
   }
 
@@ -103,8 +114,11 @@ export class Battle {
     return clash;
   }
 
-  public getBuildSites(unit: BattleUnit): readonly Cell[] {
-    return this.findBeside(unit).filter(
+  public getBuildSites(
+    unit: BattleUnit,
+    from: Cell = unit.cell,
+  ): readonly Cell[] {
+    return this.findBeside(from).filter(
       (cell) =>
         cell.terrain === 'plains' &&
         !this.isFlag(cell) &&
@@ -112,8 +126,11 @@ export class Battle {
     );
   }
 
-  public getBreakable(unit: BattleUnit): readonly Cell[] {
-    return this.findBeside(unit).filter((cell) => cell.terrain === 'fence');
+  public getBreakable(
+    unit: BattleUnit,
+    from: Cell = unit.cell,
+  ): readonly Cell[] {
+    return this.findBeside(from).filter((cell) => cell.terrain === 'fence');
   }
 
   public build(unit: BattleUnit, cell: Cell): boolean {
@@ -133,9 +150,9 @@ export class Battle {
   }
 
   public endTurn(): void {
-    this.turn = this.turn === 'attacker' ? 'defender' : 'attacker';
+    this.turn = this.turn.opposite;
 
-    if (this.turn === 'attacker') {
+    if (this.turn.isAttacker) {
       this.turnClock();
     }
 
@@ -145,32 +162,21 @@ export class Battle {
   }
 
   public findOutcome(): BattleOutcome | undefined {
-    const abandoned = this.abandonedBy;
-
-    if (abandoned) {
-      return this.decide(this.findEnemy(abandoned), 'retreat');
-    }
-
-    const captured = this.findFlagCaptor();
-
-    if (captured) {
-      return this.decide(captured, 'flag');
-    }
-
-    const routed = BATTLE_SIDES.find(
-      (side) => this.getUnits(side).length === 0,
-    );
-
-    if (routed) {
-      return this.decide(this.findEnemy(routed), 'rout');
-    }
-
-    return this.findStarved() ?? this.findEndured();
+    return new BattleVerdict(this, this.abandonedBy).find();
   }
 
-  private findBeside(unit: BattleUnit): readonly Cell[] {
+  private deploy(field: Battlefield): readonly BattleUnit[] {
+    const deployment = new BattleDeployment(field);
+
+    return [
+      ...deployment.form(this.attacker, BattleSide.attacker),
+      ...deployment.form(this.defender, BattleSide.defender),
+    ];
+  }
+
+  private findBeside(from: Cell): readonly Cell[] {
     const neighbors = Facing.all.map((facing) =>
-      this.field.getNeighbor(unit.cell, facing),
+      this.field.getNeighbor(from, facing),
     );
 
     return neighbors.filter((cell): cell is Cell => cell !== undefined);
@@ -210,24 +216,6 @@ export class Battle {
     }
   }
 
-  private findEnemy(side: BattleSide): BattleSide {
-    return side === 'attacker' ? 'defender' : 'attacker';
-  }
-
-  private findStarved(): BattleOutcome | undefined {
-    const starved = BATTLE_SIDES.find((side) => this.getArmy(side).isStarving);
-
-    return starved
-      ? this.decide(this.findEnemy(starved), 'starvation')
-      : undefined;
-  }
-
-  private findEndured(): BattleOutcome | undefined {
-    return this.clock.isSpent
-      ? this.decide('defender', 'endurance')
-      : undefined;
-  }
-
   private turnClock(): void {
     const opensNewDay = this.clock.isDayEnd;
 
@@ -237,35 +225,5 @@ export class Battle {
       this.attacker.eat();
       this.defender.eat();
     }
-  }
-
-  private findFlagCaptor(): BattleSide | undefined {
-    const onDefenderFlag = this.getUnit(this.field.defenderFlag);
-    const onAttackerFlag = this.getUnit(this.field.attackerFlag);
-
-    if (onDefenderFlag?.side === 'attacker') {
-      return 'attacker';
-    }
-
-    return onAttackerFlag?.side === 'defender' ? 'defender' : undefined;
-  }
-
-  private findLostUnits(): readonly BattleSide[] {
-    return BATTLE_SIDES.filter((side) =>
-      this.units.some(
-        (unit) => unit.side === side && !unit.isTroops && !unit.isStanding,
-      ),
-    );
-  }
-
-  private decide(winner: BattleSide, reason: OutcomeReason): BattleOutcome {
-    return new BattleOutcome({
-      winner,
-      reason,
-      days: this.clock.daysFought,
-      attackerSurvivors: this.attacker.troops,
-      defenderSurvivors: this.defender.troops,
-      lostUnits: this.findLostUnits(),
-    });
   }
 }

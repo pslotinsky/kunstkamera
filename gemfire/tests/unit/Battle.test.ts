@@ -1,46 +1,31 @@
 import { describe, expect, it } from 'vitest';
 
-import { Army } from '@/core/domain/Army';
-import { Battle } from '@/core/domain/Battle';
-import { Battlefield } from '@/core/domain/Battlefield';
+import { BattleSide } from '@/core/domain/BattleSide';
 import type { BattleUnit } from '@/core/domain/BattleUnit';
 import { Facing } from '@/core/domain/Facing';
 import { FifthUnit } from '@/core/domain/FifthUnit';
 import { HiredUnit } from '@/core/domain/HiredUnit';
 
-import { makeGeneral } from './factories';
+import {
+  makeArmy,
+  makeGeneral,
+  makeBattle as makeShared,
+  station,
+} from './factories';
 
 const LONDRE = 22;
 
 function makeBattle(troops = 156, food = 400, unit?: HiredUnit) {
-  const attacker = new Army({
-    commander: makeGeneral({ name: 'Erin' }),
-    troops,
-    food,
-    unit,
+  return makeShared({
+    province: LONDRE,
+    attacker: makeArmy({
+      commander: makeGeneral({ name: 'Erin' }),
+      troops,
+      food,
+      unit,
+    }),
+    defender: makeArmy({ commander: makeGeneral({ name: 'Eselred' }) }),
   });
-  const defender = new Army({
-    commander: makeGeneral({ name: 'Eselred' }),
-    troops: 200,
-    food: 400,
-  });
-
-  return new Battle({
-    attacker,
-    defender,
-    field: Battlefield.ofProvince(LONDRE),
-  });
-}
-
-function station(
-  battle: Battle,
-  unit: BattleUnit,
-  column: number,
-  row: number,
-) {
-  unit.cell = battle.field.getCell(column, row)!;
-
-  return unit;
 }
 
 function destroy(unit: BattleUnit): void {
@@ -50,7 +35,7 @@ function destroy(unit: BattleUnit): void {
 describe('Battle', () => {
   it('splits the troops four ways with the remainder to Horsemen', () => {
     const battle = makeBattle(157);
-    const mine = battle.getUnits('attacker');
+    const mine = battle.getUnits(BattleSide.attacker);
 
     expect(mine.map((unit) => unit.name)).toEqual([
       'Horsemen',
@@ -64,7 +49,7 @@ describe('Battle', () => {
 
   it('gives the committed Fifth Unit the fifth place', () => {
     const battle = makeBattle(156, 400, HiredUnit.ofName('Orks')!);
-    const mine = battle.getUnits('attacker');
+    const mine = battle.getUnits(BattleSide.attacker);
 
     expect(mine).toHaveLength(5);
     expect(mine.at(-1)!.name).toBe('Orks');
@@ -73,15 +58,19 @@ describe('Battle', () => {
 
   it('forms each side up on its own edge around its own flag', () => {
     const battle = makeBattle();
-    const mine = battle.getUnits('attacker').map((unit) => unit.cell.name);
-    const theirs = battle.getUnits('defender').map((unit) => unit.cell.name);
+    const mine = battle
+      .getUnits(BattleSide.attacker)
+      .map((unit) => unit.cell.name);
+    const theirs = battle
+      .getUnits(BattleSide.defender)
+      .map((unit) => unit.cell.name);
 
     expect(mine.every((name) => name.startsWith('A'))).toBe(true);
     expect(theirs.every((name) => name.startsWith('J'))).toBe(true);
     expect(mine).not.toContain('A4');
 
     const facings = battle.units.map((unit) => unit.facing);
-    const attackers = battle.getUnits('attacker');
+    const attackers = battle.getUnits(BattleSide.attacker);
 
     expect(facings).toContain(Facing.east);
     expect(facings).toContain(Facing.west);
@@ -90,7 +79,7 @@ describe('Battle', () => {
 
   it('leaves a unit facing the direction of its last step', () => {
     const battle = makeBattle();
-    const rider = battle.getUnits('attacker')[0]!;
+    const rider = battle.getUnits(BattleSide.attacker)[0]!;
 
     rider.moveAlong([battle.field.getCell(1, 2)!, battle.field.getCell(1, 1)!]);
 
@@ -100,7 +89,7 @@ describe('Battle', () => {
 
   it('takes its facing from a single step, with nowhere to look back to', () => {
     const battle = makeBattle();
-    const rider = battle.getUnits('attacker')[0]!;
+    const rider = battle.getUnits(BattleSide.attacker)[0]!;
     const north = battle.field.getCell(rider.cell.column, rider.cell.row - 1)!;
 
     rider.moveAlong([north]);
@@ -112,8 +101,8 @@ describe('Battle', () => {
   it('leaves two paths to one cell looking two ways', () => {
     const battle = makeBattle();
     const field = battle.field;
-    const east = battle.getUnits('attacker')[0]!;
-    const north = battle.getUnits('attacker')[1]!;
+    const east = battle.getUnits(BattleSide.attacker)[0]!;
+    const north = battle.getUnits(BattleSide.attacker)[1]!;
 
     east.moveAlong([field.getCell(1, 1)!, field.getCell(2, 1)!]);
     north.moveAlong([field.getCell(2, 2)!, field.getCell(2, 1)!]);
@@ -127,7 +116,7 @@ describe('Battle', () => {
     const before = battle.attacker.food;
 
     expect(battle.clock.phase).toBe('sunrise');
-    expect(battle.turn).toBe('attacker');
+    expect(battle.turn).toBe(BattleSide.attacker);
 
     for (let turns = 0; turns < 8; turns += 1) {
       battle.endTurn();
@@ -140,7 +129,7 @@ describe('Battle', () => {
 
   it('frees a unit to act again only on its own next turn', () => {
     const battle = makeBattle();
-    const rider = battle.getUnits('attacker')[0]!;
+    const rider = battle.getUnits(BattleSide.attacker)[0]!;
 
     rider.wait();
     expect(rider.hasActed).toBe(true);
@@ -154,7 +143,7 @@ describe('Battle', () => {
 
   it('ends at once when a unit reaches the enemy flag', () => {
     const battle = makeBattle();
-    const rider = battle.getUnits('attacker')[0]!;
+    const rider = battle.getUnits(BattleSide.attacker)[0]!;
 
     expect(battle.isOver).toBe(false);
 
@@ -162,7 +151,7 @@ describe('Battle', () => {
 
     const outcome = battle.findOutcome()!;
 
-    expect(outcome.isWonBy('attacker')).toBe(true);
+    expect(outcome.isWonBy(BattleSide.attacker)).toBe(true);
     expect(outcome.reason).toBe('flag');
   });
 
@@ -170,7 +159,7 @@ describe('Battle', () => {
     const battle = makeBattle(156, 0);
     const outcome = battle.findOutcome()!;
 
-    expect(outcome.isWonBy('defender')).toBe(true);
+    expect(outcome.isWonBy(BattleSide.defender)).toBe(true);
     expect(outcome.reason).toBe('starvation');
   });
 
@@ -183,14 +172,14 @@ describe('Battle', () => {
 
     const outcome = battle.findOutcome()!;
 
-    expect(outcome.isWonBy('defender')).toBe(true);
+    expect(outcome.isWonBy(BattleSide.defender)).toBe(true);
     expect(outcome.reason).toBe('endurance');
     expect(outcome.days).toBe(5);
   });
   it('strikes the one unit it was pointed at, whatever the pattern reaches', () => {
     const battle = makeBattle(156, 400, HiredUnit.ofName('Fachan')!);
-    const fachan = battle.getUnits('attacker').at(-1)!;
-    const [chosen, beside] = battle.getUnits('defender');
+    const fachan = battle.getUnits(BattleSide.attacker).at(-1)!;
+    const [chosen, beside] = battle.getUnits(BattleSide.defender);
 
     station(battle, fachan, 3, 3);
     station(battle, chosen!, 3, 2);
@@ -206,9 +195,24 @@ describe('Battle', () => {
 
   it('charges a body of troops to the army behind it, a Fifth Unit to nobody', () => {
     const battle = makeBattle(156, 400, HiredUnit.ofName('Orks')!);
-    const rider = station(battle, battle.getUnits('attacker')[0]!, 3, 3);
-    const orks = station(battle, battle.getUnits('attacker').at(-1)!, 2, 3);
-    const knight = station(battle, battle.getUnits('defender')[0]!, 4, 3);
+    const rider = station(
+      battle,
+      battle.getUnits(BattleSide.attacker)[0]!,
+      3,
+      3,
+    );
+    const orks = station(
+      battle,
+      battle.getUnits(BattleSide.attacker).at(-1)!,
+      2,
+      3,
+    );
+    const knight = station(
+      battle,
+      battle.getUnits(BattleSide.defender)[0]!,
+      4,
+      3,
+    );
     const troops = battle.defender.troops;
     const mine = battle.attacker.troops;
 
@@ -228,8 +232,18 @@ describe('Battle', () => {
 
   it('turns a unit to face what it struck', () => {
     const battle = makeBattle();
-    const rider = station(battle, battle.getUnits('attacker')[0]!, 3, 3);
-    const knight = station(battle, battle.getUnits('defender')[0]!, 3, 2);
+    const rider = station(
+      battle,
+      battle.getUnits(BattleSide.attacker)[0]!,
+      3,
+      3,
+    );
+    const knight = station(
+      battle,
+      battle.getUnits(BattleSide.defender)[0]!,
+      3,
+      2,
+    );
 
     rider.facing = Facing.east;
     battle.strike(rider, knight);
@@ -240,8 +254,18 @@ describe('Battle', () => {
 
   it('clears a destroyed piece off the field and frees its ground', () => {
     const battle = makeBattle();
-    const rider = station(battle, battle.getUnits('attacker')[0]!, 6, 1);
-    const knight = station(battle, battle.getUnits('defender')[0]!, 7, 1);
+    const rider = station(
+      battle,
+      battle.getUnits(BattleSide.attacker)[0]!,
+      6,
+      1,
+    );
+    const knight = station(
+      battle,
+      battle.getUnits(BattleSide.defender)[0]!,
+      7,
+      1,
+    );
     const held = knight.cell;
 
     expect(battle.getMoveRange(rider).includes(held)).toBe(false);
@@ -249,7 +273,7 @@ describe('Battle', () => {
     destroy(knight);
 
     expect(battle.getUnit(held)).toBeUndefined();
-    expect(battle.getUnits('defender')).not.toContain(knight);
+    expect(battle.getUnits(BattleSide.defender)).not.toContain(knight);
     expect(battle.getTargets(rider)).not.toContain(knight);
     expect(battle.getMoveRange(rider).includes(held)).toBe(true);
   });
@@ -257,20 +281,20 @@ describe('Battle', () => {
   it('wins by rout when nothing of theirs stands', () => {
     const battle = makeBattle();
 
-    for (const unit of battle.getUnits('defender')) {
+    for (const unit of battle.getUnits(BattleSide.defender)) {
       destroy(unit);
     }
 
     const outcome = battle.findOutcome()!;
 
-    expect(outcome.isWonBy('attacker')).toBe(true);
+    expect(outcome.isWonBy(BattleSide.attacker)).toBe(true);
     expect(outcome.reason).toBe('rout');
   });
 
   it('is no rout while their Fifth Unit still stands', () => {
     const battle = makeBattle(156, 400, HiredUnit.ofName('Orks')!);
 
-    for (const unit of battle.getUnits('attacker')) {
+    for (const unit of battle.getUnits(BattleSide.attacker)) {
       if (unit.isTroops) {
         destroy(unit);
       }
@@ -283,27 +307,27 @@ describe('Battle', () => {
   it('ends at once when a side abandons the field', () => {
     const battle = makeBattle();
 
-    battle.retreat('attacker');
+    battle.retreat(BattleSide.attacker);
 
     const outcome = battle.findOutcome()!;
 
-    expect(outcome.isWonBy('defender')).toBe(true);
+    expect(outcome.isWonBy(BattleSide.defender)).toBe(true);
     expect(outcome.reason).toBe('retreat');
   });
 
   it('reports a Fifth Unit lost on the field', () => {
     const battle = makeBattle(156, 400, HiredUnit.ofName('Orks')!);
-    const orks = battle.getUnits('attacker').at(-1)!;
+    const orks = battle.getUnits(BattleSide.attacker).at(-1)!;
 
-    for (const unit of battle.getUnits('defender')) {
+    for (const unit of battle.getUnits(BattleSide.defender)) {
       destroy(unit);
     }
 
-    expect(battle.findOutcome()!.hasLostUnit('attacker')).toBe(false);
+    expect(battle.findOutcome()!.hasLostUnit(BattleSide.attacker)).toBe(false);
 
     destroy(orks);
 
-    expect(battle.findOutcome()!.hasLostUnit('attacker')).toBe(true);
+    expect(battle.findOutcome()!.hasLostUnit(BattleSide.attacker)).toBe(true);
   });
   it('has a Guardian stand alone where troops and hired bands are many', () => {
     const battle = makeBattle(156, 400, HiredUnit.ofName('Orks')!);
@@ -315,8 +339,10 @@ describe('Battle', () => {
       strength: 150,
     });
 
-    expect(battle.getUnits('attacker')[0]!.standsAlone).toBe(false);
-    expect(battle.getUnits('attacker').at(-1)!.standsAlone).toBe(false);
+    expect(battle.getUnits(BattleSide.attacker)[0]!.standsAlone).toBe(false);
+    expect(battle.getUnits(BattleSide.attacker).at(-1)!.standsAlone).toBe(
+      false,
+    );
     expect(guardian.standsAlone).toBe(true);
   });
 });

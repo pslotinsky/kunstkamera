@@ -71,18 +71,15 @@ describe('UpkeepCommand', () => {
 
     command.execute();
 
-    // Orks (20) is paid, leaving 20; Bugbear (30) is unaffordable and deserts.
     expect(province.resources.gold).toBe(20);
     expect(province.hiredUnits.map((unit) => unit.name)).toEqual(['Orks']);
   });
 
   it('risks a mercenary in proportion to the fame it still wants', () => {
-    // Spearmen settle down at 20 fame.
     const unknown = createFixture({ units: ['Spearmen'], fame: 0 });
 
     unknown.command.execute();
 
-    // A deserter takes no pay with it.
     expect(unknown.province.hiredUnits).toHaveLength(0);
     expect(unknown.province.resources.gold).toBe(100);
 
@@ -93,7 +90,6 @@ describe('UpkeepCommand', () => {
     expect(famous.province.hiredUnits).toHaveLength(1);
     expect(famous.province.resources.gold).toBe(80);
 
-    // Halfway short of the fame they want is a one-in-two chance of desertion.
     rollAt(0.49);
     const unlucky = createFixture({ units: ['Spearmen'], fame: 10 });
 
@@ -136,7 +132,6 @@ describe('UpkeepCommand', () => {
     );
     command.execute();
 
-    // Spearmen (20) are affordable but faithless; Pikemen (40) are just unpaid.
     expect(desertions).toEqual([
       ['Spearmen', 'faithless'],
       ['Pikemen', 'unpaid'],

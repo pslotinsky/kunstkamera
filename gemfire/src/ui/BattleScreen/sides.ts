@@ -1,4 +1,4 @@
-import type { BattleSide } from '@/core/domain/BattleOutcome';
+import { BattleSide } from '@/core/domain/BattleSide';
 
-export const PLAYER_SIDE: BattleSide = 'attacker';
-export const ENEMY_SIDE: BattleSide = 'defender';
+export const PLAYER_SIDE: BattleSide = BattleSide.attacker;
+export const ENEMY_SIDE: BattleSide = BattleSide.defender;

@@ -1,5 +1,4 @@
-export type BattleSide = 'attacker' | 'defender';
-
+import { BattleSide } from './BattleSide';
 export type OutcomeReason =
   | 'flag'
   | 'rout'
@@ -15,8 +14,6 @@ export interface BattleOutcomeParams {
   readonly defenderSurvivors: number;
   readonly lostUnits?: readonly BattleSide[];
 }
-
-export const BATTLE_SIDES: readonly BattleSide[] = ['attacker', 'defender'];
 
 export class BattleOutcome {
   public readonly winner: BattleSide;
@@ -36,10 +33,10 @@ export class BattleOutcome {
   }
 
   public isWonBy(side: BattleSide): boolean {
-    return this.winner === side;
+    return this.winner.isEqual(side);
   }
 
   public hasLostUnit(side: BattleSide): boolean {
-    return this.lostUnits.includes(side);
+    return this.lostUnits.some((lost) => lost.isEqual(side));
   }
 }

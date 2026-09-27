@@ -1,6 +1,6 @@
 import type { Army } from './Army';
 import type { Battlefield } from './Battlefield';
-import type { BattleSide } from './BattleOutcome';
+import { BattleSide } from './BattleSide';
 import { BattleUnit } from './BattleUnit';
 import type { Cell } from './Cell';
 import { Facing } from './Facing';
@@ -81,7 +81,7 @@ export class BattleDeployment {
   private findGround(side: BattleSide, count: number): readonly Cell[] {
     const flag = this.field.getFlag(side);
     const inward = [...Array(this.field.columns).keys()];
-    const columns = side === 'attacker' ? inward : inward.reverse();
+    const columns = side.isAttacker ? inward : inward.reverse();
     const chosen: Cell[] = [];
 
     for (const column of columns) {

@@ -1,12 +1,12 @@
-import type { BattleSide } from '@/core/domain/BattleOutcome';
+import { BattleSide } from '@/core/domain/BattleSide';
 import type { BattleUnit } from '@/core/domain/BattleUnit';
 import type { Facing } from '@/core/domain/Facing';
 import { compact } from '@/lib/array/compact';
 
-const LIVERIES: Readonly<Record<BattleSide, string>> = {
-  attacker: 'red',
-  defender: 'blue',
-};
+const LIVERIES = new Map<BattleSide, string>([
+  [BattleSide.attacker, 'red'],
+  [BattleSide.defender, 'blue'],
+]);
 
 export function unitPiece(
   unit: BattleUnit,
@@ -14,7 +14,7 @@ export function unitPiece(
 ): string {
   const parts = [
     unit.name.toLowerCase(),
-    unit.hasLivery ? LIVERIES[unit.side] : undefined,
+    unit.hasLivery ? LIVERIES.get(unit.side) : undefined,
     facing.aspect,
   ];
   const name = compact(parts).join('-');

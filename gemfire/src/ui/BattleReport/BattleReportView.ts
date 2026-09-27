@@ -2,6 +2,7 @@ import { html, type TemplateResult } from 'lit-html';
 
 import type { Army } from '@/core/domain/Army';
 import type { BattleOutcome } from '@/core/domain/BattleOutcome';
+import { BattleSide } from '@/core/domain/BattleSide';
 import type { InvasionReport } from '@/core/domain/InvasionReport';
 import type { World } from '@/core/domain/World';
 import type { EventBus } from '@/lib/EventBus';
@@ -72,7 +73,7 @@ export class BattleReportView extends View<BattleReportContext> {
 
     let heading = `${province} holds out for ${DAY_COUNTS[outcome.days - 1]} days`;
 
-    if (outcome.isWonBy('attacker')) {
+    if (outcome.isWonBy(BattleSide.attacker)) {
       heading =
         outcome.reason === 'starvation'
           ? `${province} is starved out on the ${day} day`

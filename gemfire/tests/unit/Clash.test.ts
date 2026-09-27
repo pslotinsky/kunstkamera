@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { Battlefield } from '@/core/domain/Battlefield';
+import { BattleSide } from '@/core/domain/BattleSide';
 import { BattleUnit } from '@/core/domain/BattleUnit';
 import type { Clash } from '@/core/domain/Clash';
 import { Facing } from '@/core/domain/Facing';
@@ -54,7 +55,7 @@ function place(
 ): BattleUnit {
   return new BattleUnit({
     unit,
-    side: 'attacker',
+    side: BattleSide.attacker,
     commander: makeGeneral({ war }),
     strength,
     cell: field.getCell(column, row)!,

@@ -120,8 +120,8 @@ The two limits on a battlefield: obstacles you raise yourself, and a Guardian yo
 
 ### 8.5 The tactical AI
 
-- [ ] face an enemy army run by a tactical AI
-- [ ] hand your own army to it and auto-resolve the fight
+- [x] face an enemy army run by a tactical AI
+- [x] hand your own army to it and auto-resolve the fight
 
 ## 9. Conquest & captives
 

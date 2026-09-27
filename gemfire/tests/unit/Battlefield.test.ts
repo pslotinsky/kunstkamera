@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { BATTLEFIELDS } from '@/config/battlefields';
 import { Battlefield } from '@/core/domain/Battlefield';
+import { BattleSide } from '@/core/domain/BattleSide';
 import { BattleUnit } from '@/core/domain/BattleUnit';
 import { Cell } from '@/core/domain/Cell';
 import { Facing } from '@/core/domain/Facing';
@@ -19,7 +20,7 @@ class TestUnit extends Unit {
 function place(unit: Unit, cell: Cell): BattleUnit {
   return new BattleUnit({
     unit,
-    side: 'attacker',
+    side: BattleSide.attacker,
     commander: makeGeneral(),
     strength: 10,
     cell,

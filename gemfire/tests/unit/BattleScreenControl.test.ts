@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AttackCommand } from '@/core/commands/province/AttackCommand';
 import { Army } from '@/core/domain/Army';
 import { Battle } from '@/core/domain/Battle';
-import { Battlefield } from '@/core/domain/Battlefield';
+import { BattleSide } from '@/core/domain/BattleSide';
 import { BattleEndedEvent } from '@/core/events/BattleEndedEvent';
 import { BattleStartedEvent } from '@/core/events/BattleStartedEvent';
 import styles from '@/ui/BattleScreen/BattleScreen.module.scss';
@@ -12,27 +12,23 @@ import { BattleScreenControl } from '@/ui/BattleScreen/BattleScreenControl';
 
 import {
   advanceTo,
+  makeArmy,
   makeFamily,
   makeGeneral,
   makeProvince,
+  makeBattle as makeShared,
   makeWorld,
 } from './factories';
 
 const LONDRE = 22;
+const WHOLE_BATTLE_TIMEOUT_MS = 60000;
 
-function makeArmies() {
-  const attacker = new Army({
-    commander: makeGeneral({ name: 'Erin' }),
-    troops: 156,
-    food: 400,
+function makeBattle(attacker = makeArmy({ troops: 156 })): Battle {
+  return makeShared({
+    province: LONDRE,
+    attacker,
+    defender: makeArmy(),
   });
-  const defender = new Army({
-    commander: makeGeneral({ name: 'Eselred' }),
-    troops: 200,
-    food: 400,
-  });
-
-  return { attacker, defender };
 }
 
 function orderButton(root: HTMLElement, order: string): HTMLButtonElement {
@@ -44,7 +40,7 @@ function isOffered(root: HTMLElement, order: string): boolean {
 }
 
 function parkDefenders(battle: Battle): void {
-  for (const guard of battle.getUnits('defender')) {
+  for (const guard of battle.getUnits(BattleSide.defender)) {
     guard.cell = battle.field.getCell(9, 7)!;
   }
 }
@@ -81,17 +77,10 @@ describe('BattleScreenControl', () => {
 
   it('stays out of the way until a battle starts, then takes over', () => {
     const { control, root } = mountScreen();
-    const { attacker, defender } = makeArmies();
 
     expect(root.classList.contains(styles.hidden!)).toBe(true);
 
-    control.play(
-      new Battle({
-        attacker,
-        defender,
-        field: Battlefield.ofProvince(LONDRE),
-      }),
-    );
+    control.play(makeBattle());
 
     expect(root.classList.contains(styles.hidden!)).toBe(false);
     expect(root.querySelectorAll('[data-column]')).toHaveLength(80);
@@ -104,18 +93,16 @@ describe('BattleScreenControl', () => {
 
   it('reports the outcome when a unit reaches the enemy flag', () => {
     const { control, events, root } = mountScreen();
-    const { attacker, defender } = makeArmies();
-    const field = Battlefield.ofProvince(LONDRE);
-    const battle = new Battle({ attacker, defender, field });
+    const battle = makeBattle();
 
     let ended: BattleEndedEvent | undefined;
     events.subscribe(BattleEndedEvent, (event) => {
       ended = event;
     });
 
-    const flag = field.defenderFlag;
-    const doorstep = field.getCell(flag.column + 1, flag.row)!;
-    const rider = battle.getUnits('attacker')[0]!;
+    const flag = battle.field.defenderFlag;
+    const doorstep = battle.field.getCell(flag.column + 1, flag.row)!;
+    const rider = battle.getUnits(BattleSide.attacker)[0]!;
 
     rider.moveAlong([doorstep]);
     rider.refresh();
@@ -130,11 +117,10 @@ describe('BattleScreenControl', () => {
     getCell(doorstep.column, doorstep.row).click();
     getCell(flag.column, flag.row).click();
 
-    // the piece walks the route before the battle settles
     vi.runAllTimers();
 
     expect(ended?.outcome.reason).toBe('flag');
-    expect(ended?.outcome.isWonBy('attacker')).toBe(true);
+    expect(ended?.outcome.isWonBy(BattleSide.attacker)).toBe(true);
   });
 
   it('holds the acting province turn open while the battle runs', () => {
@@ -184,14 +170,12 @@ describe('BattleScreenControl', () => {
   });
   it('strikes what it can reach without a command in between', () => {
     const { control, root } = mountScreen();
-    const { attacker, defender } = makeArmies();
-    const field = Battlefield.ofProvince(LONDRE);
-    const battle = new Battle({ attacker, defender, field });
-    const rider = battle.getUnits('attacker')[0]!;
-    const knight = battle.getUnits('defender')[0]!;
+    const battle = makeBattle();
+    const rider = battle.getUnits(BattleSide.attacker)[0]!;
+    const knight = battle.getUnits(BattleSide.defender)[0]!;
 
-    rider.cell = field.getCell(6, 1)!;
-    knight.cell = field.getCell(7, 1)!;
+    rider.cell = battle.field.getCell(6, 1)!;
+    knight.cell = battle.field.getCell(7, 1)!;
 
     control.play(battle);
 
@@ -204,21 +188,18 @@ describe('BattleScreenControl', () => {
 
     expect(knight.strength).toBeLessThan(whole);
     expect(rider.hasActed).toBe(true);
-    expect(defender.troops).toBeLessThan(200);
+    expect(battle.getArmy(BattleSide.defender).troops).toBeLessThan(200);
   });
 
   it('finishes a unit that walks somewhere with nothing to strike', () => {
     const { control, root } = mountScreen();
-    const { attacker, defender } = makeArmies();
-    const field = Battlefield.ofProvince(LONDRE);
-    const battle = new Battle({ attacker, defender, field });
-    const rider = battle.getUnits('attacker')[0]!;
+    const battle = makeBattle();
+    const rider = battle.getUnits(BattleSide.attacker)[0]!;
 
-    rider.cell = field.getCell(0, 1)!;
+    rider.cell = battle.field.getCell(0, 1)!;
 
     control.play(battle);
 
-    // the whole allowance in one go: A2 to D2 is its three steps
     cellAt(root, 0, 1).click();
     cellAt(root, 3, 1).click();
 
@@ -231,15 +212,13 @@ describe('BattleScreenControl', () => {
 
   it('lets another unit be picked up after the first has moved', () => {
     const { control, root } = mountScreen();
-    const { attacker, defender } = makeArmies();
-    const field = Battlefield.ofProvince(LONDRE);
-    const battle = new Battle({ attacker, defender, field });
-    const [rider, knight] = battle.getUnits('attacker');
-    const enemy = battle.getUnits('defender')[0]!;
+    const battle = makeBattle();
+    const [rider, knight] = battle.getUnits(BattleSide.attacker);
+    const enemy = battle.getUnits(BattleSide.defender)[0]!;
 
-    rider!.cell = field.getCell(5, 1)!;
-    knight!.cell = field.getCell(0, 1)!;
-    enemy.cell = field.getCell(7, 1)!;
+    rider!.cell = battle.field.getCell(5, 1)!;
+    knight!.cell = battle.field.getCell(0, 1)!;
+    enemy.cell = battle.field.getCell(7, 1)!;
 
     control.play(battle);
 
@@ -253,7 +232,6 @@ describe('BattleScreenControl', () => {
 
     cellAt(root, 0, 1).click();
 
-    // the one you left keeps what it had not spent
     expect(rider!.hasActed).toBe(false);
     expect(rider!.stepsLeft).toBeGreaterThan(0);
     expect(isOffered(root, 'wait')).toBe(true);
@@ -261,13 +239,11 @@ describe('BattleScreenControl', () => {
 
   it('walks the rest of the way after a short first move', () => {
     const { control, root } = mountScreen();
-    const { attacker, defender } = makeArmies();
-    const field = Battlefield.ofProvince(LONDRE);
-    const battle = new Battle({ attacker, defender, field });
-    const rider = battle.getUnits('attacker')[0]!;
+    const battle = makeBattle();
+    const rider = battle.getUnits(BattleSide.attacker)[0]!;
 
     parkDefenders(battle);
-    rider.cell = field.getCell(0, 1)!;
+    rider.cell = battle.field.getCell(0, 1)!;
 
     control.play(battle);
 
@@ -288,14 +264,12 @@ describe('BattleScreenControl', () => {
 
   it('breaks a fence it has walked up to', () => {
     const { control, root } = mountScreen();
-    const { attacker, defender } = makeArmies();
-    const field = Battlefield.ofProvince(LONDRE);
-    const battle = new Battle({ attacker, defender, field });
-    const rider = battle.getUnits('attacker')[0]!;
-    const fence = field.getCell(8, 3)!;
+    const battle = makeBattle();
+    const rider = battle.getUnits(BattleSide.attacker)[0]!;
+    const fence = battle.field.getCell(8, 3)!;
 
     parkDefenders(battle);
-    rider.cell = field.getCell(9, 1)!;
+    rider.cell = battle.field.getCell(9, 1)!;
 
     control.play(battle);
     vi.spyOn(Math, 'random').mockReturnValue(0);
@@ -315,13 +289,11 @@ describe('BattleScreenControl', () => {
 
   it('builds a fence after walking, when the unit is a Knights', () => {
     const { control, root } = mountScreen();
-    const { attacker, defender } = makeArmies();
-    const field = Battlefield.ofProvince(LONDRE);
-    const battle = new Battle({ attacker, defender, field });
-    const knights = battle.getUnits('attacker')[1]!;
+    const battle = makeBattle();
+    const knights = battle.getUnits(BattleSide.attacker)[1]!;
 
     parkDefenders(battle);
-    knights.cell = field.getCell(6, 0)!;
+    knights.cell = battle.field.getCell(6, 0)!;
 
     control.play(battle);
 
@@ -337,18 +309,13 @@ describe('BattleScreenControl', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     cellAt(root, 5, 1).click();
 
-    expect(field.getCell(5, 1)!.terrain).toBe('fence');
+    expect(battle.field.getCell(5, 1)!.terrain).toBe('fence');
     expect(knights.hasActed).toBe(true);
   });
 
   it('asks before it abandons the field, and stays when told to', () => {
     const { control, events, root } = mountScreen();
-    const { attacker, defender } = makeArmies();
-    const battle = new Battle({
-      attacker,
-      defender,
-      field: Battlefield.ofProvince(LONDRE),
-    });
+    const battle = makeBattle();
 
     let ended: BattleEndedEvent | undefined;
     events.subscribe(BattleEndedEvent, (event) => {
@@ -369,18 +336,16 @@ describe('BattleScreenControl', () => {
     orderButton(root, 'confirm').click();
 
     expect(ended?.outcome.reason).toBe('retreat');
-    expect(ended?.outcome.isWonBy('defender')).toBe(true);
+    expect(ended?.outcome.isWonBy(BattleSide.defender)).toBe(true);
   });
   it('hands the turn over and lets the enemy take its own orders', () => {
     const { control, root } = mountScreen();
-    const { attacker, defender } = makeArmies();
-    const field = Battlefield.ofProvince(LONDRE);
-    const battle = new Battle({ attacker, defender, field });
+    const battle = makeBattle();
 
     control.play(battle);
 
     const before = battle
-      .getUnits('defender')
+      .getUnits(BattleSide.defender)
       .map((unit) => `${unit.name}${unit.cell.name}`)
       .join('|');
 
@@ -389,27 +354,25 @@ describe('BattleScreenControl', () => {
     vi.runAllTimers();
 
     const after = battle
-      .getUnits('defender')
+      .getUnits(BattleSide.defender)
       .map((unit) => `${unit.name}${unit.cell.name}`)
       .join('|');
 
     expect(after).not.toBe(before);
-    expect(battle.turn).toBe('attacker');
-    expect(battle.getUnits('attacker').every((unit) => !unit.hasActed)).toBe(
-      true,
-    );
+    expect(battle.turn).toBe(BattleSide.attacker);
+    expect(
+      battle.getUnits(BattleSide.attacker).every((unit) => !unit.hasActed),
+    ).toBe(true);
   });
 
   it('has the enemy strike when its order names a target', () => {
     const { control, root } = mountScreen();
-    const { attacker, defender } = makeArmies();
-    const field = Battlefield.ofProvince(LONDRE);
-    const battle = new Battle({ attacker, defender, field });
-    const rider = battle.getUnits('attacker')[0]!;
-    const guard = battle.getUnits('defender')[0]!;
+    const battle = makeBattle();
+    const rider = battle.getUnits(BattleSide.attacker)[0]!;
+    const guard = battle.getUnits(BattleSide.defender)[0]!;
 
-    rider.cell = field.getCell(6, 1)!;
-    guard.cell = field.getCell(7, 1)!;
+    rider.cell = battle.field.getCell(6, 1)!;
+    guard.cell = battle.field.getCell(7, 1)!;
 
     control.play(battle);
 
@@ -420,17 +383,107 @@ describe('BattleScreenControl', () => {
     vi.runAllTimers();
 
     expect(rider.strength).toBeLessThan(whole);
-    expect(attacker.troops).toBeLessThan(156);
+    expect(battle.getArmy(BattleSide.attacker).troops).toBeLessThan(156);
   });
+  it(
+    'reports a battle that runs out exactly once, and as endurance',
+    () => {
+      const { control, events, root } = mountScreen();
+      const battle = makeBattle();
+      const endings: BattleEndedEvent[] = [];
+
+      events.subscribe(BattleEndedEvent, (event) => {
+        endings.push(event);
+      });
+      control.play(battle);
+      orderButton(root, 'auto').click();
+      orderButton(root, 'hand-over').click();
+      orderButton(root, 'skip').click();
+
+      vi.runAllTimers();
+
+      expect(endings).toHaveLength(1);
+      expect(endings[0]?.outcome.reason).not.toBe('retreat');
+    },
+    WHOLE_BATTLE_TIMEOUT_MS,
+  );
+
+  it('offers Auto beside Retreat, and asks before it fires', () => {
+    const { control, root } = mountScreen();
+    const battle = makeBattle();
+
+    control.play(battle);
+
+    expect(isOffered(root, 'auto')).toBe(true);
+    expect(isOffered(root, 'hand-over')).toBe(false);
+
+    orderButton(root, 'auto').click();
+
+    expect(isOffered(root, 'hand-over')).toBe(true);
+    expect(isOffered(root, 'stay')).toBe(true);
+
+    orderButton(root, 'stay').click();
+
+    expect(isOffered(root, 'hand-over')).toBe(false);
+  });
+
+  it("plays the player's own side once it is handed over", () => {
+    const { control, root } = mountScreen();
+    const battle = makeBattle();
+
+    control.play(battle);
+
+    expect(
+      battle.getUnits(BattleSide.attacker).some((unit) => unit.hasActed),
+    ).toBe(false);
+
+    orderButton(root, 'auto').click();
+    orderButton(root, 'hand-over').click();
+
+    expect(isOffered(root, 'skip')).toBe(true);
+    expect(isOffered(root, 'auto')).toBe(false);
+
+    vi.advanceTimersByTime(2000);
+
+    expect(
+      battle.getUnits(BattleSide.attacker).some((unit) => unit.hasActed),
+    ).toBe(true);
+  });
+
+  it(
+    'finishes a handed-over battle by itself and settles it',
+    () => {
+      const { control, events, root } = mountScreen();
+      const battle = makeBattle(makeArmy({ troops: 156, food: 20 }));
+      let ended: BattleEndedEvent | undefined;
+
+      events.subscribe(BattleEndedEvent, (event) => {
+        ended = event;
+      });
+      control.play(battle);
+
+      orderButton(root, 'auto').click();
+      orderButton(root, 'hand-over').click();
+      orderButton(root, 'skip').click();
+
+      vi.runAllTimers();
+
+      expect(ended).toBeDefined();
+      expect(ended?.outcome.winner).toBe(BattleSide.defender);
+      expect(['retreat', 'starvation', 'rout', 'flag']).toContain(
+        ended?.outcome.reason,
+      );
+    },
+    WHOLE_BATTLE_TIMEOUT_MS,
+  );
+
   it('breaks a fence beside a unit with one click, no command between', () => {
     const { control, root } = mountScreen();
-    const { attacker, defender } = makeArmies();
-    const field = Battlefield.ofProvince(LONDRE);
-    const battle = new Battle({ attacker, defender, field });
-    const rider = battle.getUnits('attacker')[0]!;
-    const fence = field.getCell(8, 3)!;
+    const battle = makeBattle();
+    const rider = battle.getUnits(BattleSide.attacker)[0]!;
+    const fence = battle.field.getCell(8, 3)!;
 
-    rider.cell = field.getCell(9, 3)!;
+    rider.cell = battle.field.getCell(9, 3)!;
     expect(fence.terrain).toBe('fence');
 
     control.play(battle);
@@ -445,14 +498,12 @@ describe('BattleScreenControl', () => {
 
   it('offers Fence only to a Knights, and sites it behind the button', () => {
     const { control, root } = mountScreen();
-    const { attacker, defender } = makeArmies();
-    const field = Battlefield.ofProvince(LONDRE);
-    const battle = new Battle({ attacker, defender, field });
-    const rider = battle.getUnits('attacker')[0]!;
-    const knights = battle.getUnits('attacker')[1]!;
+    const battle = makeBattle();
+    const rider = battle.getUnits(BattleSide.attacker)[0]!;
+    const knights = battle.getUnits(BattleSide.attacker)[1]!;
 
-    rider.cell = field.getCell(6, 0)!;
-    knights.cell = field.getCell(6, 1)!;
+    rider.cell = battle.field.getCell(6, 0)!;
+    knights.cell = battle.field.getCell(6, 1)!;
 
     control.play(battle);
 
@@ -466,18 +517,16 @@ describe('BattleScreenControl', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     cellAt(root, 5, 1).click();
 
-    expect(field.getCell(5, 1)!.terrain).toBe('fence');
+    expect(battle.field.getCell(5, 1)!.terrain).toBe('fence');
     expect(knights.hasActed).toBe(true);
   });
 
   it('leaves siting without spending the turn', () => {
     const { control, root } = mountScreen();
-    const { attacker, defender } = makeArmies();
-    const field = Battlefield.ofProvince(LONDRE);
-    const battle = new Battle({ attacker, defender, field });
-    const knights = battle.getUnits('attacker')[1]!;
+    const battle = makeBattle();
+    const knights = battle.getUnits(BattleSide.attacker)[1]!;
 
-    knights.cell = field.getCell(6, 1)!;
+    knights.cell = battle.field.getCell(6, 1)!;
 
     control.play(battle);
 

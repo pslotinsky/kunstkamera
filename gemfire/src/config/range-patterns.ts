@@ -3,6 +3,7 @@ import type { RangePattern } from '@/core/domain/Unit';
 export const RANGE_REACH = 2;
 
 // biome-ignore format: keep each 5x5 grid legible as stacked rows (spec §C.6)
+// prettier-ignore
 export const RANGE_GRIDS: Record<RangePattern, readonly string[]> = {
   short: [
     'ooooo',

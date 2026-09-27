@@ -1,4 +1,4 @@
-import type { BattleSide } from './BattleOutcome';
+import { BattleSide } from './BattleSide';
 import type { Cell } from './Cell';
 
 export type Aspect = 'front' | 'back' | 'side';
@@ -17,7 +17,7 @@ export class Facing {
   ];
 
   public static towardEnemy(side: BattleSide): Facing {
-    return side === 'attacker' ? Facing.east : Facing.west;
+    return side.isAttacker ? Facing.east : Facing.west;
   }
 
   public static toward(from: Cell, to: Cell): Facing {
@@ -57,11 +57,11 @@ export class Facing {
   }
 
   public get isMirrored(): boolean {
-    return this === Facing.west;
+    return this.isEqual(Facing.west);
   }
 
   public isEqual(other: Facing): boolean {
-    return this === other;
+    return this.name === other.name;
   }
 
   public toString(): string {

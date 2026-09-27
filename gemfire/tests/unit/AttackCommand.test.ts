@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { AttackCommand } from '@/core/commands/province/AttackCommand';
 import { Army, type ArmyParams } from '@/core/domain/Army';
-import { BattleOutcome, type BattleSide } from '@/core/domain/BattleOutcome';
+import { BattleOutcome } from '@/core/domain/BattleOutcome';
+import { BattleSide } from '@/core/domain/BattleSide';
 import { Gem } from '@/core/domain/Gem';
 import { HiredUnit } from '@/core/domain/HiredUnit';
 import type { InvasionReport } from '@/core/domain/InvasionReport';
@@ -196,11 +197,11 @@ describe('AttackCommand', () => {
       setup();
 
     attack({ commander: pender });
-    finish('attacker');
+    finish(BattleSide.attacker);
 
     const outcome = report()!.outcome!;
 
-    expect(outcome.isWonBy('attacker')).toBe(true);
+    expect(outcome.isWonBy(BattleSide.attacker)).toBe(true);
     expect(enemy.belongsTo(mine)).toBe(true);
     expect(enemy.ruledBy(pender)).toBe(true);
     expect(enemy.resources.troops).toBe(outcome.attackerSurvivors);
@@ -211,7 +212,7 @@ describe('AttackCommand', () => {
     const { erin, enemy, attack, finish } = setup();
 
     attack({ commander: erin });
-    finish('attacker');
+    finish(BattleSide.attacker);
 
     expect(enemy.ruledBy(erin)).toBe(true);
     expect(enemy.isRemotelyRuled).toBe(true);
@@ -224,11 +225,11 @@ describe('AttackCommand', () => {
     });
 
     attack({ troops: 20, food: 120 });
-    finish('defender');
+    finish(BattleSide.defender);
 
     const outcome = report()!.outcome!;
 
-    expect(outcome.isWonBy('defender')).toBe(true);
+    expect(outcome.isWonBy(BattleSide.defender)).toBe(true);
     expect(enemy.belongsTo(rival)).toBe(true);
     expect(enemy.ruledBy(seth)).toBe(true);
     expect(enemy.resources.troops).toBe(outcome.defenderSurvivors);
@@ -258,7 +259,7 @@ describe('AttackCommand', () => {
     source.addUnit(HiredUnit.ofName('Orks')!);
 
     attack({ unit: source.hiredUnits[0] });
-    finish('attacker');
+    finish(BattleSide.attacker);
 
     expect(enemy.hiredUnits.map((unit) => unit.name)).toEqual(['Orks']);
     expect(source.hiredUnits).toHaveLength(0);
@@ -268,7 +269,7 @@ describe('AttackCommand', () => {
     const { mine, enemy, attack, finish } = setup();
 
     attack({ unit: mine.guardians[0] });
-    finish('attacker');
+    finish(BattleSide.attacker);
 
     expect(enemy.hiredUnits).toHaveLength(0);
     expect(mine.guardians.map((guardian) => guardian.name)).toEqual(['Zendor']);

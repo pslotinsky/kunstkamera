@@ -3,7 +3,8 @@ import { GEM_REST_MONTHS, GEM_REST_MONTHS_DEFEATED } from '@/config/battle';
 import { Army } from './Army';
 import { Battle } from './Battle';
 import { Battlefield } from './Battlefield';
-import type { BattleOutcome, BattleSide } from './BattleOutcome';
+import type { BattleOutcome } from './BattleOutcome';
+import { BattleSide } from './BattleSide';
 import type { DefenderAnswer } from './DefensePolicy';
 import { DefensePolicy } from './DefensePolicy';
 import type { Family } from './Family';
@@ -148,11 +149,11 @@ export class Invasion {
   private buryUnits(report: InvasionReport): void {
     const outcome = report.outcome!;
 
-    if (outcome.hasLostUnit('attacker')) {
+    if (outcome.hasLostUnit(BattleSide.attacker)) {
       this.dismiss(this.attacker.unit, this.source);
     }
 
-    if (outcome.hasLostUnit('defender')) {
+    if (outcome.hasLostUnit(BattleSide.defender)) {
       this.dismiss(report.defender.unit, this.target);
     }
   }
@@ -160,8 +161,18 @@ export class Invasion {
   private restGems(report: InvasionReport): void {
     const outcome = report.outcome!;
 
-    this.restGem(this.source.family, this.attacker.unit, outcome, 'attacker');
-    this.restGem(this.target.family, report.defender.unit, outcome, 'defender');
+    this.restGem(
+      this.source.family,
+      this.attacker.unit,
+      outcome,
+      BattleSide.attacker,
+    );
+    this.restGem(
+      this.target.family,
+      report.defender.unit,
+      outcome,
+      BattleSide.defender,
+    );
   }
 
   private restGem(
