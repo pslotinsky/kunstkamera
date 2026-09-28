@@ -11,6 +11,10 @@ export class Collection<Key extends string | number, Value> {
     return [...this.items.values()];
   }
 
+  public remove(key: Key): void {
+    this.items.delete(key);
+  }
+
   public getOrFail(key: Key): Value {
     const value = this.items.get(key);
 

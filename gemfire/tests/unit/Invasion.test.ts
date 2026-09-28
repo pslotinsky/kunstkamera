@@ -9,7 +9,13 @@ import { HiredUnit } from '@/core/domain/HiredUnit';
 import { Invasion } from '@/core/domain/Invasion';
 import { InvasionReport } from '@/core/domain/InvasionReport';
 
-import { makeFamily, makeGeneral, makeProvince, makeWorld } from './factories';
+import {
+  makeFamily,
+  makeGeneral,
+  makeOutcome,
+  makeProvince,
+  makeWorld,
+} from './factories';
 
 const SOURCE_GOLD = 200;
 const SOURCE_TROOPS = 156;
@@ -92,7 +98,7 @@ describe('Invasion', () => {
     invasion.begin();
 
     const report = invasion.conclude(
-      new BattleOutcome({
+      makeOutcome({
         winner: BattleSide.attacker,
         reason: 'flag',
         days: 2,
@@ -111,7 +117,7 @@ describe('Invasion', () => {
 
     expect(() =>
       invasion.conclude(
-        new BattleOutcome({
+        makeOutcome({
           winner: BattleSide.attacker,
           reason: 'flag',
           days: 1,
@@ -148,7 +154,7 @@ describe('Invasion', () => {
     target.addUnit(orks);
     invasion.begin();
     invasion.conclude(
-      new BattleOutcome({
+      makeOutcome({
         winner: BattleSide.attacker,
         reason: 'flag',
         days: 2,
@@ -167,7 +173,7 @@ describe('Invasion', () => {
 
     invasion.begin();
     invasion.conclude(
-      new BattleOutcome({
+      makeOutcome({
         winner: BattleSide.attacker,
         reason: 'flag',
         days: 2,
@@ -224,7 +230,7 @@ describe('Invasion', () => {
 
     invasion.begin();
     invasion.conclude(
-      new BattleOutcome({
+      makeOutcome({
         winner: BattleSide.defender,
         reason: 'endurance',
         days: 5,

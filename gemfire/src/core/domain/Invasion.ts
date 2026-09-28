@@ -5,6 +5,7 @@ import { Battle } from './Battle';
 import { Battlefield } from './Battlefield';
 import type { BattleOutcome } from './BattleOutcome';
 import { BattleSide } from './BattleSide';
+import { Conquest } from './Conquest';
 import type { DefenderAnswer } from './DefensePolicy';
 import { DefensePolicy } from './DefensePolicy';
 import type { Family } from './Family';
@@ -136,7 +137,23 @@ export class Invasion {
       this.evacuate(report.refuge);
     }
 
-    this.displaced = report.isTaken ? this.capture() : this.comeHome();
+    const conquest = new Conquest({
+      world: this.world,
+      source: this.source,
+      report,
+    });
+
+    report.captive = conquest.takeCaptive();
+    this.displaced = report.isTaken ? this.overrun(conquest) : this.comeHome();
+  }
+
+  private overrun(conquest: Conquest): readonly Province[] {
+    const defending = this.target.family;
+    const displaced = this.capture();
+
+    conquest.endHouse(defending);
+
+    return displaced;
   }
 
   private applyLosses(defender: Army): void {
@@ -215,7 +232,7 @@ export class Invasion {
   private capture(): readonly Province[] {
     const owner = this.source.family!;
 
-    this.target.family = owner;
+    this.target.claim(owner);
 
     const vacated = this.seat(this.attacker.commander, owner);
 

@@ -7,8 +7,12 @@ export class Stat {
     this.value = Math.min(Math.max(Math.floor(value), 0), max);
   }
 
-  public add(amount: number): Stat {
+  public increase(amount: number): Stat {
     return new Stat(this.value + amount, this.max);
+  }
+
+  public decrease(amount: number): Stat {
+    return new Stat(this.value - amount, this.max);
   }
 
   public multiply(coefficient: number): Stat {

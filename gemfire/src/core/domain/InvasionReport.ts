@@ -1,6 +1,7 @@
 import type { Army } from './Army';
 import type { BattleOutcome } from './BattleOutcome';
 import { BattleSide } from './BattleSide';
+import type { Captive } from './Captive';
 import type { DefenderAnswer } from './DefensePolicy';
 import type { Province } from './Province';
 
@@ -20,6 +21,8 @@ export class InvasionReport {
   public readonly answer: DefenderAnswer;
   public readonly outcome: BattleOutcome | undefined;
   public readonly refuge: Province | undefined;
+
+  public captive: Captive | undefined;
 
   public constructor(params: InvasionReportParams) {
     this.target = params.target;

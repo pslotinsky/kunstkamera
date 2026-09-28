@@ -25,6 +25,8 @@ export class World {
   public readonly generals: Collection<string, General>;
   public readonly player: Family;
 
+  private exiled: readonly General[] = [];
+
   public constructor(params: WorldParams) {
     this.date = params.date;
     this.map = params.map;
@@ -32,6 +34,20 @@ export class World {
     this.generals = params.generals;
     this.player = params.player;
     this.turnQueue = new TurnQueue(this.map.provinces);
+  }
+
+  public exile(general: General): void {
+    this.exiled = [...this.exiled, general];
+    this.generals.remove(general.name);
+  }
+
+  public isExiled(general: General): boolean {
+    return this.exiled.some((each) => each.isEqual(general));
+  }
+
+  public dissolve(house: Family, victor: Family): void {
+    house.surrenderTo(victor);
+    this.families.remove(house.name);
   }
 
   public isProvinceTurn(province: Province): boolean {

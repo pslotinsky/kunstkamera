@@ -18,7 +18,7 @@ export interface FamilyParams {
 export class Family {
   public readonly name: string;
   public ruler: General;
-  public readonly members: readonly General[];
+  public members: readonly General[];
   public homeProvince: Province;
   public fame: number;
   public gems: readonly Gem[];
@@ -31,6 +31,21 @@ export class Family {
     this.homeProvince = params.homeProvince;
     this.fame = params.fame ?? 0;
     this.gems = params.gems ?? [];
+  }
+
+  public enlist(general: General): void {
+    if (!this.members.some((member) => member.isEqual(general))) {
+      this.members = [...this.members, general];
+    }
+  }
+
+  public discharge(general: General): void {
+    this.members = this.members.filter((member) => !member.isEqual(general));
+  }
+
+  public surrenderTo(victor: Family): void {
+    victor.gems = [...victor.gems, ...this.gems];
+    this.gems = [];
   }
 
   public get guardians(): readonly FifthUnit[] {

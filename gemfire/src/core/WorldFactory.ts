@@ -172,8 +172,11 @@ export class WorldFactory {
         ? generals.getOrFail(definition.governor)
         : undefined;
 
-      province.family = family;
-      province.governor = resident ?? family?.ruler;
+      if (family) {
+        province.claim(family);
+      }
+
+      province.assignGovernor(resident ?? family?.ruler);
     }
   }
 }

@@ -1,15 +1,24 @@
 import { Army, type ArmyParams } from '@/core/domain/Army';
 import { Battle, type BattleParams } from '@/core/domain/Battle';
 import { Battlefield } from '@/core/domain/Battlefield';
+import {
+  BattleOutcome,
+  type BattleOutcomeParams,
+} from '@/core/domain/BattleOutcome';
 import { BattleSide } from '@/core/domain/BattleSide';
 import { BattleUnit, type BattleUnitParams } from '@/core/domain/BattleUnit';
 import { CalendarDate } from '@/core/domain/CalendarDate';
+import { Captive, type CaptiveParams } from '@/core/domain/Captive';
 import { Characteristics } from '@/core/domain/Characteristics';
 import { Development } from '@/core/domain/Development';
 import { Facing } from '@/core/domain/Facing';
 import { Family } from '@/core/domain/Family';
 import type { Gem } from '@/core/domain/Gem';
 import { General } from '@/core/domain/General';
+import {
+  InvasionReport,
+  type InvasionReportParams,
+} from '@/core/domain/InvasionReport';
 import { Province } from '@/core/domain/Province';
 import { Resources } from '@/core/domain/Resources';
 import { World } from '@/core/domain/World';
@@ -172,6 +181,40 @@ export function makeArmy(params: Partial<ArmyParams> = {}): Army {
     troops: params.troops ?? 200,
     food: params.food ?? 400,
     unit: params.unit,
+  });
+}
+
+export function makeOutcome(
+  params: Partial<BattleOutcomeParams> = {},
+): BattleOutcome {
+  return new BattleOutcome({
+    winner: params.winner ?? BattleSide.attacker,
+    reason: params.reason ?? 'flag',
+    days: params.days ?? 2,
+    attackerSurvivors: params.attackerSurvivors ?? 60,
+    defenderSurvivors: params.defenderSurvivors ?? 0,
+    lostUnits: params.lostUnits ?? [],
+  });
+}
+
+export function makeInvasionReport(
+  params: Partial<InvasionReportParams> = {},
+): InvasionReport {
+  return new InvasionReport({
+    target: params.target ?? makeProvince(),
+    attacker: params.attacker ?? makeArmy(),
+    defender: params.defender ?? makeArmy(),
+    answer: params.answer ?? 'fight',
+    outcome: 'outcome' in params ? params.outcome : makeOutcome(),
+    refuge: params.refuge,
+  });
+}
+
+export function makeCaptive(params: Partial<CaptiveParams> = {}): Captive {
+  return new Captive({
+    general: params.general ?? makeGeneral(),
+    house: params.house ?? makeFamily(),
+    captor: params.captor ?? makeFamily(),
   });
 }
 
