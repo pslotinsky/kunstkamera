@@ -1,5 +1,5 @@
 import type { Captive } from './Captive';
-import type { Family } from './Family';
+import { Succession, type SuccessionOutcome } from './Succession';
 import type { World } from './World';
 
 const RECRUIT_ODDS = 0.5;
@@ -31,15 +31,20 @@ export class Captivity {
     captive.general.decreaseWar(RELEASE_WAR_LOSS);
   }
 
-  public banish(captive: Captive): void {
+  public banish(captive: Captive): SuccessionOutcome | undefined {
+    const { general, house, captor } = captive;
     const wasRuler = captive.isRuler;
 
-    captive.house.discharge(captive.general);
-    this.world.exile(captive.general);
-
-    if (wasRuler) {
-      this.scatter(captive.house, captive.captor);
+    if (!wasRuler) {
+      this.world.getRuledProvince(general)?.assignGovernor(house.ruler);
     }
+
+    house.discharge(general);
+    this.world.exile(general);
+
+    return wasRuler
+      ? new Succession(this.world).replace(house, captor)
+      : undefined;
   }
 
   private turn(captive: Captive): void {
@@ -51,13 +56,5 @@ export class Captivity {
     if (wasRuler) {
       this.world.absorb(captive.house, captive.captor);
     }
-  }
-
-  private scatter(house: Family, victor: Family): void {
-    for (const province of this.world.getFamilyProvinces(house)) {
-      province.unclaim();
-    }
-
-    this.world.dissolve(house, victor);
   }
 }

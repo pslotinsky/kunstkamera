@@ -95,13 +95,13 @@ flowchart LR
 
 **Banishing a ruler changes behaviour from feature 9.** Today `Captivity.banish` unclaims every province and hands the gems to the captor. That skips succession and ignores the lords. With this feature, banishing goes through `Succession` like a death does: an heir is crowned if there is one, and otherwise the family disbands by the rules above, with the gems going to the banisher. Recruiting a ruler is unchanged: "successfully Recruiting a family leader immediately puts all of his territories, vassals, and armies under the player's control" (FAQ), so it is still an absorption, not a succession.
 
-**Where the work lives.** Three jobs, three classes. `Ageing` moves stats in January. `Mortality` decides who dies this month and clears the dead out of the world. `Succession` answers what happens to a family without its ruler. They run at the start of the month, from `WorldEngine`, before tax, so a province's governor is already settled when it acts. Removing a general from the world goes on `World.bury`, next to `World.exile`: a buried general leaves his family, any captivity and any governorship, and his province falls back to remote rule by his ruler. A captive stays a member of his family until he is disposed of (feature 9), so `Family.getHeirs` takes the world's captives into account: a kinsman in chains cannot be crowned.
+**Where the work lives.** How a general ages and when he is due to die are facts about one general, so they live on `General`, the way `HiredUnit.getDesertionRisk` does for a hired unit: `getYearlyChange` says how far his stats move this year, and `getDeathRisk` says how likely he is to die this month. What happens to a family without its ruler spans the family, its provinces and the world, so it is a domain service, `Succession`. `LifecycleCommand` rolls the dice and runs succession at the start of the month, from `WorldEngine`, before tax, so a province's governor is already settled when it acts. Removing a general from the world goes on `World.bury`, next to `World.exile`: a buried general leaves his family, any captivity and any governorship, and his province falls back to remote rule by his ruler. A captive stays a member of his family until he is disposed of (feature 9), so `World.getHeirs` takes the world's captives into account: a kinsman in chains cannot be crowned.
 
-**What waits for later features.** Feature 13 shows defeat. Here the player's family can disband too, which is defeat; this feature announces it, and 13 gives it its screen. Feature 14 adds the banshee's wail when a ruler dies; this feature only publishes the death, which is what the wail will listen for.
+**What waits for later features.** Feature 13 shows defeat. Here the player's family can disband too, which is defeat: this feature announces it (_Your house is no more._) and stops the game, since no month should start for a player with nothing left; 13 gives it its screen. Feature 14 adds the banshee's wail when a ruler dies; this feature only publishes the death, which is what the wail will listen for.
 
 ## Overview
 
-Three pieces of logic and one choice. **`Ageing`** moves stats every January. **`Mortality`** finds who is due to die and buries them. **`Succession`** crowns an heir or disbands the family. **`CrownCommand`** lets the player overrule the preselected heir from the announcement.
+Two rules on the general, one service, two outcomes and one choice. **`General`** knows how far he ages this year and how likely he is to die this month. **`Succession`** crowns an heir or disbands the family, and returns a **`Coronation`** or a **`Disbanding`** that says what happened. **`LifecycleCommand`** rolls for growth every January and for death every month, runs succession, and reports the news. **`CrownCommand`** lets the player overrule the preselected heir from the announcement.
 
 ## Domain model
 
@@ -112,76 +112,80 @@ classDiagram
     +deathDate CalendarDate
     +lineage string
     +getAgeAt(date) number
-    +isDueToDieOn(date) bool
+    +getYearlyChange(date, isRuler) number
+    +getDeathRisk(date) number
     +age(amount) void
   }
-  class Family {
-    +ruler General
-    +getHeirs() General[]
+  class Succession {
+    +replace(family, banisher) Coronation | Disbanding
+  }
+  class Coronation {
+    +heirs General[]
+    +heir General
+    +isChoiceFor(family) bool
     +crown(heir) void
   }
-  class Ageing {
-    +turnYear(date) void
-  }
-  class Mortality {
-    +takeTheDead(date) General[]
-  }
-  class Succession {
-    +replace(family, banisher) void
+  class Disbanding {
+    +breakaways Family[]
+    +gems Gem[]
+    +beneficiary Family
   }
   class World {
     +bury(general) void
+    +getHeirs(family) General[]
     +foundFamily(lord, province) Family
+    +isDefeated bool
   }
-  class CrownCommand {
-    +crown(heir) void
-    +execute() void
-  }
-  Ageing --> General : age
-  Mortality --> World : bury
-  Mortality --> Succession : ruler died
-  Captivity --> Succession : ruler banished
-  Succession --> Family : crown heir
+  class LifecycleCommand
+  class CrownCommand
+  LifecycleCommand --> General : roll growth and death
+  LifecycleCommand --> World : bury
+  LifecycleCommand --> Succession : a ruler died
+  Captivity --> Succession : a ruler was banished
+  Succession --> Coronation : heir found
+  Succession --> Disbanding : no heir
   Succession --> World : found breakaway families
-  CrownCommand --> Family : crown chosen heir
+  CrownCommand --> Coronation : crown the chosen heir
 ```
 
-| Class        | Responsibility                                                                               |
-| ------------ | -------------------------------------------------------------------------------------------- |
-| `Ageing`     | Each January, moves every general's stats up or down by his age and rank.                    |
-| `Mortality`  | Finds the generals due to die this month, buries them, and hands rulerless families on.       |
-| `Succession` | Crowns the strongest heir of a family without a ruler, or disbands it.                       |
-| `General`    | Knows when he is due to die and how to age by an amount.                                     |
-| `Family`     | Knows its heirs and how to crown one.                                                        |
-| `World`      | Removes a dead general everywhere he appears, and founds breakaway families from free names. |
+| Class              | Responsibility                                                                                   |
+| ------------------ | ------------------------------------------------------------------------------------------------ |
+| `General`          | Knows how far his stats move this year and how likely he is to die this month.                   |
+| `Succession`       | Crowns the strongest heir of a family without a ruler, or disbands it.                           |
+| `Coronation`       | A crowning: the heirs there were, who wears the crown, and the seats that went with it.          |
+| `Disbanding`       | A family's end: the breakaway families it left, and where its gems went.                         |
+| `World`            | Buries the dead everywhere they appear, lists a family's heirs, and founds breakaway families.   |
+| `LifecycleCommand` | Rolls for growth and death, runs succession, and publishes the news.                             |
 
-`deathDate` is scheduled by `WorldFactory`, which already rolls each general's birth month. The canonical family names become config, `FAMILY_NAMES`, since breakaway families are drawn from them. Mortality publishes `GeneralDiedEvent` (the general, his family, and the heir crowned, if any), and Succession publishes `FamilyDisbandedEvent` (the family, the breakaway families, and where its gems went).
+`deathDate` is scheduled by `WorldFactory`, which already rolls each general's birth month. The breakaway names are config, `BREAKAWAY_NAMES`: the canonical family names except Lankshire, since the royal line cannot be refounded by a vassal. `LifecycleCommand` publishes `GeneralDiedEvent` for a general who was not a ruler, and `SuccessionReportedEvent` (with the coronation or disbanding, and whether it came from a death or a banishment) for a ruler; banishing a ruler from the captive dialog publishes the same event. The game stops when `World.isDefeated`: the engine no longer ends turns once the player's family is gone.
 
 ## Flow
 
 ```mermaid
 sequenceDiagram
   participant Engine as WorldEngine
-  participant Ageing
-  participant Mortality
+  participant Life as LifecycleCommand
   participant World
   participant Succession
   participant News as Announcements
 
-  Engine->>Ageing: turnYear(date) — January only
-  Engine->>Mortality: takeTheDead(date)
-  Mortality->>World: bury(general)
-  opt the dead was a ruler
-    Mortality->>Succession: replace(family)
+  Engine->>Life: execute() at the start of the month
+  Life->>Life: roll each general's getYearlyChange — January only
+  Life->>Life: roll each general's getDeathRisk
+  Life->>World: bury(general)
+  alt the dead was a ruler
+    Life->>Succession: replace(family)
     alt an heir is left
-      Succession->>Succession: crown the strongest heir
+      Succession-->>Life: Coronation (strongest heir crowned)
     else no heir
       Succession->>World: foundFamily(lord, province) for each lord
-      Succession->>Succession: unclaim the rest, pass the gems
+      Succession-->>Life: Disbanding
     end
+    Life->>News: SuccessionReportedEvent
+  else anyone else
+    Life->>News: GeneralDiedEvent
   end
-  Mortality->>News: GeneralDiedEvent / FamilyDisbandedEvent
-  opt the family is the player's and had several heirs
+  opt the player's family, with a choice of heirs
     News->>News: ask who takes the throne → CrownCommand
   end
 ```

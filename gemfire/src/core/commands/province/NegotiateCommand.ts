@@ -116,9 +116,7 @@ export class NegotiateCommand extends ProvinceCommand {
     );
 
     if (yielded) {
-      for (const fallen of provinces) {
-        this.publish(new ProvinceUpdatedEvent(fallen));
-      }
+      this.publishUpdates(provinces);
     }
 
     this.complete(province);

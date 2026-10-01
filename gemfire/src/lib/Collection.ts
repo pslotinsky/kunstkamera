@@ -11,6 +11,14 @@ export class Collection<Key extends string | number, Value> {
     return [...this.items.values()];
   }
 
+  public add(key: Key, value: Value): void {
+    this.items.set(key, value);
+  }
+
+  public has(key: Key): boolean {
+    return this.items.has(key);
+  }
+
   public remove(key: Key): void {
     this.items.delete(key);
   }

@@ -1,8 +1,9 @@
+import { BREAKAWAY_NAMES } from '@/config/families';
 import type { Collection } from '@/lib/Collection';
 
 import type { CalendarDate } from './CalendarDate';
 import type { Captive } from './Captive';
-import type { Family } from './Family';
+import { Family } from './Family';
 import type { General, GeneralRank } from './General';
 import { Market } from './Market';
 import type { Province } from './Province';
@@ -59,8 +60,69 @@ export class World {
     return this.exiled.some((each) => each.isEqual(general));
   }
 
-  public dissolve(family: Family, victor: Family): void {
-    family.surrenderTo(victor);
+  public isHeld(general: General): boolean {
+    return this.held.some((captive) => captive.general.isEqual(general));
+  }
+
+  public get isDefeated(): boolean {
+    return !this.families.has(this.player.name);
+  }
+
+  public bury(general: General): void {
+    const family = this.findFamilyOf(general);
+
+    family?.discharge(general);
+    this.generals.remove(general.name);
+    this.held = this.held.filter(
+      (captive) => !captive.general.isEqual(general),
+    );
+
+    if (family && !family.isRuler(general)) {
+      this.getRuledProvince(general)?.assignGovernor(family.ruler);
+    }
+  }
+
+  public isRuler(general: General): boolean {
+    return this.findFamilyOf(general)?.isRuler(general) ?? false;
+  }
+
+  public getHeirs(family: Family): readonly General[] {
+    return family.members
+      .filter(
+        (member) =>
+          member.isKinOf(family) &&
+          !family.isRuler(member) &&
+          !this.isHeld(member),
+      )
+      .sort((left, right) => right.stats.total - left.stats.total);
+  }
+
+  public foundFamily(lord: General, province: Province): Family | undefined {
+    const name = BREAKAWAY_NAMES.find((free) => !this.families.has(free));
+
+    if (!name) {
+      return undefined;
+    }
+
+    const founded = new Family({
+      name,
+      ruler: lord,
+      members: [lord],
+      homeProvince: province,
+    });
+
+    this.findFamilyOf(lord)?.discharge(lord);
+    this.families.add(name, founded);
+    province.claim(founded);
+
+    return founded;
+  }
+
+  public dissolve(family: Family, victor?: Family): void {
+    if (victor) {
+      family.surrenderTo(victor);
+    }
+
     family.breakAlliance();
     this.families.remove(family.name);
   }

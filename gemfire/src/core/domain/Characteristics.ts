@@ -25,6 +25,10 @@ export class Characteristics extends Stats<CharacteristicsKey> {
   declare readonly war: number;
   declare readonly charisma: number;
 
+  public get total(): number {
+    return this.intelligence + this.war + this.charisma;
+  }
+
   protected constructor(values: CharacteristicsValues) {
     super(values, CHARACTERISTICS_MAXES);
   }

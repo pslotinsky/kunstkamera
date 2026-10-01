@@ -147,10 +147,10 @@ The Diplomacy orders: alliance, defection, sabotage, plunder, and surrender.
 
 Generals age, grow, and die; a fallen ruler's family passes to an heir.
 
-- [ ] watch a general's stats rise, then decline with age
-- [ ] lose generals and rulers to death of old age
-- [ ] pass a fallen ruler's family to an heir
-- [ ] see a heirless family disband — its gems and lands scatter
+- [x] watch a general's stats rise, then decline with age
+- [x] lose generals and rulers to death of old age
+- [x] pass a fallen ruler's family to an heir
+- [x] see a heirless family disband — its gems and lands scatter
 
 ## 12. Strategic AI
 

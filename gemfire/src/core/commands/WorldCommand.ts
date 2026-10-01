@@ -1,4 +1,5 @@
 import type { World } from '@/core/domain/World';
+import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 import type { EventBus } from '@/lib/EventBus';
 
 import type { Province } from '../domain/Province';
@@ -48,5 +49,11 @@ export abstract class WorldCommand {
 
   protected publish(event: object): void {
     this.context.events.publish(event);
+  }
+
+  protected publishUpdates(provinces: readonly Province[]): void {
+    for (const province of provinces) {
+      this.publish(new ProvinceUpdatedEvent(province));
+    }
   }
 }

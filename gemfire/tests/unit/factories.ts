@@ -33,6 +33,7 @@ interface GeneralParams {
   readonly war?: number | undefined;
   readonly charisma?: number | undefined;
   readonly lineage?: string | undefined;
+  readonly deathDate?: CalendarDate | undefined;
 }
 
 interface FamilyParams {
@@ -67,13 +68,14 @@ export function makeGeneral(params: GeneralParams = {}): General {
 
   return new General({
     name: params.name ?? `General ${generalSequence}`,
-    birth: params.birth ?? new CalendarDate(170, 1),
+    birth: params.birth ?? new CalendarDate(1156, 1),
     stats: Characteristics.from({
       intelligence: params.intelligence ?? 50,
       war: params.war ?? 50,
       charisma: params.charisma ?? 50,
     }),
     lineage: params.lineage,
+    deathDate: params.deathDate,
   });
 }
 

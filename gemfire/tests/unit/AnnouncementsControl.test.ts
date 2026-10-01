@@ -4,7 +4,9 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { Artifact } from '@/core/domain/Artifact';
 import { HiredUnit } from '@/core/domain/HiredUnit';
 import type { Province } from '@/core/domain/Province';
+import { Succession } from '@/core/domain/Succession';
 import { ArtifactFoundEvent } from '@/core/events/ArtifactFoundEvent';
+import { SuccessionReportedEvent } from '@/core/events/SuccessionReportedEvent';
 import { UnitDesertedEvent } from '@/core/events/UnitDesertedEvent';
 import styles from '@/ui/Announcements/Announcements.module.scss';
 import { AnnouncementsControl } from '@/ui/Announcements/AnnouncementsControl';
@@ -49,10 +51,20 @@ function setup() {
     root.querySelector<HTMLElement>(selector)!.click();
 
   return {
+    world,
+    mine,
     myProvince,
     theirProvince,
     ruler,
     vassal,
+    mourn: () => {
+      world.bury(ruler);
+
+      const outcome = new Succession(world).replace(mine);
+
+      events.publish(new SuccessionReportedEvent(outcome, 'death'));
+    },
+    offers: (name: string) => !!root.querySelector(`[data-value="${name}"]`),
     desert: (province: Province, name: string) =>
       events.publish(
         new UnitDesertedEvent(province, HiredUnit.ofName(name)!, 'faithless'),
@@ -62,7 +74,7 @@ function setup() {
         new ArtifactFoundEvent(province, theirProvince, SWORD_OF_FIRE),
       ),
     continue: () => click('[data-continue]'),
-    take: () => click('[data-take]'),
+    confirm: () => click('[data-choose]'),
     choose: (name: string) => click(`[data-value="${name}"]`),
     asks: () =>
       !root.querySelector('[data-ask]')!.classList.contains(styles.hidden!),
@@ -122,10 +134,30 @@ describe('AnnouncementsControl', () => {
     expect(screen.offersContinue()).toBe(false);
 
     screen.choose('Pender');
-    screen.take();
+    screen.confirm();
 
     expect(screen.vassal.stats.war).toBe(80);
     expect(screen.ruler.stats.war).toBe(50);
     expect(screen.shown()).toBe(false);
+  });
+
+  it('lets you choose your own heir among your kin, the strongest preselected', () => {
+    const screen = setup();
+    const karl = makeGeneral({ name: 'Karl', lineage: 'Blanche', war: 60 });
+    const anselm = makeGeneral({ name: 'Anselm', lineage: 'Blanche' });
+
+    screen.mine.enlist(karl);
+    screen.mine.enlist(anselm);
+    screen.mourn();
+
+    expect(screen.asks()).toBe(true);
+    expect(screen.offers('Pender')).toBe(false);
+    expect(screen.mine.ruler).toBe(karl);
+
+    screen.choose('Anselm');
+    screen.confirm();
+
+    expect(screen.mine.ruler).toBe(anselm);
+    expect(screen.myProvince.governor).toBe(anselm);
   });
 });

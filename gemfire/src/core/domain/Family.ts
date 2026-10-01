@@ -64,6 +64,10 @@ export class Family {
     this.fame = Math.max(0, this.fame - amount);
   }
 
+  public crown(heir: General): void {
+    this.ruler = heir;
+  }
+
   public enlist(general: General): void {
     if (!this.members.some((member) => member.isEqual(general))) {
       this.members = [...this.members, general];
