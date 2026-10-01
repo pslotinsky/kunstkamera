@@ -17,6 +17,7 @@ interface SetupParams {
   readonly rivalHolds?: readonly number[];
   readonly defendedBy?: 'ruler' | 'vassal';
   readonly won?: BattleSide;
+  readonly targetGold?: number;
 }
 
 function setup(params: SetupParams = {}) {
@@ -43,6 +44,7 @@ function setup(params: SetupParams = {}) {
     neighbors: hasRefuge ? [5, 7] : [5],
     family: rival,
     governor: params.defendedBy === 'vassal' ? seth : ander,
+    gold: params.targetGold ?? 0,
   });
   const refuge = makeProvince({
     number: 7,
@@ -92,7 +94,7 @@ describe('Conquest', () => {
   it('lets a beaten commander go when the dice favour him', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.9);
 
-    const { conquest } = setup({ rivalHolds: [6, 7] });
+    const { conquest } = setup({ rivalHolds: [6, 7], defendedBy: 'vassal' });
 
     expect(conquest.takeCaptive()).toBeUndefined();
   });
@@ -100,9 +102,33 @@ describe('Conquest', () => {
   it('takes a beaten commander when the dice do not', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.2);
 
-    const { conquest, ander } = setup({ rivalHolds: [6, 7] });
+    const { conquest, seth } = setup({
+      rivalHolds: [6, 7],
+      defendedBy: 'vassal',
+    });
 
-    expect(conquest.takeCaptive()?.general).toBe(ander);
+    expect(conquest.takeCaptive()?.general).toBe(seth);
+  });
+
+  it('lets a beaten commander buy his way out of a province that can pay', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.01);
+
+    const { conquest, target } = setup({
+      rivalHolds: [6, 7],
+      defendedBy: 'vassal',
+      targetGold: 500,
+    });
+
+    expect(conquest.takeCaptive()).toBeUndefined();
+    expect(target.resources.gold).toBe(500 - 100);
+  });
+
+  it('never takes a ruler who was only commanding from afar', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.01);
+
+    const { conquest } = setup({ rivalHolds: [6, 7] });
+
+    expect(conquest.takeCaptive()).toBeUndefined();
   });
 
   it('is far likelier to take a defender with nowhere to run', () => {

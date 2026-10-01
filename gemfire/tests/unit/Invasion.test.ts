@@ -24,6 +24,7 @@ const SOURCE_FOOD = 300;
 interface SetupParams {
   readonly defenders?: number;
   readonly defenderFood?: number;
+  readonly defenderGold?: number;
 }
 
 function setup(params: SetupParams = {}) {
@@ -48,6 +49,7 @@ function setup(params: SetupParams = {}) {
     neighbors: [1],
     family: rival,
     governor: seth,
+    gold: params.defenderGold ?? 0,
     troops: params.defenders ?? 200,
     food: params.defenderFood ?? 300,
   });
@@ -90,6 +92,19 @@ describe('Invasion', () => {
     expect(started).toBeInstanceOf(InvasionReport);
     expect((started as InvasionReport).isFought).toBe(false);
     expect(target.belongsTo(mine)).toBe(true);
+  });
+
+  it('hands the gold standing on a taken province to its new owner', () => {
+    const { invasion, target, mine } = setup({
+      defenderGold: 90,
+      defenderFood: 100,
+    });
+
+    invasion.begin();
+    invasion.conclude(makeOutcome({ winner: BattleSide.attacker }));
+
+    expect(target.belongsTo(mine)).toBe(true);
+    expect(target.resources.gold).toBe(90);
   });
 
   it('settles the land on conclude', () => {

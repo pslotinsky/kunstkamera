@@ -102,6 +102,16 @@ describe('Captivity', () => {
     expect(houses(world)).not.toContain('Lyle');
   });
 
+  it('finds a ruler far harder to turn than his vassals', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.35);
+
+    const vassal = setup();
+    const ruler = setup();
+
+    expect(vassal.captivity.recruit(vassal.hold())).toBe(true);
+    expect(ruler.captivity.recruit(ruler.hold(ruler.ander))).toBe(false);
+  });
+
   it('sends a released vassal home the weaker for it', () => {
     const { captivity, hold, seth } = setup();
 

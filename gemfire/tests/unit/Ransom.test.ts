@@ -12,34 +12,31 @@ describe('Ransom', () => {
     expect(ransom.food).toBe(231);
   });
 
-  it('takes the gold when the payer has it', () => {
+  it('is spent in gold when the province has it', () => {
     const ransom = Ransom.forGeneral(makeGeneral({ war: 77 }));
-    const payer = makeProvince({ gold: 216, food: 300 });
-    const receiver = makeProvince({ gold: 136 });
+    const province = makeProvince({ gold: 216, food: 300 });
 
-    expect(ransom.payFrom(payer, receiver)).toBe(true);
-    expect(payer.resources.gold).toBe(216 - 154);
-    expect(receiver.resources.gold).toBe(136 + 154);
+    expect(ransom.spendFrom(province)).toBe(true);
+    expect(province.resources.gold).toBe(216 - 154);
+    expect(province.resources.food).toBe(300);
   });
 
-  it('takes food instead when the gold falls short', () => {
+  it('is spent in food when the gold falls short', () => {
     const ransom = Ransom.forGeneral(makeGeneral({ war: 77 }));
-    const payer = makeProvince({ gold: 136, food: 300 });
-    const receiver = makeProvince();
+    const province = makeProvince({ gold: 136, food: 300 });
 
-    expect(ransom.payFrom(payer, receiver)).toBe(true);
-    expect(payer.resources.gold).toBe(136);
-    expect(payer.resources.food).toBe(300 - 231);
-    expect(receiver.resources.food).toBe(231);
+    expect(ransom.spendFrom(province)).toBe(true);
+    expect(province.resources.gold).toBe(136);
+    expect(province.resources.food).toBe(300 - 231);
   });
 
   it('takes nothing from a province that can meet neither price', () => {
     const ransom = Ransom.forGeneral(makeGeneral({ war: 77 }));
-    const payer = makeProvince({ gold: 136, food: 145 });
+    const province = makeProvince({ gold: 136, food: 145 });
 
-    expect(ransom.payFrom(payer, makeProvince())).toBe(false);
-    expect(payer.resources.gold).toBe(136);
-    expect(payer.resources.food).toBe(145);
+    expect(ransom.spendFrom(province)).toBe(false);
+    expect(province.resources.gold).toBe(136);
+    expect(province.resources.food).toBe(145);
   });
 
   it('can be met in gold alone or in food alone', () => {

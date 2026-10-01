@@ -143,7 +143,13 @@ export class Invasion {
       report,
     });
 
-    report.captive = conquest.takeCaptive();
+    const captive = conquest.takeCaptive();
+
+    report.captive = captive;
+
+    if (captive) {
+      this.world.hold(captive);
+    }
     this.displaced = report.isTaken ? this.overrun(conquest) : this.comeHome();
   }
 

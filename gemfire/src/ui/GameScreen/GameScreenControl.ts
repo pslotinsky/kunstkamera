@@ -8,6 +8,7 @@ import { Control } from '@/lib/Control';
 import type { EventClass } from '@/lib/EventBus';
 import { AnnouncementsControl } from '@/ui/Announcements/AnnouncementsControl';
 import { BattleReportControl } from '@/ui/BattleReport/BattleReportControl';
+import { CaptiveDialogControl } from '@/ui/CaptiveDialog/CaptiveDialogControl';
 import { FamilyOverviewControl } from '@/ui/FamilyOverview/FamilyOverviewControl';
 import { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
 import { HireMonsterDialogControl } from '@/ui/ProvinceCommands/CommandDialog/HireMonsterDialogControl';
@@ -50,6 +51,10 @@ export class GameScreenControl extends Control<
       hireMonster,
       searchReport: new SearchReportControl({ events: context.events }),
       battleReport: new BattleReportControl({
+        world: context.world,
+        events: context.events,
+      }),
+      captiveDialog: new CaptiveDialogControl({
         world: context.world,
         events: context.events,
       }),

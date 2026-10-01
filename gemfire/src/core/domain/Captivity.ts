@@ -3,6 +3,7 @@ import type { Family } from './Family';
 import type { World } from './World';
 
 const RECRUIT_ODDS = 0.5;
+const RULER_RECRUIT_ODDS = 0.2;
 const RELEASE_WAR_LOSS = 5;
 
 export class Captivity {
@@ -13,13 +14,17 @@ export class Captivity {
   }
 
   public recruit(captive: Captive): boolean {
-    const success = Math.random() < RECRUIT_ODDS;
+    const success = Math.random() < this.weighOdds(captive);
 
     if (success) {
       this.turn(captive);
     }
 
     return success;
+  }
+
+  private weighOdds(captive: Captive): number {
+    return captive.isRuler ? RULER_RECRUIT_ODDS : RECRUIT_ODDS;
   }
 
   public release(captive: Captive): void {
