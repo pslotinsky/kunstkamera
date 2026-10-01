@@ -138,10 +138,10 @@ The immediate fruits of a won battle.
 
 The Diplomacy orders: alliance, defection, sabotage, plunder, and surrender.
 
-- [ ] propose and break alliances
-- [ ] make enemy generals defect
-- [ ] sabotage and plunder rival provinces
-- [ ] accept a family's surrender
+- [x] propose and break alliances
+- [x] make enemy generals defect
+- [x] sabotage and plunder rival provinces
+- [x] accept a family's surrender
 
 ## 11. Character lifecycle
 

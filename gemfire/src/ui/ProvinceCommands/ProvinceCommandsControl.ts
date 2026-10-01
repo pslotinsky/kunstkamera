@@ -1,3 +1,4 @@
+import { AllyCommand } from '@/core/commands/province/AllyCommand';
 import { AttackCommand } from '@/core/commands/province/AttackCommand';
 import { ChangeLordCommand } from '@/core/commands/province/ChangeLordCommand';
 import type { CommandGroup } from '@/core/commands/province/catalog';
@@ -5,7 +6,10 @@ import { DevelopCommand } from '@/core/commands/province/DevelopCommand';
 import { GiveFoodCommand } from '@/core/commands/province/GiveFoodCommand';
 import { HireMonsterCommand } from '@/core/commands/province/HireMonsterCommand';
 import { MoveTroopsCommand } from '@/core/commands/province/MoveTroopsCommand';
+import { NegotiateCommand } from '@/core/commands/province/NegotiateCommand';
+import { PlunderCommand } from '@/core/commands/province/PlunderCommand';
 import { RecruitCommand } from '@/core/commands/province/RecruitCommand';
+import { SabotageCommand } from '@/core/commands/province/SabotageCommand';
 import { SearchCommand } from '@/core/commands/province/SearchCommand';
 import { TradeCommand } from '@/core/commands/province/TradeCommand';
 import { TransportCommand } from '@/core/commands/province/TransportCommand';
@@ -17,12 +21,15 @@ import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { Control } from '@/lib/Control';
 import type { EventBus } from '@/lib/EventBus';
 
+import { AllyDialogControl } from './CommandDialog/AllyDialogControl';
 import { AttackDialogControl } from './CommandDialog/AttackDialogControl';
 import { ChangeLordDialogControl } from './CommandDialog/ChangeLordDialogControl';
 import type { AnyCommandDialogControl } from './CommandDialog/CommandDialogControl';
 import { DevelopDialogControl } from './CommandDialog/DevelopDialogControl';
 import { GiveFoodDialogControl } from './CommandDialog/GiveFoodDialogControl';
+import { InfiltrationDialogControl } from './CommandDialog/InfiltrationDialogControl';
 import { MoveTroopsDialogControl } from './CommandDialog/MoveTroopsDialogControl';
+import { NegotiateDialogControl } from './CommandDialog/NegotiateDialogControl';
 import { RecruitDialogControl } from './CommandDialog/RecruitDialogControl';
 import { SearchDialogControl } from './CommandDialog/SearchDialogControl';
 import { TradeDialogControl } from './CommandDialog/TradeDialogControl';
@@ -54,6 +61,10 @@ export class ProvinceCommandsControl extends Control<
     [MoveTroopsCommand.name, this.controls.moveTroopsDialog],
     [ChangeLordCommand.name, this.controls.changeLordDialog],
     [SearchCommand.name, this.controls.searchDialog],
+    [AllyCommand.name, this.controls.allyDialog],
+    [NegotiateCommand.name, this.controls.negotiateDialog],
+    [SabotageCommand.name, this.controls.sabotageDialog],
+    [PlunderCommand.name, this.controls.plunderDialog],
   ]);
 
   private pending: PendingDialog | null = null;
@@ -86,6 +97,21 @@ export class ProvinceCommandsControl extends Control<
           world,
         ),
         searchDialog: new SearchDialogControl(SearchCommand.name),
+        allyDialog: new AllyDialogControl(AllyCommand.name, world),
+        negotiateDialog: new NegotiateDialogControl(
+          NegotiateCommand.name,
+          world,
+        ),
+        sabotageDialog: new InfiltrationDialogControl({
+          name: SabotageCommand.name,
+          question: 'Sabotage whose land?',
+          aim: (target) => `Send agents to wreck ${target}`,
+        }),
+        plunderDialog: new InfiltrationDialogControl({
+          name: PlunderCommand.name,
+          question: 'Plunder whose land?',
+          aim: (target) => `Send agents to rob ${target}`,
+        }),
       },
     );
 

@@ -1,6 +1,5 @@
 import type { Army } from '@/core/domain/Army';
 import { Battle } from '@/core/domain/Battle';
-import type { Family } from '@/core/domain/Family';
 import { Invasion } from '@/core/domain/Invasion';
 import type { Province } from '@/core/domain/Province';
 import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
@@ -35,12 +34,10 @@ export class AttackCommand extends ProvinceCommand {
 
   public override get selectableTargets(): readonly number[] {
     const source = this.currentProvince;
-    const family = source?.family;
 
-    return source && family
-      ? this.context.world.map
-          .getNeighbors(source)
-          .filter((province) => this.isHostile(province, family))
+    return source
+      ? this.context.world
+          .getHostileNeighbors(source)
           .map((province) => province.number)
       : [];
   }
@@ -60,16 +57,6 @@ export class AttackCommand extends ProvinceCommand {
     ) {
       this.march(source, target, attacker);
     }
-  }
-
-  private isHostile(province: Province, family: Family): boolean {
-    const { ally } = family;
-
-    return (
-      province.hasOwner() &&
-      !province.belongsTo(family) &&
-      !(ally !== undefined && province.belongsTo(ally))
-    );
   }
 
   private canLaunch(

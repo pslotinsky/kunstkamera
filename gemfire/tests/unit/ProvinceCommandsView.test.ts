@@ -6,11 +6,14 @@ import { WorldFactory } from '@/core/WorldFactory';
 import { EventBus } from '@/lib/EventBus';
 import { DropdownView } from '@/ui/Dropdown/DropdownView';
 import { AmountFieldView } from '@/ui/ProvinceCommands/AmountField/AmountFieldView';
+import { AllyDialogView } from '@/ui/ProvinceCommands/CommandDialog/AllyDialogView';
 import { AttackDialogView } from '@/ui/ProvinceCommands/CommandDialog/AttackDialogView';
 import { ChangeLordDialogView } from '@/ui/ProvinceCommands/CommandDialog/ChangeLordDialogView';
 import { DevelopDialogView } from '@/ui/ProvinceCommands/CommandDialog/DevelopDialogView';
 import { GiveFoodDialogView } from '@/ui/ProvinceCommands/CommandDialog/GiveFoodDialogView';
+import { InfiltrationDialogView } from '@/ui/ProvinceCommands/CommandDialog/InfiltrationDialogView';
 import { MoveTroopsDialogView } from '@/ui/ProvinceCommands/CommandDialog/MoveTroopsDialogView';
+import { NegotiateDialogView } from '@/ui/ProvinceCommands/CommandDialog/NegotiateDialogView';
 import { RecruitDialogView } from '@/ui/ProvinceCommands/CommandDialog/RecruitDialogView';
 import { SearchDialogView } from '@/ui/ProvinceCommands/CommandDialog/SearchDialogView';
 import { TradeDialogView } from '@/ui/ProvinceCommands/CommandDialog/TradeDialogView';
@@ -66,6 +69,19 @@ describe('ProvinceCommandsView', () => {
           {},
         ),
         searchDialog: new SearchDialogView({ name: 'SearchCommand' }, {}),
+        allyDialog: new AllyDialogView({ name: 'AllyCommand' }, {}),
+        negotiateDialog: new NegotiateDialogView(
+          { name: 'NegotiateCommand' },
+          {},
+        ),
+        sabotageDialog: new InfiltrationDialogView(
+          { name: 'SabotageCommand', question: '', aim: String },
+          {},
+        ),
+        plunderDialog: new InfiltrationDialogView(
+          { name: 'PlunderCommand', question: '', aim: String },
+          {},
+        ),
       },
     );
 

@@ -8,7 +8,9 @@ import { GiveFoodCommand } from './GiveFoodCommand';
 import { HireMonsterCommand } from './HireMonsterCommand';
 import { MoveTroopsCommand } from './MoveTroopsCommand';
 import { NegotiateCommand } from './NegotiateCommand';
+import { PlunderCommand } from './PlunderCommand';
 import { RecruitCommand } from './RecruitCommand';
+import { SabotageCommand } from './SabotageCommand';
 import { SearchCommand } from './SearchCommand';
 import { TradeCommand } from './TradeCommand';
 import { TransportCommand } from './TransportCommand';
@@ -49,7 +51,12 @@ export function createCommandGroups(
     },
     {
       title: 'Diplomacy',
-      commands: [new AllyCommand(context), new NegotiateCommand(context)],
+      commands: [
+        new AllyCommand(context),
+        new NegotiateCommand(context),
+        new SabotageCommand(context),
+        new PlunderCommand(context),
+      ],
     },
     {
       title: 'Vassal',

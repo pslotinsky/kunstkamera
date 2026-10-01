@@ -56,7 +56,7 @@ With no ally, the tile lights every province of every house you could ask. Picki
 │                                              │
 │  Peace between Blanche and Lyle: neither     │
 │  house may attack the other.                 │
-│                         [ Propose ] [ Back ] │
+│                              [ Yea ] [ Nay ] │
 └──────────────────────────────────────────────┘
 ```
 
@@ -65,7 +65,7 @@ With an ally, the tile opens straight onto the pact, with no targeting step:
 ```text
 ┌─ Alliance with Lyle ─────────────────────────┐
 │  Peace holds between Blanche and Lyle.       │
-│                  [ Break alliance ] [ Back ] │
+│  Break the alliance?         [ Yea ] [ Nay ] │
 └──────────────────────────────────────────────┘
 ```
 
@@ -77,7 +77,7 @@ With an ally, the tile opens straight onto the pact, with no targeting step:
 │                                              │
 │  ◉ Kneulf   no province      WAR 56  CHA 37  │
 │                                              │
-│                      [ Send envoy ] [ Back ] │
+│                              [ Yea ] [ Nay ] │
 └──────────────────────────────────────────────┘
 ```
 
@@ -95,7 +95,7 @@ At most provinces the list is just the lord, so Negotiate at Hyland offers only 
 └──────────────────────────────────────────────┘
 ```
 
-A refusal is a single line, such as _Lyle will not ally with you._, _Seth stays loyal to Lyle._ or _Your agents were turned back from Hyland._ A success names what was taken, such as _Your agents plundered Hyland: 27 gold, 29 food._ or _Your agents burned Hyland's walls._ A surrender gets the same line a fallen house got in feature 9: _Lyle yields. Pluvius passes to Blanche._
+A refusal is a single line, such as _Lyle will not ally with you._, _Seth stays loyal to Lyle._ or _Your agents were caught in Hyland and came back empty-handed._ A success names what was taken, such as _Your agents plundered Hyland: 27 gold, 29 food._ or _Your agents burned the walls of Hyland._ A surrender gets the same line a fallen house got in feature 9: _Lyle yields. Pluvius passes to Blanche._
 
 ## Research
 
@@ -134,7 +134,7 @@ classDiagram
   class Family {
     +ally Family
     +fame number
-    +isRoyal bool
+    +royal bool
     +formAlliance(other) void
     +breakAlliance() void
     +isHostileTo(other) bool
@@ -180,7 +180,7 @@ classDiagram
 | `General`      | Knows his family line, which is what makes kin hard to turn.                                    |
 | `World`        | Moves a general, his province, or a whole house between families.                               |
 
-Each command publishes a `MissionReportedEvent` carrying the mission, its target and its outcome, and the announcements queue turns it into a line of text. `isRoyal` and `lineage` come from config: the scenario's family entries gain `royal`, and its general entries gain `lineage`, taken from the extract's `relation`.
+Each command publishes a `MissionReportedEvent` carrying the mission, its target and its outcome, and the announcements queue turns it into a line of text. `royal` and `lineage` come from config: the scenario's family entries gain `royal`, and its general entries gain `lineage`, taken from the extract's `relation`.
 
 ## Flow
 
