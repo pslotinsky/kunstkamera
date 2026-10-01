@@ -49,20 +49,8 @@ export class Captivity {
     captive.captor.enlist(captive.general);
 
     if (wasRuler) {
-      this.absorb(captive.house, captive.captor);
+      this.world.absorb(captive.house, captive.captor);
     }
-  }
-
-  private absorb(house: Family, victor: Family): void {
-    for (const province of this.world.getFamilyProvinces(house)) {
-      province.claim(victor);
-    }
-
-    for (const member of house.members) {
-      victor.enlist(member);
-    }
-
-    this.world.dissolve(house, victor);
   }
 
   private scatter(house: Family, victor: Family): void {

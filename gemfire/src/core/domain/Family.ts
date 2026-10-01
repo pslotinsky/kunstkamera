@@ -13,6 +13,7 @@ export interface FamilyParams {
   readonly homeProvince: Province;
   readonly fame?: number;
   readonly gems?: readonly Gem[];
+  readonly royal?: boolean | undefined;
 }
 
 export class Family {
@@ -22,7 +23,8 @@ export class Family {
   public homeProvince: Province;
   public fame: number;
   public gems: readonly Gem[];
-  public ally?: Family;
+  public ally: Family | undefined;
+  public readonly royal: boolean;
 
   public constructor(params: FamilyParams) {
     this.name = params.name;
@@ -31,6 +33,35 @@ export class Family {
     this.homeProvince = params.homeProvince;
     this.fame = params.fame ?? 0;
     this.gems = params.gems ?? [];
+    this.royal = params.royal ?? false;
+  }
+
+  public formAlliance(other: Family): void {
+    this.breakAlliance();
+    other.breakAlliance();
+    this.ally = other;
+    other.ally = this;
+  }
+
+  public breakAlliance(): void {
+    if (this.ally) {
+      this.ally.ally = undefined;
+      this.ally = undefined;
+    }
+  }
+
+  public isAlliedWith(other: Family): boolean {
+    return this.ally?.isEqual(other) ?? false;
+  }
+
+  public isHostileTo(other: Family | undefined): boolean {
+    return (
+      isDefined(other) && !this.isEqual(other) && !this.isAlliedWith(other)
+    );
+  }
+
+  public loseFame(amount: number): void {
+    this.fame = Math.max(0, this.fame - amount);
   }
 
   public enlist(general: General): void {

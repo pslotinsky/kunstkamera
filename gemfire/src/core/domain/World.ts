@@ -59,9 +59,36 @@ export class World {
     return this.exiled.some((each) => each.isEqual(general));
   }
 
-  public dissolve(house: Family, victor: Family): void {
-    house.surrenderTo(victor);
-    this.families.remove(house.name);
+  public dissolve(family: Family, victor: Family): void {
+    family.surrenderTo(victor);
+    family.breakAlliance();
+    this.families.remove(family.name);
+  }
+
+  public absorb(family: Family, victor: Family): void {
+    for (const province of this.getFamilyProvinces(family)) {
+      province.claim(victor);
+    }
+
+    for (const member of family.members) {
+      victor.enlist(member);
+    }
+
+    this.dissolve(family, victor);
+  }
+
+  public transfer(general: General, to: Family): void {
+    const province = this.getRuledProvince(general);
+
+    this.findFamilyOf(general)?.discharge(general);
+    to.enlist(general);
+    province?.claim(to);
+  }
+
+  public findFamilyOf(general: General): Family | undefined {
+    return this.families.all.find((family) =>
+      family.members.some((member) => member.isEqual(general)),
+    );
   }
 
   public isProvinceTurn(province: Province): boolean {
@@ -92,6 +119,16 @@ export class World {
       : this.getRuledProvince(general);
 
     return governed ?? family.homeProvince;
+  }
+
+  public getHostileNeighbors(province: Province): readonly Province[] {
+    const { family } = province;
+
+    return family
+      ? this.map
+          .getNeighbors(province)
+          .filter((neighbor) => family.isHostileTo(neighbor.family))
+      : [];
   }
 
   public getFamilyProvinces(family: Family): readonly Province[] {

@@ -6,6 +6,7 @@ export interface GeneralDefinition {
   readonly intelligence: number;
   readonly war: number;
   readonly charisma: number;
+  readonly lineage?: string;
 }
 
 export interface FamilyDefinition {
@@ -14,6 +15,7 @@ export interface FamilyDefinition {
   readonly members: readonly string[];
   readonly fame: number;
   readonly gems: readonly string[];
+  readonly royal?: boolean;
 }
 
 export interface ProvinceDefinition {

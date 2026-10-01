@@ -32,6 +32,7 @@ interface GeneralParams {
   readonly intelligence?: number | undefined;
   readonly war?: number | undefined;
   readonly charisma?: number | undefined;
+  readonly lineage?: string | undefined;
 }
 
 interface FamilyParams {
@@ -41,6 +42,7 @@ interface FamilyParams {
   readonly homeProvince?: Province | undefined;
   readonly fame?: number | undefined;
   readonly gems?: readonly Gem[] | undefined;
+  readonly royal?: boolean | undefined;
 }
 
 interface ProvinceParams {
@@ -71,6 +73,7 @@ export function makeGeneral(params: GeneralParams = {}): General {
       war: params.war ?? 50,
       charisma: params.charisma ?? 50,
     }),
+    lineage: params.lineage,
   });
 }
 
@@ -86,6 +89,7 @@ export function makeFamily(params: FamilyParams = {}): Family {
     homeProvince: params.homeProvince ?? makePlaceholderHome(),
     fame: params.fame ?? 100,
     gems: params.gems ?? [],
+    royal: params.royal,
   });
 }
 

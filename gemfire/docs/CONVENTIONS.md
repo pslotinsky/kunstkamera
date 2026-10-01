@@ -88,7 +88,7 @@ Conventions for the Gemfire TypeScript codebase. Biome (formatter, linter, and i
   }
   ```
 
-- **Method names are actions** — `createEmpty`, `build`, `getNeighbors`, `getProvince` — not nouns or prepositions (`empty`, `fromSeeds`, `neighboursOf`). The one exception is a boolean check: **prefix it with `is` / `has` / `can`** — `isNeighbor`, not the bare `borders` / `adjoins` (which read as state, not a question).
+- **Method names are actions** — `createEmpty`, `build`, `getNeighbors`, `getProvince` — not nouns or prepositions (`neighboursOf`). Two exceptions: a boolean check takes an **`is` / `has` / `can` prefix** — `isNeighbor`, not the bare `borders` / `adjoins` (which read as state, not a question) — and a conversion or factory may be named for its source or target: `from()`, `of…()`, `to…()` (`Resources.from`, `Gem.ofName`, `toEntity`).
 - **Law of Demeter — talk to a bound collaborator, not a chain.** Prefer exposing the thing you actually use and calling it directly: `this.map.getNeighbors(province)`, where `map` is a getter — `private get map(): WorldMap { return this.world.map; }` (a getter, not a stored field — don't cache what you can derive). Navigating an aggregate inline — `this.world.map.getNeighbors(province)` — is acceptable but weaker. Chaining off a value you just produced is out — `new WorldFactory().create().map.getProvince(1)`; bind it to a local first: `const { map } = new WorldFactory().create();` then `map.getProvince(1)`. (Reading a value off an aggregate for display, like `world.date`, is fine.)
 
 ## Types & values

@@ -127,21 +127,21 @@ The two limits on a battlefield: obstacles you raise yourself, and a Guardian yo
 
 The immediate fruits of a won battle.
 
-- [ ] claim gold, food, and land as war spoils
-- [ ] knock a rival family out of the game
-- [ ] take a fallen house's gems
-- [ ] capture the losing commander, in defeat or in retreat
-- [ ] ransom, recruit, release, or banish a captured leader
-- [ ] buy a captured ruler's freedom
+- [x] claim gold, food, and land as war spoils
+- [x] knock a rival family out of the game
+- [x] take a fallen house's gems
+- [x] capture the losing commander, in defeat or in retreat
+- [x] ransom, recruit, release, or banish a captured leader
+- [x] buy a captured ruler's freedom
 
 ## 10. Diplomacy
 
 The Diplomacy orders: alliance, defection, sabotage, plunder, and surrender.
 
-- [ ] propose and break alliances
-- [ ] make enemy generals defect
-- [ ] sabotage and plunder rival provinces
-- [ ] accept a family's surrender
+- [x] propose and break alliances
+- [x] make enemy generals defect
+- [x] sabotage and plunder rival provinces
+- [x] accept a family's surrender
 
 ## 11. Character lifecycle
 

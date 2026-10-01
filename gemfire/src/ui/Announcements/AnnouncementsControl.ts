@@ -3,6 +3,7 @@ import type { CharacteristicsKey } from '@/core/domain/Characteristics';
 import type { General } from '@/core/domain/General';
 import { ArtifactFoundEvent } from '@/core/events/ArtifactFoundEvent';
 import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
+import { MissionReportedEvent } from '@/core/events/MissionReportedEvent';
 import { SearchReportedEvent } from '@/core/events/SearchReportedEvent';
 import { UnitDesertedEvent } from '@/core/events/UnitDesertedEvent';
 import { Control } from '@/lib/Control';
@@ -20,7 +21,7 @@ import {
 } from './AnnouncementsView';
 import { ArtifactTakenEvent } from './ArtifactTakenEvent';
 
-type Announced = UnitDesertedEvent | ArtifactFoundEvent;
+type Announced = UnitDesertedEvent | ArtifactFoundEvent | MissionReportedEvent;
 
 export class AnnouncementsControl extends Control<
   AnnouncementsView,
@@ -40,6 +41,7 @@ export class AnnouncementsControl extends Control<
   protected override onMount(): void {
     this.onWorldEvent(UnitDesertedEvent, (event) => this.announce(event));
     this.onWorldEvent(ArtifactFoundEvent, (event) => this.announce(event));
+    this.onWorldEvent(MissionReportedEvent, (event) => this.announce(event));
     this.onWorldEvent(SearchReportedEvent, () => this.holdForReport(true));
     this.onWorldEvent(SearchReportClosedEvent, () => this.holdForReport(false));
     this.onWorldEvent(BattleReportedEvent, () => this.holdForReport(true));
@@ -97,6 +99,8 @@ export class AnnouncementsControl extends Control<
     if (announced instanceof ArtifactFoundEvent) {
       this.offerRecipients(announced);
       this.view.showFind(announced, pending);
+    } else if (announced instanceof MissionReportedEvent) {
+      this.view.showMission(announced, pending);
     } else {
       this.view.showDesertion(announced, pending);
     }

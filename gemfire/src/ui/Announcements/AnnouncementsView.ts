@@ -1,7 +1,12 @@
 import { html, type TemplateResult } from 'lit-html';
 
+import type { SabotageDamage } from '@/core/domain/Infiltration';
 import type { World } from '@/core/domain/World';
 import type { ArtifactFoundEvent } from '@/core/events/ArtifactFoundEvent';
+import type {
+  MissionOutcome,
+  MissionReportedEvent,
+} from '@/core/events/MissionReportedEvent';
 import type {
   DesertionReason,
   UnitDesertedEvent,
@@ -18,7 +23,13 @@ import styles from './Announcements.module.scss';
 
 const DESERTION_REASONS: Record<DesertionReason, string> = {
   unpaid: 'went unpaid',
-  faithless: 'lost faith in your house',
+  faithless: 'lost faith in your family',
+};
+
+const SABOTAGE_DAMAGES: Record<SabotageDamage, string> = {
+  troops: 'cut down the troops of',
+  loyalty: 'turned the people against the lord of',
+  protection: 'burned the walls of',
 };
 
 interface Announcement {
@@ -109,8 +120,85 @@ export class AnnouncementsView extends View<
     this.takeButton.focus();
   }
 
+  public showMission(event: MissionReportedEvent, pending: number): void {
+    const you = event.province.family?.name ?? '';
+
+    this.showAnnouncement(this.describeMission(event.outcome, you), pending);
+    this.askForRecipient(false);
+    this.continueButton.focus();
+  }
+
   public hide(): void {
     this.element.classList.add(styles.hidden!);
+  }
+
+  private describeMission(outcome: MissionOutcome, you: string): Announcement {
+    switch (outcome.kind) {
+      case 'alliance':
+        return {
+          text: outcome.accepted
+            ? `${outcome.family.name} accepts. Peace holds between ${you} and ${outcome.family.name}.`
+            : `${outcome.family.name} will not ally with you.`,
+          icon: outcome.family.crest,
+        };
+      case 'break':
+        return {
+          text: `The alliance with ${outcome.family.name} is broken.`,
+          icon: outcome.family.crest,
+        };
+      case 'defection':
+        return {
+          text: this.describeDefection(outcome, you),
+          icon: outcome.general.portrait,
+        };
+      case 'surrender':
+        return {
+          text: this.describeSurrender(outcome, you),
+          icon: outcome.family.crest,
+        };
+      case 'sabotage':
+        return {
+          text: outcome.damage
+            ? `Your agents ${SABOTAGE_DAMAGES[outcome.damage]} ${outcome.target.name}.`
+            : `Your agents were caught in ${outcome.target.name} and wrecked nothing.`,
+        };
+      case 'plunder':
+        return {
+          text: outcome.loot
+            ? `Your agents plundered ${outcome.target.name}: ${outcome.loot.gold} gold, ${outcome.loot.food} food.`
+            : `Your agents were caught in ${outcome.target.name} and came back empty-handed.`,
+        };
+    }
+  }
+
+  private describeDefection(
+    outcome: Extract<MissionOutcome, { kind: 'defection' }>,
+    you: string,
+  ): string {
+    const { general, family, province, persuaded } = outcome;
+
+    if (!persuaded) {
+      return `${general.name} stays loyal to ${family.name}.`;
+    }
+
+    return province
+      ? `${general.name} has left ${family.name} for ${you}, and ${province.name} passes to ${you}.`
+      : `${general.name} has left ${family.name} for ${you}.`;
+  }
+
+  private describeSurrender(
+    outcome: Extract<MissionOutcome, { kind: 'surrender' }>,
+    you: string,
+  ): string {
+    const { family, gems, yielded } = outcome;
+
+    if (!yielded) {
+      return `${family.name} will not surrender.`;
+    }
+
+    return gems.length
+      ? `${family.name} yields. ${gems.map((gem) => gem.name).join(' and ')} ${gems.length > 1 ? 'pass' : 'passes'} to ${you}.`
+      : `${family.name} yields to ${you}.`;
   }
 
   private showAnnouncement(announcement: Announcement, pending: number): void {

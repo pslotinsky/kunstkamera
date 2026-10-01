@@ -63,6 +63,7 @@ export class WorldFactory {
           name: definition.name,
           stats: Characteristics.from(definition),
           birth: new CalendarDate(definition.birth, this.randomMonth()),
+          lineage: definition.lineage,
         }),
       );
     }
@@ -138,6 +139,7 @@ export class WorldFactory {
       homeProvince,
       fame: definition.fame,
       gems: definition.gems.map((name) => Gem.ofName(name)),
+      royal: definition.royal,
     });
   }
 
