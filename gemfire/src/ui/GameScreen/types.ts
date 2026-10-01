@@ -4,6 +4,7 @@ import type { ChildrenViews } from '@/lib/Control';
 import type { EventBus } from '@/lib/EventBus';
 import type { AnnouncementsControl } from '@/ui/Announcements/AnnouncementsControl';
 import type { BattleReportControl } from '@/ui/BattleReport/BattleReportControl';
+import type { CaptiveDialogControl } from '@/ui/CaptiveDialog/CaptiveDialogControl';
 import type { FamilyOverviewControl } from '@/ui/FamilyOverview/FamilyOverviewControl';
 import type { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
 import type { HireMonsterDialogControl } from '@/ui/ProvinceCommands/CommandDialog/HireMonsterDialogControl';
@@ -23,6 +24,7 @@ export type GameScreenControls = {
   readonly hireMonster: HireMonsterDialogControl;
   readonly searchReport: SearchReportControl;
   readonly battleReport: BattleReportControl;
+  readonly captiveDialog: CaptiveDialogControl;
   readonly announcements: AnnouncementsControl;
 };
 

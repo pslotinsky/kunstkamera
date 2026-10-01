@@ -9,7 +9,13 @@ import { HiredUnit } from '@/core/domain/HiredUnit';
 import { Invasion } from '@/core/domain/Invasion';
 import { InvasionReport } from '@/core/domain/InvasionReport';
 
-import { makeFamily, makeGeneral, makeProvince, makeWorld } from './factories';
+import {
+  makeFamily,
+  makeGeneral,
+  makeOutcome,
+  makeProvince,
+  makeWorld,
+} from './factories';
 
 const SOURCE_GOLD = 200;
 const SOURCE_TROOPS = 156;
@@ -18,6 +24,7 @@ const SOURCE_FOOD = 300;
 interface SetupParams {
   readonly defenders?: number;
   readonly defenderFood?: number;
+  readonly defenderGold?: number;
 }
 
 function setup(params: SetupParams = {}) {
@@ -42,6 +49,7 @@ function setup(params: SetupParams = {}) {
     neighbors: [1],
     family: rival,
     governor: seth,
+    gold: params.defenderGold ?? 0,
     troops: params.defenders ?? 200,
     food: params.defenderFood ?? 300,
   });
@@ -86,13 +94,26 @@ describe('Invasion', () => {
     expect(target.belongsTo(mine)).toBe(true);
   });
 
+  it('hands the gold standing on a taken province to its new owner', () => {
+    const { invasion, target, mine } = setup({
+      defenderGold: 90,
+      defenderFood: 100,
+    });
+
+    invasion.begin();
+    invasion.conclude(makeOutcome({ winner: BattleSide.attacker }));
+
+    expect(target.belongsTo(mine)).toBe(true);
+    expect(target.resources.gold).toBe(90);
+  });
+
   it('settles the land on conclude', () => {
     const { invasion, target, mine, attacker } = setup();
 
     invasion.begin();
 
     const report = invasion.conclude(
-      new BattleOutcome({
+      makeOutcome({
         winner: BattleSide.attacker,
         reason: 'flag',
         days: 2,
@@ -111,7 +132,7 @@ describe('Invasion', () => {
 
     expect(() =>
       invasion.conclude(
-        new BattleOutcome({
+        makeOutcome({
           winner: BattleSide.attacker,
           reason: 'flag',
           days: 1,
@@ -148,7 +169,7 @@ describe('Invasion', () => {
     target.addUnit(orks);
     invasion.begin();
     invasion.conclude(
-      new BattleOutcome({
+      makeOutcome({
         winner: BattleSide.attacker,
         reason: 'flag',
         days: 2,
@@ -167,7 +188,7 @@ describe('Invasion', () => {
 
     invasion.begin();
     invasion.conclude(
-      new BattleOutcome({
+      makeOutcome({
         winner: BattleSide.attacker,
         reason: 'flag',
         days: 2,
@@ -224,7 +245,7 @@ describe('Invasion', () => {
 
     invasion.begin();
     invasion.conclude(
-      new BattleOutcome({
+      makeOutcome({
         winner: BattleSide.defender,
         reason: 'endurance',
         days: 5,

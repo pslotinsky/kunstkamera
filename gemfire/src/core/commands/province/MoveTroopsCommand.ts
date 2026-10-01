@@ -86,7 +86,7 @@ export class MoveTroopsCommand extends ProvinceCommand {
   }
 
   private claim(target: Province, owner: Family): void {
-    target.family = owner;
+    target.claim(owner);
     target.assignGovernor(owner.ruler);
   }
 

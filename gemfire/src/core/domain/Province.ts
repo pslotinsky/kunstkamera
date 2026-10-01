@@ -36,21 +36,34 @@ export class Province {
   public development: Development;
   public goodwill = 0;
   public actionCount = 0;
-  public family?: Family | undefined;
   public governor?: General | undefined;
   public hiredUnits: readonly HiredUnit[] = [];
   public readonly hirePool: readonly string[];
+
+  private house: Family | undefined;
 
   public constructor(params: ProvinceParams) {
     this.number = params.number;
     this.name = params.name;
     this.neighbors = params.neighbors;
     this.landscape = params.landscape ?? 'woods';
-    this.family = params.family;
+    this.house = params.family;
     this.governor = params.governor;
     this.resources = params.resources ?? Resources.empty();
     this.development = params.development ?? Development.empty();
     this.hirePool = params.hirePool ?? [];
+  }
+
+  public get family(): Family | undefined {
+    return this.house;
+  }
+
+  public claim(family: Family): void {
+    this.house = family;
+  }
+
+  public unclaim(): void {
+    this.house = undefined;
   }
 
   public assignGovernor(governor: General | undefined): void {
@@ -110,11 +123,11 @@ export class Province {
   }
 
   public addResources(gains: ResourceGains): void {
-    this.resources = this.resources.add(gains);
+    this.resources = this.resources.increase(gains);
   }
 
   public addDevelopment(gains: DevelopmentGains): void {
-    this.development = this.development.add(gains);
+    this.development = this.development.increase(gains);
   }
 
   public recordAction(goodwill: number): void {

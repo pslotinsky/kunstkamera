@@ -1,6 +1,7 @@
 import type { Collection } from '@/lib/Collection';
 
 import type { CalendarDate } from './CalendarDate';
+import type { Captive } from './Captive';
 import type { Family } from './Family';
 import type { General, GeneralRank } from './General';
 import { Market } from './Market';
@@ -25,6 +26,9 @@ export class World {
   public readonly generals: Collection<string, General>;
   public readonly player: Family;
 
+  private exiled: readonly General[] = [];
+  private held: readonly Captive[] = [];
+
   public constructor(params: WorldParams) {
     this.date = params.date;
     this.map = params.map;
@@ -32,6 +36,32 @@ export class World {
     this.generals = params.generals;
     this.player = params.player;
     this.turnQueue = new TurnQueue(this.map.provinces);
+  }
+
+  public hold(captive: Captive): void {
+    this.held = [...this.held, captive];
+  }
+
+  public free(captive: Captive): void {
+    this.held = this.held.filter((each) => each !== captive);
+  }
+
+  public findCaptiveOf(captor: Family): Captive | undefined {
+    return this.held.find((captive) => captive.captor.isEqual(captor));
+  }
+
+  public exile(general: General): void {
+    this.exiled = [...this.exiled, general];
+    this.generals.remove(general.name);
+  }
+
+  public isExiled(general: General): boolean {
+    return this.exiled.some((each) => each.isEqual(general));
+  }
+
+  public dissolve(house: Family, victor: Family): void {
+    house.surrenderTo(victor);
+    this.families.remove(house.name);
   }
 
   public isProvinceTurn(province: Province): boolean {

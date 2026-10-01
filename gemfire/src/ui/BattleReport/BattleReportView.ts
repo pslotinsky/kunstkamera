@@ -39,6 +39,7 @@ export class BattleReportView extends View<BattleReportContext> {
         </header>
         <table class=${styles.sides} data-sides></table>
         <p class=${styles.verdict} data-verdict></p>
+        <p class="${styles.capture} ${styles.hidden}" data-capture></p>
       </section>
     `;
   }
@@ -47,6 +48,7 @@ export class BattleReportView extends View<BattleReportContext> {
     this.title.textContent = this.renderHeading(report);
     this.showSides(report);
     this.verdict.textContent = this.renderVerdict(report);
+    this.showCapture(report);
     this.element.classList.remove(styles.hidden!);
     this.closeButton.focus();
   }
@@ -110,6 +112,25 @@ export class BattleReportView extends View<BattleReportContext> {
     }
 
     return verdict;
+  }
+
+  private showCapture(report: InvasionReport): void {
+    const line = this.renderCapture(report);
+
+    this.capture.textContent = line;
+    this.capture.classList.toggle(styles.hidden!, line === '');
+  }
+
+  private renderCapture(report: InvasionReport): string {
+    const captive = report.captive;
+
+    if (!captive) {
+      return '';
+    }
+
+    return captive.captor.isEqual(this.context.world.player)
+      ? `${captive.general.name} of ${captive.house.name} is your prisoner.`
+      : `${captive.general.name} is taken by ${captive.captor.name}.`;
   }
 
   private renderEscort(defender: Army): string {
@@ -179,6 +200,10 @@ export class BattleReportView extends View<BattleReportContext> {
 
   private get verdict(): HTMLElement {
     return this.element.querySelector<HTMLElement>('[data-verdict]')!;
+  }
+
+  private get capture(): HTMLElement {
+    return this.element.querySelector<HTMLElement>('[data-capture]')!;
   }
 
   private get closeButton(): HTMLButtonElement {

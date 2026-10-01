@@ -8,9 +8,9 @@ describe('Stat', () => {
   it('clamps additions to 0…max', () => {
     const stat = new Stat(990, 999);
 
-    expect(stat.add(50).value).toBe(999);
-    expect(stat.add(-1000).value).toBe(0);
-    expect(stat.add(-100).value).toBe(890);
+    expect(stat.increase(50).value).toBe(999);
+    expect(stat.increase(-1000).value).toBe(0);
+    expect(stat.increase(-100).value).toBe(890);
   });
 
   it('caps resources and development at their maxima', () => {
@@ -18,7 +18,7 @@ describe('Stat', () => {
       gold: 990,
       food: 990,
       troops: 990,
-    }).add({
+    }).increase({
       gold: 50,
       food: 50,
       troops: 50,
@@ -32,7 +32,7 @@ describe('Stat', () => {
       loyalty: 95,
       cultivation: 195,
       protection: 195,
-    }).add({
+    }).increase({
       loyalty: 10,
       cultivation: 10,
       protection: 10,
