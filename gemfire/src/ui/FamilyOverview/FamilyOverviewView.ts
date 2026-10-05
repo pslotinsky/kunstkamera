@@ -43,6 +43,7 @@ const STATUS_LABELS: Record<ProvinceStatus, string> = {
   capital: 'Capital',
   remote: 'Ruled remotely',
   lorded: 'Lord',
+  entrusted: 'Entrusted',
   unruled: '—',
 };
 

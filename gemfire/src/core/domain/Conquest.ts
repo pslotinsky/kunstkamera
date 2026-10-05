@@ -1,7 +1,6 @@
 import { isDefined } from '@/lib/value/isDefined';
 
 import { Captive } from './Captive';
-import { DefensePolicy } from './DefensePolicy';
 import type { Family } from './Family';
 import type { General } from './General';
 import type { InvasionReport } from './InvasionReport';
@@ -28,13 +27,11 @@ export class Conquest {
   private readonly world: World;
   private readonly source: Province;
   private readonly report: InvasionReport;
-  private readonly defense: DefensePolicy;
 
   public constructor(params: ConquestParams) {
     this.world = params.world;
     this.source = params.source;
     this.report = params.report;
-    this.defense = new DefensePolicy(params.world);
   }
 
   public takeCaptive(): Captive | undefined {
@@ -62,7 +59,7 @@ export class Conquest {
   }
 
   private hasFallen(house?: Family): house is Family {
-    return isDefined(house) && this.countProvinces(house) === 0;
+    return isDefined(house) && this.world.countProvinces(house) === 0;
   }
 
   private findLoser(): Loser | undefined {
@@ -104,11 +101,7 @@ export class Conquest {
   }
 
   private isLastStand({ house, general }: Loser): boolean {
-    return house.isRuler(general) && this.countProvinces(house) === 1;
-  }
-
-  private countProvinces(house: Family): number {
-    return this.world.getFamilyProvinces(house).length;
+    return house.isRuler(general) && this.world.countProvinces(house) === 1;
   }
 
   private weighOdds(): number {
@@ -120,6 +113,14 @@ export class Conquest {
   }
 
   private hasRefuge(): boolean {
-    return isDefined(this.defense.chooseRetreat(this.report.target));
+    const { target } = this.report;
+    const house = target.family;
+
+    return (
+      isDefined(house) &&
+      this.world.map
+        .getNeighbors(target)
+        .some((neighbor) => neighbor.belongsTo(house))
+    );
   }
 }

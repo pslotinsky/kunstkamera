@@ -1,4 +1,4 @@
-import { BATTLE_DAY_LIMIT } from '@/config/battle';
+export const BATTLE_DAY_LIMIT = 5;
 
 export type Phase = 'sunrise' | 'noon' | 'sunset' | 'midnight';
 

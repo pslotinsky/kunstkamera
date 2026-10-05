@@ -10,6 +10,10 @@ const NUMBER_GAP = 14;
 const NUMBER_SIZE = 10;
 const BLOCK_WIDTH = CREST_WIDTH + NUMBER_GAP + NUMBER_SIZE;
 const NUMBER_OFFSET = BLOCK_WIDTH / 2 - NUMBER_SIZE / 2;
+const TOWER_PATH =
+  'M0 18 V4 H3 V0 H6 V4 H8 V0 H11 V4 H14 V0 H17 V4 H20 V18 Z M8 18 V12 H12 V18 Z';
+const TOWER_OFFSET_X = -10;
+const TOWER_OFFSET_Y = -CREST_HEIGHT / 2 - 22;
 
 export class ProvinceMarkers {
   private readonly group: SVGGElement;
@@ -54,7 +58,23 @@ export class ProvinceMarkers {
       ? this.createNumber(province.number, anchor.x + NUMBER_OFFSET, anchor.y)
       : this.createNumber(province.number, anchor.x, anchor.y);
 
-    return crest ? [crest, number] : [number];
+    const markings = crest ? [crest, number] : [number];
+
+    return province.isEntrusted
+      ? [...markings, this.createTower(anchor)]
+      : markings;
+  }
+
+  private createTower(anchor: MarkerAnchor): SVGPathElement {
+    const tower = document.createElementNS(SVG_NAMESPACE, 'path');
+    const x = anchor.x - BLOCK_WIDTH / 2 + CREST_WIDTH / 2 + TOWER_OFFSET_X;
+    const y = anchor.y + TOWER_OFFSET_Y;
+
+    tower.setAttribute('class', 'province-entrusted');
+    tower.setAttribute('d', TOWER_PATH);
+    tower.setAttribute('transform', `translate(${x} ${y})`);
+
+    return tower;
   }
 
   private createCrest(owner: Family, anchor: MarkerAnchor): SVGImageElement {

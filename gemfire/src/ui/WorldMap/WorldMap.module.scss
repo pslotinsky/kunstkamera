@@ -43,6 +43,13 @@
   image-rendering: pixelated;
 }
 
+.root :global(.province-entrusted) {
+  fill: #e8d9a8;
+  fill-rule: evenodd;
+  stroke: rgba(0, 0, 0, 0.8);
+  stroke-width: 1.5;
+}
+
 .root :global(.province-number) {
   font-size: 24px;
   font-weight: 600;
@@ -53,4 +60,22 @@
   stroke-linejoin: round;
   text-anchor: middle;
   dominant-baseline: central;
+}
+
+.root :global(.war-march) {
+  pointer-events: none;
+}
+
+.root :global(.war-march image) {
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 6px rgba(255, 80, 60, 0.9));
+}
+
+.root :global(.war-clash) {
+  fill: rgba(255, 190, 90, 0.55);
+  stroke: rgba(255, 90, 60, 0.95);
+  stroke-width: 4;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
 }

@@ -37,6 +37,7 @@ export class BattleReportView extends View<BattleReportContext> {
             Close
           </button>
         </header>
+        <p class=${styles.war} data-war></p>
         <table class=${styles.sides} data-sides></table>
         <p class=${styles.verdict} data-verdict></p>
         <p class="${styles.capture} ${styles.hidden}" data-capture></p>
@@ -46,6 +47,7 @@ export class BattleReportView extends View<BattleReportContext> {
 
   public showReport(report: InvasionReport): void {
     this.title.textContent = this.renderHeading(report);
+    this.war.textContent = this.renderWar(report);
     this.showSides(report);
     this.verdict.textContent = this.renderVerdict(report);
     this.showCapture(report);
@@ -89,6 +91,13 @@ export class BattleReportView extends View<BattleReportContext> {
     return heading;
   }
 
+  private renderWar(report: InvasionReport): string {
+    const { source, target, defending } = report;
+    const held = defending ? `, held by ${defending.name}` : '';
+
+    return `${source.family?.name} attacks ${target.name}${held}.`;
+  }
+
   private renderAnswerHeading(report: InvasionReport): string {
     const province = report.target.name;
 
@@ -98,20 +107,32 @@ export class BattleReportView extends View<BattleReportContext> {
   }
 
   private renderVerdict(report: InvasionReport): string {
-    const { target, attacker, defender, outcome, refuge } = report;
-    const province = target.name;
+    const { attacker, defender, outcome, refuge } = report;
+    const province = report.target.name;
+    const flight = refuge
+      ? `${defender.commander.name} flees to ${refuge.name}${this.renderEscort(report)}. `
+      : '';
 
-    let verdict = `${defender.commander.name} surrenders. ${province} is yours.`;
+    let verdict = `${defender.commander.name} surrenders. ${this.renderFall(report)}`;
 
     if (outcome && report.isTaken) {
-      verdict = `${province} is yours. ${attacker.commander.name} holds it with ${outcome.attackerSurvivors} troops.`;
+      verdict = `${flight}${this.renderFall(report)} ${attacker.commander.name} holds it${this.renderSurvivors(report, outcome)}.`;
     } else if (outcome) {
-      verdict = `${province} holds. ${attacker.commander.name} comes home with ${outcome.attackerSurvivors} troops.`;
+      verdict = `${province} holds. ${attacker.commander.name} goes home${this.renderSurvivors(report, outcome)}.`;
     } else if (refuge) {
-      verdict = `${defender.commander.name} flees to ${refuge.name}${this.renderEscort(defender)}. ${province} is yours.`;
+      verdict = `${flight}${this.renderFall(report)}`;
     }
 
     return verdict;
+  }
+
+  private renderFall(report: InvasionReport): string {
+    const victor = report.source.family;
+    const province = report.target.name;
+
+    return victor?.isEqual(this.context.world.player)
+      ? `${province} is yours.`
+      : `${province} falls to ${victor?.name}.`;
   }
 
   private showCapture(report: InvasionReport): void {
@@ -133,14 +154,34 @@ export class BattleReportView extends View<BattleReportContext> {
       : `${captive.general.name} is taken by ${captive.captor.name}.`;
   }
 
-  private renderEscort(defender: Army): string {
-    return defender.hasTroops ? ` with ${defender.troops} troops` : '';
+  private renderEscort(report: InvasionReport): string {
+    const { defender } = report;
+
+    return this.isPlayerSide(report) && defender.hasTroops
+      ? ` with ${defender.troops} troops`
+      : '';
+  }
+
+  private renderSurvivors(
+    report: InvasionReport,
+    outcome: BattleOutcome,
+  ): string {
+    return this.isPlayerSide(report)
+      ? ` with ${outcome.attackerSurvivors} troops`
+      : '';
+  }
+
+  private isPlayerSide(report: InvasionReport): boolean {
+    return report.hasSide(this.context.world.player);
   }
 
   private showSides(report: InvasionReport): void {
     const { outcome } = report;
 
-    this.sides.classList.toggle(styles.hidden!, !report.isFought);
+    this.sides.classList.toggle(
+      styles.hidden!,
+      !report.isFought || !this.isPlayerSide(report),
+    );
 
     if (outcome) {
       this.sides.innerHTML = this.renderSides(report, outcome);
@@ -192,6 +233,10 @@ export class BattleReportView extends View<BattleReportContext> {
 
   private get title(): HTMLElement {
     return this.element.querySelector<HTMLElement>('[data-title]')!;
+  }
+
+  private get war(): HTMLElement {
+    return this.element.querySelector<HTMLElement>('[data-war]')!;
   }
 
   private get sides(): HTMLElement {

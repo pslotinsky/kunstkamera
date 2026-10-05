@@ -8,6 +8,7 @@ import type { AllyDialogControl } from './CommandDialog/AllyDialogControl';
 import type { AttackDialogControl } from './CommandDialog/AttackDialogControl';
 import type { ChangeLordDialogControl } from './CommandDialog/ChangeLordDialogControl';
 import type { DevelopDialogControl } from './CommandDialog/DevelopDialogControl';
+import type { EntrustDialogControl } from './CommandDialog/EntrustDialogControl';
 import type { GiveFoodDialogControl } from './CommandDialog/GiveFoodDialogControl';
 import type { HireMonsterDialogControl } from './CommandDialog/HireMonsterDialogControl';
 import type { InfiltrationDialogControl } from './CommandDialog/InfiltrationDialogControl';
@@ -38,6 +39,7 @@ export type ProvinceCommandsControls = {
   readonly recruitDialog: RecruitDialogControl;
   readonly moveTroopsDialog: MoveTroopsDialogControl;
   readonly changeLordDialog: ChangeLordDialogControl;
+  readonly entrustDialog: EntrustDialogControl;
   readonly searchDialog: SearchDialogControl;
   readonly allyDialog: AllyDialogControl;
   readonly negotiateDialog: NegotiateDialogControl;

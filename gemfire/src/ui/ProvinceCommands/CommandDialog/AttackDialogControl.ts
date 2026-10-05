@@ -7,6 +7,7 @@ import type { World } from '@/core/domain/World';
 import { isDefined } from '@/lib/value/isDefined';
 import { DropdownControl } from '@/ui/Dropdown/DropdownControl';
 import type { DropdownOption } from '@/ui/Dropdown/DropdownView';
+import { toUnitOptions } from '@/ui/Dropdown/dropdown-options';
 
 import { AmountFieldControl } from '../AmountField/AmountFieldControl';
 import { AttackDialogView } from './AttackDialogView';
@@ -132,15 +133,7 @@ export class AttackDialogControl extends CommandDialogControl<
   }
 
   private unitOptions(): DropdownOption[] {
-    return [
-      { value: '', label: 'None' },
-      ...this.availableUnits().map((unit) => ({
-        value: unit.name,
-        label: unit.name,
-        icon: unit.portrait,
-        note: String(unit.strength),
-      })),
-    ];
+    return toUnitOptions(this.availableUnits());
   }
 
   private chosenCommander(): General | undefined {
@@ -176,9 +169,6 @@ export class AttackDialogControl extends CommandDialogControl<
   private availableUnits(): readonly FifthUnit[] {
     const province = this.world.turnQueue.current;
 
-    return [
-      ...(province?.hiredUnits ?? []),
-      ...(province?.family?.getReadyGuardians(this.world.date) ?? []),
-    ];
+    return province ? this.world.getFifthUnits(province) : [];
   }
 }

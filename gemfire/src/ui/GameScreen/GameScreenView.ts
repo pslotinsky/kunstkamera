@@ -31,6 +31,7 @@ export class GameScreenView extends View<GameScreenContext, GameScreenViews> {
           ${views.battleReport.template}
           ${views.captiveDialog.template}
           ${views.announcements.template}
+          ${views.defenseDialog.template}
         </div>
       </div>
     `;

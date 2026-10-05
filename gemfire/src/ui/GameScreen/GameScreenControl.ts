@@ -4,21 +4,26 @@ import type { Province } from '@/core/domain/Province';
 import { MonthStartedEvent } from '@/core/events/MonthStartedEvent';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
+import { WarReportedEvent } from '@/core/events/WarReportedEvent';
 import { Control } from '@/lib/Control';
 import type { EventClass } from '@/lib/EventBus';
 import { AnnouncementsControl } from '@/ui/Announcements/AnnouncementsControl';
 import { BattleReportControl } from '@/ui/BattleReport/BattleReportControl';
 import { CaptiveDialogControl } from '@/ui/CaptiveDialog/CaptiveDialogControl';
+import { DefenseDialogControl } from '@/ui/DefenseDialog/DefenseDialogControl';
 import { FamilyOverviewControl } from '@/ui/FamilyOverview/FamilyOverviewControl';
 import { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
 import { HireMonsterDialogControl } from '@/ui/ProvinceCommands/CommandDialog/HireMonsterDialogControl';
 import { TargetingEndedEvent } from '@/ui/ProvinceCommands/TargetingEndedEvent';
 import { TargetingStartedEvent } from '@/ui/ProvinceCommands/TargetingStartedEvent';
 import { SearchReportControl } from '@/ui/SearchReport/SearchReportControl';
+import { TurnHold } from '@/ui/TurnHold';
 import { WorldMapControl } from '@/ui/WorldMap/WorldMapControl';
 
 import { GameScreenView } from './GameScreenView';
 import type { GameScreenContext, GameScreenControls } from './types';
+
+const COMPUTER_TURN_MS = 400;
 
 export class GameScreenControl extends Control<
   GameScreenView,
@@ -28,6 +33,7 @@ export class GameScreenControl extends Control<
   private selectable?: Set<number> | undefined;
   private displayed?: number | undefined;
   private inspectsTarget = false;
+  private readonly turnHold: TurnHold;
 
   public constructor(context: GameScreenContext) {
     const hireMonster = new HireMonsterDialogControl(
@@ -62,7 +68,12 @@ export class GameScreenControl extends Control<
         world: context.world,
         events: context.events,
       }),
+      defenseDialog: new DefenseDialogControl({
+        world: context.world,
+        events: context.events,
+      }),
     });
+    this.turnHold = new TurnHold(context.events);
   }
 
   protected override onMount(): void {
@@ -84,6 +95,11 @@ export class GameScreenControl extends Control<
       this.startTargeting(event),
     );
     this.onWorldEvent(TargetingEndedEvent, () => this.endTargeting());
+    this.onWorldEvent(WarReportedEvent, (event) =>
+      this.controls.worldMap.showWar(event.report, () =>
+        this.controls.battleReport.showWar(event.report),
+      ),
+    );
 
     const current = this.context.world.turnQueue.current;
 
@@ -102,15 +118,28 @@ export class GameScreenControl extends Control<
   private handleTurnStart(event: TurnStartedEvent): void {
     const { province, turnNumber } = event;
 
-    if (province.belongsTo(this.context.world.player)) {
+    const { world } = this.context;
+
+    if (province.hasOwner()) {
       this.view.showTurn(province, turnNumber);
       this.showProvince(province);
+    } else {
+      this.controls.gamePanel.hideCommands();
     }
+
+    if (world.isComputerRun(province)) {
+      this.pauseComputerTurn();
+    }
+  }
+
+  private pauseComputerTurn(): void {
+    this.turnHold.hold();
+    setTimeout(() => this.turnHold.release(), COMPUTER_TURN_MS);
   }
 
   private selectProvince(province: Province): void {
     if (this.selectable?.has(province.number)) {
-      this.controls.gamePanel.pickTarget(province);
+      this.pickTarget(province);
 
       if (this.inspectsTarget) {
         this.displayed = province.number;
@@ -118,6 +147,14 @@ export class GameScreenControl extends Control<
       }
 
       this.renderTargeting(province.number);
+    }
+  }
+
+  private pickTarget(province: Province): void {
+    if (this.controls.defenseDialog.isPicking) {
+      this.controls.defenseDialog.pickRefuge(province);
+    } else {
+      this.controls.gamePanel.pickTarget(province);
     }
   }
 

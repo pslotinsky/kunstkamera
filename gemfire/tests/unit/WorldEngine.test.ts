@@ -5,6 +5,8 @@ import { TradeCommand } from '@/core/commands/province/TradeCommand';
 import { CalendarDate } from '@/core/domain/CalendarDate';
 import { MonthStartedEvent } from '@/core/events/MonthStartedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
+import { TurnHeldEvent } from '@/core/events/TurnHeldEvent';
+import { TurnReleasedEvent } from '@/core/events/TurnReleasedEvent';
 import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
 import { WorldEngine } from '@/core/WorldEngine';
 import { EventBus } from '@/lib/EventBus';
@@ -146,14 +148,18 @@ describe('WorldEngine', () => {
     const playerProvince = fixture.world.map.getProvince(1);
     const rivalProvince = fixture.world.map.getProvince(3);
     const neutralProvince = fixture.world.map.getProvince(4);
+    let rivalHarvest = 0;
 
+    fixture.events.subscribe(MonthStartedEvent, () => {
+      rivalHarvest = rivalProvince.resources.food;
+    });
     drainMonth(fixture);
 
     expect(fixture.world.date.month).toBe(9);
     expect(playerProvince.resources.food).toBe(400 + 10 + 20 * 2 + 30);
     expect(playerProvince.resources.gold).toBeGreaterThan(500);
     expect(playerProvince.resources.troops).toBe(100);
-    expect(rivalProvince.resources.food).toBe(5 + 5 * 2 + 5);
+    expect(rivalHarvest).toBe(5 + 5 * 2 + 5);
     expect(neutralProvince.resources.food).toBe(0);
     expect(neutralProvince.resources.gold).toBe(0);
   });
@@ -185,5 +191,57 @@ describe('WorldEngine', () => {
 
     expect(world.isDefeated).toBe(true);
     expect(world.date.equals(now)).toBe(true);
+  });
+
+  it('lets the lord of an entrusted province give its orders, waiting only for the rest', () => {
+    const erin = makeGeneral({ name: 'Erin' });
+    const pender = makeGeneral({ name: 'Pender' });
+    const blanche = makeFamily({
+      name: 'Blanche',
+      ruler: erin,
+      members: [erin, pender],
+    });
+    const home = makeProvince({ number: 1, family: blanche, governor: erin });
+    const entrusted = makeProvince({
+      number: 2,
+      family: blanche,
+      governor: pender,
+      gold: 100,
+    });
+
+    blanche.moveHome(home);
+    entrusted.entrust();
+
+    const { world, events } = makeWorld([home, entrusted], blanche);
+
+    new WorldEngine(world, events).start();
+
+    expect(world.turnQueue.current).toBe(home);
+
+    events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
+
+    expect(world.turnQueue.current).toBe(home);
+    expect(entrusted.development.cultivation).toBeGreaterThan(0);
+  });
+
+  it('starts no turn while something holds it, and ignores a stale turn end', async () => {
+    const { world, events } = createFixture(new CalendarDate(1186, 4));
+    const holder = {};
+    const ended = world.turnQueue.turnNumber;
+    const started: number[] = [];
+
+    events.subscribe(TurnStartedEvent, (event) =>
+      started.push(event.turnNumber),
+    );
+    events.publish(new TurnHeldEvent(holder));
+    events.publish(new TurnEndedEvent(ended));
+    events.publish(new TurnEndedEvent(ended + 1));
+
+    expect(started).toEqual([]);
+
+    events.publish(new TurnReleasedEvent(holder));
+    await Promise.resolve();
+
+    expect(started[0]).toBe(ended + 1);
   });
 });

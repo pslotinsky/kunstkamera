@@ -4,6 +4,7 @@ import type { Collection } from '@/lib/Collection';
 import type { CalendarDate } from './CalendarDate';
 import type { Captive } from './Captive';
 import { Family } from './Family';
+import type { FifthUnit } from './FifthUnit';
 import type { General, GeneralRank } from './General';
 import { Market } from './Market';
 import type { Province } from './Province';
@@ -48,7 +49,11 @@ export class World {
   }
 
   public findCaptiveOf(captor: Family): Captive | undefined {
-    return this.held.find((captive) => captive.captor.isEqual(captor));
+    return this.getCaptivesOf(captor)[0];
+  }
+
+  public getCaptivesOf(captor: Family): readonly Captive[] {
+    return this.held.filter((captive) => captive.captor.isEqual(captor));
   }
 
   public exile(general: General): void {
@@ -191,6 +196,47 @@ export class World {
           .getNeighbors(province)
           .filter((neighbor) => family.isHostileTo(neighbor.family))
       : [];
+  }
+
+  public isComputerRun(province: Province): boolean {
+    return (
+      province.hasOwner() &&
+      (!province.belongsTo(this.player) || province.isEntrusted)
+    );
+  }
+
+  public isPlayerRun(province: Province): boolean {
+    return province.belongsTo(this.player) && !province.isEntrusted;
+  }
+
+  public isBorder(province: Province): boolean {
+    return this.getHostileNeighbors(province).length > 0;
+  }
+
+  public getThreat(province: Province): number {
+    const threats = this.getHostileNeighbors(province).map((neighbor) =>
+      this.getDefense(neighbor),
+    );
+
+    return Math.max(0, ...threats);
+  }
+
+  public getDefense(province: Province): number {
+    const strongest = this.getFifthUnits(province)[0];
+
+    return province.resources.troops + (strongest?.strength ?? 0);
+  }
+
+  public getFifthUnits(province: Province): readonly FifthUnit[] {
+    const guardians = province.family?.getReadyGuardians(this.date) ?? [];
+
+    return [...province.hiredUnits, ...guardians].sort(
+      (left, right) => right.strength - left.strength,
+    );
+  }
+
+  public countProvinces(family: Family): number {
+    return this.getFamilyProvinces(family).length;
   }
 
   public getFamilyProvinces(family: Family): readonly Province[] {

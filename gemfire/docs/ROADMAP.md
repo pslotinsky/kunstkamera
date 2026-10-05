@@ -156,9 +156,9 @@ Generals age, grow, and die; a fallen ruler's family passes to an heir.
 
 Rival families that take their own monthly turns, plus handing your own work to the computer. (Tactical AI lives with Battle.)
 
-- [ ] face rival families that act on their own
-- [ ] when your land is attacked, choose to fight, retreat, or surrender
-- [ ] entrust a province to its lord, freeing you from its orders
+- [x] face rival families that act on their own
+- [x] when your land is attacked, choose to fight, retreat, or surrender
+- [x] entrust a province to its lord, freeing you from its orders
 
 ## 13. Victory & defeat
 

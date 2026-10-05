@@ -1,6 +1,6 @@
 import { Stats, type StatsParams } from './Stats';
 
-const RESOURCE_MAXES = {
+export const RESOURCE_MAXES = {
   gold: 999,
   food: 999,
   troops: 999,

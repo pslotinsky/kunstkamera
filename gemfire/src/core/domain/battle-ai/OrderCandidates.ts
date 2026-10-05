@@ -1,7 +1,5 @@
-import { BLOW_WEIGHT, RETALIATION } from '@/config/battle';
-
 import type { Battle } from '../Battle';
-import type { BattleUnit } from '../BattleUnit';
+import { type BattleUnit, BLOW_WEIGHT, RETALIATION } from '../BattleUnit';
 import type { Cell } from '../Cell';
 import { UnitOrder } from '../UnitOrder';
 import { STEPS_CAP } from './Approach';

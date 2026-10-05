@@ -3,6 +3,7 @@ import { AttackCommand } from '@/core/commands/province/AttackCommand';
 import { ChangeLordCommand } from '@/core/commands/province/ChangeLordCommand';
 import type { CommandGroup } from '@/core/commands/province/catalog';
 import { DevelopCommand } from '@/core/commands/province/DevelopCommand';
+import { EntrustCommand } from '@/core/commands/province/EntrustCommand';
 import { GiveFoodCommand } from '@/core/commands/province/GiveFoodCommand';
 import { HireMonsterCommand } from '@/core/commands/province/HireMonsterCommand';
 import { MoveTroopsCommand } from '@/core/commands/province/MoveTroopsCommand';
@@ -26,6 +27,7 @@ import { AttackDialogControl } from './CommandDialog/AttackDialogControl';
 import { ChangeLordDialogControl } from './CommandDialog/ChangeLordDialogControl';
 import type { AnyCommandDialogControl } from './CommandDialog/CommandDialogControl';
 import { DevelopDialogControl } from './CommandDialog/DevelopDialogControl';
+import { EntrustDialogControl } from './CommandDialog/EntrustDialogControl';
 import { GiveFoodDialogControl } from './CommandDialog/GiveFoodDialogControl';
 import { InfiltrationDialogControl } from './CommandDialog/InfiltrationDialogControl';
 import { MoveTroopsDialogControl } from './CommandDialog/MoveTroopsDialogControl';
@@ -60,6 +62,7 @@ export class ProvinceCommandsControl extends Control<
     [RecruitCommand.name, this.controls.recruitDialog],
     [MoveTroopsCommand.name, this.controls.moveTroopsDialog],
     [ChangeLordCommand.name, this.controls.changeLordDialog],
+    [EntrustCommand.name, this.controls.entrustDialog],
     [SearchCommand.name, this.controls.searchDialog],
     [AllyCommand.name, this.controls.allyDialog],
     [NegotiateCommand.name, this.controls.negotiateDialog],
@@ -96,6 +99,7 @@ export class ProvinceCommandsControl extends Control<
           ChangeLordCommand.name,
           world,
         ),
+        entrustDialog: new EntrustDialogControl(EntrustCommand.name),
         searchDialog: new SearchDialogControl(SearchCommand.name),
         allyDialog: new AllyDialogControl(AllyCommand.name, world),
         negotiateDialog: new NegotiateDialogControl(

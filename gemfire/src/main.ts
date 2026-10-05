@@ -21,7 +21,7 @@ if (import.meta.env.DEV) {
   });
 }
 
-engine.start();
-
 const shell = new AppControl({ world, events, commands });
 shell.mount(app);
+
+engine.start();

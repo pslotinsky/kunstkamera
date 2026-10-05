@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
+import { AllianceAnswerCommand } from '@/core/commands/AllianceAnswerCommand';
 import { AllyCommand } from '@/core/commands/province/AllyCommand';
 import { AttackCommand } from '@/core/commands/province/AttackCommand';
 import { NegotiateCommand } from '@/core/commands/province/NegotiateCommand';
 import { PlunderCommand } from '@/core/commands/province/PlunderCommand';
 import { SabotageCommand } from '@/core/commands/province/SabotageCommand';
+import { AllianceOfferedEvent } from '@/core/events/AllianceOfferedEvent';
 import { MissionReportedEvent } from '@/core/events/MissionReportedEvent';
 
 import { advanceTo, makeFamily, makeProvince, makeWorld } from './factories';
@@ -86,5 +88,52 @@ describe('AllyCommand', () => {
     ]) {
       expect(command.selectableTargets).toEqual([4]);
     }
+  });
+});
+
+describe('A rival offering the player an alliance', () => {
+  function offer() {
+    const context = setup();
+    const { world, lyle, hyland, blanche } = context;
+    const offers: AllianceOfferedEvent[] = [];
+
+    lyle.homeProvince = hyland;
+    context.context.events.subscribe(AllianceOfferedEvent, (event) =>
+      offers.push(event),
+    );
+    advanceTo(world, hyland);
+
+    const command = new AllyCommand(context.context);
+
+    command.proposeTo(blanche);
+    command.execute();
+
+    return { ...context, command, offers };
+  }
+
+  it('waits for the player instead of rolling for them', () => {
+    const { command, offers, lyle, blanche } = offer();
+
+    expect(command.suspendsTurn()).toBe(true);
+    expect(offers.map((each) => each.proposer)).toEqual([lyle]);
+    expect(blanche.ally).toBeUndefined();
+  });
+
+  it('forms the alliance only when the player accepts', () => {
+    const accepted = offer();
+    const declined = offer();
+
+    for (const [each, answer] of [
+      [accepted, true],
+      [declined, false],
+    ] as const) {
+      const reply = new AllianceAnswerCommand(each.context);
+
+      reply.answer(each.lyle, answer);
+      reply.execute();
+    }
+
+    expect(accepted.blanche.ally).toBe(accepted.lyle);
+    expect(declined.blanche.ally).toBeUndefined();
   });
 });

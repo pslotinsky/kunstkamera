@@ -11,27 +11,47 @@ export class DefensePolicy {
   }
 
   public decide(province: Province): DefenderAnswer {
-    let answer: DefenderAnswer = 'surrender';
+    const [preferred] = this.getAnswers(province);
 
-    if (province.resources.troops > 0) {
-      answer = 'fight';
-    } else if (this.chooseRetreat(province)) {
-      answer = 'retreat';
-    }
-
-    return answer;
+    return preferred ?? 'surrender';
   }
 
-  public chooseRetreat(province: Province): Province | undefined {
+  public getAnswers(province: Province): readonly DefenderAnswer[] {
+    const answers: DefenderAnswer[] = [];
+
+    if (province.resources.troops > 0) {
+      answers.push('fight');
+    }
+
+    if (this.getRefuges(province).length > 0) {
+      answers.push('retreat');
+    }
+
+    return answers.length > 0 ? answers : ['surrender'];
+  }
+
+  public getRefuges(province: Province): readonly Province[] {
     const { family } = province;
 
-    return family
-      ? this.world.map
-          .getNeighbors(province)
-          .filter((neighbor) => neighbor.belongsTo(family))
-          .sort(
-            (left, right) => right.resources.troops - left.resources.troops,
-          )[0]
-      : undefined;
+    if (!family) {
+      return [];
+    }
+
+    const neighbors = this.world.map
+      .getNeighbors(province)
+      .filter((neighbor) => neighbor.belongsTo(family));
+    const home = family.homeProvince;
+    const isHomeApart =
+      !home.isEqual(province) &&
+      home.belongsTo(family) &&
+      !neighbors.some((neighbor) => neighbor.isEqual(home));
+
+    return isHomeApart ? [...neighbors, home] : neighbors;
+  }
+
+  public chooseRefuge(province: Province): Province | undefined {
+    return [...this.getRefuges(province)].sort(
+      (left, right) => right.resources.troops - left.resources.troops,
+    )[0];
   }
 }

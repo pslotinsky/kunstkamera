@@ -1,11 +1,10 @@
-import type { RecruitCommand } from '@/core/commands/province/RecruitCommand';
+import { RecruitCommand } from '@/core/commands/province/RecruitCommand';
 import type { World } from '@/core/domain/World';
 
 import { AmountFieldControl } from '../AmountField/AmountFieldControl';
 import { CommandDialogControl } from './CommandDialogControl';
 import { RecruitDialogView } from './RecruitDialogView';
 
-const GOLD_PER_TROOP = 2;
 const TROOP_CEILING = 999;
 
 export class RecruitDialogControl extends CommandDialogControl<
@@ -52,7 +51,9 @@ export class RecruitDialogControl extends CommandDialogControl<
     let max = 0;
 
     if (province) {
-      const affordable = Math.floor(province.resources.gold / GOLD_PER_TROOP);
+      const affordable = Math.floor(
+        province.resources.gold / RecruitCommand.GOLD_PER_TROOP,
+      );
       const headroom = TROOP_CEILING - province.resources.troops;
 
       max = Math.min(affordable, headroom);

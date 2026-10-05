@@ -2,7 +2,12 @@ import type { World } from '@/core/domain/World';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 import type { EventBus } from '@/lib/EventBus';
 
+import { Battle } from '../domain/Battle';
+import type { Invasion } from '../domain/Invasion';
+import type { InvasionReport } from '../domain/InvasionReport';
 import type { Province } from '../domain/Province';
+import { BattleReportedEvent } from '../events/BattleReportedEvent';
+import { BattleStartedEvent } from '../events/BattleStartedEvent';
 
 export interface WorldCommandContext {
   readonly world: World;
@@ -49,6 +54,18 @@ export abstract class WorldCommand {
 
   protected publish(event: object): void {
     this.context.events.publish(event);
+  }
+
+  protected publishInvasion(
+    invasion: Invasion,
+    started: Battle | InvasionReport,
+  ): void {
+    if (started instanceof Battle) {
+      this.publish(new BattleStartedEvent(invasion, started));
+    } else {
+      this.publish(new BattleReportedEvent(started));
+      this.publishUpdates(invasion.affected);
+    }
   }
 
   protected publishUpdates(provinces: readonly Province[]): void {

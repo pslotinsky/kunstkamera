@@ -23,7 +23,7 @@ export class AppControl extends Control<AppView, AppControls> {
 
     events.subscribe(
       BattleStartedEvent,
-      (event) => this.controls.battleScreen.play(event.battle),
+      (event) => this.controls.battleScreen.play(event.battle, event.invasion),
       this.signal,
     );
     events.subscribe(

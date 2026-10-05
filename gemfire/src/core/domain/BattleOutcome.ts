@@ -36,6 +36,10 @@ export class BattleOutcome {
     return this.winner.isEqual(side);
   }
 
+  public isWithdrawnBy(side: BattleSide): boolean {
+    return this.reason === 'retreat' && !this.isWonBy(side);
+  }
+
   public hasLostUnit(side: BattleSide): boolean {
     return this.lostUnits.some((lost) => lost.isEqual(side));
   }

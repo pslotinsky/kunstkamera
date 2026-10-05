@@ -10,6 +10,7 @@ import { AllyDialogView } from '@/ui/ProvinceCommands/CommandDialog/AllyDialogVi
 import { AttackDialogView } from '@/ui/ProvinceCommands/CommandDialog/AttackDialogView';
 import { ChangeLordDialogView } from '@/ui/ProvinceCommands/CommandDialog/ChangeLordDialogView';
 import { DevelopDialogView } from '@/ui/ProvinceCommands/CommandDialog/DevelopDialogView';
+import { EntrustDialogView } from '@/ui/ProvinceCommands/CommandDialog/EntrustDialogView';
 import { GiveFoodDialogView } from '@/ui/ProvinceCommands/CommandDialog/GiveFoodDialogView';
 import { InfiltrationDialogView } from '@/ui/ProvinceCommands/CommandDialog/InfiltrationDialogView';
 import { MoveTroopsDialogView } from '@/ui/ProvinceCommands/CommandDialog/MoveTroopsDialogView';
@@ -68,6 +69,7 @@ describe('ProvinceCommandsView', () => {
           { name: 'ChangeLordCommand' },
           {},
         ),
+        entrustDialog: new EntrustDialogView({ name: 'EntrustCommand' }, {}),
         searchDialog: new SearchDialogView({ name: 'SearchCommand' }, {}),
         allyDialog: new AllyDialogView({ name: 'AllyCommand' }, {}),
         negotiateDialog: new NegotiateDialogView(

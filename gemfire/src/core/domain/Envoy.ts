@@ -84,7 +84,8 @@ export class Envoy {
   }
 
   private weighAlliance(other: Family): number {
-    const ratio = this.countProvinces(other) / this.countProvinces(this.family);
+    const ratio =
+      this.world.countProvinces(other) / this.world.countProvinces(this.family);
     const share = (ALLY_REFUSAL_RATIO - ratio) / (ALLY_REFUSAL_RATIO - 1);
 
     return ALLY_ODDS * Math.min(1, Math.max(0, share));
@@ -101,13 +102,9 @@ export class Envoy {
 
   private canForceSurrender(rival: Family): boolean {
     return (
-      this.countProvinces(this.family) >=
-        this.countProvinces(rival) * SURRENDER_RATIO &&
+      this.world.countProvinces(this.family) >=
+        this.world.countProvinces(rival) * SURRENDER_RATIO &&
       this.family.fame > rival.fame
     );
-  }
-
-  private countProvinces(family: Family): number {
-    return this.world.getFamilyProvinces(family).length;
   }
 }

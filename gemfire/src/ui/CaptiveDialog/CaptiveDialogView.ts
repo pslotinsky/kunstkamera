@@ -1,16 +1,13 @@
 import { html, type TemplateResult } from 'lit-html';
 
 import type { Captive } from '@/core/domain/Captive';
+import type { Disposal, DisposalOutcome } from '@/core/domain/Captivity';
 import type { World } from '@/core/domain/World';
 import type { EventBus } from '@/lib/EventBus';
 import { View } from '@/lib/View';
 
 import { CaptiveDismissedEvent } from './CaptiveDismissedEvent';
-import {
-  type Disposal,
-  DisposalChosenEvent,
-  type DisposalOutcome,
-} from './DisposalChosenEvent';
+import { DisposalChosenEvent } from './DisposalChosenEvent';
 
 import styles from './CaptiveDialog.module.scss';
 
