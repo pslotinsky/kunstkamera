@@ -1,6 +1,7 @@
 import { Envoy } from '@/core/domain/Envoy';
 import type { Family } from '@/core/domain/Family';
 import type { Province } from '@/core/domain/Province';
+import { AllianceOfferedEvent } from '@/core/events/AllianceOfferedEvent';
 import { MissionReportedEvent } from '@/core/events/MissionReportedEvent';
 import { isDefined } from '@/lib/value/isDefined';
 
@@ -10,6 +11,7 @@ const ALLY_GOODWILL = 1;
 
 export class AllyCommand extends ProvinceCommand {
   private proposed: Family | undefined;
+  private offered = false;
 
   public constructor(context: WorldCommandContext) {
     super('Ally', context);
@@ -21,6 +23,10 @@ export class AllyCommand extends ProvinceCommand {
 
   public proposeTo(family: Family): void {
     this.proposed = family;
+  }
+
+  public override suspendsTurn(): boolean {
+    return this.offered;
   }
 
   public override canExecute(): boolean {
@@ -45,6 +51,8 @@ export class AllyCommand extends ProvinceCommand {
     const province = this.currentProvince;
     const family = province?.family;
 
+    this.offered = false;
+
     if (province && family && this.canExecute()) {
       if (family.ally) {
         this.breakAlliance(province, family, family.ally);
@@ -67,6 +75,24 @@ export class AllyCommand extends ProvinceCommand {
   }
 
   private propose(province: Province, family: Family, other: Family): void {
+    if (other.isEqual(this.context.world.player)) {
+      this.offer(province, family);
+    } else {
+      this.send(province, family, other);
+    }
+  }
+
+  private offer(province: Province, family: Family): void {
+    const envoy = this.createEnvoy(family);
+
+    if (envoy.canAllyWith(this.context.world.player)) {
+      this.offered = true;
+      this.publish(new AllianceOfferedEvent(province, family));
+      this.complete(province, ALLY_GOODWILL);
+    }
+  }
+
+  private send(province: Province, family: Family, other: Family): void {
     const accepted = this.createEnvoy(family).proposeAlliance(other);
 
     this.publish(

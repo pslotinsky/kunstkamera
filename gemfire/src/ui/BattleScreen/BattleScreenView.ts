@@ -15,7 +15,6 @@ import { FenceChosenEvent } from './FenceChosenEvent';
 import { RetreatChosenEvent } from './RetreatChosenEvent';
 import { RetreatConfirmedEvent } from './RetreatConfirmedEvent';
 import { SkipChosenEvent } from './SkipChosenEvent';
-import { ENEMY_SIDE, PLAYER_SIDE } from './sides';
 import { TurnDoneEvent } from './TurnDoneEvent';
 import type { BattleScreenContext, BattleScreenViews } from './types';
 import { UnitWaitedEvent } from './UnitWaitedEvent';
@@ -42,12 +41,15 @@ const LEAVING: readonly Order[] = ['confirm', 'stay'];
 const HANDING_OVER: readonly Order[] = ['hand-over', 'stay'];
 const PLAYING_ITSELF: readonly Order[] = ['skip'];
 const WATCHING: readonly Order[] = [];
+const SIDES: readonly BattleSide[] = [BattleSide.attacker, BattleSide.defender];
 
 export class BattleScreenView extends View<
   BattleScreenContext,
   BattleScreenViews
 > {
   protected readonly rootClass = styles.root!;
+
+  private retreatable = true;
 
   public get template(): TemplateResult {
     return html`
@@ -115,6 +117,9 @@ export class BattleScreenView extends View<
             </button>
           </span>
           <span class=${styles.prompt} data-prompt></span>
+          <span class="${styles.refuge} ${styles.gone}" data-refuge>
+            ${this.views.refuge.template}
+          </span>
           <span class=${styles.actions}>
             <button
               type="button"
@@ -170,8 +175,9 @@ export class BattleScreenView extends View<
     this.element.style.setProperty('--columns', String(battle.field.columns));
     this.element.style.setProperty('--rows', String(battle.field.rows));
     this.place.textContent = battle.field.name;
-    this.showCommander(PLAYER_SIDE, battle.getArmy(PLAYER_SIDE));
-    this.showCommander(ENEMY_SIDE, battle.getArmy(ENEMY_SIDE));
+    for (const side of SIDES) {
+      this.showCommander(side, battle.getArmy(side));
+    }
   }
 
   public showClock(clock: BattleClock): void {
@@ -179,8 +185,9 @@ export class BattleScreenView extends View<
   }
 
   public showArmies(battle: Battle): void {
-    this.showArmy(PLAYER_SIDE, battle);
-    this.showArmy(ENEMY_SIDE, battle);
+    for (const side of SIDES) {
+      this.showArmy(side, battle);
+    }
   }
 
   public askForUnit(): void {
@@ -223,8 +230,17 @@ export class BattleScreenView extends View<
     this.ask(told, watching ? WATCHING : IDLE);
   }
 
+  public allowRetreat(allowed: boolean): void {
+    this.retreatable = allowed;
+  }
+
   public askToRetreat(): void {
     this.ask('Abandon the field and go home?', LEAVING);
+  }
+
+  public askToFlee(): void {
+    this.ask('Abandon the field and flee to', LEAVING);
+    this.refuge.classList.remove(styles.gone!);
   }
 
   public askToHandOver(): void {
@@ -249,11 +265,14 @@ export class BattleScreenView extends View<
 
   private ask(prompt: string, offered: readonly Order[]): void {
     this.prompt.textContent = prompt;
+    this.refuge.classList.add(styles.gone!);
 
     for (const button of this.orderButtons) {
       const order = button.dataset.order as Order;
+      const shown =
+        offered.includes(order) && (order !== 'retreat' || this.retreatable);
 
-      button.classList.toggle(styles.gone!, !offered.includes(order));
+      button.classList.toggle(styles.gone!, !shown);
     }
   }
 
@@ -322,5 +341,9 @@ export class BattleScreenView extends View<
 
   private get prompt(): HTMLElement {
     return this.element.querySelector<HTMLElement>('[data-prompt]')!;
+  }
+
+  private get refuge(): HTMLElement {
+    return this.element.querySelector<HTMLElement>('[data-refuge]')!;
   }
 }

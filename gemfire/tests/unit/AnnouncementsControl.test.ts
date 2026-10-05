@@ -4,9 +4,13 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { Artifact } from '@/core/domain/Artifact';
 import { HiredUnit } from '@/core/domain/HiredUnit';
 import type { Province } from '@/core/domain/Province';
+import { Resources } from '@/core/domain/Resources';
 import { Succession } from '@/core/domain/Succession';
+import { AllianceOfferedEvent } from '@/core/events/AllianceOfferedEvent';
 import { ArtifactFoundEvent } from '@/core/events/ArtifactFoundEvent';
+import { MissionReportedEvent } from '@/core/events/MissionReportedEvent';
 import { SuccessionReportedEvent } from '@/core/events/SuccessionReportedEvent';
+import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { UnitDesertedEvent } from '@/core/events/UnitDesertedEvent';
 import styles from '@/ui/Announcements/Announcements.module.scss';
 import { AnnouncementsControl } from '@/ui/Announcements/AnnouncementsControl';
@@ -51,6 +55,8 @@ function setup() {
     root.querySelector<HTMLElement>(selector)!.click();
 
   return {
+    events,
+    theirs,
     world,
     mine,
     myProvince,
@@ -159,5 +165,53 @@ describe('AnnouncementsControl', () => {
 
     expect(screen.mine.ruler).toBe(anselm);
     expect(screen.myProvince.governor).toBe(anselm);
+  });
+
+  it('tells you what a rival did to your land, in its words', () => {
+    const screen = setup();
+
+    screen.events.publish(
+      new MissionReportedEvent(screen.theirProvince, {
+        kind: 'plunder',
+        target: screen.myProvince,
+        loot: Resources.from({ gold: 40, food: 0 }),
+      }),
+    );
+
+    expect(screen.text()).toBe(
+      'Agents from Fitzroy plundered Lorraine: 40 gold, 0 food.',
+    );
+  });
+
+  it('keeps quiet about what rivals do to each other', () => {
+    const screen = setup();
+    const other = makeProvince({
+      number: 3,
+      family: makeFamily({ name: 'Lyle' }),
+    });
+
+    screen.events.publish(
+      new MissionReportedEvent(screen.theirProvince, {
+        kind: 'plunder',
+        target: other,
+        loot: undefined,
+      }),
+    );
+
+    expect(screen.shown()).toBe(false);
+  });
+
+  it('forms an alliance a rival offers once you accept, then lets the month go on', () => {
+    const screen = setup();
+    const ended: TurnEndedEvent[] = [];
+
+    screen.events.subscribe(TurnEndedEvent, (event) => ended.push(event));
+    screen.events.publish(
+      new AllianceOfferedEvent(screen.theirProvince, screen.theirs),
+    );
+    screen.confirm();
+
+    expect(screen.mine.ally).toBe(screen.theirs);
+    expect(ended).toHaveLength(1);
   });
 });

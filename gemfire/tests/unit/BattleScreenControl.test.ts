@@ -1,11 +1,10 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { BATTLE_DAY_LIMIT } from '@/config/battle';
 import { AttackCommand } from '@/core/commands/province/AttackCommand';
 import { Army } from '@/core/domain/Army';
 import { Battle } from '@/core/domain/Battle';
-import { BattleClock } from '@/core/domain/BattleClock';
+import { BATTLE_DAY_LIMIT, BattleClock } from '@/core/domain/BattleClock';
 import { BattleSide } from '@/core/domain/BattleSide';
 import { BattleEndedEvent } from '@/core/events/BattleEndedEvent';
 import { BattleStartedEvent } from '@/core/events/BattleStartedEvent';
@@ -17,6 +16,7 @@ import {
   makeArmy,
   makeFamily,
   makeGeneral,
+  makeInvasion,
   makeProvince,
   makeBattle as makeShared,
   makeWorld,
@@ -540,5 +540,22 @@ describe('BattleScreenControl', () => {
 
     expect(knights.hasActed).toBe(false);
     expect(isOffered(root, 'fence')).toBe(true);
+  });
+
+  it('lets the attacker move first when the player defends', () => {
+    const { control, root } = mountScreen();
+    const invasion = makeInvasion();
+
+    invasion.muster();
+
+    const battle = invasion.answer({ answer: 'fight' }) as Battle;
+
+    control.play(battle, invasion);
+
+    expect(battle.turn.isAttacker).toBe(true);
+    expect(root.querySelector('[data-prompt]')!.textContent).toBe(
+      'The enemy is moving…',
+    );
+    expect(isOffered(root, 'retreat')).toBe(false);
   });
 });

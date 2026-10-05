@@ -4,7 +4,9 @@ import { Coronation } from '@/core/domain/Coronation';
 import type { Disbanding } from '@/core/domain/Disbanding';
 import type { SabotageDamage } from '@/core/domain/Infiltration';
 import type { World } from '@/core/domain/World';
+import type { AllianceOfferedEvent } from '@/core/events/AllianceOfferedEvent';
 import type { ArtifactFoundEvent } from '@/core/events/ArtifactFoundEvent';
+import type { CaptiveJudgedEvent } from '@/core/events/CaptiveJudgedEvent';
 import type { GeneralDiedEvent } from '@/core/events/GeneralDiedEvent';
 import type {
   MissionOutcome,
@@ -25,6 +27,7 @@ import type { DropdownControl } from '@/ui/Dropdown/DropdownControl';
 
 import { AnnouncementDismissedEvent } from './AnnouncementDismissedEvent';
 import { ChoiceConfirmedEvent } from './ChoiceConfirmedEvent';
+import { ChoiceDeclinedEvent } from './ChoiceDeclinedEvent';
 
 import styles from './Announcements.module.scss';
 
@@ -42,7 +45,17 @@ const SABOTAGE_DAMAGES: Record<SabotageDamage, string> = {
 interface Choice {
   readonly label: string;
   readonly action: string;
+  readonly decline?: string | undefined;
 }
+
+type Verdict = CaptiveJudgedEvent['outcome'];
+
+const VERDICTS: Record<Verdict, string> = {
+  joined: 'recruited',
+  refused: 'released',
+  released: 'released',
+  banished: 'banished',
+};
 
 interface Announcement {
   readonly text: string;
@@ -79,7 +92,15 @@ export class AnnouncementsView extends View<
         </figure>
         <div class="${styles.ask} ${styles.hidden}" data-ask>
           <span class=${styles.askLabel} data-ask-label></span>
-          <div class=${styles.recipient}>${this.views.recipient.template}</div>
+          <div class=${styles.recipient} data-picker>
+            ${this.views.recipient.template}
+          </div>
+          <button
+            class="${styles.action} ${styles.take}"
+            type="button"
+            data-decline
+            @click=${() => this.publish(new ChoiceDeclinedEvent())}
+          ></button>
           <button
             class="${styles.action} ${styles.take}"
             type="button"
@@ -128,9 +149,40 @@ export class AnnouncementsView extends View<
   }
 
   public showMission(event: MissionReportedEvent, pending: number): void {
-    const you = event.province.family?.name ?? '';
+    const actor = event.province.family;
+    const name = actor?.name ?? '';
 
-    this.tell(this.describeMission(event.outcome, you), pending);
+    this.tell(
+      actor?.isEqual(this.context.world.player)
+        ? this.describeMission(event.outcome, name)
+        : this.describeRivalMission(event.outcome, name),
+      pending,
+    );
+  }
+
+  public showVerdict(event: CaptiveJudgedEvent, pending: number): void {
+    const { captive, outcome } = event;
+
+    this.tell(
+      {
+        text: `${captive.captor.name} ${VERDICTS[outcome]} ${captive.general.name}.`,
+        icon: captive.general.portrait,
+      },
+      pending,
+    );
+  }
+
+  public askForAlliance(event: AllianceOfferedEvent, pending: number): void {
+    const { proposer } = event;
+
+    this.ask(
+      {
+        text: `${proposer.ruler.name} of ${proposer.name} proposes an alliance.`,
+        icon: proposer.crest,
+      },
+      { label: '', action: 'Accept', decline: 'Decline' },
+      pending,
+    );
   }
 
   public showDeath(event: GeneralDiedEvent, pending: number): void {
@@ -243,6 +295,50 @@ export class AnnouncementsView extends View<
     }
   }
 
+  private describeRivalMission(
+    outcome: MissionOutcome,
+    rival: string,
+  ): Announcement {
+    switch (outcome.kind) {
+      case 'break':
+        return { text: `${rival} has broken the alliance with you.` };
+      case 'defection':
+        return {
+          text: this.describeLoss(outcome, rival),
+          icon: outcome.general.portrait,
+        };
+      case 'sabotage':
+        return {
+          text: outcome.damage
+            ? `Agents from ${rival} ${SABOTAGE_DAMAGES[outcome.damage]} ${outcome.target.name}.`
+            : `Agents from ${rival} were caught in ${outcome.target.name}.`,
+        };
+      case 'plunder':
+        return {
+          text: outcome.loot
+            ? `Agents from ${rival} plundered ${outcome.target.name}: ${outcome.loot.gold} gold, ${outcome.loot.food} food.`
+            : `Agents from ${rival} were caught in ${outcome.target.name}.`,
+        };
+      default:
+        return { text: '' };
+    }
+  }
+
+  private describeLoss(
+    outcome: Extract<MissionOutcome, { kind: 'defection' }>,
+    rival: string,
+  ): string {
+    const { general, province, persuaded } = outcome;
+
+    if (!persuaded) {
+      return `${general.name} turned away the envoys of ${rival}.`;
+    }
+
+    return province
+      ? `${general.name} has defected to ${rival}, taking ${province.name} with him.`
+      : `${general.name} has defected to ${rival}.`;
+  }
+
   private describeDefection(
     outcome: Extract<MissionOutcome, { kind: 'defection' }>,
     you: string,
@@ -306,10 +402,15 @@ export class AnnouncementsView extends View<
   }
 
   private showChoice(choice: Choice | undefined): void {
+    const decline = choice?.decline;
+
     this.choice.classList.toggle(styles.hidden!, !choice);
     this.continueButton.classList.toggle(styles.hidden!, !!choice);
+    this.picker.classList.toggle(styles.hidden!, decline !== undefined);
+    this.declineButton.classList.toggle(styles.hidden!, decline === undefined);
     this.askLabel.textContent = choice?.label ?? '';
     this.chooseButton.textContent = choice?.action ?? '';
+    this.declineButton.textContent = decline ?? '';
   }
 
   private get icon(): HTMLImageElement {
@@ -334,6 +435,14 @@ export class AnnouncementsView extends View<
 
   private get askLabel(): HTMLElement {
     return this.element.querySelector<HTMLElement>('[data-ask-label]')!;
+  }
+
+  private get picker(): HTMLElement {
+    return this.element.querySelector<HTMLElement>('[data-picker]')!;
+  }
+
+  private get declineButton(): HTMLButtonElement {
+    return this.element.querySelector<HTMLButtonElement>('[data-decline]')!;
   }
 
   private get chooseButton(): HTMLButtonElement {

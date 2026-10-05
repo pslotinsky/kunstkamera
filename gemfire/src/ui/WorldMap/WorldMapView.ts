@@ -3,12 +3,14 @@ import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 
 import worldMapSvgMarkup from '@/assets/map.svg?raw';
 import worldMapImageUrl from '@/assets/map.webp';
+import type { InvasionReport } from '@/core/domain/InvasionReport';
 import type { Province } from '@/core/domain/Province';
 import { View } from '@/lib/View';
 
 import { ProvinceMarkers } from './ProvinceMarkers';
 import { ProvinceSelectedEvent } from './ProvinceSelectedEvent';
 import type { WorldMapContext } from './types';
+import { WarMarch } from './WarMarch';
 
 import styles from './WorldMap.module.scss';
 
@@ -25,6 +27,7 @@ export class WorldMapView extends View<WorldMapContext> {
 
   private provinceElements = new Map<number, SVGGeometryElement>();
   private markers: ProvinceMarkers | undefined;
+  private warMarch: WarMarch | undefined;
 
   public addHighlighting(
     provinceNumber: number,
@@ -37,6 +40,14 @@ export class WorldMapView extends View<WorldMapContext> {
 
   public actualizeProvince(province: Province): void {
     this.markers?.actualize(province);
+  }
+
+  public showWar(report: InvasionReport): void {
+    this.warMarch?.play(report);
+  }
+
+  public clearWar(): void {
+    this.warMarch?.clear();
   }
 
   public clearHighlighting(): void {
@@ -74,6 +85,7 @@ export class WorldMapView extends View<WorldMapContext> {
     }
 
     this.markers.mount();
+    this.warMarch = new WarMarch(svg);
   }
 
   private createProvinceElements(): Map<number, SVGGeometryElement> {

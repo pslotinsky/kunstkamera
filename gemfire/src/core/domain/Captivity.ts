@@ -2,6 +2,10 @@ import type { Captive } from './Captive';
 import { Succession, type SuccessionOutcome } from './Succession';
 import type { World } from './World';
 
+export type Disposal = 'recruit' | 'release' | 'banish';
+
+export type DisposalOutcome = 'joined' | 'refused' | 'released' | 'banished';
+
 const RECRUIT_ODDS = 0.5;
 const RULER_RECRUIT_ODDS = 0.2;
 const RELEASE_WAR_LOSS = 5;

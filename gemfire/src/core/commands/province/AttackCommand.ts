@@ -1,9 +1,11 @@
 import type { Army } from '@/core/domain/Army';
 import { Battle } from '@/core/domain/Battle';
+import { AutoBattle } from '@/core/domain/battle-ai/AutoBattle';
 import { Invasion } from '@/core/domain/Invasion';
+import type { InvasionReport } from '@/core/domain/InvasionReport';
 import type { Province } from '@/core/domain/Province';
-import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
-import { BattleStartedEvent } from '@/core/events/BattleStartedEvent';
+import { DefenseRequestedEvent } from '@/core/events/DefenseRequestedEvent';
+import { WarReportedEvent } from '@/core/events/WarReportedEvent';
 
 import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
@@ -74,22 +76,42 @@ export class AttackCommand extends ProvinceCommand {
   }
 
   private march(source: Province, target: Province, attacker: Army): void {
-    const invasion = new Invasion({
-      world: this.context.world,
-      source,
-      target,
-      attacker,
-    });
-    const started = invasion.begin();
+    const { world } = this.context;
+    const invasion = new Invasion({ world, source, target, attacker });
 
     this.recordAction(ATTACK_GOODWILL);
-    this.suspended = started instanceof Battle;
 
-    if (started instanceof Battle) {
-      this.publish(new BattleStartedEvent(invasion, started));
+    if (world.isComputerRun(target)) {
+      this.fight(invasion);
     } else {
-      this.publish(new BattleReportedEvent(started));
-      this.publishUpdates(invasion.affected);
+      this.suspended = true;
+      invasion.muster();
+      this.publish(new DefenseRequestedEvent(invasion));
     }
+  }
+
+  private fight(invasion: Invasion): void {
+    const started = invasion.begin();
+
+    if (this.context.world.isComputerRun(invasion.source)) {
+      this.reportWar(invasion, started);
+    } else {
+      this.suspended = started instanceof Battle;
+      this.publishInvasion(invasion, started);
+    }
+  }
+
+  private reportWar(
+    invasion: Invasion,
+    started: Battle | InvasionReport,
+  ): void {
+    const report =
+      started instanceof Battle
+        ? invasion.conclude(new AutoBattle(started).fight())
+        : started;
+
+    this.suspended = true;
+    this.publish(new WarReportedEvent(report));
+    this.publishUpdates(invasion.affected);
   }
 }

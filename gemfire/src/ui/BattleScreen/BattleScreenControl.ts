@@ -3,10 +3,17 @@ import { BattleSide } from '@/core/domain/BattleSide';
 import type { BattleUnit } from '@/core/domain/BattleUnit';
 import { TacticalPolicy } from '@/core/domain/battle-ai/TacticalPolicy';
 import type { Cell } from '@/core/domain/Cell';
+import type { Invasion } from '@/core/domain/Invasion';
 import type { MoveRange } from '@/core/domain/MoveRange';
+import type { Province } from '@/core/domain/Province';
 import type { UnitOrder } from '@/core/domain/UnitOrder';
 import { BattleEndedEvent } from '@/core/events/BattleEndedEvent';
 import { Control } from '@/lib/Control';
+import { DropdownControl } from '@/ui/Dropdown/DropdownControl';
+import {
+  findOptionProvince,
+  toProvinceOptions,
+} from '@/ui/Dropdown/dropdown-options';
 
 import { ActionCancelledEvent } from './ActionCancelledEvent';
 import { AutoChosenEvent } from './AutoChosenEvent';
@@ -19,7 +26,6 @@ import { RetreatChosenEvent } from './RetreatChosenEvent';
 import { RetreatConfirmedEvent } from './RetreatConfirmedEvent';
 import { SkipChosenEvent } from './SkipChosenEvent';
 import { SkyControl } from './Sky/SkyControl';
-import { ENEMY_SIDE, PLAYER_SIDE } from './sides';
 import { TurnDoneEvent } from './TurnDoneEvent';
 import type { BattleScreenContext, BattleScreenControls } from './types';
 import { UnitWaitedEvent } from './UnitWaitedEvent';
@@ -32,8 +38,9 @@ export class BattleScreenControl extends Control<
   BattleScreenView,
   BattleScreenControls
 > {
-  private readonly enemy = new TacticalPolicy(ENEMY_SIDE);
-
+  private side: BattleSide = BattleSide.attacker;
+  private enemy = new TacticalPolicy(BattleSide.defender);
+  private refuges: readonly Province[] = [];
   private auto?: TacticalPolicy | undefined;
   private battle?: Battle | undefined;
   private selected?: BattleUnit | undefined;
@@ -50,12 +57,19 @@ export class BattleScreenControl extends Control<
       sky: new SkyControl(),
       board: new BattleBoardControl(),
       clash: new ClashControl(),
+      refuge: new DropdownControl({ name: 'refuge' }),
     });
   }
 
-  public play(battle: Battle): void {
+  public play(battle: Battle, invasion?: Invasion): void {
+    const defends = invasion?.target.belongsTo(this.context.world.player);
+
+    this.side = defends ? BattleSide.defender : BattleSide.attacker;
+    this.enemy = new TacticalPolicy(this.side.opposite);
+    this.refuges = defends ? invasion!.refuges : [];
     this.battle = battle;
     this.auto = undefined;
+    this.offerRefuges(invasion?.chooseRefuge());
     this.skipping = false;
     this.clearOrder();
 
@@ -65,8 +79,8 @@ export class BattleScreenControl extends Control<
       this.view.showBattle(battle);
       this.controls.board.showBattle(battle);
       this.controls.clash.showLandscape(battle.field.landscape);
-      this.startPlayerTurn(battle);
       this.view.show();
+      this.openTurn(battle);
     }
   }
 
@@ -96,7 +110,7 @@ export class BattleScreenControl extends Control<
   private pickCell(cell: Cell): void {
     const battle = this.battle;
 
-    if (battle && !this.busy && battle.turn.isEqual(PLAYER_SIDE)) {
+    if (battle && !this.busy && battle.turn.isEqual(this.side)) {
       this.actOn(battle, cell);
     }
   }
@@ -111,7 +125,7 @@ export class BattleScreenControl extends Control<
       this.strikeAt(battle, standing);
     } else if (this.breakable.includes(cell)) {
       this.breakAt(battle, cell);
-    } else if (standing?.side.isEqual(PLAYER_SIDE) && !standing.hasActed) {
+    } else if (standing?.side.isEqual(this.side) && !standing.hasActed) {
       this.turnTo(battle, standing);
     } else if (ordered && this.range?.includes(cell)) {
       this.moveSelected(battle, cell);
@@ -271,7 +285,7 @@ export class BattleScreenControl extends Control<
   }
 
   private askToHandOver(): void {
-    if (this.battle?.turn.isEqual(PLAYER_SIDE)) {
+    if (this.battle?.turn.isEqual(this.side)) {
       this.asking = 'handover';
       this.view.askToHandOver();
     }
@@ -282,7 +296,7 @@ export class BattleScreenControl extends Control<
 
     if (battle) {
       this.asking = 'unit';
-      this.auto = new TacticalPolicy(PLAYER_SIDE);
+      this.auto = new TacticalPolicy(this.side);
       this.clearOrder();
       this.startPlayerTurn(battle);
     }
@@ -299,10 +313,25 @@ export class BattleScreenControl extends Control<
   }
 
   private askToLeave(): void {
-    if (this.battle?.turn.isEqual(PLAYER_SIDE)) {
+    if (this.battle?.turn.isEqual(this.side)) {
       this.asking = 'retreat';
-      this.view.askToRetreat();
+
+      if (this.side.isAttacker) {
+        this.view.askToRetreat();
+      } else {
+        this.view.askToFlee();
+      }
     }
+  }
+
+  private offerRefuges(preferred: Province | undefined): void {
+    this.controls.refuge.setOptions(toProvinceOptions(this.refuges));
+    this.controls.refuge.setValue(preferred ? String(preferred.number) : '');
+    this.view.allowRetreat(this.side.isAttacker || this.refuges.length > 0);
+  }
+
+  private findChosenRefuge(): Province | undefined {
+    return findOptionProvince(this.refuges, this.controls.refuge.value);
   }
 
   private leave(): void {
@@ -310,7 +339,7 @@ export class BattleScreenControl extends Control<
 
     if (battle) {
       this.asking = 'unit';
-      battle.retreat(PLAYER_SIDE);
+      battle.retreat(this.side);
       this.endBattle(battle);
     }
   }
@@ -336,7 +365,7 @@ export class BattleScreenControl extends Control<
   private finishTurn(): void {
     const battle = this.battle;
 
-    if (battle && !this.busy && battle.turn.isEqual(PLAYER_SIDE)) {
+    if (battle && !this.busy && battle.turn.isEqual(this.side)) {
       battle.endTurn();
       this.clearOrder();
       this.startEnemyTurn(battle);
@@ -347,7 +376,7 @@ export class BattleScreenControl extends Control<
     this.showRound(battle);
 
     if (this.auto) {
-      this.openSide(battle, PLAYER_SIDE);
+      this.openSide(battle, this.side);
     } else {
       this.view.askForUnit();
     }
@@ -355,7 +384,7 @@ export class BattleScreenControl extends Control<
 
   private startEnemyTurn(battle: Battle): void {
     this.showRound(battle);
-    this.openSide(battle, ENEMY_SIDE);
+    this.openSide(battle, this.side.opposite);
   }
 
   private openSide(battle: Battle, side: BattleSide): void {
@@ -396,7 +425,7 @@ export class BattleScreenControl extends Control<
   }
 
   private openTurn(battle: Battle): void {
-    if (battle.turn.isEqual(PLAYER_SIDE)) {
+    if (battle.turn.isEqual(this.side)) {
       this.startPlayerTurn(battle);
     } else {
       this.startEnemyTurn(battle);
@@ -515,7 +544,7 @@ export class BattleScreenControl extends Control<
   }
 
   private announce(battle: Battle, side: BattleSide): void {
-    if (side.isEqual(PLAYER_SIDE)) {
+    if (side.isEqual(this.side)) {
       this.view.showHandedOver(battle.getArmy(side).commander.name);
     } else {
       this.view.showEnemyTurn();
@@ -523,7 +552,7 @@ export class BattleScreenControl extends Control<
   }
 
   private findPolicy(side: BattleSide): TacticalPolicy | undefined {
-    return side.isEqual(ENEMY_SIDE) ? this.enemy : this.auto;
+    return side.isEqual(this.side.opposite) ? this.enemy : this.auto;
   }
 
   private resume(battle: Battle, side: BattleSide): void {
@@ -559,7 +588,9 @@ export class BattleScreenControl extends Control<
     if (outcome) {
       this.stopOrdering();
       this.battle = undefined;
-      this.context.events.publish(new BattleEndedEvent(outcome));
+      this.context.events.publish(
+        new BattleEndedEvent(outcome, this.findChosenRefuge()),
+      );
     }
   }
 }

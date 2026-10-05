@@ -1,27 +1,25 @@
+import { JudgeCaptiveCommand } from '@/core/commands/JudgeCaptiveCommand';
 import type { Captive } from '@/core/domain/Captive';
-import { Captivity } from '@/core/domain/Captivity';
-import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
-import { SuccessionReportedEvent } from '@/core/events/SuccessionReportedEvent';
+import type { Disposal } from '@/core/domain/Captivity';
 import { Control } from '@/lib/Control';
 import { BattleReportClosedEvent } from '@/ui/BattleReport/BattleReportClosedEvent';
+import { TurnHold } from '@/ui/TurnHold';
 
 import {
   type CaptiveDialogContext,
   CaptiveDialogView,
 } from './CaptiveDialogView';
 import { CaptiveDismissedEvent } from './CaptiveDismissedEvent';
-import {
-  type Disposal,
-  DisposalChosenEvent,
-  type DisposalOutcome,
-} from './DisposalChosenEvent';
+import { DisposalChosenEvent } from './DisposalChosenEvent';
 
 export class CaptiveDialogControl extends Control<CaptiveDialogView> {
-  private readonly captivity: Captivity;
+  private readonly judge: JudgeCaptiveCommand;
+  private readonly turnHold: TurnHold;
 
   public constructor(context: CaptiveDialogContext) {
     super(CaptiveDialogView, context);
-    this.captivity = new Captivity(context.world);
+    this.judge = new JudgeCaptiveCommand(context);
+    this.turnHold = new TurnHold(context.events);
   }
 
   protected override onMount(): void {
@@ -33,57 +31,30 @@ export class CaptiveDialogControl extends Control<CaptiveDialogView> {
     this.subscribe(DisposalChosenEvent, (event) =>
       this.dispose(event.disposal),
     );
-    this.subscribe(CaptiveDismissedEvent, () => this.view.hide());
+    this.subscribe(CaptiveDismissedEvent, () => this.close());
   }
 
   private open(): void {
     const captive = this.findCaptive();
 
     if (captive) {
+      this.turnHold.hold();
       this.view.showDisposals(captive);
     }
+  }
+
+  private close(): void {
+    this.view.hide();
+    this.turnHold.release();
   }
 
   private dispose(disposal: Disposal): void {
     const captive = this.findCaptive();
 
-    if (!captive) {
-      return;
-    }
-
-    const outcome = this.carryOut(disposal, captive);
-
-    this.context.world.free(captive);
-    this.view.showOutcome(captive, outcome);
-  }
-
-  private carryOut(disposal: Disposal, captive: Captive): DisposalOutcome {
-    if (disposal === 'recruit') {
-      return this.captivity.recruit(captive) ? 'joined' : 'refused';
-    }
-
-    if (disposal === 'release') {
-      this.captivity.release(captive);
-
-      return 'released';
-    }
-
-    this.banish(captive);
-
-    return 'banished';
-  }
-
-  private banish(captive: Captive): void {
-    const outcome = this.captivity.banish(captive);
-
-    if (outcome) {
-      this.context.events.publish(
-        new SuccessionReportedEvent(outcome, 'banishment'),
-      );
-
-      for (const province of outcome.provinces) {
-        this.context.events.publish(new ProvinceUpdatedEvent(province));
-      }
+    if (captive) {
+      this.judge.judge(captive, disposal);
+      this.judge.execute();
+      this.view.showOutcome(captive, this.judge.outcome!);
     }
   }
 

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 
-import { Army } from '@/core/domain/Army';
 import { Battle } from '@/core/domain/Battle';
 import { BattleOutcome } from '@/core/domain/BattleOutcome';
 import { BattleSide } from '@/core/domain/BattleSide';
@@ -10,6 +9,7 @@ import { Invasion } from '@/core/domain/Invasion';
 import { InvasionReport } from '@/core/domain/InvasionReport';
 
 import {
+  makeArmy,
   makeFamily,
   makeGeneral,
   makeOutcome,
@@ -55,7 +55,7 @@ function setup(params: SetupParams = {}) {
   });
 
   const { world } = makeWorld([source, target], mine);
-  const attacker = new Army({ commander: erin, troops: 100, food: 120 });
+  const attacker = makeArmy({ commander: erin, troops: 100, food: 120 });
   const invasion = new Invasion({ world, source, target, attacker });
 
   return { invasion, source, target, attacker, mine, rival, world };
@@ -255,5 +255,113 @@ describe('Invasion', () => {
     );
 
     expect(rival.getReadyGuardians(world.date)).toHaveLength(0);
+  });
+});
+
+function setupRefuges() {
+  const erin = makeGeneral({ name: 'Erin' });
+  const mine = makeFamily({ name: 'Blanche', ruler: erin });
+  const seth = makeGeneral({ name: 'Seth' });
+  const ander = makeGeneral({ name: 'Ander' });
+  const rival = makeFamily({
+    name: 'Lyle',
+    ruler: ander,
+    members: [ander, seth],
+  });
+
+  const source = makeProvince({
+    number: 1,
+    neighbors: [22],
+    family: mine,
+    governor: erin,
+    gold: SOURCE_GOLD,
+    troops: SOURCE_TROOPS,
+    food: SOURCE_FOOD,
+  });
+  const target = makeProvince({
+    number: 22,
+    name: 'Londre',
+    neighbors: [1, 23],
+    family: rival,
+    governor: seth,
+    gold: 80,
+    troops: 200,
+    food: 300,
+  });
+  const neighbor = makeProvince({
+    number: 23,
+    name: 'Carveti',
+    neighbors: [22],
+    family: rival,
+  });
+  const home = makeProvince({
+    number: 30,
+    name: 'Petaria',
+    family: rival,
+    governor: ander,
+  });
+
+  rival.homeProvince = home;
+
+  const { world } = makeWorld([source, target, neighbor, home], mine);
+  const attacker = makeArmy({ commander: erin, troops: 100, food: 120 });
+  const invasion = new Invasion({ world, source, target, attacker });
+
+  return { invasion, target, neighbor, home, rival };
+}
+
+describe('Invasion answered by its defender', () => {
+  it('fights with the Fifth Unit the defender picks, not the strongest', () => {
+    const { invasion, target, rival } = setupRefuges();
+    const orks = HiredUnit.ofName('Orks')!;
+    const dragon = Gem.ofName('Dragon')!;
+
+    rival.gems = [dragon];
+    target.addUnit(orks);
+    invasion.muster();
+
+    const battle = invasion.answer({ answer: 'fight', unit: orks }) as Battle;
+
+    expect(invasion.defendingUnits[0]).toBe(dragon.guardian);
+    expect(battle.defender.unit).toBe(orks);
+  });
+
+  it('flees to the refuge the defender picks, home taking the gold too', () => {
+    const { invasion, target, home } = setupRefuges();
+
+    invasion.muster();
+
+    const report = invasion.answer({ answer: 'retreat', refuge: home });
+
+    expect((report as InvasionReport).refuge).toBe(home);
+    expect(home.resources).toMatchObject({ troops: 200, food: 300, gold: 80 });
+    expect(target.resources.gold).toBe(0);
+  });
+
+  it('leaves the gold behind when fleeing to a neighbour', () => {
+    const { invasion, neighbor } = setupRefuges();
+
+    invasion.muster();
+    invasion.answer({ answer: 'retreat', refuge: neighbor });
+
+    expect(neighbor.resources).toMatchObject({ troops: 200, gold: 0 });
+  });
+
+  it('leads the survivors of a mid-battle withdrawal to the refuge', () => {
+    const { invasion, neighbor } = setupRefuges();
+
+    invasion.begin();
+
+    const report = invasion.conclude(
+      makeOutcome({
+        winner: BattleSide.attacker,
+        reason: 'retreat',
+        defenderSurvivors: 70,
+      }),
+      neighbor,
+    );
+
+    expect(report.refuge).toBe(neighbor);
+    expect(neighbor.resources.troops).toBe(200);
   });
 });

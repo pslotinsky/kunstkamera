@@ -1,6 +1,5 @@
-import { BATTLE_DAY_LIMIT } from '@/config/battle';
-
 import type { Battle } from '../Battle';
+import { BATTLE_DAY_LIMIT } from '../BattleClock';
 import type { BattleOutcome } from '../BattleOutcome';
 import { BattleSide } from '../BattleSide';
 import type { Cell } from '../Cell';

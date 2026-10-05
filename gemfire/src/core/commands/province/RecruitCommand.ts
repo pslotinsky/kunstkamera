@@ -1,8 +1,8 @@
 import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
-const GOLD_PER_TROOP = 2;
-
 export class RecruitCommand extends ProvinceCommand {
+  public static readonly GOLD_PER_TROOP = 2;
+
   private troops = 0;
 
   public constructor(context: WorldCommandContext) {
@@ -23,6 +23,6 @@ export class RecruitCommand extends ProvinceCommand {
   }
 
   private get cost(): number {
-    return this.troops * GOLD_PER_TROOP;
+    return this.troops * RecruitCommand.GOLD_PER_TROOP;
   }
 }

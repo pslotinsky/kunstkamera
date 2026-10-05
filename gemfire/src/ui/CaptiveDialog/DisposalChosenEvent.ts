@@ -1,6 +1,4 @@
-export type Disposal = 'recruit' | 'release' | 'banish';
-
-export type DisposalOutcome = 'joined' | 'refused' | 'released' | 'banished';
+import type { Disposal } from '@/core/domain/Captivity';
 
 export class DisposalChosenEvent {
   public constructor(public readonly disposal: Disposal) {}

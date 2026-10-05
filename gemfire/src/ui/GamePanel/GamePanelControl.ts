@@ -37,6 +37,10 @@ export class GamePanelControl extends Control<
     }
   }
 
+  public hideCommands(): void {
+    this.controls.provinceCommands.hide();
+  }
+
   public showProvinceInfo(province: Province): void {
     this.controls.provinceInfo.showProvince(province);
   }
@@ -52,6 +56,6 @@ export class GamePanelControl extends Control<
   private isCommandsVisible(province: Province): boolean {
     const { world } = this.context;
 
-    return world.isProvinceTurn(province) && province.belongsTo(world.player);
+    return world.isProvinceTurn(province) && world.isPlayerRun(province);
   }
 }

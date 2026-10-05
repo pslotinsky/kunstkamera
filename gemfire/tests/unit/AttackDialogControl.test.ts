@@ -107,7 +107,7 @@ describe('AttackDialogControl', () => {
     const dialog = setup();
 
     expect(dialog.commander()).toContain('Erin');
-    expect(dialog.slotOptions()).toEqual(['', 'Orks', 'Zendor']);
+    expect(dialog.slotOptions()).toEqual(['', 'Zendor', 'Orks']);
   });
 
   it('leaves out a Guardian whose gem is still resting', () => {

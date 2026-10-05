@@ -15,6 +15,7 @@ import { Facing } from '@/core/domain/Facing';
 import { Family } from '@/core/domain/Family';
 import type { Gem } from '@/core/domain/Gem';
 import { General } from '@/core/domain/General';
+import { Invasion, type InvasionParams } from '@/core/domain/Invasion';
 import {
   InvasionReport,
   type InvasionReportParams,
@@ -81,11 +82,15 @@ export function makeGeneral(params: GeneralParams = {}): General {
 
 let placeholderHomeNumber = 0;
 
+let familySequence = 0;
+
 export function makeFamily(params: FamilyParams = {}): Family {
+  familySequence += 1;
+
   const ruler = params.ruler ?? makeGeneral();
 
   return new Family({
-    name: params.name ?? 'Family',
+    name: params.name ?? `Family ${familySequence}`,
     ruler,
     members: params.members ?? [ruler],
     homeProvince: params.homeProvince ?? makePlaceholderHome(),
@@ -203,11 +208,48 @@ export function makeOutcome(
   });
 }
 
+export function makeInvasion(params: Partial<InvasionParams> = {}): Invasion {
+  const attacking = makeFamily({ name: 'Lyle' });
+  const source =
+    params.source ??
+    makeProvince({
+      number: 1,
+      neighbors: [LONDRE],
+      family: attacking,
+      governor: attacking.ruler,
+      gold: 100,
+      troops: 300,
+      food: 300,
+    });
+  const target =
+    params.target ??
+    makeProvince({
+      number: LONDRE,
+      neighbors: [source.number],
+      family: makeFamily({ name: 'Blanche' }),
+      troops: 200,
+      food: 300,
+    });
+  const world =
+    params.world ?? makeWorld([source, target], target.family!).world;
+
+  return new Invasion({
+    world,
+    source,
+    target,
+    attacker:
+      params.attacker ??
+      makeArmy({ commander: source.governor ?? makeGeneral() }),
+  });
+}
+
 export function makeInvasionReport(
   params: Partial<InvasionReportParams> = {},
 ): InvasionReport {
   return new InvasionReport({
+    source: params.source ?? makeProvince({ number: 2 }),
     target: params.target ?? makeProvince(),
+    defending: params.defending,
     attacker: params.attacker ?? makeArmy(),
     defender: params.defender ?? makeArmy(),
     answer: params.answer ?? 'fight',

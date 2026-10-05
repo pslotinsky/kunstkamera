@@ -1,17 +1,3 @@
-import {
-  BACKLASH_RATE,
-  BLOW_RATE,
-  BLOW_WEIGHT,
-  FENCE_ODDS_BASE,
-  FENCE_ODDS_CEILING,
-  FENCE_ODDS_FLOOR,
-  FENCE_ODDS_PER_STRENGTH,
-  MAX_WAR,
-  RANGE_WEIGHT,
-  RETALIATION,
-  WAR_LEVERAGE,
-} from '@/config/battle';
-
 import { BattleSide } from './BattleSide';
 import type { Cell } from './Cell';
 import { Clash } from './Clash';
@@ -20,6 +6,34 @@ import type { General } from './General';
 import type { RangePattern, Unit } from './Unit';
 
 export type Approach = 'front' | 'flank' | 'rear';
+
+const WAR_LEVERAGE = 0.5;
+const MAX_WAR = 100;
+const FENCE_ODDS_BASE = 0.4;
+const FENCE_ODDS_PER_STRENGTH = 0.005;
+const FENCE_ODDS_FLOOR = 0.3;
+const FENCE_ODDS_CEILING = 0.9;
+const BLOW_RATE = 0.25;
+const BACKLASH_RATE = 0.2;
+
+export const BLOW_WEIGHT: Readonly<Record<Approach, number>> = {
+  front: 1,
+  flank: 1.4,
+  rear: 2,
+};
+
+export const RETALIATION: Readonly<Record<Approach, number>> = {
+  front: 1,
+  flank: 0.6,
+  rear: 0.3,
+};
+
+const RANGE_WEIGHT: Readonly<Record<RangePattern, number>> = {
+  short: 1,
+  long: 0.6,
+  circular: 1,
+  largest: 1,
+};
 
 export interface BattleUnitParams {
   readonly unit: Unit;

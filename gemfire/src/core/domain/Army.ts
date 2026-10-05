@@ -1,12 +1,11 @@
-import {
-  DAILY_FOOD_BASE,
-  DAILY_FOOD_PER_STRENGTH,
-  DEPLOYMENT_BASE_GOLD,
-  DEPLOYMENT_TROOPS_PER_GOLD,
-} from '@/config/battle';
-
 import type { FifthUnit } from './FifthUnit';
 import type { General } from './General';
+
+const DEPLOYMENT_TROOPS_PER_GOLD = 8;
+const DEPLOYMENT_BASE_GOLD = 10;
+
+const DAILY_FOOD_PER_STRENGTH = 10;
+const DAILY_FOOD_BASE = 1;
 
 export interface ArmyParams {
   readonly commander: General;
@@ -16,6 +15,12 @@ export interface ArmyParams {
 }
 
 export class Army {
+  public static measureDailyFood(troops: number, unit?: FifthUnit): number {
+    const fed = troops + (unit?.consumesFood ? unit.strength : 0);
+
+    return Math.floor(fed / DAILY_FOOD_PER_STRENGTH) + DAILY_FOOD_BASE;
+  }
+
   public readonly commander: General;
   public readonly unit: FifthUnit | undefined;
   public readonly committedTroops: number;
@@ -48,10 +53,7 @@ export class Army {
   }
 
   public get dailyFood(): number {
-    const fed =
-      this.troops + (this.unit?.consumesFood ? this.unit.strength : 0);
-
-    return Math.floor(fed / DAILY_FOOD_PER_STRENGTH) + DAILY_FOOD_BASE;
+    return Army.measureDailyFood(this.troops, this.unit);
   }
 
   public get supplyDays(): number {

@@ -25,7 +25,12 @@ const MAX_GOODWILL = 15;
 const ACTIONS_PER_TURN = 3;
 const REMOTE_PENALTY = 0.5;
 
-export type ProvinceStatus = 'capital' | 'remote' | 'lorded' | 'unruled';
+export type ProvinceStatus =
+  | 'capital'
+  | 'remote'
+  | 'lorded'
+  | 'entrusted'
+  | 'unruled';
 
 export class Province {
   public readonly number: number;
@@ -41,6 +46,7 @@ export class Province {
   public readonly hirePool: readonly string[];
 
   private house: Family | undefined;
+  private entrusted = false;
 
   public constructor(params: ProvinceParams) {
     this.number = params.number;
@@ -60,14 +66,36 @@ export class Province {
 
   public claim(family: Family): void {
     this.house = family;
+    this.entrusted = false;
   }
 
   public unclaim(): void {
     this.house = undefined;
+    this.entrusted = false;
   }
 
   public assignGovernor(governor: General | undefined): void {
+    if (!this.ruledBy(governor)) {
+      this.entrusted = false;
+    }
+
     this.governor = governor;
+  }
+
+  public get isEntrusted(): boolean {
+    return this.entrusted;
+  }
+
+  public canEntrust(): boolean {
+    return this.hasLord && !this.isHome;
+  }
+
+  public entrust(): void {
+    this.entrusted = this.canEntrust();
+  }
+
+  public cancelEntrust(): void {
+    this.entrusted = false;
   }
 
   public addUnit(unit: HiredUnit): void {
@@ -109,6 +137,8 @@ export class Province {
       status = 'capital';
     } else if (this.isRemotelyRuled) {
       status = 'remote';
+    } else if (this.isEntrusted) {
+      status = 'entrusted';
     } else if (this.hasLord) {
       status = 'lorded';
     }
