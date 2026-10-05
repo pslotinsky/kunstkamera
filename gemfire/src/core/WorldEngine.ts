@@ -1,3 +1,4 @@
+import { LifecycleCommand } from '@/core/commands/LifecycleCommand';
 import { TaxAndHarvestCommand } from '@/core/commands/TaxAndHarvestCommand';
 import { UpkeepCommand } from '@/core/commands/UpkeepCommand';
 import type { BattleOutcome } from '@/core/domain/BattleOutcome';
@@ -15,6 +16,7 @@ import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
 import type { EventBus } from '@/lib/EventBus';
 
 export class WorldEngine {
+  private readonly lifecycle: LifecycleCommand;
   private readonly taxAndHarvest: TaxAndHarvestCommand;
   private readonly upkeep: UpkeepCommand;
 
@@ -24,6 +26,7 @@ export class WorldEngine {
     private readonly world: World,
     private readonly events: EventBus,
   ) {
+    this.lifecycle = new LifecycleCommand({ world, events });
     this.taxAndHarvest = new TaxAndHarvestCommand({ world, events });
     this.upkeep = new UpkeepCommand({ world, events });
   }
@@ -63,7 +66,7 @@ export class WorldEngine {
   }
 
   private handleTurnStart(province: Province): void {
-    if (!province.belongsTo(this.world.player)) {
+    if (!this.world.isDefeated && !province.belongsTo(this.world.player)) {
       this.events.publish(new TurnEndedEvent(this.world.turnQueue.turnNumber));
     }
   }
@@ -80,6 +83,7 @@ export class WorldEngine {
   }
 
   private handleMonthStart(): void {
+    this.lifecycle.execute();
     this.world.market.swing(this.world.date.month);
     this.taxAndHarvest.execute();
   }

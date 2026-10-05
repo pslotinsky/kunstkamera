@@ -129,14 +129,29 @@ describe('Captivity', () => {
     expect(rival.members).not.toContain(seth);
   });
 
-  it('scatters a house whose ruler is banished', () => {
-    const { captivity, hold, world, mine, ander, hyland, ostgard } = setup();
+  it('disbands a family whose banished ruler leaves no heir', () => {
+    const { captivity, hold, world, mine, ander, seth, hyland, ostgard } =
+      setup();
 
     captivity.banish(hold(ander));
 
     expect(hyland.family).toBeUndefined();
-    expect(ostgard.family).toBeUndefined();
+    expect(ostgard.family?.ruler).toBe(seth);
+    expect(ostgard.family?.name).not.toBe('Lyle');
     expect(mine.gems.map((gem) => gem.name)).toContain('Pluvius');
     expect(houses(world)).not.toContain('Lyle');
+  });
+
+  it('crowns an heir instead when the banished ruler has one', () => {
+    const { captivity, hold, world, rival, ander, hyland } = setup();
+    const wolfen = makeGeneral({ name: 'Wolfen', lineage: 'Lyle' });
+
+    rival.enlist(wolfen);
+    world.generals.add(wolfen.name, wolfen);
+    captivity.banish(hold(ander));
+
+    expect(rival.ruler).toBe(wolfen);
+    expect(hyland.governor).toBe(wolfen);
+    expect(houses(world)).toContain('Lyle');
   });
 });

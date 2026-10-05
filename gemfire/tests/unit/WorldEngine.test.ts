@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { RecruitCommand } from '@/core/commands/province/RecruitCommand';
 import { TradeCommand } from '@/core/commands/province/TradeCommand';
@@ -9,7 +9,7 @@ import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
 import { WorldEngine } from '@/core/WorldEngine';
 import { EventBus } from '@/lib/EventBus';
 
-import { makeFamily, makeProvince, makeWorld } from './factories';
+import { makeFamily, makeGeneral, makeProvince, makeWorld } from './factories';
 
 interface Fixture {
   readonly world: ReturnType<typeof makeWorld>['world'];
@@ -69,6 +69,8 @@ function drainMonth(fixture: Fixture): void {
 }
 
 describe('WorldEngine', () => {
+  afterEach(() => vi.restoreAllMocks());
+
   it('records the action but leaves the turn for the orchestrator when a command executes', () => {
     const { world, events } = createFixture(new CalendarDate(1186, 4));
     const province = world.turnQueue.current!;
@@ -165,5 +167,23 @@ describe('WorldEngine', () => {
     expect(fixture.world.date.month).toBe(5);
     expect(playerProvince.resources.gold).toBe(500);
     expect(playerProvince.resources.food).toBe(400);
+  });
+
+  it("stops the clock once the player's family is no more", () => {
+    const now = new CalendarDate(1186, 4);
+    const erin = makeGeneral({ deathDate: now });
+    const blanche = makeFamily({ name: 'Blanche', ruler: erin });
+    const rodale = makeProvince({ number: 1, family: blanche, governor: erin });
+    const { world, events } = makeWorld(
+      [rodale, makeProvince({ number: 2 })],
+      blanche,
+      now,
+    );
+
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    new WorldEngine(world, events).start();
+
+    expect(world.isDefeated).toBe(true);
+    expect(world.date.equals(now)).toBe(true);
   });
 });

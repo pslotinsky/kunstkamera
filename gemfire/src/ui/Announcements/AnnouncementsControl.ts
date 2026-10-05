@@ -1,10 +1,13 @@
+import { CrownCommand } from '@/core/commands/CrownCommand';
 import { GrantArtifactCommand } from '@/core/commands/GrantArtifactCommand';
-import type { CharacteristicsKey } from '@/core/domain/Characteristics';
+import { Coronation } from '@/core/domain/Coronation';
 import type { General } from '@/core/domain/General';
 import { ArtifactFoundEvent } from '@/core/events/ArtifactFoundEvent';
 import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
+import { GeneralDiedEvent } from '@/core/events/GeneralDiedEvent';
 import { MissionReportedEvent } from '@/core/events/MissionReportedEvent';
 import { SearchReportedEvent } from '@/core/events/SearchReportedEvent';
+import { SuccessionReportedEvent } from '@/core/events/SuccessionReportedEvent';
 import { UnitDesertedEvent } from '@/core/events/UnitDesertedEvent';
 import { Control } from '@/lib/Control';
 import type { EventClass } from '@/lib/EventBus';
@@ -19,15 +22,21 @@ import {
   type AnnouncementsControls,
   AnnouncementsView,
 } from './AnnouncementsView';
-import { ArtifactTakenEvent } from './ArtifactTakenEvent';
+import { ChoiceConfirmedEvent } from './ChoiceConfirmedEvent';
 
-type Announced = UnitDesertedEvent | ArtifactFoundEvent | MissionReportedEvent;
+type Announced =
+  | UnitDesertedEvent
+  | ArtifactFoundEvent
+  | MissionReportedEvent
+  | GeneralDiedEvent
+  | SuccessionReportedEvent;
 
 export class AnnouncementsControl extends Control<
   AnnouncementsView,
   AnnouncementsControls
 > {
   private readonly grantArtifact: GrantArtifactCommand;
+  private readonly crown: CrownCommand;
   private readonly queue: Announced[] = [];
   private reporting = false;
 
@@ -36,18 +45,21 @@ export class AnnouncementsControl extends Control<
       recipient: new DropdownControl({ name: 'recipient' }),
     });
     this.grantArtifact = new GrantArtifactCommand(context);
+    this.crown = new CrownCommand(context);
   }
 
   protected override onMount(): void {
     this.onWorldEvent(UnitDesertedEvent, (event) => this.announce(event));
     this.onWorldEvent(ArtifactFoundEvent, (event) => this.announce(event));
     this.onWorldEvent(MissionReportedEvent, (event) => this.announce(event));
+    this.onWorldEvent(GeneralDiedEvent, (event) => this.announce(event));
+    this.onWorldEvent(SuccessionReportedEvent, (event) => this.announce(event));
     this.onWorldEvent(SearchReportedEvent, () => this.holdForReport(true));
     this.onWorldEvent(SearchReportClosedEvent, () => this.holdForReport(false));
     this.onWorldEvent(BattleReportedEvent, () => this.holdForReport(true));
     this.onWorldEvent(BattleReportClosedEvent, () => this.holdForReport(false));
     this.subscribe(AnnouncementDismissedEvent, () => this.dismiss());
-    this.subscribe(ArtifactTakenEvent, () => this.takeArtifact());
+    this.subscribe(ChoiceConfirmedEvent, () => this.confirmChoice());
   }
 
   private onWorldEvent<EventType extends object>(
@@ -58,9 +70,33 @@ export class AnnouncementsControl extends Control<
   }
 
   private announce(event: Announced): void {
-    if (event.province.belongsTo(this.context.world.player)) {
+    if (this.isNews(event)) {
       this.queue.push(event);
       this.refresh();
+    }
+  }
+
+  private isNews(event: Announced): boolean {
+    const { player } = this.context.world;
+
+    if (event instanceof SuccessionReportedEvent) {
+      return true;
+    }
+
+    if (event instanceof GeneralDiedEvent) {
+      return event.family?.isEqual(player) ?? false;
+    }
+
+    return event.province.belongsTo(player);
+  }
+
+  private confirmChoice(): void {
+    const head = this.queue[0];
+
+    if (head instanceof ArtifactFoundEvent) {
+      this.takeArtifact(head);
+    } else if (head instanceof SuccessionReportedEvent) {
+      this.crownHeir(head);
     }
   }
 
@@ -69,14 +105,27 @@ export class AnnouncementsControl extends Control<
     this.refresh();
   }
 
-  private takeArtifact(): void {
-    const found = this.queue[0];
-    const recipient = this.findRecipient();
+  private takeArtifact(found: ArtifactFoundEvent): void {
+    const recipient = this.findChosen(this.members);
 
-    if (found instanceof ArtifactFoundEvent && recipient) {
+    if (recipient) {
       this.grantArtifact.grant(found.artifact, recipient);
       this.grantArtifact.execute();
       this.dismiss();
+    }
+  }
+
+  private crownHeir(succession: SuccessionReportedEvent): void {
+    const { outcome } = succession;
+
+    if (outcome instanceof Coronation) {
+      const heir = this.findChosen(outcome.heirs);
+
+      if (heir) {
+        this.crown.crown(outcome, heir);
+        this.crown.execute();
+        this.dismiss();
+      }
     }
   }
 
@@ -101,29 +150,60 @@ export class AnnouncementsControl extends Control<
       this.view.showFind(announced, pending);
     } else if (announced instanceof MissionReportedEvent) {
       this.view.showMission(announced, pending);
+    } else if (announced instanceof GeneralDiedEvent) {
+      this.view.showDeath(announced, pending);
+    } else if (announced instanceof SuccessionReportedEvent) {
+      this.showSuccession(announced, pending);
     } else {
       this.view.showDesertion(announced, pending);
     }
+  }
+
+  private showSuccession(
+    succession: SuccessionReportedEvent,
+    pending: number,
+  ): void {
+    const { outcome } = succession;
+
+    if (
+      outcome instanceof Coronation &&
+      outcome.isChoiceFor(this.context.world.player)
+    ) {
+      this.offerHeirs(outcome);
+      this.view.askForHeir(succession, pending);
+    } else {
+      this.view.showSuccession(succession, pending);
+    }
+  }
+
+  private offerHeirs(coronation: Coronation): void {
+    const { date } = this.context.world;
+
+    this.controls.recipient.setOptions(
+      coronation.heirs.map((heir) =>
+        this.buildOption(heir, `age ${heir.getAgeAt(date)}`),
+      ),
+    );
+    this.controls.recipient.setValue(coronation.heir?.name ?? '');
   }
 
   private offerRecipients(found: ArtifactFoundEvent): void {
     const { characteristic } = found.artifact;
 
     this.controls.recipient.setOptions(
-      this.members.map((member) => this.buildOption(member, characteristic)),
+      this.members.map((member) =>
+        this.buildOption(member, String(member.stats.get(characteristic))),
+      ),
     );
     this.controls.recipient.setValue(this.defaultRecipient(found).name);
   }
 
-  private buildOption(
-    member: General,
-    characteristic: CharacteristicsKey,
-  ): DropdownOption {
+  private buildOption(general: General, note: string): DropdownOption {
     return {
-      value: member.name,
-      label: member.name,
-      icon: member.portrait,
-      note: String(member.stats.get(characteristic)),
+      value: general.name,
+      label: general.name,
+      icon: general.portrait,
+      note,
     };
   }
 
@@ -135,10 +215,10 @@ export class AnnouncementsControl extends Control<
     return seated ?? this.context.world.player.ruler;
   }
 
-  private findRecipient(): General | undefined {
+  private findChosen(candidates: readonly General[]): General | undefined {
     const chosen = this.controls.recipient.value;
 
-    return this.members.find((member) => member.name === chosen);
+    return candidates.find((candidate) => candidate.name === chosen);
   }
 
   private get members(): readonly General[] {

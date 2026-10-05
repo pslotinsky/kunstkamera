@@ -1,5 +1,7 @@
 import type { Captive } from '@/core/domain/Captive';
 import { Captivity } from '@/core/domain/Captivity';
+import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
+import { SuccessionReportedEvent } from '@/core/events/SuccessionReportedEvent';
 import { Control } from '@/lib/Control';
 import { BattleReportClosedEvent } from '@/ui/BattleReport/BattleReportClosedEvent';
 
@@ -66,9 +68,23 @@ export class CaptiveDialogControl extends Control<CaptiveDialogView> {
       return 'released';
     }
 
-    this.captivity.banish(captive);
+    this.banish(captive);
 
     return 'banished';
+  }
+
+  private banish(captive: Captive): void {
+    const outcome = this.captivity.banish(captive);
+
+    if (outcome) {
+      this.context.events.publish(
+        new SuccessionReportedEvent(outcome, 'banishment'),
+      );
+
+      for (const province of outcome.provinces) {
+        this.context.events.publish(new ProvinceUpdatedEvent(province));
+      }
+    }
   }
 
   private findCaptive(): Captive | undefined {

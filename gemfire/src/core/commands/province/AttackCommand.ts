@@ -4,7 +4,6 @@ import { Invasion } from '@/core/domain/Invasion';
 import type { Province } from '@/core/domain/Province';
 import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
 import { BattleStartedEvent } from '@/core/events/BattleStartedEvent';
-import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 
 import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
@@ -90,13 +89,7 @@ export class AttackCommand extends ProvinceCommand {
       this.publish(new BattleStartedEvent(invasion, started));
     } else {
       this.publish(new BattleReportedEvent(started));
-      this.announce(invasion.affected);
-    }
-  }
-
-  private announce(provinces: readonly Province[]): void {
-    for (const province of provinces) {
-      this.publish(new ProvinceUpdatedEvent(province));
+      this.publishUpdates(invasion.affected);
     }
   }
 }

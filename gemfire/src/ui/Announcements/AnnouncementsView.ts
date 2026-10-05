@@ -1,12 +1,19 @@
 import { html, type TemplateResult } from 'lit-html';
 
+import { Coronation } from '@/core/domain/Coronation';
+import type { Disbanding } from '@/core/domain/Disbanding';
 import type { SabotageDamage } from '@/core/domain/Infiltration';
 import type { World } from '@/core/domain/World';
 import type { ArtifactFoundEvent } from '@/core/events/ArtifactFoundEvent';
+import type { GeneralDiedEvent } from '@/core/events/GeneralDiedEvent';
 import type {
   MissionOutcome,
   MissionReportedEvent,
 } from '@/core/events/MissionReportedEvent';
+import type {
+  SuccessionCause,
+  SuccessionReportedEvent,
+} from '@/core/events/SuccessionReportedEvent';
 import type {
   DesertionReason,
   UnitDesertedEvent,
@@ -17,7 +24,7 @@ import { View } from '@/lib/View';
 import type { DropdownControl } from '@/ui/Dropdown/DropdownControl';
 
 import { AnnouncementDismissedEvent } from './AnnouncementDismissedEvent';
-import { ArtifactTakenEvent } from './ArtifactTakenEvent';
+import { ChoiceConfirmedEvent } from './ChoiceConfirmedEvent';
 
 import styles from './Announcements.module.scss';
 
@@ -31,6 +38,11 @@ const SABOTAGE_DAMAGES: Record<SabotageDamage, string> = {
   loyalty: 'turned the people against the lord of',
   protection: 'burned the walls of',
 };
+
+interface Choice {
+  readonly label: string;
+  readonly action: string;
+}
 
 interface Announcement {
   readonly text: string;
@@ -66,16 +78,14 @@ export class AnnouncementsView extends View<
           </div>
         </figure>
         <div class="${styles.ask} ${styles.hidden}" data-ask>
-          <span class=${styles.askLabel}>It goes to</span>
+          <span class=${styles.askLabel} data-ask-label></span>
           <div class=${styles.recipient}>${this.views.recipient.template}</div>
           <button
             class="${styles.action} ${styles.take}"
             type="button"
-            data-take
-            @click=${() => this.publish(new ArtifactTakenEvent())}
-          >
-            Take
-          </button>
+            data-choose
+            @click=${() => this.publish(new ChoiceConfirmedEvent())}
+          ></button>
         </div>
         <footer class=${styles.footer}>
           <span class=${styles.pending} data-pending></span>
@@ -95,41 +105,103 @@ export class AnnouncementsView extends View<
   public showDesertion(event: UnitDesertedEvent, pending: number): void {
     const { unit, province, reason } = event;
 
-    this.showAnnouncement(
+    this.tell(
       {
         text: `The ${unit.name} of ${province.name} ${DESERTION_REASONS[reason]} and deserted.`,
         icon: unit.portrait,
       },
       pending,
     );
-    this.askForRecipient(false);
-    this.continueButton.focus();
   }
 
   public showFind(event: ArtifactFoundEvent, pending: number): void {
     const { foundIn, artifact } = event;
 
-    this.showAnnouncement(
+    this.ask(
       {
         text: `Your spy came back from ${foundIn.name} with the ${artifact.name}.`,
         detail: artifact.effect,
       },
+      { label: 'It goes to', action: 'Take' },
       pending,
     );
-    this.askForRecipient(true);
-    this.takeButton.focus();
   }
 
   public showMission(event: MissionReportedEvent, pending: number): void {
     const you = event.province.family?.name ?? '';
 
-    this.showAnnouncement(this.describeMission(event.outcome, you), pending);
-    this.askForRecipient(false);
-    this.continueButton.focus();
+    this.tell(this.describeMission(event.outcome, you), pending);
+  }
+
+  public showDeath(event: GeneralDiedEvent, pending: number): void {
+    const { general } = event;
+
+    this.tell(
+      { text: `${general.name} has died of old age.`, icon: general.portrait },
+      pending,
+    );
+  }
+
+  public showSuccession(event: SuccessionReportedEvent, pending: number): void {
+    const { outcome, cause } = event;
+    const departure = this.describeDeparture(outcome, cause);
+    const consequence =
+      outcome instanceof Coronation
+        ? `${outcome.heir?.name} takes the throne.`
+        : this.describeDisbanding(outcome);
+
+    this.tell(
+      { text: `${departure} ${consequence}`, icon: outcome.family.crest },
+      pending,
+    );
+  }
+
+  public askForHeir(event: SuccessionReportedEvent, pending: number): void {
+    const { outcome, cause } = event;
+
+    this.ask(
+      {
+        text: this.describeDeparture(outcome, cause),
+        detail: `Who takes the throne of ${outcome.family.name}?`,
+        icon: outcome.family.crest,
+      },
+      { label: 'The heir', action: 'Crown' },
+      pending,
+    );
   }
 
   public hide(): void {
     this.element.classList.add(styles.hidden!);
+  }
+
+  private describeDeparture(
+    outcome: Coronation | Disbanding,
+    cause: SuccessionCause,
+  ): string {
+    const { deposed, family } = outcome;
+
+    return cause === 'death'
+      ? `${deposed.name} of ${family.name} has died of old age.`
+      : `${deposed.name} of ${family.name} is banished from Ishmeria.`;
+  }
+
+  private describeDisbanding(disbanding: Disbanding): string {
+    const { family, breakaways, gems, beneficiary } = disbanding;
+
+    if (family.isEqual(this.context.world.player)) {
+      return 'Your house is no more.';
+    }
+
+    const rulers = breakaways.map(
+      (breakaway) =>
+        ` ${breakaway.ruler.name} now rules ${breakaway.homeProvince.name} as ${breakaway.name}.`,
+    );
+    const passing =
+      beneficiary && gems.length
+        ? ` ${gems.map((gem) => gem.name).join(' and ')} ${gems.length > 1 ? 'pass' : 'passes'} to ${beneficiary.name}.`
+        : '';
+
+    return `${family.name} has no heir and is no more.${rulers.join('')}${passing}`;
   }
 
   private describeMission(outcome: MissionOutcome, you: string): Announcement {
@@ -217,9 +289,27 @@ export class AnnouncementsView extends View<
     }
   }
 
-  private askForRecipient(asks: boolean): void {
-    this.ask.classList.toggle(styles.hidden!, !asks);
-    this.continueButton.classList.toggle(styles.hidden!, asks);
+  private tell(announcement: Announcement, pending: number): void {
+    this.showAnnouncement(announcement, pending);
+    this.showChoice(undefined);
+    this.continueButton.focus();
+  }
+
+  private ask(
+    announcement: Announcement,
+    choice: Choice,
+    pending: number,
+  ): void {
+    this.showAnnouncement(announcement, pending);
+    this.showChoice(choice);
+    this.chooseButton.focus();
+  }
+
+  private showChoice(choice: Choice | undefined): void {
+    this.choice.classList.toggle(styles.hidden!, !choice);
+    this.continueButton.classList.toggle(styles.hidden!, !!choice);
+    this.askLabel.textContent = choice?.label ?? '';
+    this.chooseButton.textContent = choice?.action ?? '';
   }
 
   private get icon(): HTMLImageElement {
@@ -238,12 +328,16 @@ export class AnnouncementsView extends View<
     return this.element.querySelector<HTMLElement>('[data-pending]')!;
   }
 
-  private get ask(): HTMLElement {
+  private get choice(): HTMLElement {
     return this.element.querySelector<HTMLElement>('[data-ask]')!;
   }
 
-  private get takeButton(): HTMLButtonElement {
-    return this.element.querySelector<HTMLButtonElement>('[data-take]')!;
+  private get askLabel(): HTMLElement {
+    return this.element.querySelector<HTMLElement>('[data-ask-label]')!;
+  }
+
+  private get chooseButton(): HTMLButtonElement {
+    return this.element.querySelector<HTMLButtonElement>('[data-choose]')!;
   }
 
   private get continueButton(): HTMLButtonElement {
