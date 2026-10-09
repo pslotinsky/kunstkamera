@@ -57,6 +57,10 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
     super.open(command);
   }
 
+  public override get targetPrompt(): string {
+    return 'Move troops where?';
+  }
+
   public override pickTarget(province: Province): void {
     if (this.command?.selectableTargets.includes(province.number)) {
       this.target = province;

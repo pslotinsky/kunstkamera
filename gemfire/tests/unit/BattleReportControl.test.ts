@@ -1,11 +1,14 @@
 // @vitest-environment jsdom
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
+import type { BattleOutcome } from '@/core/domain/BattleOutcome';
+import { BattleSide } from '@/core/domain/BattleSide';
 import type { Captive } from '@/core/domain/Captive';
 import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import styles from '@/ui/BattleReport/BattleReport.module.scss';
 import { BattleReportControl } from '@/ui/BattleReport/BattleReportControl';
+import { SoundBoard } from '@/ui/sound/SoundBoard';
 
 import {
   makeArmy,
@@ -13,6 +16,7 @@ import {
   makeFamily,
   makeGeneral,
   makeInvasionReport,
+  makeOutcome,
   makeProvince,
   makeWorld,
 } from './factories';
@@ -25,15 +29,20 @@ function setup() {
   const home = makeProvince({ number: 1, family: mine, governor: erin });
   const target = makeProvince({ number: 22, family: rival, governor: seth });
   const { world, events } = makeWorld([home, target], mine);
+  const sounds = new SoundBoard();
 
-  function show(captive?: Captive): HTMLElement {
+  function show(
+    captive?: Captive,
+    outcome: BattleOutcome = makeOutcome(),
+  ): HTMLElement {
     const container = document.createElement('div');
-    const control = new BattleReportControl({ world, events });
+    const control = new BattleReportControl({ world, events, sounds });
     const report = makeInvasionReport({
       source: home,
       target,
       attacker: makeArmy({ commander: erin }),
       defender: makeArmy({ commander: seth }),
+      outcome,
     });
 
     report.captive = captive;
@@ -45,7 +54,7 @@ function setup() {
 
   function showWar(): { root: HTMLElement; ended: TurnEndedEvent[] } {
     const container = document.createElement('div');
-    const control = new BattleReportControl({ world, events });
+    const control = new BattleReportControl({ world, events, sounds });
     const ended: TurnEndedEvent[] = [];
     const camp = makeProvince({ number: 7, family: rival, governor: seth });
     const coryll = makeFamily({ name: 'Coryll' });
@@ -65,7 +74,7 @@ function setup() {
     return { root: container, ended };
   }
 
-  return { show, showWar, mine, rival, erin, seth };
+  return { show, showWar, sounds, mine, rival, erin, seth };
 }
 
 function getCaptureLine(root: HTMLElement): string | null {
@@ -120,6 +129,35 @@ describe('BattleReportControl', () => {
 
     expect(isSidesShown(show())).toBe(true);
     expect(isSidesShown(showWar().root)).toBe(false);
+  });
+
+  it('plays the fanfare when your won war is reported', () => {
+    const { show, sounds } = setup();
+    const fanfare = vi.spyOn(sounds, 'playFanfare');
+
+    show();
+
+    expect(fanfare).toHaveBeenCalledOnce();
+  });
+
+  it('plays the dirge when your lost war is reported', () => {
+    const { show, sounds } = setup();
+    const dirge = vi.spyOn(sounds, 'playDirge');
+
+    show(undefined, makeOutcome({ winner: BattleSide.defender }));
+
+    expect(dirge).toHaveBeenCalledOnce();
+  });
+
+  it('keeps silent over a rival war report', () => {
+    const { showWar, sounds } = setup();
+    const fanfare = vi.spyOn(sounds, 'playFanfare');
+    const dirge = vi.spyOn(sounds, 'playDirge');
+
+    showWar();
+
+    expect(fanfare).not.toHaveBeenCalled();
+    expect(dirge).not.toHaveBeenCalled();
   });
 
   it('ends the rival turn when its war report is closed', () => {

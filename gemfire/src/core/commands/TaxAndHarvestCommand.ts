@@ -3,7 +3,7 @@ import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 
 import { WorldCommand, type WorldCommandContext } from './WorldCommand';
 
-export const SEPTEMBER = 9;
+const SEPTEMBER = 9;
 
 const PROVISIONAL_TAX_GOLD = 100;
 

@@ -105,7 +105,7 @@ sequenceDiagram
 
 ## Persistence
 
-Nothing new to persist: troops are already part of `Province.resources`, and a claim writes the same `family` / `governor` fields feature 4 already saves. (Save/load itself is feature 16.)
+Nothing new to persist: troops are already part of `Province.resources`, and a claim writes the same `family` / `governor` fields feature 4 already saves. (Save/load itself is feature 17.)
 
 ## Tests
 

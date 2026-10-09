@@ -27,7 +27,7 @@
 
 .banner {
   position: absolute;
-  top: 4vh;
+  top: 4cqh;
   left: 50%;
   display: flex;
   gap: 1rem;
@@ -79,7 +79,7 @@
 }
 
 .file + .file {
-  margin-left: -3vh;
+  margin-left: -3cqh;
 }
 
 .striker {
@@ -91,8 +91,8 @@
 }
 
 .figure {
-  width: 19vh;
-  height: 19vh;
+  width: 19cqh;
+  height: 19cqh;
   object-fit: contain;
   filter: drop-shadow(0 0.2rem 0.3rem rgba(0, 0, 0, 0.5));
   image-rendering: pixelated;
@@ -102,13 +102,13 @@
 }
 
 .figure + .figure {
-  margin-top: -7.5vh;
+  margin-top: -7.5cqh;
 }
 
 .alone {
-  width: 38vh;
-  height: 38vh;
-  margin-bottom: 6vh;
+  width: 38cqh;
+  height: 38cqh;
+  margin-bottom: 6cqh;
 }
 
 .mirrored {
@@ -117,7 +117,7 @@
 
 .falling {
   opacity: 0;
-  translate: 0 -1.4vh;
+  translate: 0 -1.4cqh;
 }
 
 @keyframes lunge {
@@ -126,7 +126,7 @@
   }
 
   40% {
-    translate: 9vw 0;
+    translate: 9cqw 0;
   }
 
   100% {
@@ -140,16 +140,16 @@
   }
 
   15% {
-    translate: 2vw 0;
+    translate: 2cqw 0;
     filter: brightness(2.6) saturate(0.25);
   }
 
   35% {
-    translate: -1.2vw 0;
+    translate: -1.2cqw 0;
   }
 
   60% {
-    translate: 0.6vw 0;
+    translate: 0.6cqw 0;
     filter: brightness(1.4);
   }
 
@@ -163,7 +163,7 @@
 }
 
 .struck {
-  animation: flinch 760ms ease-out;
+  animation: flinch 760ms ease-out 250ms;
 }
 
 .sunrise {

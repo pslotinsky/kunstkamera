@@ -26,8 +26,16 @@ export class FamilyOverviewControl extends CommandDialogControl<
   }
 
   public override open(command: ViewCommand): void {
-    this.command = command;
     this.viewed = this.world.player;
+    super.open(command);
+  }
+
+  public override chooseTarget(province: Province): void {
+    this.pickTarget(province);
+  }
+
+  public override get targetPrompt(): string {
+    return 'View whose family?';
   }
 
   public override get inspectsTarget(): boolean {

@@ -38,6 +38,11 @@ export class WorldMapView extends View<WorldMapContext> {
     element?.classList.add(highlighting);
   }
 
+  public dim(dimmed: boolean): void {
+    this.element.classList.toggle(styles.dimmed!, dimmed);
+    this.element.toggleAttribute('data-dimmed', dimmed);
+  }
+
   public actualizeProvince(province: Province): void {
     this.markers?.actualize(province);
   }

@@ -21,6 +21,7 @@ export abstract class CommandDialogView<
   Views extends ViewRecord = Record<string, never>,
 > extends View<Context, Views> {
   protected readonly rootClass = styles.root!;
+  protected readonly isOverlay: boolean = false;
 
   public show(): void {
     this.element.classList.remove(this.hiddenClass);
@@ -35,6 +36,7 @@ export abstract class CommandDialogView<
       <div
         class="${this.rootClass} ${this.hiddenClass}"
         data-dialog=${this.context.name}
+        ?data-overlay=${this.isOverlay}
       >
         ${this.renderBody()}
       </div>

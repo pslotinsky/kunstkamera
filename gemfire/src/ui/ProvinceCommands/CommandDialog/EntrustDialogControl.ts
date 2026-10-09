@@ -25,6 +25,10 @@ export class EntrustDialogControl extends CommandDialogControl<
     super.open(command);
   }
 
+  public override get targetPrompt(): string {
+    return 'Which territory?';
+  }
+
   public override pickTarget(province: Province): void {
     this.target = province;
     this.mode = province.isEntrusted ? 'cancel' : 'entrust';

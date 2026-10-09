@@ -1,5 +1,36 @@
 :root {
   color-scheme: dark;
+
+  --font-display: 'EB Garamond', Georgia, serif;
+  --font-body: 'EB Garamond', Georgia, serif;
+
+  --surface-900: #050b1a;
+  --surface-800: #071024;
+  --surface-700: #0e182e;
+  --surface-600: #152337;
+  --accent: #112f84;
+  --accent-bright: #3f74e8;
+  --frame-line: #1f2d4d;
+  --trim: #b08d48;
+  --trim-dim: #5e4d2e;
+  --gold-text: #f8d98e;
+  --rule-space: 1rem;
+  --parchment-ink: #3b2412;
+  --parchment-ink-soft: #6a4a2c;
+  --map-dim: saturate(0.6) hue-rotate(-15deg) brightness(0.62);
+  --frame-bright: #6f8fd6;
+  --ink: #fdefcf;
+  --ink-cool: #bfd0ef;
+  --ink-soft: #b9c3ce;
+  --heading: #d6b17a;
+  --ink-muted: #8f9bad;
+  --ocean-top: #0f3b9d;
+  --ocean-bottom: #022d85;
+
+  --edge: #2e4068;
+  --edge-bright: var(--frame-bright);
+  --button: var(--surface-700);
+  --button-hover: var(--surface-600);
 }
 
 * {
@@ -8,12 +39,21 @@
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
-  background: #0b1020;
-  color: #e6e9f0;
+  font-family: var(--font-body);
+  background: var(--ocean-bottom);
+  color: var(--ink);
+}
+
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.03em;
 }
 
 #app {
-  min-height: 100vh;
-  padding: 1rem;
+  display: flex;
+  height: 100dvh;
+  overflow: hidden;
+  background: #000;
 }

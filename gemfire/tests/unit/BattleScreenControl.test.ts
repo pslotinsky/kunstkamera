@@ -10,6 +10,7 @@ import { BattleEndedEvent } from '@/core/events/BattleEndedEvent';
 import { BattleStartedEvent } from '@/core/events/BattleStartedEvent';
 import styles from '@/ui/BattleScreen/BattleScreen.module.scss';
 import { BattleScreenControl } from '@/ui/BattleScreen/BattleScreenControl';
+import { SoundBoard } from '@/ui/sound/SoundBoard';
 
 import {
   advanceTo,
@@ -57,7 +58,11 @@ function mountScreen() {
   const mine = makeFamily({ name: 'Blanche', ruler: erin });
   const home = makeProvince({ number: 1, name: 'Rodale', family: mine });
   const { world, events } = makeWorld([home], mine);
-  const control = new BattleScreenControl({ world, events });
+  const control = new BattleScreenControl({
+    world,
+    events,
+    sounds: new SoundBoard(),
+  });
   const container = document.createElement('div');
 
   control.mount(container);

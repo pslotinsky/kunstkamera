@@ -7,6 +7,7 @@ import type { InvasionReport } from '@/core/domain/InvasionReport';
 import type { World } from '@/core/domain/World';
 import type { EventBus } from '@/lib/EventBus';
 import { View } from '@/lib/View';
+import type { SoundBoard } from '@/ui/sound/SoundBoard';
 
 import { BattleReportDismissedEvent } from './BattleReportDismissedEvent';
 
@@ -19,6 +20,7 @@ const NO_UNIT = '—';
 export interface BattleReportContext {
   readonly world: World;
   readonly events: EventBus;
+  readonly sounds: SoundBoard;
 }
 
 export class BattleReportView extends View<BattleReportContext> {
@@ -26,7 +28,7 @@ export class BattleReportView extends View<BattleReportContext> {
 
   public get template(): TemplateResult {
     return html`
-      <section class="${styles.root} ${styles.hidden}">
+      <section class="${styles.root} ${styles.hidden}" data-overlay>
         <header class=${styles.header}>
           <h2 class=${styles.title} data-title></h2>
           <button

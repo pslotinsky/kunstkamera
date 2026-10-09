@@ -1,0 +1,105 @@
+@mixin panel {
+  color: var(--ink);
+  background: var(--surface-800);
+  border: 1px solid var(--frame-line);
+  border-radius: 4px;
+  box-shadow: 0 0.6rem 1.6rem rgba(0, 0, 0, 0.5);
+}
+
+@mixin card {
+  padding: 0.6rem 0.75rem;
+  background: var(--surface-700);
+  border: 1px solid var(--frame-line);
+  border-radius: 4px;
+}
+
+@mixin well {
+  background: var(--surface-600);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+}
+
+@mixin double-trim {
+  border: 1px solid var(--trim);
+  box-shadow:
+    inset 0 0 0 2px var(--surface-900),
+    inset 0 0 0 3px var(--trim-dim);
+}
+
+
+@mixin display-type {
+  font-family: var(--font-display);
+  color: var(--ink);
+  letter-spacing: 0.04em;
+}
+
+@mixin selected {
+  color: var(--ink);
+  background: var(--surface-600);
+  border-color: var(--trim);
+  box-shadow:
+    inset 0 0 0 1px rgba(216, 181, 106, 0.35),
+    0 0 0.5rem rgba(216, 181, 106, 0.25);
+}
+
+@mixin ornate-corners($size: 56px) {
+  pointer-events: none;
+  content: '';
+  background:
+    url('@/assets/ui/corner-top-left.webp') top left / $size auto no-repeat,
+    url('@/assets/ui/corner-top-right.webp') top right / $size auto no-repeat,
+    url('@/assets/ui/corner-bottom-left.webp') bottom left / $size auto
+      no-repeat,
+    url('@/assets/ui/corner-bottom-right.webp') bottom right / $size auto
+      no-repeat;
+}
+
+@mixin ornament-rule {
+  position: absolute;
+  right: 0;
+  left: 0;
+  aspect-ratio: 765 / 39;
+  pointer-events: none;
+  content: '';
+  background: url('@/assets/ui/rule.webp') center / 100% auto no-repeat;
+  translate: 0 -50%;
+}
+
+@mixin dialog($width: 30rem) {
+  @include panel;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 4;
+  width: min(#{$width}, calc(100% - 3rem));
+  max-height: calc(100% - 3rem);
+  padding: 1rem 1.25rem 1.1rem;
+  font-size: 1.3rem;
+  border-color: var(--trim);
+  border-radius: 2px;
+  transform: translate(-50%, -50%);
+
+  &::after {
+    @include ornate-corners(30px);
+
+    position: absolute;
+    inset: -3px;
+  }
+}
+
+@mixin divider {
+  position: relative;
+  width: 100%;
+  height: 0;
+  margin: 0;
+  padding: var(--rule-space) 0;
+  overflow: visible;
+  border: none;
+
+  &::after {
+    @include ornament-rule;
+
+    top: 50%;
+  }
+}

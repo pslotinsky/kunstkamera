@@ -1,14 +1,12 @@
+@use '@/ui/kit';
+
 .root {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
+  @include kit.dialog(100%);
+
+  height: calc(100% - 3rem);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
-  overflow: hidden;
-  background: rgba(12, 16, 28, 0.94);
-  border-radius: 8px;
+  gap: 1rem;
 }
 
 .header {
@@ -18,94 +16,111 @@
 }
 
 .crest {
-  margin: 0;
-  font-size: 1rem;
+  margin: 0 1rem 0 0.25rem;
+  color: var(--gold-text);
+  font-size: 1.6em;
+  font-weight: 500;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
+.crest::after {
+  margin-left: 0.6rem;
+  color: var(--trim);
+  font-size: 0.8em;
+  vertical-align: middle;
+  content: '◇';
+}
+
 .tabs {
   display: flex;
-  gap: 0.35rem;
+  gap: 0.5rem;
 }
 
 .tab {
-  padding: 0.25rem 0.75rem;
+  padding: 0.4rem 1.6rem;
   font: inherit;
-  color: inherit;
-  background: #1f2740;
-  border: 1px solid #2c3656;
+  font-size: 1.1em;
+  color: var(--ink-cool);
+  background: var(--button);
+  border: 1px solid var(--edge);
   border-radius: 4px;
   cursor: pointer;
 }
 
 .tab:hover {
-  border-color: #56649a;
+  border-color: var(--edge-bright);
 }
 
 .active {
-  background: #2c3656;
-  border-color: #56649a;
+  @include kit.selected;
+  color: var(--gold-text);
 }
 
 .close {
   margin-left: auto;
-  padding: 0.25rem 0.75rem;
+  padding: 0.4rem 1.4rem;
   font: inherit;
-  color: inherit;
-  background: #1f2740;
-  border: 1px solid #2c3656;
+  font-size: 1.1em;
+  color: var(--gold-text);
+  background: var(--button);
+  border: 1px solid var(--trim);
   border-radius: 4px;
   cursor: pointer;
 }
 
 .close:hover {
-  border-color: #56649a;
+  border-color: var(--edge-bright);
 }
 
 .body {
   flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8rem;
+  font-size: 1.05em;
+  border: none;
 }
 
 .table th {
   position: sticky;
   top: 0;
-  padding: 0.4rem 0.6rem;
+  padding: 0.7rem 0.8rem;
   text-align: left;
-  font-size: 0.7rem;
+  font-size: 0.85em;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  opacity: 0.7;
-  background: #141a2c;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  background: var(--surface-900);
+  border-bottom: 1px solid var(--trim-dim);
+  color: #d8c7b4;
 }
 
 .table td {
-  padding: 0.35rem 0.6rem;
+  padding: 0.55rem 0.8rem;
   vertical-align: middle;
-  border-top: 1px solid #2c3656;
+  border-top: 1px solid var(--edge);
+  color: #fffbe6;
 }
 
 .table tbody tr:hover {
-  background: rgba(86, 100, 154, 0.15);
+  background: rgba(91, 141, 224, 0.14);
 }
 
 .card {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.9rem;
 }
 
 .portrait {
   flex: 0 0 auto;
-  width: 44px;
+  width: 52px;
   aspect-ratio: 64 / 80;
   object-fit: contain;
   border-radius: 3px;
@@ -119,24 +134,25 @@
 }
 
 .title {
-  font-size: 0.7rem;
+  font-size: 0.8em;
+  color: var(--ink-muted);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  opacity: 0.6;
+  letter-spacing: 0.06em;
 }
 
 .name {
+  font-size: 1.15em;
   font-weight: 600;
 }
 
 .age {
-  font-size: 0.75rem;
-  opacity: 0.7;
+  font-size: 0.9em;
+  color: #9da8ba;
 }
 
 .unitPortrait {
   flex: 0 0 auto;
-  width: 44px;
+  width: 60px;
   aspect-ratio: 1;
   object-fit: contain;
   border-radius: 3px;

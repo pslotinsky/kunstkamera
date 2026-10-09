@@ -1,8 +1,26 @@
+@use '@/ui/kit';
+
 .root {
-  flex: 0 0 18rem;
-  position: sticky;
+  @include kit.panel;
+
+  position: absolute;
   top: 1rem;
-  padding: 1rem;
-  background: #161c30;
-  border-radius: 8px;
+  bottom: 1rem;
+  left: 1rem;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  width: var(--hud-width);
+  padding: 1.25rem 1.1rem;
+  border-color: var(--trim);
+  border-radius: 2px;
 }
+
+.root::after {
+  @include kit.ornate-corners(30px);
+
+  position: absolute;
+  inset: -3px;
+  z-index: 3;
+}
+

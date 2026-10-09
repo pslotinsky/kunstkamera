@@ -18,8 +18,8 @@ export class AllyDialogView extends CommandDialogView {
     proposer: Family,
   ): void {
     this.showLines(
-      `${family.ruler.name} of ${family.name} — Fame ${family.fame}, ${provinces} provinces`,
-      `Peace between ${proposer.name} and ${family.name}: neither house may attack the other.`,
+      `Ally with ${family.name}`,
+      `${family.ruler.name} — Fame ${family.fame}, ${provinces} provinces. Peace between ${proposer.name} and ${family.name}: neither house may attack the other.`,
     );
     this.confirmButton.disabled = false;
   }
@@ -34,9 +34,9 @@ export class AllyDialogView extends CommandDialogView {
 
   protected renderBody(): TemplateResult {
     return html`
-      <p class=${styles.prompt} data-headline></p>
+      <h2 class=${styles.title} data-headline></h2>
       <p class="${styles.prompt} ${styles.section}" data-detail></p>
-      <div class="${styles.actions} ${styles.section}">
+      <div class="${styles.actions} ${styles.footer}">
         <button
           class=${styles.button}
           type="button"

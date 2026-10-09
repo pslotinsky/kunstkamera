@@ -7,7 +7,7 @@ import styles from './Sky.module.scss';
 
 const FULL_TURN = 360;
 
-const HOURS: Readonly<Record<Phase, string>> = {
+const SKIES: Readonly<Record<Phase, string>> = {
   sunrise: styles.sunrise!,
   noon: styles.noon!,
   sunset: styles.sunset!,
@@ -17,10 +17,10 @@ const HOURS: Readonly<Record<Phase, string>> = {
 const ORDER: readonly Phase[] = ['sunrise', 'noon', 'sunset', 'midnight'];
 
 const ANGLES: Readonly<Record<Phase, number>> = {
-  sunrise: -60,
-  noon: 0,
-  sunset: 60,
-  midnight: 180,
+  sunrise: -55,
+  noon: 20,
+  sunset: 55,
+  midnight: 160,
 };
 
 export class SkyView extends View {
@@ -31,24 +31,33 @@ export class SkyView extends View {
   public get template(): TemplateResult {
     return html`
       <span class=${styles.root}>
-        <span class=${styles.wheel} data-wheel>
-          <img
-            class="${styles.body} ${styles.sun}"
-            src="/sky/sun.webp"
-            alt=""
-          />
-          <img
-            class="${styles.body} ${styles.moon}"
-            src="/sky/moon.webp"
-            alt=""
-          />
+        ${ORDER.map(
+          (phase) =>
+            html`<span class="${styles.sky} ${SKIES[phase]}" data-sky=${phase}></span>`,
+        )}
+        <span class=${styles.orbit}>
+          <span class=${styles.wheel} data-wheel>
+            <img
+              class="${styles.body} ${styles.sun}"
+              src="/sky/sun.webp"
+              alt=""
+            />
+            <img
+              class="${styles.body} ${styles.moon}"
+              src="/sky/moon.webp"
+              alt=""
+            />
+          </span>
         </span>
       </span>
     `;
   }
 
   public showPhase(phase: Phase): void {
-    this.element.className = `${styles.root!} ${HOURS[phase]}`;
+    for (const sky of this.skies) {
+      sky.classList.toggle(styles.shown!, sky.dataset.sky === phase);
+    }
+
     this.turnTo(phase);
   }
 
@@ -61,6 +70,10 @@ export class SkyView extends View {
     const turn = days * FULL_TURN + ANGLES[phase];
 
     this.wheel.style.setProperty('--turn', `${turn}deg`);
+  }
+
+  private get skies(): readonly HTMLElement[] {
+    return [...this.element.querySelectorAll<HTMLElement>('[data-sky]')];
   }
 
   private get wheel(): HTMLElement {

@@ -52,6 +52,10 @@ export class AttackDialogControl extends CommandDialogControl<
     super.open(command);
   }
 
+  public override get targetPrompt(): string {
+    return 'Attack where?';
+  }
+
   public override pickTarget(province: Province): void {
     if (this.command?.selectableTargets.includes(province.number)) {
       this.target = province;

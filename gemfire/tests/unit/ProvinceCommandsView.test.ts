@@ -4,21 +4,6 @@ import { describe, expect, it } from 'vitest';
 import { createCommandGroups } from '@/core/commands/province/catalog';
 import { WorldFactory } from '@/core/WorldFactory';
 import { EventBus } from '@/lib/EventBus';
-import { DropdownView } from '@/ui/Dropdown/DropdownView';
-import { AmountFieldView } from '@/ui/ProvinceCommands/AmountField/AmountFieldView';
-import { AllyDialogView } from '@/ui/ProvinceCommands/CommandDialog/AllyDialogView';
-import { AttackDialogView } from '@/ui/ProvinceCommands/CommandDialog/AttackDialogView';
-import { ChangeLordDialogView } from '@/ui/ProvinceCommands/CommandDialog/ChangeLordDialogView';
-import { DevelopDialogView } from '@/ui/ProvinceCommands/CommandDialog/DevelopDialogView';
-import { EntrustDialogView } from '@/ui/ProvinceCommands/CommandDialog/EntrustDialogView';
-import { GiveFoodDialogView } from '@/ui/ProvinceCommands/CommandDialog/GiveFoodDialogView';
-import { InfiltrationDialogView } from '@/ui/ProvinceCommands/CommandDialog/InfiltrationDialogView';
-import { MoveTroopsDialogView } from '@/ui/ProvinceCommands/CommandDialog/MoveTroopsDialogView';
-import { NegotiateDialogView } from '@/ui/ProvinceCommands/CommandDialog/NegotiateDialogView';
-import { RecruitDialogView } from '@/ui/ProvinceCommands/CommandDialog/RecruitDialogView';
-import { SearchDialogView } from '@/ui/ProvinceCommands/CommandDialog/SearchDialogView';
-import { TradeDialogView } from '@/ui/ProvinceCommands/CommandDialog/TradeDialogView';
-import { TransportDialogView } from '@/ui/ProvinceCommands/CommandDialog/TransportDialogView';
 import styles from '@/ui/ProvinceCommands/ProvinceCommands.module.scss';
 import { ProvinceCommandsView } from '@/ui/ProvinceCommands/ProvinceCommandsView';
 
@@ -27,65 +12,7 @@ describe('ProvinceCommandsView', () => {
     const world = new WorldFactory().create();
     const events = new EventBus();
     const commands = createCommandGroups({ world, events });
-    const view = new ProvinceCommandsView(
-      { world, commands, events },
-      {
-        attackDialog: new AttackDialogView(
-          { name: 'AttackCommand' },
-          {
-            commander: new DropdownView({ name: 'commander' }, {}),
-            troops: new AmountFieldView({ name: 'troops' }, {}),
-            food: new AmountFieldView({ name: 'food' }, {}),
-            unit: new DropdownView({ name: 'unit' }, {}),
-          },
-        ),
-        developDialog: new DevelopDialogView({ name: 'DevelopCommand' }, {}),
-        giveFoodDialog: new GiveFoodDialogView({ name: 'GiveFoodCommand' }, {}),
-        tradeDialog: new TradeDialogView(
-          { name: 'TradeCommand' },
-          { amount: new AmountFieldView({ name: 'amount' }, {}) },
-        ),
-        transportDialog: new TransportDialogView(
-          { name: 'TransportCommand' },
-          {
-            gold: new AmountFieldView({ name: 'gold' }, {}),
-            food: new AmountFieldView({ name: 'food' }, {}),
-          },
-        ),
-        recruitDialog: new RecruitDialogView(
-          { name: 'RecruitCommand' },
-          { troops: new AmountFieldView({ name: 'troops' }, {}) },
-        ),
-        moveTroopsDialog: new MoveTroopsDialogView(
-          { name: 'MoveTroopsCommand' },
-          {
-            troops: new AmountFieldView({ name: 'troops' }, {}),
-            food: new AmountFieldView({ name: 'food' }, {}),
-            gold: new AmountFieldView({ name: 'gold' }, {}),
-            carry: new DropdownView({ name: 'carry' }, {}),
-          },
-        ),
-        changeLordDialog: new ChangeLordDialogView(
-          { name: 'ChangeLordCommand' },
-          {},
-        ),
-        entrustDialog: new EntrustDialogView({ name: 'EntrustCommand' }, {}),
-        searchDialog: new SearchDialogView({ name: 'SearchCommand' }, {}),
-        allyDialog: new AllyDialogView({ name: 'AllyCommand' }, {}),
-        negotiateDialog: new NegotiateDialogView(
-          { name: 'NegotiateCommand' },
-          {},
-        ),
-        sabotageDialog: new InfiltrationDialogView(
-          { name: 'SabotageCommand', question: '', aim: String },
-          {},
-        ),
-        plunderDialog: new InfiltrationDialogView(
-          { name: 'PlunderCommand', question: '', aim: String },
-          {},
-        ),
-      },
-    );
+    const view = new ProvinceCommandsView({ world, commands, events }, {});
 
     const container = document.createElement('div');
     view.mount(container);

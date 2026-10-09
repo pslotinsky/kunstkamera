@@ -20,7 +20,7 @@ const START_MONTH = 1;
 const MONTHS_PER_YEAR = 12;
 const DEATH_SPREAD_MONTHS = 3;
 
-// TODO: replaced by the family chosen at new-game setup (feature 13)
+// TODO: replaced by the family chosen at new-game setup (feature 16)
 const playerFamily = 'Blanche';
 
 export class WorldFactory {

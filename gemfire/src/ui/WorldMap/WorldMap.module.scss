@@ -1,13 +1,22 @@
 .root {
-  flex: 1 1 auto;
-  min-width: 0;
+  display: flex;
+  background: linear-gradient(180deg, var(--ocean-top), var(--ocean-bottom));
+  transition: filter 300ms ease;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  container-type: size;
 }
 
 .root svg {
   display: block;
-  width: 100%;
+  width: min(100cqw, 100cqh * 1448 / 1086);
   height: auto;
-  border-radius: 8px;
+  mask-image:
+    linear-gradient(to right, transparent, #000 4%, #000 96%, transparent),
+    linear-gradient(to bottom, transparent, #000 4%, #000 96%, transparent);
+  mask-composite: intersect;
 }
 
 .root :global(.province) {
@@ -78,4 +87,8 @@
   opacity: 0;
   transform-box: fill-box;
   transform-origin: center;
+}
+
+.dimmed {
+  filter: var(--map-dim);
 }

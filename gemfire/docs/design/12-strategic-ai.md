@@ -171,7 +171,7 @@ That splits `Invasion.begin` into two steps: mustering, and the answer. The one 
 
 **Entrust is a free order for the ruler.** Appendix D files it as a setup command that costs no turn, beside Change Lord, and the manual pitches it as freeing "the ruler from monthly commands". Change Lord is a home-province order (feature 4), and Entrust gives a lord the same kind of charge, so it follows the same rule. "Entrust a province in the hands of the lord or lady" means a manor or the capital cannot be entrusted: nobody is there to hand it to. The entrustment ends when the lord leaves the province (Change Lord, defection, death) or the province changes hands. The FAQ's "simply Cancel the Entrust at any time" is the toggle's second side. The sources do not say who answers an attack on an entrusted province. "An entrusted province solely in the hands of a lord or lady" (manual) says the lord does, and Entrust exists to spare the player that province's decisions. So its defence follows `DefensePolicy` and its battles are map battles. A player who wants to defend a border province themselves cancels its entrustment first, which is also the FAQ's advice: entrusting "is not a good idea if that territory is on the border of enemy territory".
 
-**Pacing.** A rival turn without a war runs at once. A turn with one waits for its march, clash and dialog, then the next province goes. A message speed is feature 17's subject. The march is the map's own animation, separate from the battle screen: it plays in the time the map battle takes to compute, and the result is computed before the dialog opens, so the screen decides when the result is shown, never what it is.
+**Pacing.** A rival turn without a war runs at once. A turn with one waits for its march, clash and dialog, then the next province goes. A message speed is feature 18's subject. The march is the map's own animation, separate from the battle screen: it plays in the time the map battle takes to compute, and the result is computed before the dialog opens, so the screen decides when the result is shown, never what it is.
 
 **Every dialog holds the month.** A war report, a defence prompt, an announcement or a captive to judge can open while the computer is playing, and the next province must not move underneath it. Each such dialog holds the turn while it is open (`TurnHold`), and the engine starts no turn while anything holds it. The engine also starts each turn through a queued event of its own, so a hold that the same chain of events raises always lands before the next turn begins. A turn end that does not belong to the turn in progress is ignored, so a stray click can never end a rival's turn. While the computer plays, the command rail is hidden.
 
@@ -301,7 +301,7 @@ sequenceDiagram
 
 ## Persistence
 
-The entrusted flag joins each province's save (feature 16). Everything else the AI uses is read from the world each turn and never stored.
+The entrusted flag joins each province's save (feature 17). Everything else the AI uses is read from the world each turn and never stored.
 
 ## Tests
 

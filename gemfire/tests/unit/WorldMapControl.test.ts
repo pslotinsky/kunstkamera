@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { SoundBoard } from '@/ui/sound/SoundBoard';
+import { MARCH_MS } from '@/ui/WorldMap/WarMarch';
 import { WorldMapControl } from '@/ui/WorldMap/WorldMapControl';
 
 import {
@@ -17,7 +19,8 @@ function setup() {
   const target = makeProvince({ number: 8, family: defending });
   const { world } = makeWorld([source, target], attacking);
   const container = document.createElement('div');
-  const control = new WorldMapControl({ map: world.map });
+  const sounds = new SoundBoard();
+  const control = new WorldMapControl({ map: world.map, sounds });
 
   control.mount(container);
 
@@ -27,7 +30,15 @@ function setup() {
     );
   }
 
-  return { attacking, defending, source, target, control, getMarkerCrests };
+  return {
+    attacking,
+    defending,
+    source,
+    target,
+    control,
+    sounds,
+    getMarkerCrests,
+  };
 }
 
 describe('WorldMapControl', () => {
@@ -49,5 +60,38 @@ describe('WorldMapControl', () => {
     vi.runAllTimers();
 
     expect(getMarkerCrests()).toEqual([attacking.crest, attacking.crest]);
+  });
+
+  it('plays a distant skirmish when the war march clashes', () => {
+    vi.useFakeTimers();
+    const { source, target, control, sounds } = setup();
+    const skirmish = vi.spyOn(sounds, 'playSkirmish');
+
+    control.showWar(makeInvasionReport({ source, target }), () => {});
+
+    expect(skirmish).not.toHaveBeenCalled();
+
+    vi.advanceTimersByTime(MARCH_MS);
+
+    expect(skirmish).toHaveBeenCalledOnce();
+  });
+
+  it('marches without a clash when the war was not fought', () => {
+    vi.useFakeTimers();
+    const { source, target, control, sounds } = setup();
+    const skirmish = vi.spyOn(sounds, 'playSkirmish');
+
+    control.showWar(
+      makeInvasionReport({
+        source,
+        target,
+        answer: 'surrender',
+        outcome: undefined,
+      }),
+      () => {},
+    );
+    vi.runAllTimers();
+
+    expect(skirmish).not.toHaveBeenCalled();
   });
 });

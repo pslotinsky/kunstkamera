@@ -7,6 +7,7 @@ import { Facing } from '@/core/domain/Facing';
 import type { Landscape } from '@/core/domain/Province';
 import { countTo } from '@/lib/dom/countTo';
 import { View } from '@/lib/View';
+import type { SoundBoard } from '@/ui/sound/SoundBoard';
 
 import { unitPiece } from '../../art/unitPiece';
 import { unitPreview } from '../../art/unitPreview';
@@ -26,7 +27,11 @@ const SKIES: Readonly<Record<Phase, string>> = {
   midnight: styles.midnight!,
 };
 
-export class ClashView extends View {
+export interface ClashContext {
+  readonly sounds: SoundBoard;
+}
+
+export class ClashView extends View<ClashContext> {
   protected readonly rootClass = styles.root!;
 
   private landscape: Landscape = 'woods';
@@ -68,6 +73,7 @@ export class ClashView extends View {
   }
 
   public show(clash: Clash): void {
+    this.calm();
     this.showCorner(
       'striker',
       clash.striker,
@@ -178,6 +184,11 @@ export class ClashView extends View {
     standing.forEach((figure, index) => {
       figure.classList.toggle(styles.falling!, index < lost);
     });
+  }
+
+  private calm(): void {
+    this.rankOf('striker').classList.remove(styles.striking!);
+    this.rankOf('target').classList.remove(styles.struck!);
   }
 
   private restart(element: HTMLElement, style: string): void {

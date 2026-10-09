@@ -103,7 +103,6 @@ export class ProvinceInfoView extends View {
       <header class=${styles.header}></header>
       <hr class=${styles.divider} />
       ${this.renderDetails(province)}
-      <hr class=${styles.divider} />
     `;
   }
 

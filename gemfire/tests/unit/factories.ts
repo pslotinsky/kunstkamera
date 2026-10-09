@@ -6,12 +6,11 @@ import {
   type BattleOutcomeParams,
 } from '@/core/domain/BattleOutcome';
 import { BattleSide } from '@/core/domain/BattleSide';
-import { BattleUnit, type BattleUnitParams } from '@/core/domain/BattleUnit';
+import type { BattleUnit } from '@/core/domain/BattleUnit';
 import { CalendarDate } from '@/core/domain/CalendarDate';
 import { Captive, type CaptiveParams } from '@/core/domain/Captive';
 import { Characteristics } from '@/core/domain/Characteristics';
 import { Development } from '@/core/domain/Development';
-import { Facing } from '@/core/domain/Facing';
 import { Family } from '@/core/domain/Family';
 import type { Gem } from '@/core/domain/Gem';
 import { General } from '@/core/domain/General';
@@ -181,9 +180,6 @@ type MakeBattleParams = Partial<Omit<BattleParams, 'field'>> & {
   readonly province?: number | undefined;
 };
 
-type MakeBattleUnitParams = Partial<BattleUnitParams> &
-  Pick<BattleUnitParams, 'unit' | 'cell'>;
-
 const LONDRE = 22;
 
 export function makeArmy(params: Partial<ArmyParams> = {}): Army {
@@ -274,17 +270,6 @@ export function makeBattle(params: MakeBattleParams = {}): Battle {
       params.defender ??
       makeArmy({ commander: makeGeneral({ name: 'Eselred' }) }),
     field: Battlefield.ofProvince(params.province ?? LONDRE),
-  });
-}
-
-export function makeBattleUnit(params: MakeBattleUnitParams): BattleUnit {
-  return new BattleUnit({
-    unit: params.unit,
-    side: params.side ?? BattleSide.attacker,
-    commander: params.commander ?? makeGeneral(),
-    strength: params.strength ?? 40,
-    cell: params.cell,
-    facing: params.facing ?? Facing.east,
   });
 }
 

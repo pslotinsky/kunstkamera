@@ -34,7 +34,7 @@ export class CaptiveDialogView extends View<CaptiveDialogContext> {
 
   public get template(): TemplateResult {
     return html`
-      <section class="${styles.root} ${styles.hidden}">
+      <section class="${styles.root} ${styles.hidden}" data-overlay>
         <h2 class=${styles.title} data-title></h2>
         <img class=${styles.portrait} data-portrait alt="" />
         <p class=${styles.captive} data-captive></p>

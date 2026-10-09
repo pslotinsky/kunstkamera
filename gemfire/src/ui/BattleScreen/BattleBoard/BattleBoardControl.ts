@@ -4,8 +4,13 @@ import type { BattleUnit } from '@/core/domain/BattleUnit';
 import type { Cell } from '@/core/domain/Cell';
 import { Facing } from '@/core/domain/Facing';
 import { Control } from '@/lib/Control';
+import type { SoundBoard } from '@/ui/sound/SoundBoard';
 
-import { BattleBoardView, type Offset } from './BattleBoardView';
+import {
+  type BattleBoardContext,
+  BattleBoardView,
+  type Offset,
+} from './BattleBoardView';
 import { CellPickedEvent } from './CellPickedEvent';
 
 const STEP_MS = 130;
@@ -22,8 +27,8 @@ export class BattleBoardControl extends Control<BattleBoardView> {
   private walking?: Walk | undefined;
   private stepping?: ReturnType<typeof setTimeout> | undefined;
 
-  public constructor() {
-    super(BattleBoardView, {});
+  public constructor(context: BattleBoardContext) {
+    super(BattleBoardView, context);
   }
 
   public onCellPicked(handler: (cell: Cell) => void): void {
@@ -108,6 +113,10 @@ export class BattleBoardControl extends Control<BattleBoardView> {
     return window.matchMedia?.(STILL).matches ?? false;
   }
 
+  private get sounds(): SoundBoard {
+    return this.context.sounds;
+  }
+
   private measure(from: Cell, path: readonly Cell[]): readonly Offset[] {
     return path.map((cell) => ({
       columns: cell.column - from.column,
@@ -123,6 +132,7 @@ export class BattleBoardControl extends Control<BattleBoardView> {
       const previous = index === 0 ? walk.from : walk.path[index - 1]!;
 
       this.view.turn(walk.unit, Facing.between(previous, cell));
+      this.sounds.playStep();
       this.stepping = setTimeout(() => this.takeStep(index + 1), STEP_MS);
     } else if (walk) {
       this.walking = undefined;

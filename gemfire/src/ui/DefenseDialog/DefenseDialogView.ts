@@ -40,7 +40,7 @@ export class DefenseDialogView extends View<
 
   public get template(): TemplateResult {
     return html`
-      <section class="${styles.root} ${styles.hidden}">
+      <section class="${styles.root} ${styles.hidden}" data-overlay>
         <h2 class=${styles.title} data-title></h2>
         <p class=${styles.line} data-attacker></p>
         <p class=${styles.line} data-garrison></p>

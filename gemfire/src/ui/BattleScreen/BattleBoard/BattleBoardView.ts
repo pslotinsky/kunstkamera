@@ -6,6 +6,7 @@ import type { BattleUnit } from '@/core/domain/BattleUnit';
 import type { Cell } from '@/core/domain/Cell';
 import { Facing } from '@/core/domain/Facing';
 import { View } from '@/lib/View';
+import type { SoundBoard } from '@/ui/sound/SoundBoard';
 
 import { unitPiece } from '../../art/unitPiece';
 import { CellPickedEvent } from './CellPickedEvent';
@@ -33,7 +34,11 @@ const TINTS: Readonly<Record<Phase, string>> = {
   midnight: styles.midnight!,
 };
 
-export class BattleBoardView extends View {
+export interface BattleBoardContext {
+  readonly sounds: SoundBoard;
+}
+
+export class BattleBoardView extends View<BattleBoardContext> {
   protected readonly rootClass = styles.root!;
 
   private readonly cellElements = new Map<Cell, HTMLElement>();
@@ -225,7 +230,7 @@ export class BattleBoardView extends View {
     piece.className = styles.piece!;
     portrait.className = styles.portrait!;
     portrait.alt = unit.name;
-    count.className = styles.count!;
+    count.className = `${styles.count!} ${unit.side.isAttacker ? styles.attacker! : styles.defender!}`;
     piece.append(portrait, count);
 
     this.pieces.set(unit, piece);

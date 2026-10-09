@@ -25,6 +25,11 @@ export class WorldMapControl extends Control<WorldMapView> {
 
     this.deferred = new Map();
     this.view.showWar(report);
+
+    if (report.isFought) {
+      setTimeout(() => this.context.sounds.playSkirmish(), MARCH_MS);
+    }
+
     setTimeout(() => {
       this.view.clearWar();
       this.actualizeDeferred();
@@ -35,6 +40,10 @@ export class WorldMapControl extends Control<WorldMapView> {
   public showCurrent(province: Province): void {
     this.clearHighlighting();
     this.view.addHighlighting(province.number, 'current');
+  }
+
+  public dim(dimmed: boolean): void {
+    this.view.dim(dimmed);
   }
 
   public actualizeProvince(province: Province): void {

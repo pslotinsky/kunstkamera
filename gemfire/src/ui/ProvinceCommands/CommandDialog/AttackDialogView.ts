@@ -24,9 +24,7 @@ export class AttackDialogView extends CommandDialogView<
   AttackViews
 > {
   public showTarget(target: Province | undefined): void {
-    this.targetPrompt.textContent = target
-      ? `${target} (${target.family?.name})`
-      : 'Attack where?';
+    this.targetPrompt.textContent = target ? `Attack ${target}` : '';
   }
 
   public showForm(visible: boolean): void {
@@ -51,7 +49,7 @@ export class AttackDialogView extends CommandDialogView<
 
   protected renderBody(): TemplateResult {
     return html`
-      <p class=${styles.prompt} data-target>Attack where?</p>
+      <h2 class=${styles.title} data-target></h2>
       <div class=${styles.hidden} data-form>
         <div class=${styles.section}>
           <p class=${styles.prompt}>Who leads?</p>
@@ -70,7 +68,7 @@ export class AttackDialogView extends CommandDialogView<
           ${this.views.unit.template}
         </div>
         <p class="${styles.prompt} ${styles.section}" data-figures></p>
-        <div class="${styles.actions} ${styles.section}">
+        <div class="${styles.actions} ${styles.footer}">
           <button
             class=${styles.button}
             type="button"

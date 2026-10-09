@@ -14,6 +14,7 @@ export class AppControl extends Control<AppView, AppControls> {
       battleScreen: new BattleScreenControl({
         world: context.world,
         events: context.events,
+        sounds: context.sounds,
       }),
     });
   }
