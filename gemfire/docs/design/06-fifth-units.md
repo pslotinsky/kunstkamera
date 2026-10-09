@@ -8,7 +8,7 @@ The hiring economy for the special units that fill an army's fifth slot: hire pr
 
 In scope: hire available Fifth Units for Gold (a province stations several — one of each type it hires); pay their upkeep every three months or lose them to desertion; risk losing a mercenary an obscure family cannot hold, and be told when one leaves; dismiss a stationed unit; carry one stationed unit along when moving troops into a neighbour (§8.6); and see a province's stationed units through View. The last two reach back into feature 5's Move Troops and the View command, which had nothing to carry or show until Fifth Units existed.
 
-Out of scope: the battle itself and the fifth army slot it fills (feature 8 — so a hired unit's Move, Range, flying, and Strength loss are recorded for later but unused here); Gem Guardians (feature 7) and Pastha (feature 14), the other two things that can fill the fifth slot; monster rampage (§8.10 — no observed rate to model, so it waits for the random-events feature); and dynamic changes to a province's hire pool over time (§8.3 — unconfirmed, so availability is static per scenario).
+Out of scope: the battle itself and the fifth army slot it fills (feature 8 — so a hired unit's Move, Range, flying, and Strength loss are recorded for later but unused here); Gem Guardians (feature 7) and Pastha (feature 15), the other two things that can fill the fifth slot; monster rampage (§8.10 — no observed rate to model, so it waits for the random-events feature); and dynamic changes to a province's hire pool over time (§8.3 — unconfirmed, so availability is static per scenario).
 
 ## Glossary
 
@@ -208,7 +208,7 @@ sequenceDiagram
 
 ## Persistence
 
-Each province contributes its `hiredUnits` (each unit's type plus current Strength, since Strength will erode in battle later) and the `hirePool` of types it may hire. Nothing else is new; the charge and desertion mutate the same `Province.resources.gold` already saved. (Save/load is feature 16.)
+Each province contributes its `hiredUnits` (each unit's type plus current Strength, since Strength will erode in battle later) and the `hirePool` of types it may hire. Nothing else is new; the charge and desertion mutate the same `Province.resources.gold` already saved. (Save/load is feature 17.)
 
 ## Tests
 

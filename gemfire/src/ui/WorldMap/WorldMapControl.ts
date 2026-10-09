@@ -25,6 +25,11 @@ export class WorldMapControl extends Control<WorldMapView> {
 
     this.deferred = new Map();
     this.view.showWar(report);
+
+    if (report.isFought) {
+      setTimeout(() => this.context.sounds.playSkirmish(), MARCH_MS);
+    }
+
     setTimeout(() => {
       this.view.clearWar();
       this.actualizeDeferred();

@@ -268,7 +268,7 @@ sequenceDiagram
 
 ## Persistence
 
-A battle is transient: it is assembled, resolved, reported, and dropped inside a single province's turn, so nothing about it is saved. What the invasion leaves behind is all state that already saves — a province's owner, its governor, its resources, and the hired units stationed in it. `Army` and `BattleOutcome` never outlive the order that made them, and there is no such thing as a battle in progress to reload. (Save/load is feature 16; stage 8.2 will have to answer whether a battle on the field can be saved mid-fight, and the answer will probably be no.)
+A battle is transient: it is assembled, resolved, reported, and dropped inside a single province's turn, so nothing about it is saved. What the invasion leaves behind is all state that already saves — a province's owner, its governor, its resources, and the hired units stationed in it. `Army` and `BattleOutcome` never outlive the order that made them, and there is no such thing as a battle in progress to reload. (Save/load is feature 17; stage 8.2 will have to answer whether a battle on the field can be saved mid-fight, and the answer will probably be no.)
 
 ## Tests
 

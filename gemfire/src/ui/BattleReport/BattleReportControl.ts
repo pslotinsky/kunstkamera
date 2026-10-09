@@ -34,7 +34,23 @@ export class BattleReportControl extends Control<BattleReportView> {
 
   private show(report: InvasionReport): void {
     this.turnHold.hold();
+    this.soundOutcome(report);
     this.view.showReport(report);
+  }
+
+  private soundOutcome(report: InvasionReport): void {
+    const { player } = this.context.world;
+
+    if (report.hasSide(player)) {
+      const isAttacker = report.source.family?.isEqual(player) ?? false;
+      const isWon = isAttacker === report.isTaken;
+
+      if (isWon) {
+        this.context.sounds.playFanfare();
+      } else {
+        this.context.sounds.playDirge();
+      }
+    }
   }
 
   private close(): void {

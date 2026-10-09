@@ -160,7 +160,14 @@ Rival families that take their own monthly turns, plus handing your own work to 
 - [x] when your land is attacked, choose to fight, retreat, or surrender
 - [x] entrust a province to its lord, freeing you from its orders
 
-## 13. Victory & defeat
+## 13. Audio
+
+Music and sound effects across the game.
+
+- [x] hear music over the map and in battle
+- [x] hear sound effects for actions and combat
+
+## 14. Victory & defeat
 
 How the campaign ends.
 
@@ -168,7 +175,7 @@ How the campaign ends.
 - [ ] be knocked out when your last province falls
 - [ ] see the campaign's ending
 
-## 14. Events
+## 15. Events
 
 Good and bad events, seasonal disasters, and Pastha.
 
@@ -178,24 +185,25 @@ Good and bad events, seasonal disasters, and Pastha.
 - [ ] hear the banshee when a ruler dies
 - [ ] suffer a hired unit's rampage (loyalty, cultivation, and protection drop)
 
-## 15. New game & advisors
+## 16. New game & advisors
 
 Starting a campaign: title screen, scenario and family choice, and an advisor to consult.
 
 - [ ] start a new game from the title screen
+- [ ] hear the title theme on the menus
 - [ ] pick one of the four scenarios
 - [ ] choose the family you play
 - [ ] pick one of four advisors at setup
 - [ ] get advice on your next move during play
 
-## 16. Save / load
+## 17. Save / load
 
 Persistence of game state between sessions.
 
 - [ ] save a game in progress
 - [ ] load and resume a saved game
 
-## 17. Options / settings
+## 18. Options / settings
 
 Game settings and session control.
 
@@ -203,13 +211,6 @@ Game settings and session control.
 - [ ] toggle battle animation
 - [ ] toggle sound
 - [ ] quit, or hand the game to the computer to finish
-
-## 18. Audio
-
-Music and sound effects across the game.
-
-- [ ] hear music across menus, map, and battle
-- [ ] hear sound effects for actions and combat
 
 ## 19. Multiplayer
 

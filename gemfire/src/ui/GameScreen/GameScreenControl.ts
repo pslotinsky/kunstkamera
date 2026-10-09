@@ -46,7 +46,10 @@ export class GameScreenControl extends Control<
     );
 
     super(GameScreenView, context, {
-      worldMap: new WorldMapControl({ map: context.world.map }),
+      worldMap: new WorldMapControl({
+        map: context.world.map,
+        sounds: context.sounds,
+      }),
       gamePanel: new GamePanelControl({
         world: context.world,
         commands: context.commands,
@@ -59,6 +62,7 @@ export class GameScreenControl extends Control<
       battleReport: new BattleReportControl({
         world: context.world,
         events: context.events,
+        sounds: context.sounds,
       }),
       captiveDialog: new CaptiveDialogControl({
         world: context.world,

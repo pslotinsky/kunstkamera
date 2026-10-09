@@ -4,7 +4,7 @@
 
 The Domestic orders that grow a province month over month: develop its fields and walls, feed its people, trade at the market, and move resources around the realm.
 
-This feature fills in the real `execute` bodies of the five Domestic commands (Cultivation, Protection, Give Food, Trade, Transport), gives orders **parameters** for the first time (amounts and a target province), and lands the **goodwill bookkeeping** every turn-consuming order feeds — the hidden per-province counters that feature 14's event checks will consume. Out of scope: the events that spend goodwill (14), disasters that degrade stats (14), Recruit (5), and rival AI (12).
+This feature fills in the real `execute` bodies of the five Domestic commands (Cultivation, Protection, Give Food, Trade, Transport), gives orders **parameters** for the first time (amounts and a target province), and lands the **goodwill bookkeeping** every turn-consuming order feeds — the hidden per-province counters that feature 15's event checks will consume. Out of scope: the events that spend goodwill (15), disasters that degrade stats (15), Recruit (5), and rival AI (12).
 
 ## Glossary
 
@@ -17,7 +17,7 @@ This feature fills in the real `execute` bodies of the five Domestic commands (C
 | Transport    | Send Gold and Food to **any** province you own, however distant (Move Troops, feature 5, is the bordering-only military sibling). Turn-consuming, goodwill 0.        |
 | Market rate  | The realm-wide exchange rate — low (1 Gold = 2 Food), average (1 = 1), or high (2 Gold = 1 Food) — swinging at month start within the season's range.                 |
 | Goodwill     | A hidden per-province score: each turn-consuming order adds its modifier (appendix-d §D.5). Feature 15's event check reads and resets it.                            |
-| Action count | A hidden per-province counter of turn-consuming orders taken; an event check fires at 3 (feature 14). Skip Turn and free orders don't count.                          |
+| Action count | A hidden per-province counter of turn-consuming orders taken; an event check fires at 3 (feature 15). Skip Turn and free orders don't count.                          |
 | Governor     | The general running the province — their Intelligence scales Develop gains, their Charm scales Give Food.                                                             |
 
 ## Functionality
@@ -27,7 +27,7 @@ This feature fills in the real `execute` bodies of the five Domestic commands (C
 - Trade: see the month's market rate, then buy or sell a chosen amount of Food at it — without spending the turn, any number of times.
 - Transport: choose any other owned province and send it Gold and/or Food.
 - The market rate swings at month start, picking among the rates the season allows.
-- Every turn-consuming order records its goodwill and bumps the province's action count; the counters sit dormant until feature 14.
+- Every turn-consuming order records its goodwill and bumps the province's action count; the counters sit dormant until feature 15.
 - Resource and stat caps hold everywhere: Gold/Food/Troops 0–999, Loyalty 0–100, Cultivation/Protection 0–200.
 
 ## Use cases
@@ -73,7 +73,7 @@ After any order resolves, the province info panel refreshes — development, gol
 
 The table is our invention — a provisional model that makes prices breathe with the year (cheap around the harvest, dear by spring) while staying one lookup. It is the tuning seam: later variants can price by how much food the realm holds, or carry a good/normal/bad yield modifier from the last harvest, without touching Trade. The rate shows only inside the Trade dialog, preserving the original's check-by-opening-Trade rhythm.
 
-**Goodwill is part of the order's mutation.** "Every order carries goodwill" — and recording it is just another province write, like spending gold or raising loyalty: the base offers two protected helpers, `recordAction(goodwill = 0)` writing the counters on the current province and `endTurn()` publishing `TurnEnded`, and each turn-consuming command calls both, passing its §D.5 modifier (`this.recordAction(1)` from Cultivation, plain `this.recordAction()` from Transport) — no field on the base, the value lives where the order's effects live. No event in between — the bus is for flow (the queue reacts to `TurnEnded`), not for sibling state writes, and feature 14's check needs only the accumulated `actionCount` hitting 3. Skip Turn publishes `TurnEnded` directly — no action recorded, so a skipped month leaves the counters untouched (spec §11.2: only turn-based actions count). The counters live on `Province` and just accumulate — feature 14 reads and resets them.
+**Goodwill is part of the order's mutation.** "Every order carries goodwill" — and recording it is just another province write, like spending gold or raising loyalty: the base offers two protected helpers, `recordAction(goodwill = 0)` writing the counters on the current province and `endTurn()` publishing `TurnEnded`, and each turn-consuming command calls both, passing its §D.5 modifier (`this.recordAction(1)` from Cultivation, plain `this.recordAction()` from Transport) — no field on the base, the value lives where the order's effects live. No event in between — the bus is for flow (the queue reacts to `TurnEnded`), not for sibling state writes, and feature 15's check needs only the accumulated `actionCount` hitting 3. Skip Turn publishes `TurnEnded` directly — no action recorded, so a skipped month leaves the counters untouched (spec §11.2: only turn-based actions count). The counters live on `Province` and just accumulate — feature 15 reads and resets them.
 
 **Provisional formulas, flagged.** Give Food is Medium-High confidence (`floor(CHA × Food / 300)`, spec §4.6) — adopted as is. The Develop gain is only bounded (+2…+5 scaling with Intelligence, minimum +2; thresholds unverified) — we provisionally tier it as `2 + floor(INT / 25)`, capped at +5, in one place so the real thresholds drop in. A province without a governor uses the minimums (gain +2, Charm 0). Both join appendix-d's unknown-formula register workflow.
 

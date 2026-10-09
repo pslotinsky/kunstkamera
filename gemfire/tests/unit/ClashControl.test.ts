@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { BattleSide } from '@/core/domain/BattleSide';
 import { BattleUnit } from '@/core/domain/BattleUnit';
@@ -11,6 +11,7 @@ import { StandardUnit } from '@/core/domain/StandardUnit';
 import type { Unit } from '@/core/domain/Unit';
 import styles from '@/ui/BattleScreen/Clash/Clash.module.scss';
 import { ClashControl } from '@/ui/BattleScreen/Clash/ClashControl';
+import { SoundBoard } from '@/ui/sound/SoundBoard';
 
 import { makeGeneral } from './factories';
 
@@ -27,7 +28,7 @@ function muster(unit: Unit, strength: number, side: BattleSide) {
 
 function play(striker: BattleUnit, target: BattleUnit) {
   const container = document.createElement('div');
-  const control = new ClashControl();
+  const control = new ClashControl({ sounds: new SoundBoard() });
 
   control.mount(container);
   control.play(
@@ -87,5 +88,39 @@ describe('ClashControl', () => {
       striker: 12,
       target: 1,
     });
+  });
+
+  it('sounds the strike and the blow at the clash beats', () => {
+    vi.useFakeTimers();
+
+    const sounds = new SoundBoard();
+    const strike = vi.spyOn(sounds, 'playStrike');
+    const blow = vi.spyOn(sounds, 'playBlow');
+    const container = document.createElement('div');
+    const control = new ClashControl({ sounds });
+
+    control.mount(container);
+    control.play(
+      new Clash({
+        striker: muster(knights, 48, BattleSide.attacker),
+        target: muster(knights, 48, BattleSide.defender),
+        approach: 'front',
+        losses: 0,
+        backlash: 0,
+      }),
+      () => {},
+    );
+
+    vi.advanceTimersByTime(800);
+    expect(strike).not.toHaveBeenCalled();
+
+    vi.advanceTimersByTime(360);
+    expect(strike).toHaveBeenCalledExactlyOnceWith('short');
+    expect(blow).not.toHaveBeenCalled();
+
+    vi.advanceTimersByTime(540);
+    expect(blow).toHaveBeenCalledOnce();
+
+    vi.useRealTimers();
   });
 });

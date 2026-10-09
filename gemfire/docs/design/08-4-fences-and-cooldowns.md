@@ -207,7 +207,7 @@ sequenceDiagram
 
 ## Persistence
 
-The first thing a battle produces that outlives it. Fences are battle-scoped and vanish with the field, exactly as 8.2's grid does — but a Gem's rest is a month on the strategic calendar, so a save taken between turns has to carry it or a house would get its Guardian back by quitting. One date per gem, which is a fact rather than a position in a process: it restores to the same meaning whenever it is loaded. (Save/load is feature 16.)
+The first thing a battle produces that outlives it. Fences are battle-scoped and vanish with the field, exactly as 8.2's grid does — but a Gem's rest is a month on the strategic calendar, so a save taken between turns has to carry it or a house would get its Guardian back by quitting. One date per gem, which is a fact rather than a position in a process: it restores to the same meaning whenever it is loaded. (Save/load is feature 17.)
 
 ## Tests
 

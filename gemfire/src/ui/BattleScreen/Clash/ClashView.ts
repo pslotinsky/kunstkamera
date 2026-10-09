@@ -7,6 +7,7 @@ import { Facing } from '@/core/domain/Facing';
 import type { Landscape } from '@/core/domain/Province';
 import { countTo } from '@/lib/dom/countTo';
 import { View } from '@/lib/View';
+import type { SoundBoard } from '@/ui/sound/SoundBoard';
 
 import { unitPiece } from '../../art/unitPiece';
 import { unitPreview } from '../../art/unitPreview';
@@ -26,7 +27,11 @@ const SKIES: Readonly<Record<Phase, string>> = {
   midnight: styles.midnight!,
 };
 
-export class ClashView extends View {
+export interface ClashContext {
+  readonly sounds: SoundBoard;
+}
+
+export class ClashView extends View<ClashContext> {
   protected readonly rootClass = styles.root!;
 
   private landscape: Landscape = 'woods';

@@ -55,8 +55,8 @@ export class BattleScreenControl extends Control<
   public constructor(context: BattleScreenContext) {
     super(BattleScreenView, context, {
       sky: new SkyControl(),
-      board: new BattleBoardControl(),
-      clash: new ClashControl(),
+      board: new BattleBoardControl(context),
+      clash: new ClashControl(context),
       refuge: new DropdownControl({ name: 'refuge' }),
     });
   }
@@ -149,6 +149,7 @@ export class BattleScreenControl extends Control<
     if (unit) {
       const done = battle.build(unit, cell);
 
+      this.soundWork(false);
       this.finishWork(battle, unit, cell);
       this.view.showWork(unit, done);
     }
@@ -160,6 +161,7 @@ export class BattleScreenControl extends Control<
     if (unit) {
       const done = battle.breakDown(unit, cell);
 
+      this.soundWork(true);
       this.finishWork(battle, unit, cell);
       this.view.showBreaking(unit, done);
     }
@@ -531,6 +533,10 @@ export class BattleScreenControl extends Control<
       ? battle.breakDown(unit, cell)
       : battle.build(unit, cell);
 
+    if (!this.skipping) {
+      this.soundWork(breaking);
+    }
+
     this.controls.board.redraw(battle, cell);
     this.controls.board.place(unit);
 
@@ -553,6 +559,14 @@ export class BattleScreenControl extends Control<
 
   private findPolicy(side: BattleSide): TacticalPolicy | undefined {
     return side.isEqual(this.side.opposite) ? this.enemy : this.auto;
+  }
+
+  private soundWork(breaking: boolean): void {
+    if (breaking) {
+      this.context.sounds.playCrack();
+    } else {
+      this.context.sounds.playKnock();
+    }
   }
 
   private resume(battle: Battle, side: BattleSide): void {

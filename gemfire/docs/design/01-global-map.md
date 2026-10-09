@@ -13,7 +13,7 @@ This feature owns the _view and selection_ layer: rendering provinces, showing o
 | World (Ishmeria) | The top-level aggregate: the fixed island kingdom; one 30-province map shared by all four scenarios (geography never changes — only the political state does). |
 | Province         | Primary territorial unit (numbered 1–30, named). Holds an owner, local economy, a governor, adjacency, and hireable Fifth Units.                               |
 | Family           | A political actor that owns provinces, generals, and Gems.                                                                                                     |
-| Player           | The family you control — full detail and commands apply to its provinces. Hardcoded for now; chosen at setup (feature 15).                                     |
+| Player           | The family you control — full detail and commands apply to its provinces. Hardcoded for now; chosen at setup (feature 16).                                     |
 | Ownership        | Each province belongs to one family, or is **neutral** (unclaimed).                                                                                            |
 | Adjacency        | Which provinces border each other — the _only_ routes for movement and invasion.                                                                               |
 | Governor         | The general administering a province (distinct from a family's ruler).                                                                                         |
@@ -192,7 +192,7 @@ classDiagram
   Family "1" --> "1" Province : homeProvince
 ```
 
-_Shape only: `name / INT / WAR / CHA / birth` follow the canonical record in appendix-b §B.2; `loyalty` is the hidden general loyalty (≠ a province's public loyalty), and `fame` lives on the ruler, not the general. `player` is the family you control — hardcoded now, chosen at setup (feature 15). Aging, stat growth/decline, and death belong to feature 11 (Character lifecycle)._
+_Shape only: `name / INT / WAR / CHA / birth` follow the canonical record in appendix-b §B.2; `loyalty` is the hidden general loyalty (≠ a province's public loyalty), and `fame` lives on the ruler, not the general. `player` is the family you control — hardcoded now, chosen at setup (feature 16). Aging, stat growth/decline, and death belong to feature 11 (Character lifecycle)._
 
 ## Tests
 

@@ -10,12 +10,14 @@ import type { FamilyOverviewControl } from '@/ui/FamilyOverview/FamilyOverviewCo
 import type { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
 import type { HireMonsterDialogControl } from '@/ui/ProvinceCommands/CommandDialog/HireMonsterDialogControl';
 import type { SearchReportControl } from '@/ui/SearchReport/SearchReportControl';
+import type { SoundBoard } from '@/ui/sound/SoundBoard';
 import type { WorldMapControl } from '@/ui/WorldMap/WorldMapControl';
 
 export interface GameScreenContext {
   readonly world: World;
   readonly events: EventBus;
   readonly commands: readonly CommandGroup[];
+  readonly sounds: SoundBoard;
 }
 
 export type GameScreenControls = {

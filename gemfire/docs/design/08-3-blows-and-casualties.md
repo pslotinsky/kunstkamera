@@ -120,7 +120,7 @@ It takes its time, because there is nothing to watch if it does not. The scene h
 
 The scene behind them is the one thing this stage does buy: sixteen painted backdrops in `public/landscape/`, one for each of four landscapes at each of the four hours. Which one is showing is never a decision — the province's field names the landscape and the clock names the hour.
 
-The enemy's blows cut to it too, and they are the ones that most need it: a player who never sees what hit him is left to work it out by comparing badges. The banner counts down the way the header's food does, reusing the same helper, and the clash is dismissed by a click or by waiting it out. Under `prefers-reduced-motion` it does not play at all: the numbers change on the board, a struck piece flashes, a destroyed one goes, and the turn carries on. That is also the seam feature 17's "toggle battle animation" plugs into — the option will have something real to switch off, and the game stays playable with it off.
+The enemy's blows cut to it too, and they are the ones that most need it: a player who never sees what hit him is left to work it out by comparing badges. The banner counts down the way the header's food does, reusing the same helper, and the clash is dismissed by a click or by waiting it out. Under `prefers-reduced-motion` it does not play at all: the numbers change on the board, a struck piece flashes, a destroyed one goes, and the turn carries on. That is also the seam feature 18's "toggle battle animation" plugs into — the option will have something real to switch off, and the game stays playable with it off.
 
 **The board keeps the score.** A blow is legible without the clash: the target's badge falls to its new strength, a destroyed piece is removed rather than greyed — grey already means "has acted" — and the cell it was blocking opens for anyone who wants it.
 
@@ -201,7 +201,7 @@ One honest limit: the two paths converge on the same two steps rather than becom
 
 Counting tiles is how the answer was **found**; it is not how it is **kept**. A rule that reads "more boulders than woods and water means a mountain province" is a guess with thresholds in it — nothing in the game says a field with five woods and four river cells is woodland — and it would re-decide the question, silently and differently, the first time a layout was edited. What kind of country a province is belongs to the province, beside its name and its neighbours, so `landscape` is authored in the province catalogue and simply read. §11's disaster regions name the same four groups for twenty-three of the thirty, which is as close to a second source as this fact has; the remaining seven have no disaster and take the reading their terrain gives.
 
-Feature 14 settles it beyond doubt: seasonal disasters need exactly this classification, and a province that is woodland for the purpose of a fire while being something else for the purpose of a backdrop would be a bug waiting in the data. One fact, one home, two readers. Sixteen backdrops, 615×535 apiece, 1.6 MB for the set, each cropped so every landscape puts its horizon at the same height: the scene never jumps when a battle moves to another province, and the four hours of one landscape are the same place relit rather than four different places. They are upscaled to fill the screen with `image-rendering: pixelated`, which is the one upscale that flatters pixel art instead of smearing it.
+Feature 15 settles it beyond doubt: seasonal disasters need exactly this classification, and a province that is woodland for the purpose of a fire while being something else for the purpose of a backdrop would be a bug waiting in the data. One fact, one home, two readers. Sixteen backdrops, 615×535 apiece, 1.6 MB for the set, each cropped so every landscape puts its horizon at the same height: the scene never jumps when a battle moves to another province, and the four hours of one landscape are the same place relit rather than four different places. They are upscaled to fill the screen with `image-rendering: pixelated`, which is the one upscale that flatters pixel art instead of smearing it.
 
 That also retires something 8.2 built. The ground was going to be the terrain tile of the cell the target stands on, tiled across the bottom of the scene — which was the right answer while the sky was a flat colour band, and is the wrong one under a painted horizon. The tile stays where it belongs, on the board. What survives of the colour band is a single underlay in the hour's colour, so a backdrop that fails to load leaves a lit scene rather than a black hole.
 
@@ -394,7 +394,7 @@ sequenceDiagram
 
 ## Persistence
 
-Nothing, for the same reason 8.2 contributes nothing: a battle begins and ends inside one province's turn, so no save can ever be holding one. The constants this stage adds are config, not state. (Save/load is feature 16.)
+Nothing, for the same reason 8.2 contributes nothing: a battle begins and ends inside one province's turn, so no save can ever be holding one. The constants this stage adds are config, not state. (Save/load is feature 17.)
 
 ## Tests
 
