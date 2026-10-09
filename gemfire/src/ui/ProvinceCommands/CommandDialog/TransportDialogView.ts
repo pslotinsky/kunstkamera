@@ -4,17 +4,8 @@ import type { TransportDirection } from '@/core/commands/province/TransportComma
 
 import type { AmountFieldView } from '../AmountField/AmountFieldView';
 import { CommandDialogView } from './CommandDialogView';
-import { DirectionSelectedEvent } from './DirectionSelectedEvent';
 
 import styles from './CommandDialog.module.scss';
-
-const DIRECTIONS: {
-  readonly direction: TransportDirection;
-  readonly label: string;
-}[] = [
-  { direction: 'send', label: 'Send' },
-  { direction: 'receive', label: 'Receive' },
-];
 
 type Resource = 'gold' | 'food';
 
@@ -33,39 +24,16 @@ export class TransportDialogView extends CommandDialogView<
   TransportDialogContext,
   { gold: AmountFieldView; food: AmountFieldView }
 > {
-  public showDirection(direction: TransportDirection | undefined): void {
-    for (const button of this.directionButtons) {
-      button.classList.toggle(
-        styles.selected!,
-        button.dataset.direction === direction,
-      );
-    }
-  }
-
   public showTarget(
     direction: TransportDirection | undefined,
     target: TransportTarget | undefined,
   ): void {
-    this.targetPrompt.classList.toggle(styles.hidden!, direction === undefined);
+    const place = target ? `${target.number}: ${target.name}` : '';
 
-    if (direction) {
-      if (target) {
-        this.targetPrompt.textContent =
-          direction === 'receive'
-            ? `From ${target.number} ${target.name}`
-            : `To ${target.number} ${target.name}`;
-      } else {
-        this.targetPrompt.textContent =
-          direction === 'receive'
-            ? 'Transport from where?'
-            : 'Transport to where?';
-      }
-    }
-  }
-
-  public showAmounts(visible: boolean): void {
-    this.amounts.classList.toggle(styles.hidden!, !visible);
-    this.footer.classList.toggle(styles.hidden!, !visible);
+    this.title.textContent =
+      direction === 'receive'
+        ? `Transport from ${place}`
+        : `Transport to ${place}`;
   }
 
   public setRange(resource: Resource, max: number): void {
@@ -78,29 +46,11 @@ export class TransportDialogView extends CommandDialogView<
 
   protected renderBody(): TemplateResult {
     return html`
-      <div class=${styles.actions}>
-        ${DIRECTIONS.map(
-          ({ direction, label }) => html`<button
-            class=${styles.button}
-            type="button"
-            data-direction=${direction}
-            @click=${() => this.publish(new DirectionSelectedEvent(direction))}
-          >
-            ${label}
-          </button>`,
-        )}
-      </div>
-      <p
-        class="${styles.prompt} ${styles.section} ${styles.hidden}"
-        data-target
-      ></p>
-      <div class="${styles.section} ${styles.hidden}" data-amounts>
+      <h2 class=${styles.title} data-title></h2>
+      <div>
         ${this.renderAmount('gold')} ${this.renderAmount('food')}
       </div>
-      <div
-        class="${styles.actions} ${styles.section} ${styles.hidden}"
-        data-footer
-      >
+      <div class="${styles.actions} ${styles.footer}">
         <button
           class=${styles.button}
           type="button"
@@ -130,26 +80,14 @@ export class TransportDialogView extends CommandDialogView<
     `;
   }
 
-  private get directionButtons(): NodeListOf<HTMLButtonElement> {
-    return this.element.querySelectorAll<HTMLButtonElement>('[data-direction]');
-  }
-
   private range(resource: Resource): HTMLElement {
     return this.element.querySelector<HTMLElement>(
       `[data-range="${resource}"]`,
     )!;
   }
 
-  private get amounts(): HTMLElement {
-    return this.element.querySelector<HTMLElement>('[data-amounts]')!;
-  }
-
-  private get footer(): HTMLElement {
-    return this.element.querySelector<HTMLElement>('[data-footer]')!;
-  }
-
-  private get targetPrompt(): HTMLElement {
-    return this.element.querySelector<HTMLElement>('[data-target]')!;
+  private get title(): HTMLElement {
+    return this.element.querySelector<HTMLElement>('[data-title]')!;
   }
 
   private get confirmButton(): HTMLButtonElement {

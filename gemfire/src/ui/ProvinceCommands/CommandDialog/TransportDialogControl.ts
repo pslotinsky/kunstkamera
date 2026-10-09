@@ -7,7 +7,7 @@ import type { World } from '@/core/domain/World';
 
 import { AmountFieldControl } from '../AmountField/AmountFieldControl';
 import { CommandDialogControl } from './CommandDialogControl';
-import { DirectionSelectedEvent } from './DirectionSelectedEvent';
+import { CommandStep } from './CommandStep';
 import {
   TransportDialogView,
   type TransportTarget,
@@ -18,6 +18,16 @@ const RESOURCE_CEILING = 999;
 type Resource = 'gold' | 'food';
 
 const RESOURCES: readonly Resource[] = ['gold', 'food'];
+
+const DIRECTIONS: readonly { value: TransportDirection; label: string }[] = [
+  { value: 'send', label: 'Send' },
+  { value: 'receive', label: 'Receive' },
+];
+
+const QUESTIONS: Record<TransportDirection, string> = {
+  send: 'Transport to where?',
+  receive: 'Transport from where?',
+};
 
 export class TransportDialogControl extends CommandDialogControl<
   TransportDialogView,
@@ -38,6 +48,18 @@ export class TransportDialogControl extends CommandDialogControl<
       },
     );
     this.world = world;
+  }
+
+  public override get step(): CommandStep | undefined {
+    if (this.direction && this.target) {
+      return undefined;
+    }
+
+    return new CommandStep(
+      this.direction ? QUESTIONS[this.direction] : 'Send or receive?',
+      DIRECTIONS,
+      this.direction,
+    );
   }
 
   public override open(command: TransportCommand): void {
@@ -68,14 +90,14 @@ export class TransportDialogControl extends CommandDialogControl<
   }
 
   protected override onMount(): void {
-    this.subscribe(DirectionSelectedEvent, (event) => {
-      this.direction = event.direction as TransportDirection;
-      this.update();
-    });
-
     for (const resource of RESOURCES) {
       this.controls[resource].onChange(() => this.update());
     }
+  }
+
+  protected override selectChoice(value: string): void {
+    this.direction = value as TransportDirection;
+    this.update();
   }
 
   protected override setupCommand(command: TransportCommand): void {
@@ -88,9 +110,7 @@ export class TransportDialogControl extends CommandDialogControl<
   }
 
   private update(): void {
-    this.view.showDirection(this.direction);
     this.view.showTarget(this.direction, this.target);
-    this.view.showAmounts(this.target !== undefined);
 
     for (const resource of RESOURCES) {
       const max = this.getMax(resource);

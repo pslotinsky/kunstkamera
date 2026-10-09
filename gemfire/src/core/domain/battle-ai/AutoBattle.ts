@@ -5,7 +5,7 @@ import type { BattleUnit } from '../BattleUnit';
 import type { UnitOrder } from '../UnitOrder';
 import { TacticalPolicy } from './TacticalPolicy';
 
-export const AUTO_BATTLE_DEPTH = 1;
+const AUTO_BATTLE_DEPTH = 1;
 
 export class AutoBattle {
   private readonly battle: Battle;

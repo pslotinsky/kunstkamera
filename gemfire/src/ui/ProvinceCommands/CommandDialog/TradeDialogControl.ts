@@ -2,14 +2,26 @@ import type {
   TradeCommand,
   TradeDirection,
 } from '@/core/commands/province/TradeCommand';
+import type { MarketRateName } from '@/core/domain/MarketRate';
 import type { World } from '@/core/domain/World';
 
 import { AmountFieldControl } from '../AmountField/AmountFieldControl';
 import { CommandDialogControl } from './CommandDialogControl';
-import { DirectionSelectedEvent } from './DirectionSelectedEvent';
+import { CommandStep } from './CommandStep';
 import { TradeDialogView } from './TradeDialogView';
 
 const FOOD_CEILING = 999;
+
+const DIRECTIONS: readonly { value: TradeDirection; label: string }[] = [
+  { value: 'buy', label: 'Buy' },
+  { value: 'sell', label: 'Sell' },
+];
+
+const FLAVOR: Record<MarketRateName, string> = {
+  low: 'The prices are low.',
+  average: 'The prices are average.',
+  high: 'The prices are high.',
+};
 
 export class TradeDialogControl extends CommandDialogControl<
   TradeDialogView,
@@ -30,6 +42,12 @@ export class TradeDialogControl extends CommandDialogControl<
     this.world = world;
   }
 
+  public override get step(): CommandStep | undefined {
+    return this.direction === undefined
+      ? new CommandStep(FLAVOR[this.world.market.rate.name], DIRECTIONS)
+      : undefined;
+  }
+
   public override open(command: TradeCommand): void {
     this.direction = undefined;
     this.controls.amount.reset();
@@ -42,12 +60,12 @@ export class TradeDialogControl extends CommandDialogControl<
   }
 
   protected override onMount(): void {
-    this.subscribe(DirectionSelectedEvent, (event) => {
-      this.direction = event.direction as TradeDirection;
-      this.update();
-    });
-
     this.controls.amount.onChange(() => this.update());
+  }
+
+  protected override selectChoice(value: string): void {
+    this.direction = value as TradeDirection;
+    this.update();
   }
 
   protected override setupCommand(command: TradeCommand): void {
@@ -56,9 +74,7 @@ export class TradeDialogControl extends CommandDialogControl<
   }
 
   private update(): void {
-    this.view.showFlavor(this.world.market.rate.name);
     this.view.showDirection(this.direction);
-    this.view.showAmounts(this.direction !== undefined);
     this.controls.amount.setMax(this.max);
     this.view.setRange(this.direction, this.max);
     this.view.enableConfirm(this.controls.amount.value > 0);

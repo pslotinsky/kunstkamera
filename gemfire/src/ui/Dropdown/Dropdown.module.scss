@@ -1,3 +1,5 @@
+@use '@/ui/kit';
+
 .dropdown {
   position: relative;
 }
@@ -12,14 +14,14 @@
   font: inherit;
   color: inherit;
   text-align: left;
-  background: #1f2740;
-  border: 1px solid #2c3656;
+  background: var(--button);
+  border: 1px solid var(--edge);
   border-radius: 4px;
   cursor: pointer;
 }
 
 .trigger:hover {
-  border-color: #56649a;
+  border-color: var(--edge-bright);
 }
 
 .triggerLabel {
@@ -32,7 +34,7 @@
 
 .caret {
   margin-left: auto;
-  font-size: 1rem;
+  font-size: 1em;
   opacity: 0.6;
 }
 
@@ -47,8 +49,8 @@
   max-height: 240px;
   padding: 0.25rem;
   overflow-y: auto;
-  background: #141a2c;
-  border: 1px solid #2c3656;
+  background: var(--surface-900);
+  border: 1px solid var(--edge);
   border-radius: 6px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
 }
@@ -69,8 +71,8 @@
 }
 
 .option:hover {
-  border-color: #2c3656;
-  background: #1f2740;
+  border-color: var(--edge);
+  background: var(--button);
 }
 
 .icon {
@@ -90,8 +92,7 @@
 }
 
 .selected {
-  border-color: #56649a;
-  background: #2c3656;
+  @include kit.selected;
 }
 
 .hidden {

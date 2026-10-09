@@ -34,6 +34,7 @@ const EMPTY: Record<HireMode, string> = {
 
 export class HireMonsterDialogView extends CommandDialogView {
   protected override readonly rootClass = styles.root!;
+  protected override readonly isOverlay = true;
 
   protected override get hiddenClass(): string {
     return styles.hidden!;

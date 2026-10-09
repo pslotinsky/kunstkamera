@@ -230,7 +230,7 @@ export class BattleBoardView extends View<BattleBoardContext> {
     piece.className = styles.piece!;
     portrait.className = styles.portrait!;
     portrait.alt = unit.name;
-    count.className = styles.count!;
+    count.className = `${styles.count!} ${unit.side.isAttacker ? styles.attacker! : styles.defender!}`;
     piece.append(portrait, count);
 
     this.pieces.set(unit, piece);

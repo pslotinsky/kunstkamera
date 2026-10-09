@@ -82,7 +82,7 @@ export class AnnouncementsView extends View<
 
   public get template(): TemplateResult {
     return html`
-      <div class="${styles.root} ${styles.hidden}">
+      <div class="${styles.root} ${styles.hidden}" data-overlay>
         <figure class=${styles.scroll}>
           <img class=${styles.icon} data-icon alt="" />
           <div>

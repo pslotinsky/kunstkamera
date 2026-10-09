@@ -34,9 +34,9 @@ export class MoveTroopsDialogView extends CommandDialogView<
     if (target) {
       const claim = target.isNeutral() ? ' (claim)' : '';
 
-      this.targetPrompt.textContent = `To ${target.number} ${target.name}${claim}`;
+      this.targetPrompt.textContent = `Move to ${target}${claim}`;
     } else {
-      this.targetPrompt.textContent = 'Move troops where?';
+      this.targetPrompt.textContent = '';
     }
   }
 
@@ -60,9 +60,7 @@ export class MoveTroopsDialogView extends CommandDialogView<
 
   protected renderBody(): TemplateResult {
     return html`
-      <p class="${styles.prompt} ${styles.section}" data-target>
-        Move troops where?
-      </p>
+      <h2 class=${styles.title} data-target></h2>
       <div class="${styles.section} ${styles.hidden}" data-amounts>
         ${RESOURCES.map((resource) => this.renderAmount(resource))}
       </div>
@@ -71,7 +69,7 @@ export class MoveTroopsDialogView extends CommandDialogView<
         ${this.views.carry.template}
       </div>
       <div
-        class="${styles.actions} ${styles.section} ${styles.hidden}"
+        class="${styles.actions} ${styles.footer} ${styles.hidden}"
         data-footer
       >
         <button

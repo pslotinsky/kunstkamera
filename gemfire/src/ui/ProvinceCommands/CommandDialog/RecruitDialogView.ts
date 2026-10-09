@@ -26,7 +26,7 @@ export class RecruitDialogView extends CommandDialogView<
     return html`
       <p class=${styles.prompt} data-prompt></p>
       <div class=${styles.section}>${this.views.troops.template}</div>
-      <div class="${styles.actions} ${styles.section}">
+      <div class="${styles.actions} ${styles.footer}">
         <button
           class=${styles.button}
           type="button"

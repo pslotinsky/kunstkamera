@@ -1,11 +1,16 @@
-import type {
+import {
   DevelopCommand,
-  DevelopTarget,
+  type DevelopTarget,
 } from '@/core/commands/province/DevelopCommand';
 
 import { CommandDialogControl } from './CommandDialogControl';
+import { CommandStep } from './CommandStep';
 import { DevelopDialogView } from './DevelopDialogView';
-import { DevelopTargetSelectedEvent } from './DevelopTargetSelectedEvent';
+
+const TARGETS: readonly { value: DevelopTarget; label: string }[] = [
+  { value: 'cultivation', label: 'Cultivation' },
+  { value: 'protection', label: 'Protection' },
+];
 
 export class DevelopDialogControl extends CommandDialogControl<
   DevelopDialogView,
@@ -17,26 +22,27 @@ export class DevelopDialogControl extends CommandDialogControl<
     super(DevelopDialogView, { name });
   }
 
+  public override get step(): CommandStep {
+    return new CommandStep(
+      `Invest ${DevelopCommand.COST} gold in what?`,
+      TARGETS,
+      this.target,
+    );
+  }
+
   public override open(command: DevelopCommand): void {
     this.target = undefined;
-    this.update();
     super.open(command);
   }
 
-  protected override onMount(): void {
-    this.subscribe(DevelopTargetSelectedEvent, (event) => {
-      this.target = event.target as DevelopTarget;
-      this.update();
-    });
+  protected override selectChoice(value: string): void {
+    this.target = value as DevelopTarget;
+    this.submit();
   }
 
   protected override setupCommand(command: DevelopCommand): void {
     if (this.target) {
       command.target = this.target;
     }
-  }
-
-  private update(): void {
-    this.view.showTarget(this.target);
   }
 }

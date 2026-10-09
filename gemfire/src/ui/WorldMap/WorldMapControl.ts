@@ -42,6 +42,10 @@ export class WorldMapControl extends Control<WorldMapView> {
     this.view.addHighlighting(province.number, 'current');
   }
 
+  public dim(dimmed: boolean): void {
+    this.view.dim(dimmed);
+  }
+
   public actualizeProvince(province: Province): void {
     if (this.deferred) {
       this.deferred.set(province.number, province);

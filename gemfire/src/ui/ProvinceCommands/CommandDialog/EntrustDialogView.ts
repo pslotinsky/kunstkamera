@@ -23,8 +23,8 @@ export class EntrustDialogView extends CommandDialogView<EntrustDialogContext> {
     const lord = province?.governor?.name;
 
     this.target.textContent = province
-      ? `${province.name} — Lord ${lord}`
-      : 'Which territory?';
+      ? `Entrust ${province} to Lord ${lord}`
+      : '';
     this.modes.classList.toggle(styles.hidden!, !province);
     this.footer.classList.toggle(styles.hidden!, !province);
   }
@@ -40,7 +40,7 @@ export class EntrustDialogView extends CommandDialogView<EntrustDialogContext> {
 
   protected renderBody(): TemplateResult {
     return html`
-      <p class=${styles.prompt} data-target></p>
+      <h2 class=${styles.title} data-target></h2>
       <div class="${styles.actions} ${styles.hidden}" data-modes>
         ${MODES.map(
           ({ mode, label }) => html`<button
@@ -54,7 +54,7 @@ export class EntrustDialogView extends CommandDialogView<EntrustDialogContext> {
         )}
       </div>
       <div
-        class="${styles.actions} ${styles.section} ${styles.hidden}"
+        class="${styles.actions} ${styles.footer} ${styles.hidden}"
         data-footer
       >
         <button

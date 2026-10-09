@@ -17,7 +17,7 @@ export class GamePanelControl extends Control<
         context.world,
         context.commands,
         context.events,
-        context.overlayDialogs,
+        context.dialogs,
       ),
     });
   }

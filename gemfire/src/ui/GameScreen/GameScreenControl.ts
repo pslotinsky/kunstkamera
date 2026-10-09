@@ -1,5 +1,3 @@
-import { HireMonsterCommand } from '@/core/commands/province/HireMonsterCommand';
-import { ViewCommand } from '@/core/commands/province/ViewCommand';
 import type { Province } from '@/core/domain/Province';
 import { MonthStartedEvent } from '@/core/events/MonthStartedEvent';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
@@ -10,10 +8,9 @@ import type { EventClass } from '@/lib/EventBus';
 import { AnnouncementsControl } from '@/ui/Announcements/AnnouncementsControl';
 import { BattleReportControl } from '@/ui/BattleReport/BattleReportControl';
 import { CaptiveDialogControl } from '@/ui/CaptiveDialog/CaptiveDialogControl';
+import { CommandDialogsControl } from '@/ui/CommandDialogs/CommandDialogsControl';
 import { DefenseDialogControl } from '@/ui/DefenseDialog/DefenseDialogControl';
-import { FamilyOverviewControl } from '@/ui/FamilyOverview/FamilyOverviewControl';
 import { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
-import { HireMonsterDialogControl } from '@/ui/ProvinceCommands/CommandDialog/HireMonsterDialogControl';
 import { TargetingEndedEvent } from '@/ui/ProvinceCommands/TargetingEndedEvent';
 import { TargetingStartedEvent } from '@/ui/ProvinceCommands/TargetingStartedEvent';
 import { SearchReportControl } from '@/ui/SearchReport/SearchReportControl';
@@ -21,6 +18,7 @@ import { TurnHold } from '@/ui/TurnHold';
 import { WorldMapControl } from '@/ui/WorldMap/WorldMapControl';
 
 import { GameScreenView } from './GameScreenView';
+import { OverlayToggledEvent } from './OverlayToggledEvent';
 import type { GameScreenContext, GameScreenControls } from './types';
 
 const COMPUTER_TURN_MS = 400;
@@ -36,14 +34,7 @@ export class GameScreenControl extends Control<
   private readonly turnHold: TurnHold;
 
   public constructor(context: GameScreenContext) {
-    const hireMonster = new HireMonsterDialogControl(
-      HireMonsterCommand.name,
-      context.world,
-    );
-    const familyOverview = new FamilyOverviewControl(
-      ViewCommand.name,
-      context.world,
-    );
+    const commandDialogs = new CommandDialogsControl({ world: context.world });
 
     super(GameScreenView, context, {
       worldMap: new WorldMapControl({
@@ -54,10 +45,9 @@ export class GameScreenControl extends Control<
         world: context.world,
         commands: context.commands,
         events: context.events,
-        overlayDialogs: { hireMonster, familyOverview },
+        dialogs: commandDialogs,
       }),
-      familyOverview,
-      hireMonster,
+      commandDialogs,
       searchReport: new SearchReportControl({ events: context.events }),
       battleReport: new BattleReportControl({
         world: context.world,
@@ -99,6 +89,9 @@ export class GameScreenControl extends Control<
       this.startTargeting(event),
     );
     this.onWorldEvent(TargetingEndedEvent, () => this.endTargeting());
+    this.subscribe(OverlayToggledEvent, (event) =>
+      this.controls.worldMap.dim(event.isOpen),
+    );
     this.onWorldEvent(WarReportedEvent, (event) =>
       this.controls.worldMap.showWar(event.report, () =>
         this.controls.battleReport.showWar(event.report),

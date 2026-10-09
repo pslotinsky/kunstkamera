@@ -73,6 +73,7 @@ export class ClashView extends View<ClashContext> {
   }
 
   public show(clash: Clash): void {
+    this.calm();
     this.showCorner(
       'striker',
       clash.striker,
@@ -183,6 +184,11 @@ export class ClashView extends View<ClashContext> {
     standing.forEach((figure, index) => {
       figure.classList.toggle(styles.falling!, index < lost);
     });
+  }
+
+  private calm(): void {
+    this.rankOf('striker').classList.remove(styles.striking!);
+    this.rankOf('target').classList.remove(styles.struck!);
   }
 
   private restart(element: HTMLElement, style: string): void {

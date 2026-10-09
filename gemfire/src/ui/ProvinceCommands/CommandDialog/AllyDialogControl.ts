@@ -24,6 +24,10 @@ export class AllyDialogControl extends CommandDialogControl<
     this.update();
   }
 
+  public override get targetPrompt(): string {
+    return 'Ally with which family?';
+  }
+
   public override pickTarget(province: Province): void {
     if (this.command?.selectableTargets.includes(province.number)) {
       this.family = province.family;

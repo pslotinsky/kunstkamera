@@ -24,9 +24,7 @@ interface ChangeLordDialogContext {
 
 export class ChangeLordDialogView extends CommandDialogView<ChangeLordDialogContext> {
   public showTarget(province: Province | undefined): void {
-    this.target.textContent = province
-      ? `Province ${province}`
-      : 'Which territory?';
+    this.target.textContent = province ? `Change lord of ${province}` : '';
     this.question.classList.toggle(styles.hidden!, !province);
   }
 
@@ -80,7 +78,7 @@ export class ChangeLordDialogView extends CommandDialogView<ChangeLordDialogCont
 
   protected renderBody(): TemplateResult {
     return html`
-      <p class=${styles.prompt} data-target></p>
+      <h2 class=${styles.title} data-target></h2>
       <p
         class="${styles.prompt} ${styles.section} ${styles.hidden}"
         data-question
@@ -88,7 +86,7 @@ export class ChangeLordDialogView extends CommandDialogView<ChangeLordDialogCont
         Who shall rule?
       </p>
       <div class="${styles.lords} ${styles.section}" data-options></div>
-      <div class="${styles.actions} ${styles.section}">
+      <div class="${styles.actions} ${styles.footer}">
         <button
           class=${styles.button}
           type="button"

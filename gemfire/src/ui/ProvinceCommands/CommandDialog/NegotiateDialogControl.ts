@@ -34,6 +34,10 @@ export class NegotiateDialogControl extends CommandDialogControl<
     this.update();
   }
 
+  public override get targetPrompt(): string {
+    return 'Send an envoy where?';
+  }
+
   public override pickTarget(province: Province): void {
     if (this.command?.selectableTargets.includes(province.number)) {
       this.target = province;

@@ -16,9 +16,7 @@ export interface InfiltrationDialogContext extends CommandDialogContext {
 
 export class InfiltrationDialogView extends CommandDialogView<InfiltrationDialogContext> {
   public showTarget(target: Province | undefined): void {
-    this.targetPrompt.textContent = target
-      ? this.context.aim(target)
-      : this.context.question;
+    this.targetPrompt.textContent = target ? this.context.aim(target) : '';
   }
 
   public enableConfirm(enabled: boolean): void {
@@ -27,11 +25,11 @@ export class InfiltrationDialogView extends CommandDialogView<InfiltrationDialog
 
   protected renderBody(): TemplateResult {
     return html`
-      <p class=${styles.prompt} data-target>${this.context.question}</p>
+      <h2 class=${styles.title} data-target></h2>
       <p class="${styles.prompt} ${styles.section}">
         Your agents take the rest of the month.
       </p>
-      <div class="${styles.actions} ${styles.section}">
+      <div class="${styles.actions} ${styles.footer}">
         <button
           class=${styles.button}
           type="button"

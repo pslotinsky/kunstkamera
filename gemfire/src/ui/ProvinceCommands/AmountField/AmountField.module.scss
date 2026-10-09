@@ -21,8 +21,8 @@
   padding: 0.25rem 0.4rem;
   font: inherit;
   color: inherit;
-  background: #1f2740;
-  border: 1px solid #2c3656;
+  background: var(--button);
+  border: 1px solid var(--edge);
   border-radius: 4px;
 }
 
@@ -30,14 +30,14 @@
   padding: 0.25rem 0.75rem;
   font: inherit;
   color: inherit;
-  background: #1f2740;
-  border: 1px solid #2c3656;
+  background: var(--button);
+  border: 1px solid var(--edge);
   border-radius: 4px;
   cursor: pointer;
 }
 
 .button:hover:not(:disabled) {
-  border-color: #56649a;
+  border-color: var(--edge-bright);
 }
 
 .button:disabled {

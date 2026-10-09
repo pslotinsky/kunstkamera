@@ -28,9 +28,7 @@ export interface Candidate {
 
 export class NegotiateDialogView extends CommandDialogView {
   public showTarget(target: Province | undefined): void {
-    this.prompt.textContent = target
-      ? `Send an envoy into ${target}`
-      : 'Send an envoy where?';
+    this.prompt.textContent = target ? `Send an envoy to ${target}` : '';
   }
 
   public showMission(mission: NegotiationMission | undefined): void {
@@ -70,7 +68,7 @@ export class NegotiateDialogView extends CommandDialogView {
 
   protected renderBody(): TemplateResult {
     return html`
-      <p class=${styles.prompt} data-prompt>Send an envoy where?</p>
+      <h2 class=${styles.title} data-prompt></h2>
       <div class="${styles.actions} ${styles.hidden}" data-missions>
         ${MISSIONS.map(
           ({ mission, label }) => html`<button
@@ -84,7 +82,7 @@ export class NegotiateDialogView extends CommandDialogView {
         )}
       </div>
       <div class="${styles.lords} ${styles.section}" data-options></div>
-      <div class="${styles.actions} ${styles.section}">
+      <div class="${styles.actions} ${styles.footer}">
         <button
           class=${styles.button}
           type="button"

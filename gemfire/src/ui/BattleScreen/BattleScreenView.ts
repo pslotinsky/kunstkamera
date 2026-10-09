@@ -1,12 +1,15 @@
-import { html, type TemplateResult } from 'lit-html';
+import { html, render, type TemplateResult } from 'lit-html';
 
+import foodIconUrl from '@/assets/icons/food.webp';
 import type { Army } from '@/core/domain/Army';
 import type { Battle } from '@/core/domain/Battle';
 import type { BattleClock } from '@/core/domain/BattleClock';
 import { BattleSide } from '@/core/domain/BattleSide';
 import type { BattleUnit } from '@/core/domain/BattleUnit';
+import { Facing } from '@/core/domain/Facing';
 import { countTo } from '@/lib/dom/countTo';
 import { View } from '@/lib/View';
+import { unitPiece } from '@/ui/art/unitPiece';
 
 import { ActionCancelledEvent } from './ActionCancelledEvent';
 import { AutoChosenEvent } from './AutoChosenEvent';
@@ -43,6 +46,15 @@ const PLAYING_ITSELF: readonly Order[] = ['skip'];
 const WATCHING: readonly Order[] = [];
 const SIDES: readonly BattleSide[] = [BattleSide.attacker, BattleSide.defender];
 
+const DEFAULT_COLUMNS = 10;
+const DEFAULT_ROWS = 8;
+const BOARD_HEIGHT = 832;
+const FOOTER_HEIGHT = 64;
+const SIDE_MIN_WIDTH = 270;
+const SIDE_MAX_WIDTH = 400;
+const GAP = 16;
+const MARGIN = 16;
+
 export class BattleScreenView extends View<
   BattleScreenContext,
   BattleScreenViews
@@ -50,35 +62,41 @@ export class BattleScreenView extends View<
   protected readonly rootClass = styles.root!;
 
   private retreatable = true;
+  private columns = DEFAULT_COLUMNS;
+  private rows = DEFAULT_ROWS;
 
   public get template(): TemplateResult {
     return html`
       <section class="${styles.root} ${styles.hidden}">
-        <header class=${styles.header}>
-          <span class="${styles.army} ${styles.mine}">
-            <span class=${styles.commander} data-commander="attacker"></span>
-            <span class=${styles.supply} data-supply="attacker">
-              food <span data-food="attacker"></span>,
-              <span data-days="attacker"></span> days
+        <div class=${styles.stage}>
+          ${this.renderSide(BattleSide.attacker, styles.mine!)}
+          <div class=${styles.field}>${this.views.board.template}</div>
+          ${this.renderSide(BattleSide.defender, styles.theirs!)}
+          <div class="${styles.box} ${styles.placeBox}">
+            <span class=${styles.place} data-place></span>
+          </div>
+          <div class="${styles.box} ${styles.bar}">
+            ${this.renderOrders()}
+            <span class=${styles.center}>
+              <span class=${styles.prompt} data-prompt></span>
+              <span class="${styles.refuge} ${styles.gone}" data-refuge>
+                ${this.views.refuge.template}
+              </span>
             </span>
-          </span>
-          <span class=${styles.almanac}>
-            <span class=${styles.when}>
-              <span class=${styles.clock} data-clock></span>
-              <span class=${styles.place} data-place></span>
-            </span>
+            ${this.renderActions()}
+          </div>
+          <div class="${styles.box} ${styles.dayBox}">
+            <span class=${styles.clock} data-clock></span>
             ${this.views.sky.template}
-          </span>
-          <span class="${styles.army} ${styles.theirs}">
-            <span class=${styles.commander} data-commander="defender"></span>
-            <span class=${styles.supply} data-supply="defender">
-              food <span data-food="defender"></span>,
-              <span data-days="defender"></span> days
-            </span>
-          </span>
-        </header>
-        <div class=${styles.field}>${this.views.board.template}</div>
-        <footer class=${styles.footer}>
+          </div>
+        </div>
+        ${this.views.clash.template}
+      </section>
+    `;
+  }
+
+  private renderOrders(): TemplateResult {
+    return html`
           <span class=${styles.orders}>
             <button
               type="button"
@@ -116,10 +134,11 @@ export class BattleScreenView extends View<
               Stay
             </button>
           </span>
-          <span class=${styles.prompt} data-prompt></span>
-          <span class="${styles.refuge} ${styles.gone}" data-refuge>
-            ${this.views.refuge.template}
-          </span>
+    `;
+  }
+
+  private renderActions(): TemplateResult {
+    return html`
           <span class=${styles.actions}>
             <button
               type="button"
@@ -157,14 +176,12 @@ export class BattleScreenView extends View<
               Skip
             </button>
           </span>
-        </footer>
-        ${this.views.clash.template}
-      </section>
     `;
   }
 
   public show(): void {
     this.element.classList.remove(styles.hidden!);
+    this.fitStage();
   }
 
   public hide(): void {
@@ -172,8 +189,11 @@ export class BattleScreenView extends View<
   }
 
   public showBattle(battle: Battle): void {
-    this.element.style.setProperty('--columns', String(battle.field.columns));
-    this.element.style.setProperty('--rows', String(battle.field.rows));
+    this.columns = battle.field.columns;
+    this.rows = battle.field.rows;
+    this.element.style.setProperty('--columns', String(this.columns));
+    this.element.style.setProperty('--rows', String(this.rows));
+    this.fitStage();
     this.place.textContent = battle.field.name;
     for (const side of SIDES) {
       this.showCommander(side, battle.getArmy(side));
@@ -263,6 +283,63 @@ export class BattleScreenView extends View<
     this.ask('The enemy is moving…', WATCHING);
   }
 
+  private fitStage(): void {
+    const boardWidth = (BOARD_HEIGHT * this.columns) / this.rows;
+    const roomWidth = this.element.clientWidth - 2 * MARGIN;
+    const roomHeight = this.element.clientHeight - 2 * MARGIN;
+    const height = BOARD_HEIGHT + GAP + FOOTER_HEIGHT;
+    const narrowest = boardWidth + 2 * (SIDE_MIN_WIDTH + GAP);
+    const scale = Math.min(roomHeight / height, roomWidth / narrowest);
+    const side = (roomWidth / scale - boardWidth) / 2 - GAP;
+
+    if (scale > 0) {
+      this.element.style.setProperty('--stage-scale', String(scale));
+      this.element.style.setProperty('--footer', `${FOOTER_HEIGHT}px`);
+      this.element.style.setProperty(
+        '--side',
+        `${Math.min(side, SIDE_MAX_WIDTH)}px`,
+      );
+    }
+  }
+
+  private renderSide(side: BattleSide, tone: string): TemplateResult {
+    return html`
+      <aside class="${styles.side} ${tone}">
+        <div class=${styles.heraldry}>
+          <img class=${styles.crest} data-crest=${side} alt="" />
+          <img class=${styles.portrait} data-portrait=${side} alt="" />
+        </div>
+        <span class=${styles.commander} data-commander=${side}></span>
+        <span class=${styles.supply} data-supply=${side}>
+          <img class=${styles.foodIcon} src=${foodIconUrl} alt="Food" title="Food" />
+          <span data-food=${side}></span> ·
+          <span data-days=${side}></span> days
+        </span>
+        <hr class=${styles.divider} />
+        <ul class=${styles.roster} data-roster=${side}></ul>
+      </aside>
+    `;
+  }
+
+  private showRoster(side: BattleSide, battle: Battle): void {
+    render(
+      battle.getUnits(side).map((unit) => this.renderUnit(unit)),
+      this.rosterOf(side),
+    );
+  }
+
+  private renderUnit(unit: BattleUnit): TemplateResult {
+    const fallen = unit.isStanding ? '' : styles.fallen;
+
+    return html`
+      <li class="${styles.unit} ${fallen}">
+        <img class=${styles.unitIcon} src=${unitPiece(unit, Facing.south)} alt="" />
+        <span class=${styles.unitName}>${unit.name}</span>
+        <span class=${styles.strength}>${unit.strength}</span>
+      </li>
+    `;
+  }
+
   private ask(prompt: string, offered: readonly Order[]): void {
     this.prompt.textContent = prompt;
     this.refuge.classList.add(styles.gone!);
@@ -277,7 +354,16 @@ export class BattleScreenView extends View<
   }
 
   private showCommander(side: BattleSide, army: Army): void {
+    const family = this.context.world.findFamilyOf(army.commander);
+    const crest = this.crestOf(side);
+
     this.commanderOf(side).textContent = army.commander.name;
+    this.portraitOf(side).src = army.commander.portrait;
+    crest.classList.toggle(styles.gone!, !family);
+
+    if (family) {
+      crest.src = family.crest;
+    }
   }
 
   private showArmy(side: BattleSide, battle: Battle): void {
@@ -285,6 +371,7 @@ export class BattleScreenView extends View<
 
     this.spendFood(side, army.food);
     this.daysOf(side).textContent = String(army.supplyDays);
+    this.showRoster(side, battle);
   }
 
   private spendFood(side: BattleSide, food: number): void {
@@ -311,6 +398,22 @@ export class BattleScreenView extends View<
     return this.element.querySelector<HTMLElement>(
       `[data-commander="${side}"]`,
     )!;
+  }
+
+  private crestOf(side: BattleSide): HTMLImageElement {
+    return this.element.querySelector<HTMLImageElement>(
+      `[data-crest="${side}"]`,
+    )!;
+  }
+
+  private portraitOf(side: BattleSide): HTMLImageElement {
+    return this.element.querySelector<HTMLImageElement>(
+      `[data-portrait="${side}"]`,
+    )!;
+  }
+
+  private rosterOf(side: BattleSide): HTMLElement {
+    return this.element.querySelector<HTMLElement>(`[data-roster="${side}"]`)!;
   }
 
   private supplyOf(side: BattleSide): HTMLElement {

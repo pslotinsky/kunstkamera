@@ -8,9 +8,7 @@ import styles from './CommandDialog.module.scss';
 
 export class SearchDialogView extends CommandDialogView {
   public showTarget(target: Province | undefined): void {
-    this.targetPrompt.textContent = target
-      ? `Send a spy into ${target}`
-      : 'Spy on whose land?';
+    this.targetPrompt.textContent = target ? `Spy on ${target}` : '';
   }
 
   public enableConfirm(enabled: boolean): void {
@@ -19,11 +17,11 @@ export class SearchDialogView extends CommandDialogView {
 
   protected renderBody(): TemplateResult {
     return html`
-      <p class=${styles.prompt} data-target>Spy on whose land?</p>
+      <h2 class=${styles.title} data-target></h2>
       <p class="${styles.prompt} ${styles.section}">
         A spy takes 5 gold and the rest of the month.
       </p>
-      <div class="${styles.actions} ${styles.section}">
+      <div class="${styles.actions} ${styles.footer}">
         <button
           class=${styles.button}
           type="button"

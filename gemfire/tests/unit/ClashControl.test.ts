@@ -90,6 +90,39 @@ describe('ClashControl', () => {
     });
   });
 
+  it('shows a new clash with no leftover animation', () => {
+    vi.useFakeTimers();
+
+    const container = document.createElement('div');
+    const control = new ClashControl({ sounds: new SoundBoard() });
+    const freshClash = () =>
+      new Clash({
+        striker: muster(knights, 48, BattleSide.attacker),
+        target: muster(knights, 48, BattleSide.defender),
+        approach: 'front',
+        losses: 0,
+        backlash: 0,
+      });
+
+    control.mount(container);
+    control.play(freshClash(), () => {});
+    vi.advanceTimersByTime(800);
+
+    const striker = container.querySelector('[data-rank="striker"]')!;
+    const target = container.querySelector('[data-rank="target"]')!;
+
+    expect(striker.classList.contains(styles.striking!)).toBe(true);
+    expect(target.classList.contains(styles.struck!)).toBe(true);
+
+    control.stop();
+    control.play(freshClash(), () => {});
+
+    expect(striker.classList.contains(styles.striking!)).toBe(false);
+    expect(target.classList.contains(styles.struck!)).toBe(false);
+
+    vi.useRealTimers();
+  });
+
   it('sounds the strike and the blow at the clash beats', () => {
     vi.useFakeTimers();
 

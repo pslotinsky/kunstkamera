@@ -24,6 +24,10 @@ export class InfiltrationDialogControl extends CommandDialogControl<
     super.open(command);
   }
 
+  public override get targetPrompt(): string {
+    return this.context.question;
+  }
+
   public override pickTarget(province: Province): void {
     if (this.command?.selectableTargets.includes(province.number)) {
       this.target = province;

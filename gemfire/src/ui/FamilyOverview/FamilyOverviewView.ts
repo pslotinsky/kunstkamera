@@ -49,6 +49,7 @@ const STATUS_LABELS: Record<ProvinceStatus, string> = {
 
 export class FamilyOverviewView extends CommandDialogView {
   protected override readonly rootClass = styles.root!;
+  protected override readonly isOverlay = true;
 
   protected override get hiddenClass(): string {
     return styles.hidden!;

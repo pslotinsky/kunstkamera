@@ -5,10 +5,9 @@ import type { EventBus } from '@/lib/EventBus';
 import type { AnnouncementsControl } from '@/ui/Announcements/AnnouncementsControl';
 import type { BattleReportControl } from '@/ui/BattleReport/BattleReportControl';
 import type { CaptiveDialogControl } from '@/ui/CaptiveDialog/CaptiveDialogControl';
+import type { CommandDialogsControl } from '@/ui/CommandDialogs/CommandDialogsControl';
 import type { DefenseDialogControl } from '@/ui/DefenseDialog/DefenseDialogControl';
-import type { FamilyOverviewControl } from '@/ui/FamilyOverview/FamilyOverviewControl';
 import type { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
-import type { HireMonsterDialogControl } from '@/ui/ProvinceCommands/CommandDialog/HireMonsterDialogControl';
 import type { SearchReportControl } from '@/ui/SearchReport/SearchReportControl';
 import type { SoundBoard } from '@/ui/sound/SoundBoard';
 import type { WorldMapControl } from '@/ui/WorldMap/WorldMapControl';
@@ -23,8 +22,7 @@ export interface GameScreenContext {
 export type GameScreenControls = {
   readonly worldMap: WorldMapControl;
   readonly gamePanel: GamePanelControl;
-  readonly familyOverview: FamilyOverviewControl;
-  readonly hireMonster: HireMonsterDialogControl;
+  readonly commandDialogs: CommandDialogsControl;
   readonly searchReport: SearchReportControl;
   readonly battleReport: BattleReportControl;
   readonly captiveDialog: CaptiveDialogControl;

@@ -1,5 +1,6 @@
-import { html, nothing, type TemplateResult } from 'lit-html';
+import { html, nothing, render, type TemplateResult } from 'lit-html';
 
+import allyIconUrl from '@/assets/icons/ally.webp';
 import attackIconUrl from '@/assets/icons/attack.webp';
 import changeLordIconUrl from '@/assets/icons/change-lord.webp';
 import developIconUrl from '@/assets/icons/develop.webp';
@@ -10,7 +11,10 @@ import giveFoodIconUrl from '@/assets/icons/give-food.webp';
 import hireMonsterIconUrl from '@/assets/icons/hire-monster.webp';
 import militaryIconUrl from '@/assets/icons/military.webp';
 import moveTroopsIconUrl from '@/assets/icons/move-troops.webp';
+import negotiateIconUrl from '@/assets/icons/negotiate.webp';
+import plunderIconUrl from '@/assets/icons/plunder.webp';
 import recruitIconUrl from '@/assets/icons/recruit.webp';
+import sabotageIconUrl from '@/assets/icons/sabotage.webp';
 import searchIconUrl from '@/assets/icons/search.webp';
 import tradeIconUrl from '@/assets/icons/trade.webp';
 import transportIconUrl from '@/assets/icons/transport.webp';
@@ -24,9 +28,10 @@ import type { WorldCommand } from '@/core/commands/WorldCommand';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { View } from '@/lib/View';
 
-import { CommandDialogView } from './CommandDialog/CommandDialogView';
+import type { CommandStep } from './CommandDialog/CommandStep';
 import { CommandSelectedEvent } from './CommandSelectedEvent';
-import type { ProvinceCommandsContext, ProvinceCommandsViews } from './types';
+import { StepChosenEvent } from './StepChosenEvent';
+import type { ProvinceCommandsContext } from './types';
 
 import styles from './ProvinceCommands.module.scss';
 
@@ -46,16 +51,17 @@ const COMMAND_ICONS: Record<string, string> = {
   Trade: tradeIconUrl,
   'Give Food': giveFoodIconUrl,
   Transport: transportIconUrl,
+  Ally: allyIconUrl,
+  Negotiate: negotiateIconUrl,
+  Sabotage: sabotageIconUrl,
+  Plunder: plunderIconUrl,
   View: viewIconUrl,
   'Change Lord': changeLordIconUrl,
   Entrust: entrustIconUrl,
   Search: searchIconUrl,
 };
 
-export class ProvinceCommandsView extends View<
-  ProvinceCommandsContext,
-  ProvinceCommandsViews
-> {
+export class ProvinceCommandsView extends View<ProvinceCommandsContext> {
   protected readonly rootClass = styles.root!;
 
   public show(): void {
@@ -101,6 +107,10 @@ export class ProvinceCommandsView extends View<
     }
   }
 
+  public showStep(step: CommandStep | undefined): void {
+    render(step ? this.renderStep(step) : nothing, this.stepElement);
+  }
+
   public disableActions(): void {
     this.setActionsEnabled(false);
   }
@@ -112,7 +122,7 @@ export class ProvinceCommandsView extends View<
           ${this.context.commands.map((group) => this.renderGroupButton(group))}
         </div>
         ${this.context.commands.map((group) => this.renderCommands(group))}
-        ${this.renderDialogs()}
+        <div class=${styles.step} data-step></div>
         <button
           class=${styles.skipTurn}
           type="button"
@@ -124,12 +134,6 @@ export class ProvinceCommandsView extends View<
         </button>
       </section>
     `;
-  }
-
-  protected renderDialogs(): TemplateResult[] {
-    return Object.values(this.views)
-      .filter((view) => view instanceof CommandDialogView)
-      .map((view) => view.template);
   }
 
   protected renderGroupButton(group: CommandGroup): TemplateResult {
@@ -231,5 +235,30 @@ export class ProvinceCommandsView extends View<
     );
 
     section?.classList.remove(styles.hidden!);
+  }
+
+  private renderStep(step: CommandStep): TemplateResult {
+    return html`
+      <p class=${styles.prompt}>${step.prompt}</p>
+      ${
+        step.choices.length > 0
+          ? html`<div class=${styles.choices}>
+              ${step.choices.map(
+                (choice) => html`<button
+                  class="${styles.choice} ${step.isChosen(choice) ? styles.chosen : ''}"
+                  type="button"
+                  @click=${() => this.publish(new StepChosenEvent(choice.value))}
+                >
+                  ${choice.label}
+                </button>`,
+              )}
+            </div>`
+          : nothing
+      }
+    `;
+  }
+
+  private get stepElement(): HTMLElement {
+    return this.element.querySelector<HTMLElement>('[data-step]')!;
   }
 }

@@ -19,7 +19,7 @@ export class SearchReportView extends View<SearchReportContext> {
 
   public get template(): TemplateResult {
     return html`
-      <section class="${styles.root} ${styles.hidden}">
+      <section class="${styles.root} ${styles.hidden}" data-overlay>
         <header class=${styles.header}>
           <h2 class=${styles.title} data-title></h2>
           <button

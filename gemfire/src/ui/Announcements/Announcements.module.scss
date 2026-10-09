@@ -1,18 +1,11 @@
+@use '@/ui/kit';
+
 .root {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 4;
+  @include kit.dialog(30rem);
+
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  width: min(30rem, calc(100% - 3rem));
-  padding: 1rem 1.25rem;
-  background: rgba(12, 16, 28, 0.96);
-  border: 1px solid #2c3656;
-  border-radius: 8px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
-  transform: translate(-50%, -50%);
 }
 
 .scroll {
@@ -27,18 +20,18 @@
   width: 52px;
   aspect-ratio: 1;
   object-fit: cover;
-  border: 1px solid #2c3656;
+  border: 1px solid var(--edge);
   border-radius: 6px;
 }
 
 .text {
-  font-size: 0.95rem;
+  font-size: 0.95em;
   line-height: 1.4;
 }
 
 .detail {
   margin: 0.2rem 0 0;
-  font-size: 0.8rem;
+  font-size: 0.8em;
   opacity: 0.75;
 }
 
@@ -53,7 +46,7 @@
 }
 
 .askLabel {
-  font-size: 0.8rem;
+  font-size: 0.8em;
   opacity: 0.75;
 }
 
@@ -65,7 +58,7 @@
 }
 
 .pending {
-  font-size: 0.75rem;
+  font-size: 0.75em;
   opacity: 0.7;
 }
 
@@ -73,14 +66,14 @@
   padding: 0.25rem 0.9rem;
   font: inherit;
   color: inherit;
-  background: #1f2740;
-  border: 1px solid #2c3656;
+  background: var(--button);
+  border: 1px solid var(--edge);
   border-radius: 4px;
   cursor: pointer;
 }
 
 .action:hover {
-  border-color: #56649a;
+  border-color: var(--edge-bright);
 }
 
 .take {

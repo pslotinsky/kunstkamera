@@ -1,13 +1,15 @@
 .root {
-  position: relative;
-  display: block;
-  width: 4.5rem;
-  height: 2.1rem;
+  --stretch: 2.4;
+
+  position: absolute;
+  inset: 0;
   overflow: hidden;
-  background-color: #1b2237;
-  border: 1px solid #2c3656;
-  border-radius: 1.1rem 1.1rem 0.2rem 0.2rem;
-  transition: background-color 700ms ease;
+}
+
+.orbit {
+  position: absolute;
+  inset: 0;
+  scale: var(--stretch) 1;
 }
 
 .wheel {
@@ -16,8 +18,8 @@
   position: absolute;
   bottom: 0;
   left: 50%;
-  width: 3rem;
-  height: 3rem;
+  width: 6.6rem;
+  height: 6.6rem;
   translate: -50% 50%;
   rotate: var(--turn);
   transition: rotate 700ms ease;
@@ -26,39 +28,52 @@
 .body {
   position: absolute;
   left: 50%;
-  width: 1rem;
-  height: 1rem;
-  margin-left: -0.5rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-left: -0.55rem;
   rotate: calc(-1 * var(--turn));
+  scale: calc(1 / var(--stretch)) 1;
+  image-rendering: pixelated;
   transition: rotate 700ms ease;
 }
 
 .sun {
-  top: -0.5rem;
+  top: -0.55rem;
 }
 
 .moon {
-  bottom: -0.5rem;
+  bottom: -0.55rem;
+}
+
+.sky {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 700ms ease;
 }
 
 .sunrise {
-  background-color: var(--sky-sunrise);
+  background: linear-gradient(#4985fa, #8f8ee1 30%, #da99b7 55%, #f9a98d);
 }
 
 .noon {
-  background-color: var(--sky-noon);
+  background: linear-gradient(#0187fa, #36a2f8 30%, #41b1f9 55%, #68c1f9);
 }
 
 .sunset {
-  background-color: var(--sky-sunset);
+  background: linear-gradient(#5a368c, #a64475 30%, #f16750 55%, #fa7f48);
 }
 
 .midnight {
-  background-color: var(--sky-midnight);
+  background: linear-gradient(#03103e, #0c1c5e 30%, #122777 55%, #19399d);
+}
+
+.shown {
+  opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .root,
+  .sky,
   .wheel,
   .body {
     transition: none;
