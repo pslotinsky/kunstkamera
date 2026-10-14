@@ -55,12 +55,11 @@
 .portrait {
   flex: 0 0 auto;
   width: 80px;
-  aspect-ratio: 64 / 80;
+  aspect-ratio: 1;
   object-fit: contain;
   padding: 2px;
   border: 1px solid var(--trim);
   border-radius: 3px;
-  image-rendering: pixelated;
 }
 
 .hint {

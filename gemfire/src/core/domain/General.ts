@@ -35,7 +35,7 @@ export class General {
   }
 
   public get portrait(): string {
-    return `/portraits/${this.name.toLowerCase()}.png`;
+    return `/portraits/${this.name.toLowerCase()}.webp`;
   }
 
   public age(amount: number): void {

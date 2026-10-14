@@ -121,10 +121,9 @@
 .portrait {
   flex: 0 0 auto;
   width: 52px;
-  aspect-ratio: 64 / 80;
+  aspect-ratio: 1;
   object-fit: contain;
   border-radius: 3px;
-  image-rendering: pixelated;
 }
 
 .identity {

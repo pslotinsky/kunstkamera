@@ -66,12 +66,14 @@
 
 .heraldry {
   display: flex;
-  gap: 0.75rem;
+  gap: 1.5rem;
   align-items: center;
   justify-content: center;
+  width: 100%;
 }
 
 .crest {
+  flex: 0 0 auto;
   width: 4.5rem;
   aspect-ratio: 48 / 62;
   object-fit: contain;
@@ -79,13 +81,13 @@
 }
 
 .portrait {
-  width: 5.5rem;
-  aspect-ratio: 64 / 80;
-  object-fit: contain;
+  flex: 0 1 6rem;
+  min-width: 0;
+  aspect-ratio: 1;
+  object-fit: cover;
   padding: 2px;
   border: 1px solid var(--trim);
   border-radius: 3px;
-  image-rendering: pixelated;
 }
 
 .commander {
