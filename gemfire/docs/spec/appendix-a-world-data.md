@@ -17,9 +17,9 @@ Scenario ownership, rulers, vassals, Gems, starting resources, and scenario-spec
 
 ---
 
-# A.1 Map Overview
+## A.1 Map Overview
 
-## Fixed Map
+### Fixed Map
 
 Gemfire uses a fixed world map of Ishmeria.
 
@@ -42,7 +42,7 @@ The geography itself remains stable.
 
 ---
 
-## Province Count
+### Province Count
 
 The map contains:
 
@@ -54,7 +54,7 @@ Province numbers are stable across scenarios.
 
 ---
 
-## Map Reference
+### Map Reference
 
 The numbered province map is the primary spatial reference for Ishmeria.
 
@@ -67,7 +67,7 @@ The player interacts with the world primarily through these numbered provinces.
 
 ---
 
-## Visual References
+### Visual References
 
 The printed Ishmeria map is useful for:
 
@@ -84,7 +84,7 @@ The Spriters Resource asset sheet is useful for:
 
 ---
 
-# A.2 Province List
+## A.2 Province List
 
 |   # | Province |
 | --: | -------- |
@@ -121,9 +121,9 @@ The Spriters Resource asset sheet is useful for:
 
 ---
 
-# A.3 Province Adjacency
+## A.3 Province Adjacency
 
-## Source Note
+### Source Note
 
 The adjacency table is primarily reconstructed from Andrew Que’s Gemfire Complete Guide land pages.
 
@@ -143,7 +143,7 @@ Confidence: High.
 
 ---
 
-## Overview
+### Overview
 
 Province adjacency determines:
 
@@ -157,7 +157,7 @@ A province can only be directly attacked from an adjacent province.
 
 ---
 
-## Adjacency Table
+### Adjacency Table
 
 |   # | Province | Adjacent Provinces                                                          |
 | --: | -------- | --------------------------------------------------------------------------- |
@@ -194,7 +194,7 @@ A province can only be directly attacked from an adjacent province.
 
 ---
 
-## Adjacency Graph
+### Adjacency Graph
 
 ```mermaid
 graph TD
@@ -291,9 +291,9 @@ graph TD
 
 ---
 
-# A.4 Strategic Geography
+## A.4 Strategic Geography
 
-## Connection Count
+### Connection Count
 
 The number of adjacent provinces strongly affects strategic value.
 
@@ -332,7 +332,7 @@ The number of adjacent provinces strongly affects strategic value.
 
 ---
 
-## Major Hub Provinces
+### Major Hub Provinces
 
 The highest-connectivity provinces are:
 
@@ -348,7 +348,7 @@ The highest-connectivity provinces are:
 
 ---
 
-## Bridge Provinces
+### Bridge Provinces
 
 Some provinces connect major regions and are strategically important even if they are not the largest hubs.
 
@@ -362,7 +362,7 @@ Some provinces connect major regions and are strategically important even if the
 
 ---
 
-## Strategic Notes
+### Strategic Notes
 
 The map is not evenly connected.
 
@@ -370,9 +370,9 @@ Several provinces act as strategic control points. Losing a hub can expose many 
 
 ---
 
-# A.5 Geographic Regions
+## A.5 Geographic Regions
 
-## Approximate Regional Grouping
+### Approximate Regional Grouping
 
 The following grouping is based on map position and adjacency.
 
@@ -388,9 +388,9 @@ These regions are descriptive, not confirmed internal game regions.
 
 ---
 
-# A.6 Active Families
+## A.6 Active Families
 
-## Overview
+### Overview
 
 Gemfire contains more active families than the seven major houses often discussed in summaries.
 
@@ -412,7 +412,7 @@ Confirmed active families include:
 
 ---
 
-## Boundary Note
+### Boundary Note
 
 This appendix lists families only at world level.
 
@@ -426,9 +426,9 @@ Scenario-specific family data includes:
 
 ---
 
-# A.7 World Data Summary
+## A.7 World Data Summary
 
-## Core Facts
+### Core Facts
 
 ```text
 World: Ishmeria
@@ -442,7 +442,7 @@ Movement / Attack: Based on province adjacency
 
 ---
 
-## Strategic Model
+### Strategic Model
 
 ```mermaid
 flowchart TD
@@ -464,7 +464,7 @@ flowchart TD
 
 ---
 
-# Open Data Questions
+## Open Data Questions
 
 The following data remains to be fully verified:
 
@@ -477,7 +477,7 @@ The following data remains to be fully verified:
 
 ---
 
-# Summary
+## Summary
 
 Appendix A defines Ishmeria as a fixed 30-province map.
 

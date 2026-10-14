@@ -13,6 +13,8 @@ import type { ResourceKey } from '@/core/domain/Resources';
 import type { Stats } from '@/core/domain/Stats';
 import { countTo } from '@/lib/dom/countTo';
 import { View } from '@/lib/View';
+import { getFamilyCrestUrl } from '@/ui/art/getFamilyCrestUrl';
+import { getGeneralPortraitUrl } from '@/ui/art/getGeneralPortraitUrl';
 
 import styles from './ProvinceInfo.module.scss';
 
@@ -130,7 +132,7 @@ export class ProvinceInfoView extends View {
         family
           ? html`<img
               class=${styles.crest}
-              src=${family.crest}
+              src=${getFamilyCrestUrl(family)}
               alt="${familyName} crest"
             />`
           : nothing
@@ -146,7 +148,7 @@ export class ProvinceInfoView extends View {
     return html`
       <img
         class=${styles.portrait}
-        src=${governor.portrait}
+        src=${getGeneralPortraitUrl(governor)}
         alt=${governor.name}
       />
       <h2>${governor.name}</h2>

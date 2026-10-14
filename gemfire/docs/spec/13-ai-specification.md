@@ -17,9 +17,9 @@ The main role of the AI is not to outthink the player through complex planning. 
 
 ---
 
-# 13.1 AI Layers
+## 13.1 AI Layers
 
-## Overview
+### Overview
 
 Gemfire’s AI can be divided into several layers:
 
@@ -35,7 +35,7 @@ AI
 
 ---
 
-## Layer Model
+### Layer Model
 
 ```mermaid
 flowchart TD
@@ -51,7 +51,7 @@ flowchart TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 AI operates on the same major layers as the player:
 
@@ -65,9 +65,9 @@ Available evidence suggests that the AI relies on simple rules rather than deep 
 
 ---
 
-# 13.2 Province / Entrust AI
+## 13.2 Province / Entrust AI
 
-## Overview
+### Overview
 
 Entrust allows the player to delegate control of a specific province to the computer.
 
@@ -77,7 +77,7 @@ It operates at the province level.
 
 ---
 
-## Function
+### Function
 
 An entrusted province:
 
@@ -88,7 +88,7 @@ An entrusted province:
 
 ---
 
-## Known Use Cases
+### Known Use Cases
 
 Entrust is most useful:
 
@@ -99,7 +99,7 @@ Entrust is most useful:
 
 ---
 
-## Limitations
+### Limitations
 
 Entrust AI is not considered optimal.
 
@@ -112,7 +112,7 @@ It should not be relied on for:
 
 ---
 
-## Current Understanding
+### Current Understanding
 
 The exact priority order of Entrust AI is unknown.
 
@@ -128,7 +128,7 @@ It is not confirmed how the AI chooses between:
 
 ---
 
-## Design Observation
+### Design Observation
 
 Entrust AI is a convenience system.
 
@@ -136,9 +136,9 @@ Its purpose is to reduce management burden, not to play optimally for the player
 
 ---
 
-# 13.3 Strategic Map AI
+## 13.3 Strategic Map AI
 
-## Overview
+### Overview
 
 Strategic AI controls houses on the global map.
 
@@ -152,7 +152,7 @@ It chooses:
 
 ---
 
-## Target Selection
+### Target Selection
 
 AI appears inclined to attack weak neighbouring provinces.
 
@@ -165,7 +165,7 @@ Common targets include:
 
 ---
 
-## Local Strength Comparison
+### Local Strength Comparison
 
 AI likely uses simple local strength evaluation.
 
@@ -183,7 +183,7 @@ Exact formula remains unresolved.
 
 ---
 
-## Strategic Model
+### Strategic Model
 
 ```mermaid
 flowchart TD
@@ -206,7 +206,7 @@ flowchart TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 Strategic AI appears opportunistic.
 
@@ -214,9 +214,9 @@ It does not necessarily conduct deep campaigns, but it can punish weak defence a
 
 ---
 
-# 13.4 Economic AI
+## 13.4 Economic AI
 
-## Overview
+### Overview
 
 Economic AI maintains provinces at a basic level.
 
@@ -233,7 +233,7 @@ Exact priorities are not confirmed, but observed behaviour and advisor hints sug
 
 ---
 
-## Likely Priorities
+### Likely Priorities
 
 AI likely uses simple province-maintenance heuristics:
 
@@ -248,7 +248,7 @@ Exact logic remains unknown.
 
 ---
 
-## Important Resources
+### Important Resources
 
 AI must manage the same basic resources as the player:
 
@@ -263,7 +263,7 @@ AI must manage the same basic resources as the player:
 
 ---
 
-## Design Observation
+### Design Observation
 
 Economic AI does not appear to deeply optimize long-term development.
 
@@ -271,9 +271,9 @@ Its role is to keep provinces active and prevent the world from becoming static.
 
 ---
 
-# 13.5 Diplomatic AI
+## 13.5 Diplomatic AI
 
-## Overview
+### Overview
 
 Diplomatic AI handles political actions for computer-controlled houses.
 
@@ -283,7 +283,7 @@ There are also observations suggesting that AI may use some hostile diplomatic a
 
 ---
 
-## Alliance Management
+### Alliance Management
 
 Known behaviour:
 
@@ -293,7 +293,7 @@ Known behaviour:
 
 ---
 
-## Other Diplomacy
+### Other Diplomacy
 
 AI may use or attempt to use:
 
@@ -305,13 +305,13 @@ The frequency and exact targeting rules are not confirmed.
 
 ---
 
-## Surrender
+### Surrender
 
 It is not confirmed that AI actively uses Surrender as a strategic tool in the same way as the player.
 
 ---
 
-## Diplomatic AI Model
+### Diplomatic AI Model
 
 ```mermaid
 flowchart TD
@@ -327,7 +327,7 @@ flowchart TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 Diplomatic AI is present but limited.
 
@@ -335,9 +335,9 @@ It supports instability on the political map, but it does not appear to function
 
 ---
 
-# 13.6 Tactical Battle AI
+## 13.6 Tactical Battle AI
 
-## Overview
+### Overview
 
 Tactical AI controls an army in battle when the side is computer-controlled or when the player enables Auto.
 
@@ -345,7 +345,7 @@ This is one of the most visible parts of Gemfire’s AI.
 
 ---
 
-## Core Behaviour
+### Core Behaviour
 
 Tactical AI appears objective-driven.
 
@@ -359,7 +359,7 @@ Observed priorities include:
 
 ---
 
-## Flag Rush
+### Flag Rush
 
 AI often moves aggressively toward the player’s flag.
 
@@ -372,7 +372,7 @@ This creates pressure, but also makes the AI vulnerable to:
 
 ---
 
-## Flag Defense Response
+### Flag Defense Response
 
 If the AI’s own flag is threatened, it can redirect units to protect it.
 
@@ -384,7 +384,7 @@ AI redirects units to cover flag
 
 ---
 
-## Retreat Behaviour
+### Retreat Behaviour
 
 AI may retreat if it considers the battle lost.
 
@@ -399,7 +399,7 @@ Exact rules remain unresolved.
 
 ---
 
-## Tactical AI Weaknesses
+### Tactical AI Weaknesses
 
 AI struggles with positional nuance:
 
@@ -411,7 +411,7 @@ AI struggles with positional nuance:
 
 ---
 
-## Tactical AI Model
+### Tactical AI Model
 
 ```mermaid
 flowchart TD
@@ -440,7 +440,7 @@ flowchart TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 Tactical AI is not a sophisticated tactical opponent.
 
@@ -448,9 +448,9 @@ It creates pressure through objectives, but skilled positioning can exploit its 
 
 ---
 
-# 13.7 Auto-Control and Auto-Combat
+## 13.7 Auto-Control and Auto-Combat
 
-## Auto in Tactical Battle
+### Auto in Tactical Battle
 
 The player can use Auto to let the computer control the tactical battle.
 
@@ -458,7 +458,7 @@ This delegates tactical unit decisions to AI.
 
 ---
 
-## Auto-Control Weakness
+### Auto-Control Weakness
 
 Auto is generally unreliable for important battles.
 
@@ -472,7 +472,7 @@ Because tactical AI is positionally weak, Auto may:
 
 ---
 
-## Map-Level Automated Resolution
+### Map-Level Automated Resolution
 
 AI-controlled or entrusted battles may resolve without the player manually controlling the tactical battlefield.
 
@@ -490,7 +490,7 @@ Computer resolves or controls battle
 
 ---
 
-## Unknowns
+### Unknowns
 
 It is not confirmed whether map-level auto-combat uses:
 
@@ -500,7 +500,7 @@ It is not confirmed whether map-level auto-combat uses:
 
 ---
 
-## Design Observation
+### Design Observation
 
 Auto systems exist primarily to reduce friction and speed up play.
 
@@ -508,9 +508,9 @@ They are not a replacement for careful manual control in important battles.
 
 ---
 
-# 13.8 AI and Difficulty
+## 13.8 AI and Difficulty
 
-## No Confirmed Resource Cheats
+### No Confirmed Resource Cheats
 
 No confirmed evidence has been found that the AI receives special economic bonuses.
 
@@ -524,7 +524,7 @@ There is no confirmed evidence that AI receives:
 
 ---
 
-## AI Weakness as Balance
+### AI Weakness as Balance
 
 AI is often described as weak or simplistic.
 
@@ -541,7 +541,7 @@ The challenge of Gemfire comes less from AI brilliance and more from:
 
 ---
 
-## Design Observation
+### Design Observation
 
 Gemfire uses systemic pressure more than AI intelligence.
 
@@ -549,9 +549,9 @@ Even simple AI can be dangerous when the player is surrounded, under-supplied, o
 
 ---
 
-# 13.9 AI Interaction with Other Systems
+## 13.9 AI Interaction with Other Systems
 
-## AI and Turn Structure
+### AI and Turn Structure
 
 Because the game is province-based, AI operates through province activations.
 
@@ -561,7 +561,7 @@ Instead, each province can make a local decision.
 
 ---
 
-## AI and Economy
+### AI and Economy
 
 AI uses the same economic resources as the player:
 
@@ -574,7 +574,7 @@ AI uses the same economic resources as the player:
 
 ---
 
-## AI and Characters
+### AI and Characters
 
 AI controls rulers and vassals.
 
@@ -588,7 +588,7 @@ It can:
 
 ---
 
-## AI and Gems
+### AI and Gems
 
 AI can use Gems as Fifth Units when available.
 
@@ -598,7 +598,7 @@ No confirmed evidence has been found that AI ignores Gem cooldown.
 
 ---
 
-## AI and Events
+### AI and Events
 
 AI-controlled provinces appear subject to normal event systems.
 
@@ -606,9 +606,9 @@ No confirmed evidence has been found that AI is immune to disasters, bad events,
 
 ---
 
-# 13.10 Reconstructed AI System
+## 13.10 Reconstructed AI System
 
-## Full Model
+### Full Model
 
 ```mermaid
 flowchart TD
@@ -639,9 +639,9 @@ flowchart TD
 
 ---
 
-# 13.11 Design Summary
+## 13.11 Design Summary
 
-## AI Role
+### AI Role
 
 AI in Gemfire exists to:
 
@@ -654,7 +654,7 @@ AI in Gemfire exists to:
 
 ---
 
-## AI Limitations
+### AI Limitations
 
 AI is limited by:
 
@@ -666,7 +666,7 @@ AI is limited by:
 
 ---
 
-## Strategic Consequence
+### Strategic Consequence
 
 The player is not challenged primarily by a brilliant opponent.
 
@@ -690,7 +690,7 @@ Simple but persistent AI
 
 ---
 
-# Open Questions
+## Open Questions
 
 The following AI details remain unresolved:
 
@@ -705,7 +705,7 @@ The following AI details remain unresolved:
 
 ---
 
-# Summary
+## Summary
 
 Gemfire’s AI is not a deep strategic planner.
 

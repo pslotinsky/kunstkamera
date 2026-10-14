@@ -1,0 +1,29 @@
+.content {
+  min-width: 0;
+  width: 100%;
+  max-width: 64rem;
+  margin-inline: auto;
+  padding: 3rem 1.5rem 6rem;
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+  }
+
+  > p {
+    margin-block: 1rem 1.5rem;
+    color: var(--color-fd-muted-foreground);
+  }
+}
+
+.content:focus {
+  outline: none;
+}
+
+@media (max-width: 760px) {
+  .content {
+    padding-top: 1.5rem;
+  }
+}

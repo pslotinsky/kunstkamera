@@ -6,6 +6,7 @@ import type { BattleUnit } from '@/core/domain/BattleUnit';
 import type { Cell } from '@/core/domain/Cell';
 import { Facing } from '@/core/domain/Facing';
 import { View } from '@/lib/View';
+import { getPublicAssetUrl } from '@/ui/art/getPublicAssetUrl';
 import type { SoundBoard } from '@/ui/sound/SoundBoard';
 
 import { unitPiece } from '../../art/unitPiece';
@@ -87,7 +88,7 @@ export class BattleBoardView extends View<BattleBoardContext> {
     const element = this.cellElements.get(cell);
 
     if (element) {
-      element.style.backgroundImage = `url(/battle-map/${sprite}.webp)`;
+      element.style.backgroundImage = `url(${getPublicAssetUrl(`battle-map/${sprite}.webp`)})`;
     }
   }
 
@@ -215,7 +216,7 @@ export class BattleBoardView extends View<BattleBoardContext> {
     element.className = styles.cell!;
     element.dataset.column = String(cell.column);
     element.dataset.row = String(cell.row);
-    element.style.backgroundImage = `url(/battle-map/${sprite}.webp)`;
+    element.style.backgroundImage = `url(${getPublicAssetUrl(`battle-map/${sprite}.webp`)})`;
     this.putOn(element, cell);
 
     this.cellElements.set(cell, element);

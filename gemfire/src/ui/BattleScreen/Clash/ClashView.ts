@@ -7,6 +7,7 @@ import { Facing } from '@/core/domain/Facing';
 import type { Landscape } from '@/core/domain/Province';
 import { countTo } from '@/lib/dom/countTo';
 import { View } from '@/lib/View';
+import { getPublicAssetUrl } from '@/ui/art/getPublicAssetUrl';
 import type { SoundBoard } from '@/ui/sound/SoundBoard';
 
 import { unitPiece } from '../../art/unitPiece';
@@ -198,7 +199,9 @@ export class ClashView extends View<ClashContext> {
   }
 
   private paintBackdrop(): void {
-    const source = `/landscape/${this.landscape}-${this.phase}.webp`;
+    const source = getPublicAssetUrl(
+      `landscape/${this.landscape}-${this.phase}.webp`,
+    );
 
     this.backdrop.style.backgroundImage = `url(${source})`;
   }

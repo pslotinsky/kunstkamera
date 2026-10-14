@@ -18,9 +18,9 @@ Gemfire is not only a game about territories. A house’s power depends heavily 
 
 ---
 
-# 5.1 Character Model
+## 5.1 Character Model
 
-## Overview
+### Overview
 
 Each character is a named general associated with one of the houses of Ishmeria.
 
@@ -40,7 +40,7 @@ A character can:
 
 ---
 
-## Roles
+### Roles
 
 A character may perform different roles depending on context.
 
@@ -54,7 +54,7 @@ A character may perform different roles depending on context.
 
 ---
 
-## Design Observation
+### Design Observation
 
 A character is not a tactical military unit.
 
@@ -66,9 +66,9 @@ Characters are best understood as strategic agents who connect governance, diplo
 
 ---
 
-# 5.2 Character Attributes
+## 5.2 Character Attributes
 
-## Core Attributes
+### Core Attributes
 
 Gemfire characters use three primary attributes:
 
@@ -82,7 +82,7 @@ The full 64-general roster and record format is canonical in Appendix B §B.2.
 
 ---
 
-## WAR / Military
+### WAR / Military
 
 WAR represents a character’s military ability.
 
@@ -98,7 +98,7 @@ Exact damage formulas and WAR modifiers remain unresolved.
 
 ---
 
-## INT / Domestic
+### INT / Domestic
 
 INT represents a character’s administrative and organizational ability.
 
@@ -114,7 +114,7 @@ INT may also be involved in resisting sabotage or other hostile actions, but exa
 
 ---
 
-## CHA / Charm
+### CHA / Charm
 
 CHA represents personal influence and ability to inspire or persuade.
 
@@ -124,9 +124,9 @@ CHA is also likely relevant to some diplomatic and recruitment-related systems, 
 
 ---
 
-# 5.3 Lords and Governors
+## 5.3 Lords and Governors
 
-## Overview
+### Overview
 
 A province may be governed by a lord / governor.
 
@@ -134,7 +134,7 @@ The governing character affects the quality of province administration.
 
 ---
 
-## Responsibilities
+### Responsibilities
 
 A lord / governor is relevant to:
 
@@ -146,13 +146,13 @@ A lord / governor is relevant to:
 
 ---
 
-## Development Efficiency
+### Development Efficiency
 
 The Develop command depends on the acting character’s INT / Domestic ability: INT / Domestic drives Develop's result. See the economy chapter §4.7.
 
 ---
 
-## Design Observation
+### Design Observation
 
 A province cannot be evaluated only by its resources.
 
@@ -160,9 +160,9 @@ The character governing it can strongly affect how quickly it develops and how e
 
 ---
 
-# 5.4 Rulers
+## 5.4 Rulers
 
-## Overview
+### Overview
 
 Rulers occupy a special position in the character system.
 
@@ -178,7 +178,7 @@ The ruler is associated with:
 
 ---
 
-## Ruler Capture and Recruitment
+### Ruler Capture and Recruitment
 
 Capturing or recruiting a ruler has special strategic importance.
 
@@ -194,7 +194,7 @@ Exact conditions and edge cases remain unresolved.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Capturing or recruiting the right ruler can be more powerful than conquering provinces one by one.
 
@@ -202,9 +202,9 @@ This makes rulers high-value political targets, not just stronger generals.
 
 ---
 
-# 5.5 Fame
+## 5.5 Fame
 
-## Overview
+### Overview
 
 Fame is associated with the ruler of a house.
 
@@ -212,7 +212,7 @@ Ordinary generals do not appear to have Fame in the same way.
 
 ---
 
-## Sources of Fame
+### Sources of Fame
 
 Known or strongly supported sources of Fame include:
 
@@ -233,13 +233,13 @@ Exact Fame gain and loss formulas remain unresolved.
 
 ---
 
-## Effects
+### Effects
 
 Fame belongs to the ruler. It is raised by victories, conquest, new vassals, and good events; it is lowered by defeats, lost territory, and negative events. Fame affects Ally, Defection, and Surrender; the exact formula is unknown.
 
 ---
 
-## Conceptual Model
+### Conceptual Model
 
 ```mermaid
 flowchart TD
@@ -256,7 +256,7 @@ flowchart TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 Fame turns battlefield success into political power.
 
@@ -264,9 +264,9 @@ A successful ruler becomes more persuasive, which can lead to more vassals, more
 
 ---
 
-# 5.6 Hidden General Loyalty
+## 5.6 Hidden General Loyalty
 
-## Overview
+### Overview
 
 General Loyalty is separate from province Loyalty.
 
@@ -276,7 +276,7 @@ General Loyalty represents a character’s loyalty to their current ruler or hou
 
 ---
 
-## Confirmed / Reconstructed Facts
+### Confirmed / Reconstructed Facts
 
 General Loyalty is hidden from the player.
 
@@ -284,7 +284,7 @@ It is a hidden value affecting resistance to Recruit, Defection, and Surrender. 
 
 ---
 
-## Design Observation
+### Design Observation
 
 Hidden General Loyalty creates uncertainty.
 
@@ -292,9 +292,9 @@ The player may know a general’s public stats, but not how willing that charact
 
 ---
 
-# 5.7 Capture, Recruitment, Release, and Banishment
+## 5.7 Capture, Recruitment, Release, and Banishment
 
-## Capture
+### Capture
 
 After defeat in battle, a commander may:
 
@@ -305,7 +305,7 @@ Exact capture probability is unresolved.
 
 ---
 
-## Captured Generals
+### Captured Generals
 
 A captured general can be handled in several ways:
 
@@ -317,7 +317,7 @@ A captured general can be handled in several ways:
 
 ---
 
-## Recruit
+### Recruit
 
 A successful Recruit transfers the general to the player’s house.
 
@@ -332,7 +332,7 @@ Exact formula remains unresolved.
 
 ---
 
-## Strategic Importance
+### Strategic Importance
 
 Recruitment is one of the most important non-territorial expansion tools in Gemfire.
 
@@ -345,9 +345,9 @@ A strong recruited general can immediately improve:
 
 ---
 
-# 5.8 Defection and Character Transfer
+## 5.8 Defection and Character Transfer
 
-## Overview
+### Overview
 
 Defection is a diplomatic attempt to convert an enemy vassal.
 
@@ -355,7 +355,7 @@ Unlike battlefield recruitment, Defection targets a character while they are sti
 
 ---
 
-## Effects
+### Effects
 
 If the target governs a province, successful Defection may transfer both:
 
@@ -366,7 +366,7 @@ This makes character loyalty directly connected to map control.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Gemfire’s political map can change because people change sides.
 
@@ -374,9 +374,9 @@ This is one of the reasons characters are central to the game’s strategic stru
 
 ---
 
-# 5.9 Character Growth
+## 5.9 Character Growth
 
-## Annual Growth
+### Annual Growth
 
 Characters improve over time. Ordinary officers gain small yearly stat increases, while rulers and force leaders gain larger ones. Stats rise each year until roughly age 60, then decline, and a character dies of old age at about 75 (a few months either way). These age thresholds are player-tested (medium confidence); the exact per-year magnitude is unquantified.
 
@@ -384,7 +384,7 @@ This is why a character's INT / WAR / CHA differ between scenarios (which are fi
 
 ---
 
-## Effects
+### Effects
 
 The following attributes can increase:
 
@@ -394,7 +394,7 @@ The following attributes can increase:
 
 ---
 
-## Design Observation
+### Design Observation
 
 Character growth creates continuity between scenarios and across long campaigns.
 
@@ -402,9 +402,9 @@ A valuable character can remain relevant as the war progresses.
 
 ---
 
-# 5.10 Artifacts
+## 5.10 Artifacts
 
-## Overview
+### Overview
 
 Artifacts are special items that improve character attributes.
 
@@ -412,7 +412,7 @@ Most artifacts are found through the Search command.
 
 ---
 
-## Known Artifact Categories
+### Known Artifact Categories
 
 | Artifact               | Effect   |
 | ---------------------- | -------- |
@@ -429,7 +429,7 @@ Artifacts are found via the Search command; the exact success rate is unknown.
 
 ---
 
-## Conceptual Model
+### Conceptual Model
 
 ```mermaid
 flowchart TD
@@ -441,7 +441,7 @@ flowchart TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 Artifacts make Search strategically relevant.
 
@@ -449,9 +449,9 @@ They can turn a good character into an exceptional one and strengthen the long-t
 
 ---
 
-# 5.11 Relationship Between Characters and Gems
+## 5.11 Relationship Between Characters and Gems
 
-## Confirmed Facts
+### Confirmed Facts
 
 Gems are not owned by individual generals.
 
@@ -463,7 +463,7 @@ If a house is absorbed or dissolved, its Gems may transfer to the victor.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Characters and Gems are connected politically, not as personal equipment.
 
@@ -471,9 +471,9 @@ A ruler does not simply “carry” a Gem as an item. Instead, Gem ownership ref
 
 ---
 
-# 5.12 Character Lifecycle
+## 5.12 Character Lifecycle
 
-## Reconstructed Lifecycle
+### Reconstructed Lifecycle
 
 ```mermaid
 flowchart TD
@@ -500,7 +500,7 @@ flowchart TD
 
 ---
 
-# 5.13 Character System Summary
+## 5.13 Character System Summary
 
 Characters are one of the core systems of Gemfire.
 
@@ -526,7 +526,7 @@ A small house with excellent characters can be more dangerous than its map posit
 
 ---
 
-# Open Questions
+## Open Questions
 
 The following character-system details remain unresolved:
 

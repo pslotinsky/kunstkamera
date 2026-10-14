@@ -1,6 +1,7 @@
 import type { ZZFX } from 'zzfx';
 
 import type { RangePattern } from '@/core/domain/Unit';
+import { getPublicAssetUrl } from '@/ui/art/getPublicAssetUrl';
 
 const MASTER_LEVEL = 0.4;
 const DEFAULT_ATTACK = 0.005;
@@ -19,8 +20,8 @@ const MUSIC_LEVEL = 0.25;
 const MUSIC_FADE = 0.6;
 
 const MUSIC_TRACKS = {
-  map: '/music/strategic-map.mp3',
-  battle: '/music/battle.mp3',
+  map: getPublicAssetUrl('music/strategic-map.mp3'),
+  battle: getPublicAssetUrl('music/battle.mp3'),
 } as const;
 
 export type MusicTrack = keyof typeof MUSIC_TRACKS;
@@ -623,7 +624,8 @@ export class SoundBoard {
     file: string,
   ): Promise<AudioBuffer | undefined> {
     try {
-      const response = await fetch(`/sounds/${file}.ogg`);
+      const source = getPublicAssetUrl(`sounds/${file}.ogg`);
+      const response = await fetch(source);
       const encoded = await response.arrayBuffer();
 
       return await context.decodeAudioData(encoded);

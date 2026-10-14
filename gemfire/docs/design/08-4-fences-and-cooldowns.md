@@ -1,4 +1,4 @@
-# 8.4 Fences & Cooldowns — Design
+# 8.4 Fences & Cooldowns
 
 ## Description
 

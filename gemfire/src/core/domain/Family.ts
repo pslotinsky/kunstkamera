@@ -97,10 +97,6 @@ export class Family {
     return this.gems.find((gem) => gem.guardian === guardian);
   }
 
-  public get crest(): string {
-    return `/crests/${this.name.toLowerCase()}.png`;
-  }
-
   public isRuler(general: General | undefined): boolean {
     return isDefined(general) && this.ruler.isEqual(general);
   }

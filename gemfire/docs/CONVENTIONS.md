@@ -5,7 +5,7 @@ Conventions for the Gemfire TypeScript codebase. Biome (formatter, linter, and i
 ## Files & modules
 
 - **One class per file; the filename matches the class name in PascalCase** — `WorldMap.ts` exports `class WorldMap`, `GameScreenView.ts` exports `class GameScreenView`. This holds for the UI too: each component is a `View` class (markup + in-place DOM updates) paired with a `Control` class (state + coordination), one class per file.
-- Modules that are pure data or plain functions use **kebab-case** filenames — config (`provinces.ts`), render-models (`map-view-model.ts`), shared helpers (`dom.ts`).
+- Files exporting a single helper function use the function’s **camelCase** name — `countTo.ts`, `isDefined.ts`, `unitPreview.ts`. Pure data and multi-function modules use **kebab-case** filenames — config (`provinces.ts`), render-models (`map-view-model.ts`), shared helpers (`dom.ts`).
 
 ## Classes
 

@@ -32,8 +32,4 @@ export class FifthUnit extends Unit {
   public override get standsAlone(): boolean {
     return true;
   }
-
-  public get portrait(): string {
-    return `/fifth-units/${this.name.toLowerCase()}.webp`;
-  }
 }

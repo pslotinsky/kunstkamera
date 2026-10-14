@@ -18,9 +18,9 @@ Detailed province lists, adjacency data, and scenario ownership tables are maint
 
 ---
 
-# 2.1 Ishmeria
+## 2.1 Ishmeria
 
-## Confirmed Facts
+### Confirmed Facts
 
 Gemfire takes place in **Ishmeria**, a fixed island kingdom.
 
@@ -47,7 +47,7 @@ The geography of Ishmeria remains stable across all scenarios.
 
 ---
 
-## Design Observation
+### Design Observation
 
 The fixed map is one of Gemfire’s defining features.
 
@@ -64,9 +64,9 @@ The map is not just a backdrop. It is a stable strategic system.
 
 ---
 
-# 2.2 Provinces
+## 2.2 Provinces
 
-## Confirmed Facts
+### Confirmed Facts
 
 The province is the primary territorial unit in Gemfire.
 
@@ -85,7 +85,7 @@ Control over provinces is the main way a house expands its power.
 
 ---
 
-## Province Roles
+### Province Roles
 
 A province has several roles at the same time:
 
@@ -99,7 +99,7 @@ A province has several roles at the same time:
 
 ---
 
-## Province Attributes
+### Province Attributes
 
 Confirmed or strongly supported province-level data includes:
 
@@ -120,7 +120,7 @@ Population is not currently confirmed as a province stat in Gemfire.
 
 ---
 
-## Province Relationships
+### Province Relationships
 
 ```mermaid
 graph TD
@@ -139,7 +139,7 @@ graph TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 Gemfire is province-centered.
 
@@ -149,9 +149,9 @@ This makes local geography, resource placement, governors, and border pressure c
 
 ---
 
-# 2.3 Province Adjacency
+## 2.3 Province Adjacency
 
-## Confirmed Facts
+### Confirmed Facts
 
 Province adjacency determines which provinces can be attacked directly.
 
@@ -169,7 +169,7 @@ The full adjacency table is canonical in Appendix A §A.3; strategic geography i
 
 ---
 
-## Strategic Implications
+### Strategic Implications
 
 High-connectivity provinces are strategically valuable but difficult to defend.
 
@@ -179,7 +179,7 @@ Dead-end provinces can function as safer rear territories, while central hubs ca
 
 ---
 
-## Design Observation
+### Design Observation
 
 Adjacency is one of the main ways Gemfire turns a fixed map into a strategic puzzle.
 
@@ -193,9 +193,9 @@ The same province can be valuable for several different reasons:
 
 ---
 
-# 2.4 Houses / Families
+## 2.4 Houses / Families
 
-## Confirmed Facts
+### Confirmed Facts
 
 Ishmeria is divided between noble houses / families.
 
@@ -211,7 +211,7 @@ The number and identity of active houses depend on the selected scenario. The ca
 
 ---
 
-## House Responsibilities
+### House Responsibilities
 
 A house is the main political actor in Gemfire.
 
@@ -228,7 +228,7 @@ Each house:
 
 ---
 
-## House Components
+### House Components
 
 ```mermaid
 graph TD
@@ -250,7 +250,7 @@ graph TD
 
 ---
 
-## House-Level Attributes
+### House-Level Attributes
 
 Confirmed or strongly supported house-level data includes:
 
@@ -267,9 +267,9 @@ Gold, Food, Troops, Loyalty, Cultivation, and Protection are province-level valu
 
 ---
 
-# 2.5 Rulers and Generals
+## 2.5 Rulers and Generals
 
-## Confirmed Facts
+### Confirmed Facts
 
 Characters are persistent strategic entities.
 
@@ -287,7 +287,7 @@ In battle, the commander influences the army, while the tactical units are gener
 
 ---
 
-## Character Relationship to the World
+### Character Relationship to the World
 
 ```mermaid
 graph TD
@@ -304,7 +304,7 @@ graph TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 The world model is character-driven.
 
@@ -312,9 +312,9 @@ Provinces matter, but their value depends heavily on who governs or commands the
 
 ---
 
-# 2.6 Gems
+## 2.6 Gems
 
-## Confirmed Facts
+### Confirmed Facts
 
 Gems are not owned by individual provinces.
 
@@ -326,7 +326,7 @@ Gems are tied to political survival and family absorption. Capturing a province 
 
 ---
 
-## Gem Ownership Model
+### Gem Ownership Model
 
 ```mermaid
 flowchart TD
@@ -338,7 +338,7 @@ flowchart TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 Gems give the world model a magical-political layer.
 
@@ -346,9 +346,9 @@ They are not just battle assets. They also represent dynastic power, family surv
 
 ---
 
-# 2.7 Armies and Warfare
+## 2.7 Armies and Warfare
 
-## Confirmed Facts
+### Confirmed Facts
 
 Strategic warfare is province-based.
 
@@ -365,7 +365,7 @@ When an invasion begins, the game transitions from the strategic map to a tactic
 
 ---
 
-## Strategic-to-Tactical Flow
+### Strategic-to-Tactical Flow
 
 ```mermaid
 flowchart TD
@@ -388,9 +388,9 @@ flowchart TD
 
 ---
 
-# 2.8 Events and Geography
+## 2.8 Events and Geography
 
-## Confirmed Facts
+### Confirmed Facts
 
 The world model includes both political geography and environmental risk.
 
@@ -407,7 +407,7 @@ Exact province-by-province disaster mapping remains unresolved.
 
 ---
 
-## Design Observation
+### Design Observation
 
 The fixed map matters not only for war, but also for long-term risk.
 
@@ -415,7 +415,7 @@ Different regions are exposed to different environmental threats, which gives ge
 
 ---
 
-# 2.9 World Hierarchy
+## 2.9 World Hierarchy
 
 ```mermaid
 graph TD
@@ -443,7 +443,7 @@ graph TD
 
 ---
 
-# 2.10 World Model Summary
+## 2.10 World Model Summary
 
 Gemfire’s world model is built around a fixed map of Ishmeria divided into 30 provinces.
 

@@ -1,4 +1,4 @@
-# <Feature> — Design
+# <Feature>
 
 _One design doc per roadmap feature, numbered to match it (e.g. `01-global-map.md`). All sections are optional — keep one only if it earns its place for this feature, and delete the rest._
 

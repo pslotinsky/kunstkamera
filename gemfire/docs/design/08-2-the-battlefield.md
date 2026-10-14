@@ -1,4 +1,4 @@
-# 8.2 The Battlefield — Design
+# 8.2 The Battlefield
 
 ## Description
 

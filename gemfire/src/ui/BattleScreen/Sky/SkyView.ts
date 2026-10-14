@@ -2,6 +2,7 @@ import { html, type TemplateResult } from 'lit-html';
 
 import type { Phase } from '@/core/domain/BattleClock';
 import { View } from '@/lib/View';
+import { getPublicAssetUrl } from '@/ui/art/getPublicAssetUrl';
 
 import styles from './Sky.module.scss';
 
@@ -39,12 +40,12 @@ export class SkyView extends View {
           <span class=${styles.wheel} data-wheel>
             <img
               class="${styles.body} ${styles.sun}"
-              src="/sky/sun.webp"
+              src=${getPublicAssetUrl('sky/sun.webp')}
               alt=""
             />
             <img
               class="${styles.body} ${styles.moon}"
-              src="/sky/moon.webp"
+              src=${getPublicAssetUrl('sky/moon.webp')}
               alt=""
             />
           </span>

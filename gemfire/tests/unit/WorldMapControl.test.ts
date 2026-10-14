@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { getFamilyCrestUrl } from '@/ui/art/getFamilyCrestUrl';
 import { SoundBoard } from '@/ui/sound/SoundBoard';
 import { MARCH_MS } from '@/ui/WorldMap/WarMarch';
 import { WorldMapControl } from '@/ui/WorldMap/WorldMapControl';
@@ -55,11 +56,17 @@ describe('WorldMapControl', () => {
     target.claim(attacking);
     control.actualizeProvince(target);
 
-    expect(getMarkerCrests()).toEqual([attacking.crest, defending.crest]);
+    expect(getMarkerCrests()).toEqual([
+      getFamilyCrestUrl(attacking),
+      getFamilyCrestUrl(defending),
+    ]);
 
     vi.runAllTimers();
 
-    expect(getMarkerCrests()).toEqual([attacking.crest, attacking.crest]);
+    expect(getMarkerCrests()).toEqual([
+      getFamilyCrestUrl(attacking),
+      getFamilyCrestUrl(attacking),
+    ]);
   });
 
   it('plays a distant skirmish when the war march clashes', () => {

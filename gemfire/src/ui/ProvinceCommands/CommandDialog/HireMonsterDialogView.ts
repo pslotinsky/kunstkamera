@@ -7,6 +7,7 @@ import type { RangePattern } from '@/core/domain/FifthUnit';
 import type { HiredUnit } from '@/core/domain/HiredUnit';
 import { capitalize } from '@/lib/string/capitalize';
 import { isDefined } from '@/lib/value/isDefined';
+import { getFifthUnitPortraitUrl } from '@/ui/art/getFifthUnitPortraitUrl';
 import { unitPreview } from '@/ui/art/unitPreview';
 
 import { CommandDialogView } from './CommandDialogView';
@@ -99,7 +100,7 @@ export class HireMonsterDialogView extends CommandDialogView {
   private renderUnit(unit: HiredUnit): string {
     return `
       <button class=${styles.unit} type="button" data-unit="${unit.name}">
-        <img class=${styles.thumb} src="${unit.portrait}" alt="" />
+        <img class=${styles.thumb} src="${getFifthUnitPortraitUrl(unit)}" alt="" />
         <span class=${styles.unitName}>${unit.name}</span>
         <span class=${styles.cost}><img class=${styles.costIcon} src="${goldIconUrl}" alt="gold" />${unit.cost}</span>
       </button>
@@ -112,7 +113,7 @@ export class HireMonsterDialogView extends CommandDialogView {
 
     return `
       <div class=${styles.top}>
-        <img class=${styles.portrait} src="${unit.portrait}" alt="${unit.name}" />
+        <img class=${styles.portrait} src="${getFifthUnitPortraitUrl(unit)}" alt="${unit.name}" />
         <div class=${styles.info}>
           <h2 class=${styles.name}>${unit.name}</h2>
           <span class=${styles.kind}>${capitalize(unit.category)}</span>

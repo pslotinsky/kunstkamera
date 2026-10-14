@@ -5,6 +5,7 @@ import type { Disposal, DisposalOutcome } from '@/core/domain/Captivity';
 import type { World } from '@/core/domain/World';
 import type { EventBus } from '@/lib/EventBus';
 import { View } from '@/lib/View';
+import { getGeneralPortraitUrl } from '@/ui/art/getGeneralPortraitUrl';
 
 import { CaptiveDismissedEvent } from './CaptiveDismissedEvent';
 import { DisposalChosenEvent } from './DisposalChosenEvent';
@@ -68,7 +69,7 @@ export class CaptiveDialogView extends View<CaptiveDialogContext> {
 
     this.title.textContent = title;
     this.captive.textContent = `${captive.general.name} of ${captive.house.name} — WAR ${war}, CHA ${charisma}`;
-    this.portrait.src = captive.general.portrait;
+    this.portrait.src = getGeneralPortraitUrl(captive.general);
     this.element.classList.remove(styles.hidden!);
   }
 

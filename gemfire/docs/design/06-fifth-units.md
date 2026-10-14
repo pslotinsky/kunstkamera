@@ -1,4 +1,4 @@
-# 6. Fifth Units — Design
+# 6. Fifth Units
 
 ## Description
 

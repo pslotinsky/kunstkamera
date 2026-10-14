@@ -17,9 +17,9 @@ Diplomatic commands allow the player to create alliances, recruit enemy vassals,
 
 ---
 
-# 10.1 System Overview
+## 10.1 System Overview
 
-## Diplomacy as Province Action
+### Diplomacy as Province Action
 
 Diplomatic actions are performed through provinces.
 
@@ -41,7 +41,7 @@ Transport Resources
 
 ---
 
-## Diplomatic Commands
+### Diplomatic Commands
 
 Core diplomatic commands:
 
@@ -55,7 +55,7 @@ Core diplomatic commands:
 
 ---
 
-## Design Observation
+### Design Observation
 
 Diplomacy in Gemfire is an active tool of political conflict.
 
@@ -69,9 +69,9 @@ It can directly:
 
 ---
 
-# 10.2 Alliance
+## 10.2 Alliance
 
-## Overview
+### Overview
 
 Alliance is a peace agreement between two houses.
 
@@ -79,13 +79,13 @@ Functionally, it is closer to a non-aggression pact than to a full military alli
 
 ---
 
-## Confirmed Rules
+### Confirmed Rules
 
 A house may have at most one ally at a time. The Ally command is available only from the home province. An alliance is a mutual non-aggression agreement and can be broken. An alliance with Lankshire is not allowed.
 
 ---
 
-## No Confirmed Military Assistance
+### No Confirmed Military Assistance
 
 There is no confirmed evidence that allies:
 
@@ -99,7 +99,7 @@ Alliance should therefore be treated as a non-aggression agreement.
 
 ---
 
-## Break Alliance
+### Break Alliance
 
 An alliance can be broken through the same command.
 
@@ -109,7 +109,7 @@ No confirmed direct Fame or reputation penalty for breaking an alliance has been
 
 ---
 
-## Design Observation
+### Design Observation
 
 Alliance temporarily stabilizes one front.
 
@@ -117,9 +117,9 @@ Because a house can have only one ally, diplomacy cannot make the player fully s
 
 ---
 
-# 10.3 Defection
+## 10.3 Defection
 
-## Overview
+### Overview
 
 Defection is an attempt to recruit an enemy vassal.
 
@@ -127,7 +127,7 @@ It is one of the strongest political mechanics in Gemfire because a successful D
 
 ---
 
-## Target
+### Target
 
 Defection targets an enemy vassal, not a province directly.
 
@@ -138,7 +138,7 @@ Possible targets include:
 
 ---
 
-## Effects
+### Effects
 
 If the target is the lord / governor of an enemy province, successful Defection can transfer:
 
@@ -149,7 +149,7 @@ If the target is the lord / governor of an enemy province, successful Defection 
 
 ---
 
-## Map Range
+### Map Range
 
 Defection does not require province adjacency.
 
@@ -167,7 +167,7 @@ If vassal governs a province, that province transfers too
 
 ---
 
-## Influencing Factors
+### Influencing Factors
 
 Known or likely success factors:
 
@@ -182,7 +182,7 @@ Exact formula remains unresolved.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Defection is not a replacement for war. It converts political pressure into map control.
 
@@ -190,9 +190,9 @@ The player can gain territory without direct invasion, but the system still depe
 
 ---
 
-# 10.4 Surrender
+## 10.4 Surrender
 
-## Overview
+### Overview
 
 Surrender is an attempt to make an entire enemy house submit.
 
@@ -200,7 +200,7 @@ It is the diplomatic equivalent of absorbing a rival political entity.
 
 ---
 
-## Effects
+### Effects
 
 Successful Surrender can transfer:
 
@@ -210,7 +210,7 @@ Successful Surrender can transfer:
 
 ---
 
-## Requirements
+### Requirements
 
 Surrender has a low chance of success and is usually viable only against a significantly weakened family.
 
@@ -227,7 +227,7 @@ Exact formula remains unresolved.
 
 ---
 
-## Ruler Resistance
+### Ruler Resistance
 
 Some rulers may be highly resistant to Surrender.
 
@@ -237,7 +237,7 @@ Exact ruler-specific rules remain unresolved.
 
 ---
 
-## Strategic Effect
+### Strategic Effect
 
 Surrender can create a result comparable to several military conquests:
 
@@ -253,7 +253,7 @@ Gain Gems
 
 ---
 
-## Design Observation
+### Design Observation
 
 Surrender converts accumulated military, economic, and reputational pressure into political absorption.
 
@@ -261,9 +261,9 @@ The mechanic reinforces the importance of Fame and the weakening of rival houses
 
 ---
 
-# 10.5 Sabotage
+## 10.5 Sabotage
 
-## Overview
+### Overview
 
 Sabotage is a hostile operation against an enemy province.
 
@@ -271,7 +271,7 @@ Its purpose is to weaken enemy territory before war or reduce the enemy’s econ
 
 ---
 
-## Effects
+### Effects
 
 Sabotage destroys about one fifth (1/5) of one of the target's Troops, Loyalty, or Protection, and is resisted by the target lord's Domestic / INT.
 
@@ -280,7 +280,7 @@ exact effect is not fully settled.)
 
 ---
 
-## Target
+### Target
 
 Sabotage targets an enemy province.
 
@@ -288,7 +288,7 @@ Exact range restrictions require further verification.
 
 ---
 
-## Defense
+### Defense
 
 Exact defense rules against Sabotage are unresolved.
 
@@ -301,7 +301,7 @@ Possible defensive factors include:
 
 ---
 
-## Design Observation
+### Design Observation
 
 Sabotage attacks enemy economic strength without direct invasion.
 
@@ -309,9 +309,9 @@ It is especially useful against strong provinces that are difficult to conquer i
 
 ---
 
-# 10.6 Plunder
+## 10.6 Plunder
 
-## Overview
+### Overview
 
 Plunder is a raid or hostile operation against a neighbouring enemy province.
 
@@ -319,7 +319,7 @@ Its purpose is to steal resources and weaken the enemy economy.
 
 ---
 
-## Target
+### Target
 
 Plunder targets a neighbouring enemy province.
 
@@ -327,13 +327,13 @@ Unlike Defection, Plunder is local and depends on geography.
 
 ---
 
-## Effects
+### Effects
 
 Plunder targets a neighbouring enemy province and steals about one fifth (1/5) of its Gold and one fifth (1/5) of its Food. It is resisted by the target lord's Domestic / INT and can damage the enemy ruler's reputation / Fame.
 
 ---
 
-## Strategic Use
+### Strategic Use
 
 Plunder can be used to:
 
@@ -344,7 +344,7 @@ Plunder can be used to:
 
 ---
 
-## Defense
+### Defense
 
 Exact defense rules against Plunder are unresolved.
 
@@ -357,7 +357,7 @@ Possible defensive factors include:
 
 ---
 
-## Design Observation
+### Design Observation
 
 Plunder connects diplomacy, economy, and military geography.
 
@@ -365,9 +365,9 @@ It is a form of economic warfare between neighbouring provinces.
 
 ---
 
-# 10.7 Fame and Diplomatic Power
+## 10.7 Fame and Diplomatic Power
 
-## Overview
+### Overview
 
 Fame is associated with the ruler of a house.
 
@@ -375,7 +375,7 @@ It represents political prestige and affects diplomatic effectiveness.
 
 ---
 
-## Sources of Fame
+### Sources of Fame
 
 Fame can increase through:
 
@@ -396,13 +396,13 @@ Exact Fame gain and loss formulas remain unresolved.
 
 ---
 
-## Effects
+### Effects
 
 Fame is a ruler stat (detailed in the characters chapter §5) that strongly affects Ally, Defection, and Surrender.
 
 ---
 
-## Fame Model
+### Fame Model
 
 ```mermaid
 flowchart TD
@@ -424,7 +424,7 @@ flowchart TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 Fame turns success into political leverage.
 
@@ -446,9 +446,9 @@ Become stronger
 
 ---
 
-# 10.8 Diplomacy and Characters
+## 10.8 Diplomacy and Characters
 
-## Defection and Generals
+### Defection and Generals
 
 Defection is directly tied to the character system.
 
@@ -458,7 +458,7 @@ If that vassal governs a province, the province may transfer with them.
 
 ---
 
-## Hidden Loyalty
+### Hidden Loyalty
 
 Hidden General Loyalty affects resistance to Defection.
 
@@ -468,7 +468,7 @@ Exact loyalty scale and formula remain unresolved.
 
 ---
 
-## CHA / Charm
+### CHA / Charm
 
 CHA may affect Defection or other diplomatic checks.
 
@@ -478,7 +478,7 @@ The confirmed CHA formula is for Give Food, not Defection.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Gemfire diplomacy works through people.
 
@@ -486,9 +486,9 @@ The political map changes not only because armies move, but because specific cha
 
 ---
 
-# 10.9 Diplomacy and Gems
+## 10.9 Diplomacy and Gems
 
-## Surrender and Gems
+### Surrender and Gems
 
 When Surrender succeeds, the victor can gain the surrendering house’s Gems.
 
@@ -496,7 +496,7 @@ This makes Surrender one of the fastest ways to increase magical power.
 
 ---
 
-## Family Absorption
+### Family Absorption
 
 Surrender and ruler recruitment overlap with the family absorption system.
 
@@ -508,7 +508,7 @@ Both can lead to:
 
 ---
 
-## Design Observation
+### Design Observation
 
 Diplomacy can be one of the fastest ways to gain a Gem, but only after the political conditions make the target vulnerable.
 
@@ -516,9 +516,9 @@ The player does not gain a Gem simply by taking one province. Gem transfer is ti
 
 ---
 
-# 10.10 Strategic Role of Diplomacy
+## 10.10 Strategic Role of Diplomacy
 
-## Diplomatic Paths to Power
+### Diplomatic Paths to Power
 
 Diplomacy converts pressure into strategic gains.
 
@@ -532,7 +532,7 @@ Diplomacy converts pressure into strategic gains.
 
 ---
 
-## Opportunity Cost
+### Opportunity Cost
 
 Because diplomacy consumes a province’s monthly action, each diplomatic move competes with development and war.
 
@@ -555,7 +555,7 @@ flowchart TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 Diplomacy in Gemfire has high cost and high potential.
 
@@ -563,9 +563,9 @@ One successful Defection or Surrender can change the map more than a normal atta
 
 ---
 
-# 10.11 Diplomacy System Summary
+## 10.11 Diplomacy System Summary
 
-## Reconstructed Diplomacy System
+### Reconstructed Diplomacy System
 
 ```mermaid
 flowchart TD
@@ -595,7 +595,7 @@ flowchart TD
 
 ---
 
-# Open Questions
+## Open Questions
 
 The following diplomacy details remain unresolved:
 
@@ -611,7 +611,7 @@ The following diplomacy details remain unresolved:
 
 ---
 
-# Summary
+## Summary
 
 Diplomacy in Gemfire is a set of active political commands, not a passive relationship system.
 

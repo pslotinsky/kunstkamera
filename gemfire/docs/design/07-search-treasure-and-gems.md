@@ -1,4 +1,4 @@
-# 7. Search, Treasure & Gems — Design
+# 7. Search, Treasure & Gems
 
 ## Description
 

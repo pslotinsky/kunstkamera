@@ -9,6 +9,8 @@ import type { BattleUnit } from '@/core/domain/BattleUnit';
 import { Facing } from '@/core/domain/Facing';
 import { countTo } from '@/lib/dom/countTo';
 import { View } from '@/lib/View';
+import { getFamilyCrestUrl } from '@/ui/art/getFamilyCrestUrl';
+import { getGeneralPortraitUrl } from '@/ui/art/getGeneralPortraitUrl';
 import { unitPiece } from '@/ui/art/unitPiece';
 
 import { ActionCancelledEvent } from './ActionCancelledEvent';
@@ -358,11 +360,11 @@ export class BattleScreenView extends View<
     const crest = this.crestOf(side);
 
     this.commanderOf(side).textContent = army.commander.name;
-    this.portraitOf(side).src = army.commander.portrait;
+    this.portraitOf(side).src = getGeneralPortraitUrl(army.commander);
     crest.classList.toggle(styles.gone!, !family);
 
     if (family) {
-      crest.src = family.crest;
+      crest.src = getFamilyCrestUrl(family);
     }
   }
 

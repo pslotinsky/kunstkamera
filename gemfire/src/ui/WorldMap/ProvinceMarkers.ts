@@ -1,5 +1,6 @@
 import type { Family } from '@/core/domain/Family';
 import type { Province } from '@/core/domain/Province';
+import { getFamilyCrestUrl } from '@/ui/art/getFamilyCrestUrl';
 
 import { MARKER_ANCHORS, type MarkerAnchor } from './markerAnchors';
 
@@ -80,7 +81,7 @@ export class ProvinceMarkers {
   private createCrest(owner: Family, anchor: MarkerAnchor): SVGImageElement {
     const crest = document.createElementNS(SVG_NAMESPACE, 'image');
 
-    crest.setAttribute('href', owner.crest);
+    crest.setAttribute('href', getFamilyCrestUrl(owner));
     crest.setAttribute('x', String(anchor.x - BLOCK_WIDTH / 2));
     crest.setAttribute('y', String(anchor.y - CREST_HEIGHT / 2));
     crest.setAttribute('width', String(CREST_WIDTH));

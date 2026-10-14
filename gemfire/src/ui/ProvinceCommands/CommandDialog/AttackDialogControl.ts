@@ -5,6 +5,7 @@ import type { General } from '@/core/domain/General';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
 import { isDefined } from '@/lib/value/isDefined';
+import { getGeneralPortraitUrl } from '@/ui/art/getGeneralPortraitUrl';
 import { DropdownControl } from '@/ui/Dropdown/DropdownControl';
 import type { DropdownOption } from '@/ui/Dropdown/DropdownView';
 import { toUnitOptions } from '@/ui/Dropdown/dropdown-options';
@@ -131,7 +132,7 @@ export class AttackDialogControl extends CommandDialogControl<
     return this.candidates().map((candidate) => ({
       value: candidate.name,
       label: candidate.name,
-      icon: candidate.portrait,
+      icon: getGeneralPortraitUrl(candidate),
       note: `WAR ${candidate.stats.war}`,
     }));
   }

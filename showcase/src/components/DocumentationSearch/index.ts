@@ -1,0 +1,1 @@
+export { DocumentationSearch } from './DocumentationSearch';

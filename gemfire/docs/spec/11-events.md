@@ -15,9 +15,9 @@ The key feature of the event system is hidden province-level moral accounting. T
 
 ---
 
-# 11.1 Event System Overview
+## 11.1 Event System Overview
 
-## Event Categories
+### Event Categories
 
 Events can be divided into several groups:
 
@@ -31,7 +31,7 @@ Events can be divided into several groups:
 
 ---
 
-## Core Model
+### Core Model
 
 ```mermaid
 flowchart TD
@@ -60,7 +60,7 @@ flowchart TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 Events create hidden feedback between province management style and long-term stability.
 
@@ -70,9 +70,9 @@ A player who repeatedly attacks, recruits, sabotages, or plunders increases the 
 
 ---
 
-# 11.2 Province Action Count
+## 11.2 Province Action Count
 
-## Overview
+### Overview
 
 Each province has a hidden action counter.
 
@@ -82,13 +82,13 @@ After three counted actions, the game performs an event check.
 
 ---
 
-## Core Rules
+### Core Rules
 
 Each province has a hidden action counter, which increases only from turn-based actions that consume the province's monthly action. An event check occurs after 3 turn-based actions, after which the counter and goodwill reset. The system can look calendar-quarter based but is actually action-count based.
 
 ---
 
-## Example
+### Example
 
 ```text
 January:
@@ -108,7 +108,7 @@ If a province performs fewer than three counted actions, the event check does no
 
 ---
 
-## Design Observation
+### Design Observation
 
 In normal play, events may appear quarterly because a province usually performs one significant action per month.
 
@@ -116,9 +116,9 @@ The underlying logic is based on action count rather than a fixed calendar quart
 
 ---
 
-# 11.3 Goodwill Value
+## 11.3 Goodwill Value
 
-## Overview
+### Overview
 
 In addition to Action Count, each province tracks a hidden goodwill / sin value.
 
@@ -128,13 +128,13 @@ Goodwill influences the chance and level of good or bad events after an event ch
 
 ---
 
-## Action Goodwill Values
+### Action Goodwill Values
 
 Each command contributes a goodwill modifier: development, protection, feeding the people, and alliances add goodwill, while attacks, recruitment, sabotage, and plunder subtract it, with many commands neutral. The full per-command goodwill values table is canonical in Appendix D §D.5.
 
 ---
 
-## Goodwill Outcomes
+### Goodwill Outcomes
 
 ```text
 Positive Goodwill
@@ -152,7 +152,7 @@ Lower or neutral event chance
 
 ---
 
-## Design Observation
+### Design Observation
 
 Gemfire implicitly judges the player’s style of rule.
 
@@ -162,9 +162,9 @@ Aggression, recruitment, sabotage, and plunder are treated as harmful or violent
 
 ---
 
-# 11.4 Good Events
+## 11.4 Good Events
 
-## Overview
+### Overview
 
 Good Events are positive outcomes triggered by favourable province management.
 
@@ -172,7 +172,7 @@ They can improve province stats, grant resources, strengthen rulers, or provide 
 
 ---
 
-## Known Good Events
+### Known Good Events
 
 | Event                          | Effect                                    |
 | ------------------------------ | ----------------------------------------- |
@@ -188,7 +188,7 @@ They can improve province stats, grant resources, strengthen rulers, or provide 
 
 ---
 
-## Event Levels
+### Event Levels
 
 Good Events appear to have different strength levels.
 
@@ -205,7 +205,7 @@ Exact thresholds and probabilities remain unresolved.
 
 ---
 
-## Ruler Empowerment
+### Ruler Empowerment
 
 Some events affect the lord of the territory.
 
@@ -215,7 +215,7 @@ This creates a strategic reason to keep some territories under direct ruler cont
 
 ---
 
-## Design Observation
+### Design Observation
 
 Good Events reward long-term peaceful development.
 
@@ -223,9 +223,9 @@ They make economic and protective actions valuable beyond their direct mechanica
 
 ---
 
-# 11.5 Bad Events
+## 11.5 Bad Events
 
-## Overview
+### Overview
 
 Bad Events are negative outcomes associated with harmful or aggressive province actions.
 
@@ -233,7 +233,7 @@ They can damage province stats, reduce resources, frighten troops, or harm stabi
 
 ---
 
-## Known Bad Events
+### Known Bad Events
 
 | Event                                               | Effect                                         |
 | --------------------------------------------------- | ---------------------------------------------- |
@@ -250,7 +250,7 @@ The death-banshee is separate from this list. When any ruler dies of old age (§
 
 ---
 
-## Bad Event Sources
+### Bad Event Sources
 
 Bad Events can be encouraged by:
 
@@ -262,7 +262,7 @@ Bad Events can be encouraged by:
 
 ---
 
-## Design Observation
+### Design Observation
 
 Bad Events serve as a hidden cost for militaristic or exploitative play.
 
@@ -270,9 +270,9 @@ Even if the player wins wars, repeated aggressive actions may destabilize provin
 
 ---
 
-# 11.6 Seasonal and Natural Disasters
+## 11.6 Seasonal and Natural Disasters
 
-## Overview
+### Overview
 
 Seasonal disasters are separate from the goodwill event system.
 
@@ -286,7 +286,7 @@ They are not triggered by province Action Count.
 
 ---
 
-## Known Seasonal Disasters
+### Known Seasonal Disasters
 
 | Disaster   | Region (provinces)                  | Month(s)                         |
 | ---------- | ----------------------------------- | -------------------------------- |
@@ -300,7 +300,7 @@ Disasters are keyed to calendar month and region, independent of the goodwill sy
 
 ---
 
-## Independence from Goodwill
+### Independence from Goodwill
 
 Seasonal disasters are independent from the province goodwill system.
 
@@ -308,7 +308,7 @@ A well-managed province can still suffer from regional disaster risk.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Disasters give geography mechanical meaning.
 
@@ -316,15 +316,15 @@ Different regions of Ishmeria face different environmental risks, making the fix
 
 ---
 
-# 11.7 Protection and Events
+## 11.7 Protection and Events
 
-## Overview
+### Overview
 
 Protection is the main province stat connected to event resistance.
 
 ---
 
-## Effects of Protection
+### Effects of Protection
 
 High Protection reduces the frequency and severity of bad events and reduces disaster damage:
 
@@ -334,7 +334,7 @@ High Protection reduces the frequency and severity of bad events and reduces dis
 
 ---
 
-## Protection vs Goodwill
+### Protection vs Goodwill
 
 Protection and goodwill are related but not identical.
 
@@ -345,7 +345,7 @@ Protection and goodwill are related but not identical.
 
 ---
 
-## Important Distinction
+### Important Distinction
 
 High Protection does not appear to be the primary driver of good event chance.
 
@@ -363,7 +363,7 @@ The Protection stat itself mainly helps resist harmful outcomes.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Protection has two roles:
 
@@ -372,9 +372,9 @@ Protection has two roles:
 
 ---
 
-# 11.8 Hired Unit Events
+## 11.8 Hired Unit Events
 
-## Overview
+### Overview
 
 Some events are tied to Hired Fifth Units.
 
@@ -382,7 +382,7 @@ These events overlap with the monster / hired unit system but are recorded here 
 
 ---
 
-## Rampage
+### Rampage
 
 A Hired Fifth Unit can go on a rampage.
 
@@ -394,7 +394,7 @@ Known effect:
 
 ---
 
-## Desertion
+### Desertion
 
 Desertion from unpaid upkeep is primarily part of Hired Fifth Unit maintenance.
 
@@ -402,7 +402,7 @@ However, from the player’s perspective it behaves like a negative event tied t
 
 ---
 
-## Design Observation
+### Design Observation
 
 Hired Fifth Units are powerful but risky.
 
@@ -410,9 +410,9 @@ Their risks are not limited to upkeep and battle death; they can also destabiliz
 
 ---
 
-# 11.9 Pastha Event
+## 11.9 Pastha Event
 
-## Overview
+### Overview
 
 Pastha is a special Fifth Unit obtained through a good event.
 
@@ -420,7 +420,7 @@ It is neither a Gem Guardian nor a hired unit.
 
 ---
 
-## Properties
+### Properties
 
 | Property | Value                  |
 | -------- | ---------------------- |
@@ -432,13 +432,13 @@ It is neither a Gem Guardian nor a hired unit.
 
 ---
 
-## Strategic Role
+### Strategic Role
 
 Pastha gives the player temporary military power as a reward for good province management.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Pastha connects the event system to the military system.
 
@@ -446,9 +446,9 @@ Peaceful development can unexpectedly produce a major tactical advantage.
 
 ---
 
-# 11.10 Events and Player Behaviour
+## 11.10 Events and Player Behaviour
 
-## Rewarded Behaviour
+### Rewarded Behaviour
 
 The game rewards:
 
@@ -460,7 +460,7 @@ The game rewards:
 
 ---
 
-## Punished or Risky Behaviour
+### Punished or Risky Behaviour
 
 The game punishes or creates risk for:
 
@@ -472,7 +472,7 @@ The game punishes or creates risk for:
 
 ---
 
-## Strategic Consequence
+### Strategic Consequence
 
 The event system pushes the player to balance:
 
@@ -492,7 +492,7 @@ Long-term province health
 
 ---
 
-## Design Observation
+### Design Observation
 
 Events create a soft moral economy.
 
@@ -500,9 +500,9 @@ The player is not forbidden from conquest and aggression, but those actions carr
 
 ---
 
-# 11.11 Event System Summary
+## 11.11 Event System Summary
 
-## Reconstructed Event Model
+### Reconstructed Event Model
 
 ```mermaid
 flowchart TD
@@ -534,7 +534,7 @@ flowchart TD
 
 ---
 
-# Open Questions
+## Open Questions
 
 The following event-system details remain unresolved:
 
@@ -549,7 +549,7 @@ The following event-system details remain unresolved:
 
 ---
 
-# Summary
+## Summary
 
 Gemfire’s event system has two main layers:
 

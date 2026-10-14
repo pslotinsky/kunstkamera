@@ -1,4 +1,4 @@
-# 1. Global map — Design
+# 1. Global map
 
 ## Description
 

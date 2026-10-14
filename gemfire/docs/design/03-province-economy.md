@@ -1,4 +1,4 @@
-# 3. Province economy — Design
+# 3. Province economy
 
 ## Description
 

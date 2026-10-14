@@ -1,4 +1,4 @@
-# 5. Armies & movement — Design
+# 5. Armies & movement
 
 ## Description
 

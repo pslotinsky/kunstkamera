@@ -15,6 +15,7 @@ import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { UnitDesertedEvent } from '@/core/events/UnitDesertedEvent';
 import { Control } from '@/lib/Control';
 import type { EventClass } from '@/lib/EventBus';
+import { getGeneralPortraitUrl } from '@/ui/art/getGeneralPortraitUrl';
 import { BattleReportClosedEvent } from '@/ui/BattleReport/BattleReportClosedEvent';
 import { DropdownControl } from '@/ui/Dropdown/DropdownControl';
 import type { DropdownOption } from '@/ui/Dropdown/DropdownView';
@@ -265,7 +266,7 @@ export class AnnouncementsControl extends Control<
     return {
       value: general.name,
       label: general.name,
-      icon: general.portrait,
+      icon: getGeneralPortraitUrl(general),
       note,
     };
   }
