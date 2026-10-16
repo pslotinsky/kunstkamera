@@ -1,76 +1,159 @@
+import { mapProjects, type ProjectId } from '../projects';
 import { getDocumentPath } from './getDocumentPath';
-import { source } from './source.server';
+import { sources } from './source.server';
 import type { DocumentSection, DocumentSummary } from './types';
 
-const sectionDefinitions = [
-  {
-    directory: 'spec',
-    title: 'Specification',
-    description: 'Game rules, systems, scenarios, and reference data.',
-  },
-  {
-    directory: 'design',
-    title: 'Design',
-    description: 'Detailed behavior for each feature of the remake.',
-  },
-  {
-    directory: 'guides',
-    title: 'Guides & references',
-    description:
-      'External manuals and other sources used during reconstruction.',
-  },
-  {
-    directory: '',
-    title: 'Roadmap',
-    description: 'Completed features and planned work for the remake.',
-  },
+interface SectionDefinition {
+  readonly title: string;
+  readonly description: string;
+  readonly includes: (file: string) => boolean;
+}
+
+const sectionDefinitions: Record<ProjectId, readonly SectionDefinition[]> = {
+  gemfire: [
+    {
+      title: 'Specification',
+      description: 'Game rules, systems, scenarios, and reference data.',
+      includes: (file) => file.startsWith('spec/'),
+    },
+    {
+      title: 'Design',
+      description: 'Detailed behavior for each feature of the remake.',
+      includes: (file) => file.startsWith('design/'),
+    },
+    {
+      title: 'Guides & references',
+      description:
+        'External manuals and other sources used during reconstruction.',
+      includes: (file) => file.startsWith('guides/'),
+    },
+    {
+      title: 'Roadmap',
+      description: 'Completed features and planned work for the remake.',
+      includes: (file) => file === 'ROADMAP.md',
+    },
+  ],
+  'total-space': [
+    {
+      title: 'Start here',
+      description: 'The project vision and a map of the game design.',
+      includes: (file) =>
+        [
+          'README.md',
+          'game/README.md',
+          'game/vision.md',
+          'game/overview.md',
+        ].includes(file),
+    },
+    {
+      title: 'Systems',
+      description: 'Rules for the strategic and combat systems.',
+      includes: (file) => file.startsWith('game/systems/'),
+    },
+    {
+      title: 'Milestones',
+      description: 'The prototype scope and development milestones.',
+      includes: (file) => file.startsWith('game/milestones/'),
+    },
+    {
+      title: 'Content',
+      description: 'Ship and building rosters, with their artwork.',
+      includes: (file) => file.startsWith('game/content/'),
+    },
+    {
+      title: 'Technical design',
+      description: 'The software model and implementation constraints.',
+      includes: (file) => file.startsWith('tech/'),
+    },
+    {
+      title: 'UI references',
+      description: 'Campaign and battle interaction notes.',
+      includes: (file) => file.startsWith('mockups/'),
+    },
+  ],
+};
+
+const startingOrder = [
+  'README.md',
+  'game/README.md',
+  'game/vision.md',
+  'game/overview.md',
 ];
 
-const documents = source
-  .getPages()
-  .map((page) => ({
-    section: page.data.info.path.split('/').slice(0, -1).join('/'),
-    summary: {
-      file: page.data.info.path,
-      title: page.data.title,
-      url: getDocumentPath(page.data.info.path),
-    } satisfies DocumentSummary,
-  }))
-  .sort((a, b) =>
-    a.summary.file.localeCompare(b.summary.file, 'en', { numeric: true }),
+function createCatalog(project: ProjectId) {
+  const documents = sources[project]
+    .getPages()
+    .map(
+      (page) =>
+        ({
+          file: page.data.info.path,
+          title: page.data.title,
+          url: getDocumentPath(project, page.data.info.path),
+        }) satisfies DocumentSummary,
+    )
+    .sort((a, b) => {
+      if (project === 'total-space') {
+        const aStart = startingOrder.indexOf(a.file);
+        const bStart = startingOrder.indexOf(b.file);
+        if (aStart !== -1 || bStart !== -1)
+          return (
+            (aStart === -1 ? Infinity : aStart) -
+            (bStart === -1 ? Infinity : bStart)
+          );
+      }
+      return a.file.localeCompare(b.file, 'en', { numeric: true });
+    });
+
+  const sections: DocumentSection[] = sectionDefinitions[project].map(
+    (definition) => ({
+      title: definition.title,
+      description: definition.description,
+      documents: documents.filter((page) => definition.includes(page.file)),
+    }),
   );
+  const grouped = new Set(
+    sections.flatMap((section) => section.documents.map((page) => page.file)),
+  );
+  const ungrouped = documents.filter((page) => !grouped.has(page.file));
+  if (ungrouped.length) {
+    throw new Error(
+      `Uncategorized ${project} documents: ${ungrouped.map((page) => page.file).join(', ')}`,
+    );
+  }
 
-const sections: DocumentSection[] = sectionDefinitions.map(
-  ({ directory, title, description }) => ({
-    title,
-    description,
-    documents: documents
-      .filter((page) => page.section === directory)
-      .map((page) => page.summary),
-  }),
-);
-
-const documentsByPath = new Map(
-  documents.map(({ summary }) => [summary.file.replace(/\.md$/, ''), summary]),
-);
-const sectionTitleByFile = new Map(
-  sections.flatMap((section) =>
-    section.documents.map(
-      (document) => [document.file, section.title] as const,
+  return {
+    sections,
+    documentsByPath: new Map(
+      documents.map((page) => [page.file.replace(/\.md$/, ''), page]),
     ),
-  ),
-);
-
-export function getDocumentationSections(): readonly DocumentSection[] {
-  return sections;
+    sectionTitleByFile: new Map(
+      sections.flatMap((section) =>
+        section.documents.map((page) => [page.file, section.title] as const),
+      ),
+    ),
+  };
 }
 
-export function getDocument(path: string): DocumentSummary | undefined {
-  return documentsByPath.get(path.replace(/\/$/, ''));
+const catalogs = mapProjects(createCatalog);
+
+export function getDocumentationSections(
+  project: ProjectId,
+): readonly DocumentSection[] {
+  return catalogs[project].sections;
 }
 
-export function getDocumentSectionTitle(file: string): string {
-  const title = sectionTitleByFile.get(file);
+export function getDocument(
+  project: ProjectId,
+  path: string,
+): DocumentSummary | undefined {
+  return catalogs[project].documentsByPath.get(path.replace(/\/$/, ''));
+}
+
+export function getDocumentSectionTitle(
+  project: ProjectId,
+  file: string,
+): string {
+  const title = catalogs[project].sectionTitleByFile.get(file);
   if (!title) throw new Error(`No documentation section for ${file}`);
   return title;
 }

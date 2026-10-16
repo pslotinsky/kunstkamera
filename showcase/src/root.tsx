@@ -9,6 +9,7 @@ import {
   useLocation,
 } from 'react-router';
 import { FrameworkLink } from './components/FrameworkLink';
+import { getDocumentationProject } from './documentation/config';
 import './root.css';
 
 const DocumentationSearch = lazy(() =>
@@ -18,7 +19,8 @@ const DocumentationSearch = lazy(() =>
 );
 
 export function Layout({ children }: { readonly children: ReactNode }) {
-  const searchEnabled = /\/gemfire\/docs(?:\/|$)/.test(useLocation().pathname);
+  const searchEnabled =
+    getDocumentationProject(useLocation().pathname) !== undefined;
 
   return (
     <html lang="en" suppressHydrationWarning>

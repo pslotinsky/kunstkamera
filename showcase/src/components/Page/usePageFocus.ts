@@ -1,11 +1,15 @@
-import { type RefObject, useEffect } from 'react';
-import { useNavigationType } from 'react-router';
+import { type RefObject, useEffect, useRef } from 'react';
+import { useLocation, useNavigationType } from 'react-router';
 
 export function usePageFocus(content: RefObject<HTMLElement | null>): void {
   const navigationType = useNavigationType();
+  const { pathname } = useLocation();
+  const previousPath = useRef<string | undefined>(undefined);
 
   useEffect(() => {
-    if (navigationType !== 'POP')
+    const pageChanged = previousPath.current !== pathname;
+    previousPath.current = pathname;
+    if (pageChanged && navigationType !== 'POP')
       content.current?.focus({ preventScroll: true });
-  }, [navigationType, content]);
+  }, [navigationType, content, pathname]);
 }

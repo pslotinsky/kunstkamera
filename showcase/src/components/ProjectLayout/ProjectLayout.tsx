@@ -6,26 +6,26 @@ import styles from './ProjectLayout.module.scss';
 
 interface ProjectLayoutProps {
   readonly tree: Root;
-  readonly game?: boolean;
+  readonly immersive?: boolean;
   readonly children: ReactNode;
 }
 
 export function ProjectLayout({
   tree,
-  game = false,
+  immersive = false,
   children,
 }: ProjectLayoutProps) {
   return (
     <DocsLayout
       {...layoutOptions}
       tree={tree}
-      searchToggle={{ enabled: !game }}
-      sidebar={{ defaultOpenLevel: game ? 0 : 2 }}
+      searchToggle={{ enabled: !immersive }}
+      sidebar={{ defaultOpenLevel: immersive ? 0 : 2 }}
       tabs={false}
-      {...(game
+      {...(immersive
         ? {
             containerProps: {
-              className: styles.gameLayout ?? '',
+              className: styles.immersiveLayout ?? '',
               style: {
                 gridTemplate:
                   '"sidebar header" var(--fd-header-height) "sidebar main" minmax(0, 1fr) / var(--fd-sidebar-col) minmax(0, 1fr)',

@@ -1,25 +1,36 @@
+import { type LoaderFunctionArgs, useLoaderData } from 'react-router';
 import { Page } from '../../components/Page';
+import { games } from '../../games';
+import { isProjectId } from '../../projects';
 import styles from './Game.module.scss';
 
-function getGameUrl(): string {
-  if (import.meta.env.DEV) {
-    return import.meta.env.VITE_GAME_URL || 'http://localhost:5174/';
-  }
-  return `${import.meta.env.BASE_URL}gemfire/game/`;
+export function loader({ params }: LoaderFunctionArgs) {
+  if (!isProjectId(params.project))
+    throw new Response('Game not found', { status: 404 });
+  const game = games[params.project];
+  if (!game) throw new Response('Game not found', { status: 404 });
+  return game;
+}
+
+function getGameUrl(game: ReturnType<typeof loader>): string {
+  if (import.meta.env.DEV)
+    return import.meta.env[game.developmentUrlOverride] || game.developmentUrl;
+  return `${import.meta.env.BASE_URL}${game.publishedPath}`;
 }
 
 export default function Game() {
-  const gameUrl = getGameUrl();
+  const game = useLoaderData<typeof loader>();
+  const title = `Play ${game.name}`;
 
   return (
-    <Page title="Play Gemfire" fullWidth className={styles.container}>
-      <h1 className={styles.pageTitle}>Play Gemfire</h1>
+    <Page title={title} fullWidth className={styles.container}>
+      <h1 className={styles.pageTitle}>{title}</h1>
       <div className={styles.stage}>
         <iframe
           id="game"
           className={styles.frame}
-          src={gameUrl}
-          title="Gemfire game"
+          src={getGameUrl(game)}
+          title={`${game.name} game`}
           allow="autoplay"
         />
       </div>

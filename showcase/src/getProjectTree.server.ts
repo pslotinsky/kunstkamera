@@ -1,26 +1,47 @@
 import type { Node, Root } from 'fumadocs-core/page-tree';
 import { getDocumentationSections } from './documentation/catalog.server';
+import { games } from './games';
+import { type ProjectId, projectNames } from './projects';
+import { getPrototypeUrl, prototypes } from './prototypes';
 
-export function getProjectTree() {
+export function getProjectTree(project: ProjectId) {
+  const projectPrototypes = prototypes.filter(
+    (item) => item.project === project,
+  );
   return {
-    $id: 'gemfire',
+    $id: project,
     name: 'Kunstkamera',
     children: [
       {
         type: 'folder' as const,
-        name: 'Gemfire',
+        name: projectNames[project],
         defaultOpen: true,
         children: [
-          { type: 'page' as const, name: 'Play', url: '/gemfire/play' },
+          ...(games[project]
+            ? [{ type: 'page' as const, name: 'Play', url: `/${project}/play` }]
+            : []),
+          ...(projectPrototypes.length
+            ? [
+                {
+                  type: 'folder' as const,
+                  name: 'Prototypes',
+                  children: projectPrototypes.map((prototype) => ({
+                    type: 'page' as const,
+                    name: prototype.name,
+                    url: getPrototypeUrl(prototype).replace(/\/$/, ''),
+                  })),
+                },
+              ]
+            : []),
           {
             type: 'folder' as const,
             name: 'Documentation',
             index: {
               type: 'page' as const,
               name: 'Documentation',
-              url: '/gemfire/docs',
+              url: `/${project}/docs`,
             },
-            children: getDocumentationSections().map((section): Node => {
+            children: getDocumentationSections(project).map((section): Node => {
               const onlyPage = section.documents[0];
               if (section.documents.length === 1 && onlyPage) {
                 return {

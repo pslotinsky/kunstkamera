@@ -6,12 +6,13 @@ import {
 } from '@react-router/dev/routes';
 
 export default [
-  route('gemfire/search.json', 'routes/Search.ts'),
-  layout('routes/ProjectGame.tsx', [
-    route('gemfire/play', 'routes/Game/Game.tsx'),
+  route(':project/search.json', 'routes/Search.ts'),
+  layout('routes/ProjectInteractive.tsx', [
+    route(':project/play', 'routes/Game/Game.tsx'),
+    route(':project/prototypes/:prototype', 'routes/Prototype/Prototype.tsx'),
   ]),
   layout('routes/ProjectDocumentation.tsx', [
-    route('gemfire/docs/*', 'routes/Documentation/Documentation.tsx'),
+    route(':project/docs/*', 'routes/Documentation/Documentation.tsx'),
   ]),
   layout('routes/Site/Site.tsx', [
     index('routes/Home/Home.tsx'),
