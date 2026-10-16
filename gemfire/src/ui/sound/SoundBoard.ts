@@ -4,6 +4,7 @@ import type { RangePattern } from '@/core/domain/Unit';
 import { getPublicAssetUrl } from '@/ui/art/getPublicAssetUrl';
 
 const MASTER_LEVEL = 0.4;
+const EFFECTS_LEVEL = 0.35;
 const DEFAULT_ATTACK = 0.005;
 const SILENCE = 0.001;
 
@@ -29,6 +30,7 @@ export type MusicTrack = keyof typeof MUSIC_TRACKS;
 interface MusicChannel {
   readonly element: HTMLAudioElement;
   readonly gain: GainNode;
+  track?: MusicTrack;
 }
 
 function spread(name: string, count: number): readonly string[] {
@@ -142,6 +144,7 @@ const ZZFX_ALARM: readonly ZzfxNote[] = [
 interface Output {
   readonly context: AudioContext;
   readonly master: GainNode;
+  readonly effects: GainNode;
 }
 
 interface EnvelopeParams {
@@ -165,6 +168,7 @@ interface NoiseParams extends EnvelopeParams {
 export class SoundBoard {
   private context?: AudioContext;
   private master?: GainNode;
+  private effects?: GainNode;
   private noiseBuffer?: AudioBuffer;
   private zzfx?: typeof ZZFX;
   private samples?: Map<string, AudioBuffer[]>;
@@ -176,7 +180,7 @@ export class SoundBoard {
     const context = this.ensureContext();
 
     if (context?.state === 'suspended') {
-      void context.resume();
+      void context.resume().then(() => this.startMusic());
     }
 
     this.loadZzfx();
@@ -543,7 +547,8 @@ export class SoundBoard {
       const music = this.ensureMusic(output);
       const url = MUSIC_TRACKS[track];
 
-      if (!music.element.src.endsWith(url)) {
+      if (music.track !== track) {
+        music.track = track;
         this.fadeTo(output, music, url);
       }
     }
@@ -657,7 +662,7 @@ export class SoundBoard {
       });
 
       source.connect(level);
-      level.connect(output.master);
+      level.connect(output.effects);
       source.start(output.context.currentTime + (options.delay ?? 0));
     }
   }
@@ -689,7 +694,7 @@ export class SoundBoard {
 
       const source = new AudioBufferSourceNode(output.context, { buffer });
 
-      source.connect(output.master);
+      source.connect(output.effects);
       source.start(output.context.currentTime + delay);
     }
   }
@@ -712,7 +717,7 @@ export class SoundBoard {
       }
 
       oscillator.connect(envelope);
-      envelope.connect(output.master);
+      envelope.connect(output.effects);
       oscillator.start(start);
       oscillator.stop(end);
     }
@@ -735,7 +740,7 @@ export class SoundBoard {
 
       source.connect(filter);
       filter.connect(envelope);
-      envelope.connect(output.master);
+      envelope.connect(output.effects);
       source.start(start);
       source.stop(end);
     }
@@ -779,9 +784,10 @@ export class SoundBoard {
   private findOutput(): Output | undefined {
     const context = this.ensureContext();
     const master = this.master;
+    const effects = this.effects;
 
-    return context && master && context.state === 'running'
-      ? { context, master }
+    return context && master && effects && context.state === 'running'
+      ? { context, master, effects }
       : undefined;
   }
 
@@ -789,10 +795,13 @@ export class SoundBoard {
     if (!this.context && typeof AudioContext !== 'undefined') {
       const context = new AudioContext();
       const master = new GainNode(context, { gain: MASTER_LEVEL });
+      const effects = new GainNode(context, { gain: EFFECTS_LEVEL });
 
       master.connect(context.destination);
+      effects.connect(master);
       this.context = context;
       this.master = master;
+      this.effects = effects;
     }
 
     return this.context;
