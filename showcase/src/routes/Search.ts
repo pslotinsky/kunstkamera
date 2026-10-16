@@ -1,14 +1,8 @@
-import { createFromSource } from 'fumadocs-core/search/server';
-import type { LoaderFunctionArgs } from 'react-router';
+import { createSearchAPI } from 'fumadocs-core/search/server';
 import { getDocumentPath } from '../documentation';
 import { getDocumentSectionTitle } from '../documentation/catalog.server';
 import { sources } from '../documentation/source.server';
-import {
-  isProjectId,
-  mapProjects,
-  type ProjectId,
-  projectNames,
-} from '../projects';
+import { mapProjects, type ProjectId, projectNames } from '../projects';
 
 type SourcePage = ReturnType<(typeof sources)[ProjectId]['getPages']>[number];
 
@@ -26,14 +20,17 @@ async function buildIndex(project: ProjectId, page: SourcePage) {
   };
 }
 
-const searches = mapProjects((project) =>
-  createFromSource(sources[project], {
-    buildIndex: (page) => buildIndex(project, page),
-  }),
-);
+const search = createSearchAPI('advanced', {
+  indexes: async () =>
+    Promise.all(
+      Object.values(
+        mapProjects((project) =>
+          sources[project].getPages().map((page) => buildIndex(project, page)),
+        ),
+      ).flat(),
+    ),
+});
 
-export function loader({ params }: LoaderFunctionArgs) {
-  if (!isProjectId(params.project))
-    throw new Response('Project not found', { status: 404 });
-  return searches[params.project].staticGET();
+export function loader() {
+  return search.staticGET();
 }

@@ -2,25 +2,25 @@ import type { Root } from 'fumadocs-core/page-tree';
 import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import type { ReactNode } from 'react';
 import { layoutOptions } from '../../layoutOptions';
-import styles from './ProjectLayout.module.scss';
+import styles from './ShowcaseLayout.module.scss';
 
-interface ProjectLayoutProps {
+interface ShowcaseLayoutProps {
   readonly tree: Root;
   readonly immersive?: boolean;
   readonly children: ReactNode;
 }
 
-export function ProjectLayout({
+export function ShowcaseLayout({
   tree,
   immersive = false,
   children,
-}: ProjectLayoutProps) {
+}: ShowcaseLayoutProps) {
   return (
     <DocsLayout
       {...layoutOptions}
       tree={tree}
       searchToggle={{ enabled: !immersive }}
-      sidebar={{ defaultOpenLevel: immersive ? 0 : 2 }}
+      sidebar={{ defaultOpenLevel: 0 }}
       tabs={false}
       {...(immersive
         ? {

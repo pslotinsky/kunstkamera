@@ -1,20 +1,7 @@
-name: Gemfire
+name: Gemfire CI
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - gemfire/**
-      - .github/workflows/gemfire.yml
-  pull_request:
-    branches: [main]
-    paths:
-      - gemfire/**
-      - .github/workflows/gemfire.yml
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  workflow_call:
 
 permissions:
   contents: read
@@ -24,8 +11,8 @@ defaults:
     working-directory: gemfire
 
 jobs:
-  ci:
-    name: CI
+  checks:
+    name: Checks
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -38,12 +25,12 @@ jobs:
           cache: npm
           cache-dependency-path: gemfire/package-lock.json
 
-      - name: Install
+      - name: Install dependencies
         run: npm ci
 
-      - name: Check
+      - name: Check code
         run: npm run check:ci
 
-      - name: Test
+      - name: Run tests
         if: success() || failure()
         run: npm test

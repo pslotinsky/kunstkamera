@@ -23,12 +23,12 @@ export default {
       });
       return [
         `/${project}/docs/`,
-        `/${project}/search.json`,
         ...files.map((file) => getDocumentPath(project, file)),
       ];
     });
     const paths = [
       '/',
+      '/search.json',
       '/404/',
       ...Object.keys(games).map((project) => `/${project}/play/`),
       ...Object.values(documentationPaths).flat(),

@@ -1,4 +1,4 @@
-name: GitHub Pages
+name: CI
 
 on:
   push:
@@ -7,30 +7,37 @@ on:
       - showcase/**
       - gemfire/**
       - total-space/**
-      - .github/workflows/pages.yml
+      - .github/workflows/ci.yml
+      - .github/workflows/gemfire-ci.yml
   pull_request:
     branches: [main]
     paths:
       - showcase/**
       - gemfire/**
       - total-space/**
-      - .github/workflows/pages.yml
+      - .github/workflows/ci.yml
+      - .github/workflows/gemfire-ci.yml
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: pages-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  build:
+  gemfire:
+    name: Gemfire
+    uses: ./.github/workflows/gemfire-ci.yml
+
+  showcase:
+    name: Showcase
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version-file: gemfire/.nvmrc
           cache: npm
@@ -43,10 +50,6 @@ jobs:
         run: npm ci --prefix showcase
       - name: Check showcase
         run: npm run check:ci --prefix showcase
-      - name: Check game
-        run: npm run check:ci --prefix gemfire
-      - name: Test game
-        run: npm test --prefix gemfire
       - name: Build showcase and game
         env:
           SHOWCASE_BASE: /${{ github.event.repository.name }}/
@@ -56,8 +59,9 @@ jobs:
           path: showcase/dist/public
 
   deploy:
+    name: Deploy GitHub Pages
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    needs: build
+    needs: [gemfire, showcase]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

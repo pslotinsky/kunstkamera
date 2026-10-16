@@ -19,8 +19,9 @@ const DocumentationSearch = lazy(() =>
 );
 
 export function Layout({ children }: { readonly children: ReactNode }) {
+  const { pathname } = useLocation();
   const searchEnabled =
-    getDocumentationProject(useLocation().pathname) !== undefined;
+    pathname === '/' || getDocumentationProject(pathname) !== undefined;
 
   return (
     <html lang="en" suppressHydrationWarning>
