@@ -12,7 +12,7 @@ defaults:
 
 jobs:
   checks:
-    name: Checks
+    name: Validate and build
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -34,3 +34,13 @@ jobs:
       - name: Run tests
         if: success() || failure()
         run: npm test
+
+      - name: Build game
+        run: npm run build -- --base ./
+
+      - name: Upload game build
+        uses: actions/upload-artifact@v4
+        with:
+          name: gemfire-game
+          path: gemfire/dist
+          if-no-files-found: error

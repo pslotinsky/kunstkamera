@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "react-router dev",
     "dev:game": "npm --prefix ../gemfire run dev -- --port 5174 --strictPort",
-    "build": "npm run typecheck && react-router build && node build/preparePages.ts && npm run build:game",
+    "build": "npm run typecheck && react-router build && node build/preparePages.ts",
     "build:game": "npm --prefix ../gemfire run build -- --base ./ --outDir ../showcase/dist/public/gemfire/game --emptyOutDir",
     "preview": "vite preview --config vite.preview.config.ts",
     "typecheck": "fumadocs-mdx && react-router typegen && tsc --noEmit",

@@ -63,10 +63,11 @@ To add another playable project, register it in `src/games.ts` and include its b
 ```sh
 npm run check:ci --prefix showcase
 npm run build --prefix showcase
+npm run build:game --prefix showcase
 npm run preview --prefix showcase
 ```
 
-The build generates Fumadocs modules and React Router types, checks TypeScript, pre-renders pages and a combined search database, packages them in `dist/public`, builds Gemfire into `dist/public/gemfire/game/`, and copies the Total Space prototypes and their images and data into `dist/public/total-space/`.
+The showcase build generates Fumadocs modules and React Router types, checks TypeScript, pre-renders pages and a combined search database, packages them in `dist/public`, and copies the Total Space prototypes and their images and data into `dist/public/total-space/`. For local preview, run `build:game` afterward to build Gemfire into `dist/public/gemfire/game/`. The showcase build recreates `dist/public`, so game files must be added after it finishes.
 
 Preview serves exactly that static artifact at `http://127.0.0.1:4173/kunstkamera/`, without the framework's development or SSR middleware. Search runs in the browser against the pre-rendered database.
 
@@ -74,6 +75,6 @@ Preview serves exactly that static artifact at `http://127.0.0.1:4173/kunstkamer
 
 ## Publishing
 
-Choose **GitHub Actions** in the repository's **Settings → Pages → Build and deployment**. The **CI** workflow (`.github/workflows/ci.yml`) runs Gemfire validation through the reusable `gemfire-ci.yml` workflow alongside the showcase checks and build. Pull requests validate and build the site. On `main`, **Deploy GitHub Pages** publishes `showcase/dist/public` after both jobs succeed.
+Choose **GitHub Actions** in the repository's **Settings → Pages → Build and deployment**. The **CI** workflow (`.github/workflows/ci.yml`) validates, tests, and builds Gemfire through the reusable `gemfire-ci.yml` workflow, which uploads the `gemfire-game` artifact. The Showcase job then checks and builds the site and downloads that game artifact into `showcase/dist/public/gemfire/game/` before uploading the combined Pages artifact. Showcase does not install Gemfire dependencies or rebuild the game. Pull requests validate and build the site. On `main`, **Deploy GitHub Pages** publishes `showcase/dist/public` after both jobs succeed.
 
 The expected URL is `https://pslotinsky.github.io/kunstkamera/`. Playwright is not a project dependency or a CI step. Do not commit generated files.
