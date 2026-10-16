@@ -10,9 +10,9 @@ The main purpose of the military system is territorial expansion through the cap
 
 ---
 
-# 6.1 Strategic Military Resources
+## 6.1 Strategic Military Resources
 
-## Troops
+### Troops
 
 Troops are the main military resource of a province.
 
@@ -24,7 +24,7 @@ Standard tactical unit types only appear when an army enters battle.
 
 ---
 
-## Food
+### Food
 
 Food is required to supply an army during a campaign.
 
@@ -34,7 +34,7 @@ Food therefore functions as both an economic resource and a military timer.
 
 ---
 
-## Gold
+### Gold
 
 Gold supports military activity through:
 
@@ -47,7 +47,7 @@ Attacks require a deployment cost of Troops / 8 + 10 Gold.
 
 ---
 
-## Design Observation
+### Design Observation
 
 On the strategic map, military power is abstract.
 
@@ -55,9 +55,9 @@ The player does not build separate cavalry, infantry, or archer units. Instead, 
 
 ---
 
-# 6.2 Commanders
+## 6.2 Commanders
 
-## Overview
+### Overview
 
 Each army has one commander.
 
@@ -69,7 +69,7 @@ The commander may be:
 
 ---
 
-## Commander Role
+### Commander Role
 
 The commander:
 
@@ -81,7 +81,7 @@ The commander:
 
 ---
 
-## WAR / Military
+### WAR / Military
 
 WAR represents the commander’s military ability.
 
@@ -97,7 +97,7 @@ Exact damage formulas and WAR modifiers remain unresolved.
 
 ---
 
-## Design Observation
+### Design Observation
 
 A general is a commander, not a tactical unit.
 
@@ -105,9 +105,9 @@ The army always consists of its standard tactical units plus an optional Fifth U
 
 ---
 
-# 6.3 Strategic Warfare
+## 6.3 Strategic Warfare
 
-## Attack
+### Attack
 
 An Attack targets an adjacent enemy province.
 
@@ -125,13 +125,13 @@ A province can only directly attack neighbouring provinces.
 
 ---
 
-## Campaign Logistics
+### Campaign Logistics
 
 An army requires Food to remain in the field; it consumes Food each day in proportion to its size (the daily formula is given under Supply, §6.9).
 
 ---
 
-## Territory Conquest
+### Territory Conquest
 
 When the attacker wins, the target province may transfer to the attacker’s house.
 
@@ -147,9 +147,9 @@ Exact post-battle edge cases remain unresolved.
 
 ---
 
-# 6.4 Army Composition
+## 6.4 Army Composition
 
-## Battlefield Army
+### Battlefield Army
 
 During tactical battle, a strategic army is represented by up to five battlefield units:
 
@@ -165,7 +165,7 @@ The commander is separate from these units.
 
 ---
 
-## Standard Troop Distribution
+### Standard Troop Distribution
 
 Strategic Troops are automatically distributed across the four standard units:
 
@@ -180,7 +180,7 @@ On entering battle, Troops are split roughly equally into Horsemen, Knights, Kni
 
 ---
 
-## Fifth Unit Slot
+### Fifth Unit Slot
 
 The fifth slot can be occupied by one special unit:
 
@@ -192,7 +192,7 @@ An army can have only one Fifth Unit at a time.
 
 ---
 
-## Design Observation
+### Design Observation
 
 The player does not customize the standard troop lineup.
 
@@ -208,15 +208,15 @@ Military variety comes from:
 
 ---
 
-# 6.5 Standard Tactical Units
+## 6.5 Standard Tactical Units
 
-## Overview
+### Overview
 
 The four standard tactical units are fixed: Horsemen, two Knights units, and Archers. Their Move, Range, and roles are canonical in Appendix C §C.1.
 
 ---
 
-## Horsemen
+### Horsemen
 
 Horsemen are the fastest standard unit.
 
@@ -230,7 +230,7 @@ They are useful for:
 
 ---
 
-## Knights
+### Knights
 
 Knights are standard frontline melee units.
 
@@ -245,7 +245,7 @@ Both Knight units appear to be mechanically similar.
 
 ---
 
-## Archers
+### Archers
 
 Archers provide ranged support.
 
@@ -260,9 +260,9 @@ Archers are tactically important because they can deal safer damage than melee u
 
 ---
 
-# 6.6 Fifth Unit System
+## 6.6 Fifth Unit System
 
-## Overview
+### Overview
 
 A Fifth Unit is a special unit that occupies the army’s fifth battlefield slot.
 
@@ -272,7 +272,7 @@ They use Strength instead of normal troop count.
 
 ---
 
-## Fifth Unit Categories
+### Fifth Unit Categories
 
 | Category         | Description                                             |
 | ---------------- | ------------------------------------------------------- |
@@ -282,7 +282,7 @@ They use Strength instead of normal troop count.
 
 ---
 
-## Gem Guardians
+### Gem Guardians
 
 Gem Guardians are tied to Gems. The seven confirmed Gem Guardians, with their Strength, Move, Range, and associated owners, are canonical in Appendix C §C.3.
 
@@ -290,7 +290,7 @@ Pastha is not a Gem Guardian. It is a special event-based Fifth Unit.
 
 ---
 
-## Hired Fifth Units
+### Hired Fifth Units
 
 Hired Fifth Units are obtained through the Hire Monster command.
 
@@ -298,7 +298,7 @@ The command name is misleading because the category includes both monsters and e
 
 ---
 
-## Strength
+### Strength
 
 Fifth Units use Strength instead of ordinary troop count.
 
@@ -308,7 +308,7 @@ Exact Strength loss rules differ by category and remain partially unresolved.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Fifth Units are the military system’s main asymmetry lever.
 
@@ -316,9 +316,9 @@ Standard units are predictable and fixed. Fifth Units create meaningful differen
 
 ---
 
-# 6.7 Gem Guardians
+## 6.7 Gem Guardians
 
-## Strategic Role
+### Strategic Role
 
 Gem Guardians are powerful Fifth Units granted by house-level Gem ownership.
 
@@ -332,13 +332,13 @@ A Gem Guardian can be used when:
 
 ---
 
-## Known Rules
+### Known Rules
 
 A Gem Guardian uses the Fifth Unit slot, requires no hiring cost or upkeep, and cannot permanently die. It is reusable but limited by a cooldown after use or defeat and weakens as it attacks; the exact cooldown and strength-loss rules are in the Gems chapter §7.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Gem Guardians create strategic timing decisions.
 
@@ -346,9 +346,9 @@ Because Gems enter cooldown after use or defeat, the player must decide when a b
 
 ---
 
-# 6.8 Hired Fifth Units
+## 6.8 Hired Fifth Units
 
-## Strategic Role
+### Strategic Role
 
 Hired Fifth Units give a province access to special military power without requiring a Gem.
 
@@ -356,13 +356,13 @@ They are strong but risky assets.
 
 ---
 
-## Known Rules
+### Known Rules
 
 Hired Fifth Units come from the Hire Monster command, are province-based, can be destroyed, and can be moved through Move Troops / Transport. They carry a hiring cost, quarterly upkeep, and desertion risk. Their stats are canonical in Appendix C §C.4.
 
 ---
 
-## Strategic Risk
+### Strategic Risk
 
 Hired Fifth Units create ongoing obligations.
 
@@ -370,9 +370,9 @@ A house that hires many special units gains military flexibility, but also incre
 
 ---
 
-# 6.9 Supply System
+## 6.9 Supply System
 
-## Food Consumption
+### Food Consumption
 
 Food determines how long an army can remain in battle.
 
@@ -382,13 +382,13 @@ Gem Guardians do not count toward this food requirement.
 
 ---
 
-## Starvation
+### Starvation
 
 If an army runs out of Food, it can lose the battle regardless of remaining unit strength.
 
 ---
 
-## Strategic Importance
+### Strategic Importance
 
 Supply is one of the main constraints on aggression.
 
@@ -396,9 +396,9 @@ A strong army without enough Food may be unable to finish a battle, while a weak
 
 ---
 
-# 6.10 Post-Battle Resolution
+## 6.10 Post-Battle Resolution
 
-## Victory Conditions
+### Victory Conditions
 
 A tactical battle can be won through:
 
@@ -412,7 +412,7 @@ Exact victory conditions and battle timing remain partially unresolved.
 
 ---
 
-## Territory Capture
+### Territory Capture
 
 If the attacker wins, the defending province may be captured.
 
@@ -420,7 +420,7 @@ If the defender wins, the province remains under its current owner.
 
 ---
 
-## Commander Capture
+### Commander Capture
 
 After defeat, the losing commander may be captured.
 
@@ -434,7 +434,7 @@ Exact capture probability remains unresolved.
 
 ---
 
-## Fifth Unit Outcome
+### Fifth Unit Outcome
 
 Fifth Unit outcomes depend on category.
 
@@ -446,9 +446,9 @@ Fifth Unit outcomes depend on category.
 
 ---
 
-# 6.11 Military Progression
+## 6.11 Military Progression
 
-## Overview
+### Overview
 
 Gemfire does not use a technology tree for military advancement.
 
@@ -465,7 +465,7 @@ Military power grows through:
 
 ---
 
-## Design Observation
+### Design Observation
 
 Military progression is political and logistical rather than technological.
 
@@ -473,9 +473,9 @@ A house becomes stronger by gaining land, people, resources, Gems, and better po
 
 ---
 
-# 6.12 Military System Summary
+## 6.12 Military System Summary
 
-## Reconstructed Military Model
+### Reconstructed Military Model
 
 ```mermaid
 flowchart TD
@@ -511,7 +511,7 @@ flowchart TD
 
 ---
 
-# Open Questions
+## Open Questions
 
 The following military-system details remain unresolved:
 
@@ -528,7 +528,7 @@ The following military-system details remain unresolved:
 
 ---
 
-# Summary
+## Summary
 
 Gemfire’s military system connects local province resources, commanders, Fifth Units, and tactical battles.
 

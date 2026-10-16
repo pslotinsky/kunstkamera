@@ -1,4 +1,5 @@
 import type { InvasionReport } from '@/core/domain/InvasionReport';
+import { getFamilyCrestUrl } from '@/ui/art/getFamilyCrestUrl';
 
 import { MARKER_ANCHORS, type MarkerAnchor } from './markerAnchors';
 
@@ -21,7 +22,8 @@ export class WarMarch {
   public play(report: InvasionReport): void {
     const from = MARKER_ANCHORS[report.source.number];
     const to = MARKER_ANCHORS[report.target.number];
-    const crest = report.source.family?.crest;
+    const { family } = report.source;
+    const crest = family ? getFamilyCrestUrl(family) : undefined;
 
     this.clear();
 

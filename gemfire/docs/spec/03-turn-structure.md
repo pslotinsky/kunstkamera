@@ -16,9 +16,9 @@ It defines:
 
 ---
 
-# 3.1 Calendar
+## 3.1 Calendar
 
-## Confirmed Facts
+### Confirmed Facts
 
 Game time is divided into months.
 
@@ -37,7 +37,7 @@ After the month is processed, the calendar advances to the next month.
 
 ---
 
-## Seasonal Cycle
+### Seasonal Cycle
 
 Gemfire includes seasonal economic and event timing.
 
@@ -47,7 +47,7 @@ Some disasters and special events are also tied to specific months or seasonal c
 
 ---
 
-## Design Observation
+### Design Observation
 
 Gemfire uses a large strategic time scale.
 
@@ -57,9 +57,9 @@ This makes long-term planning more important than short tactical optimization on
 
 ---
 
-# 3.2 Province-Based Activation
+## 3.2 Province-Based Activation
 
-## Core Model
+### Core Model
 
 Gemfire is primarily organized around province actions rather than a single global “kingdom turn.”
 
@@ -69,7 +69,7 @@ This makes the province the main unit of strategic activation.
 
 ---
 
-## Monthly Province Action
+### Monthly Province Action
 
 A province’s monthly action can be used for systems such as:
 
@@ -85,7 +85,7 @@ After most significant actions, the province’s monthly action is spent.
 
 ---
 
-## Conceptual Model
+### Conceptual Model
 
 ```mermaid
 flowchart TD
@@ -118,7 +118,7 @@ flowchart TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 The province-based model creates one of Gemfire’s key strategic constraints:
 
@@ -128,9 +128,9 @@ This forces tradeoffs between development, recruitment, diplomacy, logistics, an
 
 ---
 
-# 3.3 Turn-Consuming Commands
+## 3.3 Turn-Consuming Commands
 
-## Overview
+### Overview
 
 Most important strategic commands consume the province’s monthly action.
 
@@ -138,13 +138,13 @@ The exact behaviour of some commands may vary by version or still requires verif
 
 ---
 
-## Command Table
+### Command Table
 
 The major strategic commands (Develop, Give Food, Recruit, Attack, Transport, Hire Monster, the Diplomacy commands, and Search) each consume the province's monthly action; the full command-by-category breakdown and which commands consume the monthly action are canonical in Appendix D §D.1–D.2 and §D.4.
 
 ---
 
-## Notes
+### Notes
 
 `Hire Monster` is the original command name, but the command can provide both monsters and elite human units.
 
@@ -152,9 +152,9 @@ The major strategic commands (Develop, Give Food, Recruit, Attack, Transport, Hi
 
 ---
 
-# 3.4 Non-Turn-Consuming and Administrative Commands
+## 3.4 Non-Turn-Consuming and Administrative Commands
 
-## Overview
+### Overview
 
 Some commands do not appear to consume the province’s main monthly action.
 
@@ -162,13 +162,13 @@ These are mostly informational or administrative actions.
 
 ---
 
-## Known or Strongly Supported Examples
+### Known or Strongly Supported Examples
 
 Commands such as Trade (buy or sell Food), View / Enquiry, Change Lord, and Entrust are mostly informational or administrative and do not end the province's main action; which commands consume the monthly action is canonical in Appendix D §D.4.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Free or administrative commands reduce friction.
 
@@ -176,9 +176,9 @@ For example, Trade being non-turn-consuming lets the player adjust resources bef
 
 ---
 
-# 3.5 Entrust
+## 3.5 Entrust
 
-## Confirmed Facts
+### Confirmed Facts
 
 Entrust allows the player to delegate a province to AI control.
 
@@ -188,7 +188,7 @@ Entrust operates at the province level, not at the whole-house level.
 
 ---
 
-## Conceptual Model
+### Conceptual Model
 
 ```mermaid
 flowchart LR
@@ -199,7 +199,7 @@ flowchart LR
 
 ---
 
-## Design Observation
+### Design Observation
 
 Entrust confirms the province-centered structure of Gemfire.
 
@@ -209,9 +209,9 @@ This is mainly a convenience system for reducing micromanagement.
 
 ---
 
-# 3.6 Province Activation Order
+## 3.6 Province Activation Order
 
-## Current Understanding
+### Current Understanding
 
 The exact province activation order is not fully confirmed.
 
@@ -229,7 +229,7 @@ A captured province may be able to act later in the same month if its activation
 
 ---
 
-## Working Model
+### Working Model
 
 The current working model is:
 
@@ -240,15 +240,15 @@ The current working model is:
 
 ---
 
-## Confidence Level
+### Confidence Level
 
 The province-based model is strongly supported, but the exact internal ordering rules remain unresolved.
 
 ---
 
-# 3.7 End-of-Month Processing
+## 3.7 End-of-Month Processing
 
-## Overview
+### Overview
 
 After province activations are complete, the game performs systemic processing.
 
@@ -267,7 +267,7 @@ The exact order of these operations is not fully verified.
 
 ---
 
-## Seasonal Processing
+### Seasonal Processing
 
 Some systems are tied to specific months.
 
@@ -281,7 +281,7 @@ Examples include:
 
 ---
 
-# 3.8 Turn Structure Summary
+## 3.8 Turn Structure Summary
 
 Gemfire’s turn structure is one of its most distinctive systems.
 
@@ -301,7 +301,7 @@ The result is a compact but demanding strategic system where local decisions acc
 
 ---
 
-# Open Questions
+## Open Questions
 
 The following turn-structure details remain unresolved:
 

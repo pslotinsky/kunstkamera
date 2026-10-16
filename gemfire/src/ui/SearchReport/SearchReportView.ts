@@ -5,6 +5,7 @@ import type { FifthUnit } from '@/core/domain/FifthUnit';
 import type { SearchReportedEvent } from '@/core/events/SearchReportedEvent';
 import type { EventBus } from '@/lib/EventBus';
 import { View } from '@/lib/View';
+import { getFifthUnitPortraitUrl } from '@/ui/art/getFifthUnitPortraitUrl';
 
 import { SearchReportDismissedEvent } from './SearchReportDismissedEvent';
 
@@ -54,7 +55,7 @@ export class SearchReportView extends View<SearchReportContext> {
   private renderUnit(unit: FifthUnit): string {
     return `
       <div class="${styles.unit}">
-        <img class="${styles.portrait}" src="${unit.portrait}" alt="" />
+        <img class="${styles.portrait}" src="${getFifthUnitPortraitUrl(unit)}" alt="" />
         <span class="${styles.name}">${unit.name}</span>
         <span class="${styles.strength}">
           <img class="${styles.strengthIcon}" src="${troopsIconUrl}" alt="Strength" />${unit.strength}

@@ -1,5 +1,6 @@
 import type { FifthUnit } from '@/core/domain/FifthUnit';
 import type { Province } from '@/core/domain/Province';
+import { getFifthUnitPortraitUrl } from '@/ui/art/getFifthUnitPortraitUrl';
 
 import type { DropdownOption } from './DropdownView';
 
@@ -11,7 +12,7 @@ export function toUnitOptions(units: readonly FifthUnit[]): DropdownOption[] {
     ...units.map((unit) => ({
       value: unit.name,
       label: unit.name,
-      icon: unit.portrait,
+      icon: getFifthUnitPortraitUrl(unit),
       note: String(unit.strength),
     })),
   ];

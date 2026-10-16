@@ -1,4 +1,4 @@
-# 8.1 Launching a War — Design
+# 8.1 Launching a War
 
 ## Description
 

@@ -1,0 +1,493 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Total Space — Battle Concepts v3</title>
+<style>
+:root{--bg:#0b1016;--panel:#171e27;--panel2:#202a35;--panel3:#111820;--line:#344151;--line2:#526277;--text:#e8eef5;--muted:#94a4b5;--blue:#70ace0;--blue2:#244d70;--red:#dc747d;--red2:#65343c;--green:#7bc08f;--gold:#d8b35c}
+*{box-sizing:border-box}html,body,#root{height:100%;margin:0}body{background:var(--bg);color:var(--text);font:14px Inter,Segoe UI,Arial,sans-serif;overflow:hidden}button{font:inherit;color:inherit}.app{height:100%;display:flex;flex-direction:column;min-width:1180px}.top{height:52px;flex:0 0 52px;background:#151c24;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 16px;gap:12px}.brand{font-weight:850;letter-spacing:.5px}.crumb{color:var(--muted)}.grow{flex:1}.badge{font-size:10px;border:1px solid #455365;border-radius:12px;padding:3px 8px;color:#b3c1ce}.shell{flex:1;min-height:0;display:grid;grid-template-columns:242px 1fr}.nav{background:#121920;border-right:1px solid var(--line);overflow:auto}.nav-title{padding:13px 14px 8px;font-size:10px;color:#718293;text-transform:uppercase;letter-spacing:.8px}.nav button{width:100%;display:grid;grid-template-columns:31px 1fr;gap:9px;text-align:left;border:0;border-top:1px solid #202a35;background:transparent;padding:11px 12px;cursor:pointer}.nav button:last-child{border-bottom:1px solid #202a35}.nav button:hover{background:#1c2631}.nav button.active{background:#233543;box-shadow:inset 3px 0 0 var(--blue)}.num{width:25px;height:25px;border:1px solid #4c5b6a;background:#28333f;border-radius:50%;display:grid;place-items:center;font-weight:800}.nav button.active .num{background:#2a577d;border-color:#77acd6}.nav b{font-size:12px;display:block}.nav small{font-size:10px;color:#7f91a1;display:block;margin-top:3px;line-height:1.25}.stage{min-width:0;position:relative;overflow:hidden;background:radial-gradient(circle at 45% 28%,#243648 0,#131d27 43%,#090e13 86%)}.view{height:100%;display:flex;flex-direction:column}.head{height:70px;flex:0 0 70px;border-bottom:1px solid var(--line);background:#131a22e8;padding:11px 16px;display:flex;gap:12px;align-items:flex-start}.head h1{font-size:19px;margin:0 0 4px}.head p{margin:0;color:#91a1b1;font-size:12px;max-width:800px}.tabs{align-self:center;display:flex;gap:5px}.tabs button{border:1px solid #465568;background:#202a35;border-radius:4px;padding:6px 8px;cursor:pointer;color:#b6c3d0}.tabs button.active{background:#294f6f;border-color:#76a8d2;color:#f2f8fc}.body{flex:1;min-height:0;padding:14px}.card{background:#18212b;border:1px solid var(--line);border-radius:6px;box-shadow:0 8px 24px #0003}.btn{border:1px solid #516176;background:#273440;border-radius:4px;padding:8px 11px;cursor:pointer}.btn:hover{background:#30404f}.btn.primary{background:#29577e;border-color:#6499c7}.btn.danger{background:#64343b;border-color:#95525b}.btn:disabled{opacity:.45;cursor:default}.muted{color:var(--muted)}.small{font-size:11px}.tiny{font-size:10px}
+/* shared fleet cards */
+.fleet{padding:12px;overflow:auto}.fleet-head{display:flex;justify-content:space-between;margin-bottom:9px}.fleet-head b{font-size:12px}.roster{display:flex;gap:7px;flex-wrap:wrap}.u-card{width:104px;height:102px;background:#101820;border:1px solid #425164;border-radius:4px;padding:5px;position:relative}.u-card.enemy{border-color:#6b434a}.u-card img{width:100%;height:57px;object-fit:contain}.u-card.enemy img{transform:scaleX(-1);filter:hue-rotate(135deg) saturate(.75)}.u-card b{display:block;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.u-card span{font-size:10px;color:#9aaabb}.loss{position:absolute;right:4px;top:4px;border-radius:8px;background:#68323a;color:#ffdce0;padding:2px 5px;font-size:9px}.kv{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:11px;border-top:1px solid var(--line);padding-top:9px;margin-top:10px}
+/* 1 */
+.result-grid{height:100%;display:grid;grid-template-columns:1fr 270px 1fr;gap:12px}.resolve{padding:14px;text-align:center;display:flex;flex-direction:column;justify-content:center}.forecast{display:flex;height:8px;background:#6a343a;border-radius:6px;overflow:hidden;margin:14px 0}.forecast i{display:block;width:56%;background:#417aa7}.big{font-size:25px;font-weight:900;margin:8px 0}.win{color:#82c596}
+/* battlefields */
+.battlefield{position:relative;overflow:hidden;border:1px solid #3e4d5e;border-radius:6px;background:radial-gradient(circle at 50% 40%,#25394c,#15222e 40%,#0b1118 83%)}.battlefield:before{content:"";position:absolute;inset:0;background-image:radial-gradient(#aab5bf 1px,transparent 1px);background-size:51px 51px;opacity:.12}.ship{position:absolute;width:96px;height:58px;display:grid;place-items:center;transition:left .35s,top .35s,transform .35s}.ship img{max-width:100%;max-height:100%;filter:drop-shadow(0 5px 6px #0008)}.ship.enemy img{transform:scaleX(-1);filter:hue-rotate(135deg) saturate(.75) drop-shadow(0 5px 6px #0008)}.ship .count{position:absolute;right:-6px;bottom:-4px;border:1px solid #506073;border-radius:9px;background:#0d141bdc;padding:2px 5px;font-size:9px}.ship.selected{outline:2px solid #83bdea;background:#2a587133;border-radius:5px}
+/* 2 */
+.play-grid{height:100%;display:grid;grid-template-columns:235px 1fr 235px;gap:12px}.timeline{position:absolute;left:14px;right:14px;bottom:12px;height:43px;background:#101820e8;border:1px solid #415064;border-radius:5px;display:flex;align-items:center;padding:0 10px;gap:8px;z-index:8}.progress{height:5px;background:#354252;border-radius:5px;overflow:hidden;flex:1}.progress i{display:block;height:100%;width:0;background:#75afe0}.phasebar{position:absolute;left:12px;top:12px;display:flex;gap:5px;z-index:8}.phase{font-size:10px;color:#758697;border:1px solid #415062;background:#17212b;padding:4px 7px;border-radius:3px}.phase.active{background:#2a5574;border-color:#73a8d3;color:#f0f7fc}.flash{position:absolute;width:22px;height:22px;border-radius:50%;background:#f4c35b;box-shadow:0 0 28px #ef824f;opacity:0}.flash.on{opacity:1}
+/* 3 */
+.deploy-grid{height:100%;display:grid;grid-template-columns:1fr 290px;gap:12px}.deploy-panel{padding:11px;display:flex;flex-direction:column;min-width:0}.deploy-panel h3{font-size:12px;margin:0 0 8px}.concept-note{font-size:11px;color:#91a2b2;margin:7px 0 0}.formation-board{flex:1;min-height:0;border:1px solid #405061;background:#101820;border-radius:5px;overflow:hidden;position:relative}
+/* v1 = no spatial field; only two formations */
+.formations{display:grid;grid-template-columns:1fr 92px 1fr;height:100%;align-items:center;padding:26px 36px;gap:14px}.formation{display:grid;grid-template-rows:repeat(5,64px);gap:8px}.form-slot{border:1px solid #425164;border-radius:4px;background:#151e27;display:flex;align-items:center;gap:10px;padding:6px 9px;cursor:pointer}.form-slot:hover{border-color:#6d8298}.form-slot.active{outline:2px solid #83bdea}.form-slot.enemy{border-color:#68444b}.form-slot img{width:66px;height:48px;object-fit:contain}.form-slot.enemy img{transform:scaleX(-1);filter:hue-rotate(135deg) saturate(.75)}.form-vs{text-align:center;font-size:18px;color:#8797a7}.form-slot .meta{font-size:10px;color:#93a4b5}
+/* v2 = 1D depth echelons */
+.echelons{height:100%;display:grid;grid-template-columns:repeat(6,1fr);position:relative}.echelon{border-right:1px solid #425163;position:relative;padding:26px 7px 8px;display:flex;flex-direction:column;gap:8px;align-items:center}.echelon:nth-child(3){border-right:3px solid #718293}.echelon:last-child{border-right:0}.echelon.ours{cursor:pointer}.echelon.ours:hover{background:#24425a2a}.ech-label{position:absolute;left:5px;top:5px;color:#697b8d;font-size:9px}.ech-unit{width:86px;height:54px;border:1px solid #405061;border-radius:4px;background:#141d26;padding:3px;display:grid;place-items:center;cursor:pointer}.ech-unit.selected{outline:2px solid #83bdea}.ech-unit img{max-width:100%;max-height:100%}.ech-unit.enemy img{transform:scaleX(-1);filter:hue-rotate(135deg) saturate(.75)}
+/* v3 = one shared 1D axis */
+.axis-wrap{height:100%;display:flex;align-items:center;padding:28px}.axis{position:relative;height:4px;background:#536275;width:100%;border-radius:4px}.axis:before{content:"";position:absolute;left:50%;top:-18px;height:40px;border-left:1px dashed #728191}.axis-pos{position:absolute;top:50%;width:78px;height:52px;transform:translate(-50%,-50%);display:grid;place-items:center;cursor:pointer}.axis-pos img{max-width:100%;max-height:100%}.axis-pos.enemy img{transform:scaleX(-1);filter:hue-rotate(135deg) saturate(.75)}.axis-pos.selected{outline:2px solid #83bdea;border-radius:5px;background:#2a587133}.axis-tick{position:absolute;top:10px;width:1px;height:14px;background:#617184}.axis-distance{position:absolute;top:-32px;font-size:9px;color:#748697;transform:translateX(-50%)}
+/* v4 = abstract formation slots above + separate visual playback below */
+.hybrid{height:100%;display:grid;grid-template-rows:170px 1fr;gap:10px;padding:10px}.hybrid-slots{display:grid;grid-template-columns:1fr 78px 1fr;gap:12px;align-items:center}.slot-row{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.slot{height:65px;border:1px solid #425164;background:#151d26;border-radius:4px;display:grid;place-items:center;cursor:pointer}.slot:hover{border-color:#71869c}.slot img{max-width:68px;max-height:50px}.slot.enemy img{transform:scaleX(-1);filter:hue-rotate(135deg) saturate(.75)}.slot.selected{outline:2px solid #83bdea}.mini-cinema{position:relative;border:1px solid #3e4d5e;border-radius:5px;overflow:hidden;background:radial-gradient(circle at 50% 50%,#26394a,#101822 75%)}.cinema-label{position:absolute;left:9px;top:8px;color:#8091a2;font-size:10px;z-index:5}
+.side{padding:12px;display:flex;flex-direction:column;min-height:0}.side h3{font-size:12px;margin:0 0 8px}.notice{border:1px solid #3e4d5d;background:#111922;border-radius:4px;padding:8px;font-size:11px;color:#a7b7c6}.log{border-top:1px solid var(--line);padding-top:8px;margin-top:9px;font-size:10px;color:#99a9b8;min-height:55px}
+/* 4 */
+.decision-grid{height:100%;display:grid;grid-template-columns:1fr 305px;gap:12px}.pause-badge{position:absolute;left:12px;top:12px;z-index:8;border:1px solid #65788b;background:#101820e8;padding:6px 9px;border-radius:4px;font-weight:800}.choice{border:1px solid #465568;background:#121a22;border-radius:5px;padding:9px;margin-top:7px;cursor:pointer}.choice:hover,.choice.active{border-color:#78adde;background:#213344}.choice b{display:block;font-size:11px;margin-bottom:2px}.submode{font-size:10px;color:#8192a3;margin-bottom:7px}
+/* 5 */
+.grid-layout{height:100%;display:grid;grid-template-columns:1fr 260px;gap:12px}.gridbox{padding:10px;display:flex;flex-direction:column}.tgrid{flex:1;display:grid;grid-template-columns:repeat(10,1fr);grid-template-rows:repeat(6,1fr);border-left:1px solid #3e4d5e;border-top:1px solid #3e4d5e;background:#0f171f}.cell{position:relative;border-right:1px solid #3e4d5e;border-bottom:1px solid #3e4d5e;display:grid;place-items:center;cursor:pointer}.cell:hover{background:#243748}.cell.reach{background:#23466255}.cell.target{background:#65323b55}.cell.sel{outline:2px solid #83bdec;z-index:2}.cell img{max-width:78%;max-height:67%}.cell.enemy img{transform:scaleX(-1);filter:hue-rotate(135deg) saturate(.75)}.dual{height:100%;display:grid;grid-template-columns:1fr 70px 1fr;gap:14px;align-items:center;padding:14px}.matrix{height:410px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(4,1fr);border-left:1px solid #425164;border-top:1px solid #425164;background:#101820}.mcell{border-right:1px solid #425164;border-bottom:1px solid #425164;display:grid;place-items:center;cursor:pointer}.mcell:hover{background:#213344}.mcell.sel{outline:2px solid #83bdec}.mcell img{max-width:75%;max-height:65%}.mcell.enemy img{transform:scaleX(-1);filter:hue-rotate(135deg) saturate(.75)}
+/* 6 */
+.rts-grid{height:100%;display:grid;grid-template-columns:1fr 280px;gap:12px}.cmd{width:100%;border:1px solid #475669;background:#1b2530;color:#dae5ef;padding:8px 9px;border-radius:4px;text-align:left;margin-top:5px;cursor:pointer}.cmd:hover,.cmd.active{background:#294158;border-color:#76a9d2}.hint{position:absolute;left:12px;bottom:10px;color:#748596;font-size:10px;z-index:7}
+
+/* v4 — width-responsive layout */
+.app{
+  min-width:0 !important;
+}
+.shell{
+  grid-template-columns:clamp(178px,17vw,238px) minmax(0,1fr) !important;
+  min-width:0;
+}
+.stage,.view,.body,.head{
+  min-width:0;
+}
+.body{
+  overflow:auto;
+}
+.head{
+  height:auto !important;
+  min-height:70px;
+  flex-wrap:wrap;
+}
+.tabs{
+  max-width:100%;
+  overflow-x:auto;
+  scrollbar-width:thin;
+}
+.tabs button{
+  flex:0 0 auto;
+  white-space:nowrap;
+}
+.result-grid{
+  grid-template-columns:minmax(0,1fr) clamp(210px,22vw,270px) minmax(0,1fr);
+}
+.play-grid{
+  grid-template-columns:clamp(175px,19vw,235px) minmax(0,1fr) clamp(175px,19vw,235px);
+}
+.deploy-grid{
+  grid-template-columns:minmax(0,1fr) clamp(230px,25vw,290px);
+}
+.decision-grid{
+  grid-template-columns:minmax(0,1fr) clamp(245px,27vw,305px);
+}
+.grid-layout{
+  grid-template-columns:minmax(0,1fr) clamp(220px,23vw,260px);
+}
+.rts-grid{
+  grid-template-columns:minmax(0,1fr) clamp(230px,25vw,280px);
+}
+.u-card{
+  width:clamp(82px,8.6vw,104px);
+}
+.ship{
+  width:clamp(70px,7.5vw,96px);
+}
+.formations{
+  padding:clamp(12px,2vw,26px) clamp(14px,3vw,36px);
+  grid-template-columns:minmax(0,1fr) clamp(54px,7vw,92px) minmax(0,1fr);
+}
+.form-slot{
+  min-width:0;
+}
+.form-slot img{
+  width:clamp(44px,5vw,66px);
+}
+.hybrid-slots{
+  grid-template-columns:minmax(0,1fr) clamp(48px,6vw,78px) minmax(0,1fr);
+}
+.slot-row{
+  min-width:0;
+}
+.axis-wrap{
+  padding-inline:clamp(12px,3vw,28px);
+}
+.axis-pos{
+  width:clamp(54px,6vw,78px);
+}
+
+/* Medium desktop / small laptop */
+@media (max-width:1180px){
+  .top{padding-inline:12px}
+  .shell{grid-template-columns:188px minmax(0,1fr) !important}
+  .nav button{padding:9px 9px;grid-template-columns:28px 1fr}
+  .nav b{font-size:11px}
+  .nav small{font-size:10px}
+  .n{width:23px;height:23px}
+  .body{padding:10px}
+  .result-grid,.play-grid,.deploy-grid,.decision-grid,.grid-layout,.rts-grid{gap:9px}
+  .fleet,.side{padding:9px}
+  .roster{gap:5px}
+  .u-card{width:82px;height:88px;padding:4px}
+  .u-card img{height:47px}
+  .u-card b,.u-card span{font-size:9px}
+  .play-grid{grid-template-columns:170px minmax(0,1fr) 170px}
+  .deploy-grid{grid-template-columns:minmax(0,1fr) 225px}
+  .decision-grid{grid-template-columns:minmax(0,1fr) 245px}
+  .grid-layout{grid-template-columns:minmax(0,1fr) 220px}
+  .rts-grid{grid-template-columns:minmax(0,1fr) 225px}
+  .formations{padding:14px}
+  .formation{grid-template-rows:repeat(5,58px)}
+  .form-slot{padding:4px 6px;gap:5px}
+  .echelon{padding-inline:4px}
+  .ech-unit{width:72px}
+  .hybrid{grid-template-rows:148px 1fr}
+}
+
+/* Tablet / narrow browser: navigation becomes a horizontal concept strip */
+@media (max-width:940px){
+  body{overflow:hidden}
+  .shell{
+    grid-template-columns:1fr !important;
+    grid-template-rows:auto minmax(0,1fr);
+  }
+  .nav{
+    display:flex;
+    overflow-x:auto;
+    overflow-y:hidden;
+    border-right:0 !important;
+    border-bottom:1px solid var(--line);
+    scrollbar-width:thin;
+  }
+  .nav-title{display:none}
+  .nav button{
+    width:auto !important;
+    min-width:142px;
+    flex:0 0 142px;
+    border-top:0 !important;
+    border-right:1px solid #202a35;
+    border-bottom:0 !important;
+    padding:7px 9px;
+  }
+  .nav button.active{
+    box-shadow:inset 0 -3px 0 var(--blue);
+  }
+  .nav small{display:none}
+  .head{
+    min-height:64px;
+    padding:9px 12px;
+  }
+  .head h1{font-size:17px}
+  .head p{font-size:11px}
+  .body{padding:8px}
+  .result-grid{
+    grid-template-columns:minmax(0,1fr) 190px minmax(0,1fr);
+  }
+  .play-grid{
+    grid-template-columns:150px minmax(0,1fr) 150px;
+  }
+  .deploy-grid{
+    grid-template-columns:minmax(0,1fr) 205px;
+  }
+  .decision-grid{
+    grid-template-columns:minmax(0,1fr) 220px;
+  }
+  .grid-layout,.rts-grid{
+    grid-template-columns:minmax(0,1fr) 205px;
+  }
+  .u-card{width:72px;height:80px}
+  .u-card img{height:40px}
+  .fleet-head{font-size:10px}
+  .ship{width:64px}
+  .timeline{left:8px;right:8px;padding-inline:7px;gap:5px}
+  .formations{grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr);padding:10px}
+  .formation{grid-template-rows:repeat(5,52px);gap:5px}
+  .form-slot{font-size:10px}
+  .form-slot img{width:38px;height:38px}
+  .echelon{gap:4px}
+  .ech-unit{width:62px;height:47px}
+  .axis-pos{width:52px}
+  .hybrid{grid-template-rows:130px 1fr;padding:7px}
+  .slot{height:54px}
+}
+
+/* Compact width: preserve battlefield size; panels move below instead of crushing it */
+@media (max-width:720px){
+  .top{height:46px;flex-basis:46px}
+  .crumb,.top .badge{display:none}
+  .brand{font-size:12px}
+  .nav button{min-width:112px;flex-basis:112px;grid-template-columns:24px 1fr}
+  .nav b{font-size:10px}
+  .n{width:20px;height:20px;font-size:10px}
+  .head{
+    display:block;
+    padding:8px 10px;
+  }
+  .head h1{font-size:15px;margin-bottom:3px}
+  .head p{font-size:10px;line-height:1.3}
+  .tabs{
+    margin-top:7px;
+    padding-bottom:2px;
+  }
+  .tabs button{padding:4px 7px;font-size:10px}
+  .body{
+    overflow:auto;
+    padding:7px;
+  }
+  .result-grid,.play-grid,.deploy-grid,.decision-grid,.grid-layout,.rts-grid{
+    height:auto !important;
+    grid-template-columns:1fr !important;
+  }
+  .result-grid .fleet,.play-grid .fleet{
+    max-height:none;
+  }
+  .resolve{min-height:180px}
+  .battlefield{
+    min-height:390px;
+  }
+  .play-grid .battlefield{
+    order:-1;
+  }
+  .deploy-panel{
+    min-height:480px;
+  }
+  .deploy-grid>.side,.decision-grid>.side,.grid-layout>.side,.rts-grid>.side{
+    min-height:220px;
+  }
+  .formation-board{
+    min-height:390px;
+    overflow:auto;
+  }
+  .echelons{
+    min-width:570px;
+  }
+  .hybrid{
+    min-width:560px;
+  }
+  .axis-wrap{
+    min-width:540px;
+  }
+  .tgrid{
+    min-height:390px;
+  }
+  .dual-grid,.dual{
+    min-width:520px;
+  }
+  .roster{
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    padding-bottom:4px;
+  }
+  .u-card{
+    flex:0 0 78px;
+    width:78px;
+  }
+}
+
+/* Phone-size fallback: keep concepts usable through horizontal scrolling inside the complex boards */
+@media (max-width:480px){
+  .nav button{min-width:100px;flex-basis:100px;padding-inline:6px}
+  .head h1{font-size:14px}
+  .body{padding:5px}
+  .battlefield{min-height:340px}
+  .deploy-panel{min-height:430px}
+  .formation-board{
+    overflow:auto;
+  }
+  .formations{
+    min-width:450px;
+  }
+  .timeline .tiny{display:none}
+  .timeline .btn{padding-inline:6px !important}
+}
+
+
+/* v5 — keep variant selectors visible at every width */
+.head{
+  flex:0 0 auto !important;
+  height:auto !important;
+  min-height:70px;
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:"title variants";
+  align-items:center !important;
+  column-gap:14px;
+  row-gap:8px;
+  overflow:visible !important;
+}
+.head > div:first-child{
+  grid-area:title;
+  min-width:0;
+}
+.head > .grow{
+  display:none !important;
+}
+.head > .tabs{
+  grid-area:variants;
+  align-self:center;
+  justify-self:end;
+  max-width:min(48vw,620px);
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding-bottom:2px;
+  scrollbar-width:thin;
+}
+.head > .tabs button{
+  flex:0 0 auto;
+  white-space:nowrap;
+}
+
+/* On narrower screens, variants become an explicit second row instead of
+   being squeezed or wrapping underneath the fixed-height header. */
+@media (max-width:1180px){
+  .head{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-areas:
+      "title"
+      "variants";
+    align-items:start !important;
+  }
+  .head > .tabs{
+    justify-self:start;
+    width:100%;
+    max-width:100%;
+  }
+}
+
+/* Preserve the same explicit variants row in tablet/phone modes. */
+@media (max-width:940px){
+  .head{
+    display:grid !important;
+    height:auto !important;
+    flex-basis:auto !important;
+  }
+}
+@media (max-width:720px){
+  .head{
+    display:grid !important;
+    padding:8px 10px;
+  }
+  .head > .tabs{
+    margin-top:0 !important;
+  }
+}
+
+
+/* v6 concept refinements */
+.dd-board{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center}
+.dd-column{display:flex;flex-direction:column;gap:10px}
+.dd-title{font-size:12px;color:#7d8496;text-transform:uppercase;letter-spacing:.08em}
+.dd-rank{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:center}
+.dd-ranknum{width:26px;height:54px;border:1px solid #243048;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#9fb1da;background:#111725;font-weight:700}
+.dd-slot{position:relative;min-height:54px;border:1px solid #243048;border-radius:14px;background:#12192a;padding:8px 10px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:.18s}
+.dd-slot:hover{border-color:#4f6390}.dd-slot img{width:44px;height:28px;object-fit:contain}
+.dd-slot.active{outline:2px solid #86b1ff;border-color:#86b1ff;background:#15213b}
+.dd-slot.enemy.targetable{box-shadow:inset 0 0 0 1px #875868;background:#231722}
+.dd-slot small{display:block;color:#8f9aaf;font-size:11px}
+.dd-middle{display:flex;flex-direction:column;align-items:center;gap:10px;color:#8d97ab;font-size:12px}.dd-rules{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}.dd-rules .notice{min-height:54px}
+.duel-board{display:flex;flex-direction:column;gap:12px}.initiative{display:flex;gap:8px;overflow:auto;padding-bottom:4px}
+.init-chip{min-width:92px;padding:8px 10px;border:1px solid #243048;border-radius:14px;background:#12192a;display:flex;align-items:center;gap:8px;cursor:pointer;white-space:nowrap}
+.init-chip img{width:34px;height:22px;object-fit:contain}.init-chip.active{outline:2px solid #86b1ff;border-color:#86b1ff;background:#15213b}.init-chip.enemy{background:#1a141c}
+.duel-stage{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;padding:16px;border:1px solid #243048;border-radius:18px;background:linear-gradient(180deg,#0f1626,#0b1020)}
+.duel-ship{display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px;border:1px solid #243048;border-radius:16px;background:#11192b}.duel-ship img{width:180px;max-width:100%;height:90px;object-fit:contain}.duel-ship.enemy img{transform:scaleX(-1)}
+.duel-vs{color:#9ca7be;text-align:center;font-size:12px}.duel-vs b{display:block;font-size:24px;color:#dfe8ff;margin-bottom:6px}
+.duel-benches{display:grid;grid-template-columns:1fr 1fr;gap:10px}.duel-bench{border:1px solid #243048;border-radius:14px;padding:10px;background:#101625}.duel-mini{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.duel-mini .u-card{width:92px}
+.disciples{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:start}.formation6{display:grid;grid-template-columns:repeat(3,92px);grid-template-rows:repeat(2,92px);gap:8px;justify-content:center}
+.dcell{border:1px dashed #30405d;border-radius:16px;background:#0f1524;position:relative;min-width:0;min-height:0}
+.dunit{position:relative;border:1px solid #243048;border-radius:16px;background:#12192a;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;gap:4px;cursor:pointer;text-align:center;overflow:hidden}.dunit img{width:64px;height:38px;object-fit:contain}.dunit.enemy{background:#1a141c}.dunit.sel{outline:2px solid #86b1ff;border-color:#86b1ff;background:#15213b}.dunit span{font-size:11px;color:#9aa4b8}.dunit.big{font-weight:700}
+@media (max-width:960px){.dd-board,.duel-stage,.disciples{grid-template-columns:1fr}.dd-middle,.duel-vs{order:-1}.formation6{grid-template-columns:repeat(3,minmax(74px,1fr))}}
+
+
+/* v7 simplification */
+.depth-board{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:start}
+.depth-side{display:grid;gap:10px}.depth-row{border:1px solid #243048;border-radius:14px;background:#12192a;padding:10px}.depth-row.enemy{background:#1a141c}.depth-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;color:#9aa7bf;text-transform:uppercase;letter-spacing:.06em}.depth-ships{display:flex;gap:8px;flex-wrap:wrap}.depth-gap{display:grid;grid-template-rows:repeat(3,1fr);gap:10px;min-width:120px;padding-top:34px}.depth-dist{display:flex;align-items:center;justify-content:center;border:1px dashed #30405d;border-radius:12px;color:#7f8ca5;font-size:12px;background:#0f1524;padding:10px;text-align:center}
+.dd-simple{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:start}.dd-side{display:grid;gap:10px}.dd-pos{display:grid;grid-template-columns:32px 1fr;gap:8px;align-items:center}.dd-side.enemy .dd-pos{grid-template-columns:1fr 32px}.dd-num{width:32px;height:60px;border:1px solid #243048;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#0f1524;color:#9fb1da;font-weight:700}.dd-card{min-height:60px;border:1px solid #243048;border-radius:14px;background:#12192a;padding:8px 10px;display:flex;align-items:center;gap:10px}.dd-card img{width:48px;height:30px;object-fit:contain}.dd-card.empty{justify-content:center;color:#6f7a8f;font-size:12px}.dd-card.sel{outline:2px solid #86b1ff;border-color:#86b1ff;background:#15213b}.dd-card.allowed{box-shadow:inset 0 0 0 1px #33548f}.dd-card.target{box-shadow:inset 0 0 0 1px #875868;background:#231722}.dd-center{display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center}.dd-range{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}.dd-range .notice{min-height:56px}
+.initiative-static{display:flex;gap:8px;overflow:auto;padding-bottom:4px}.init-chip{min-width:90px;padding:8px 10px;border:1px solid #243048;border-radius:14px;background:#12192a;display:flex;align-items:center;gap:8px;white-space:nowrap}.init-chip img{width:34px;height:22px;object-fit:contain}.init-chip.current{outline:2px solid #86b1ff;border-color:#86b1ff;background:#15213b}.init-chip.enemy{background:#1a141c}
+.duel-stage{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center;padding:18px;border:1px solid #243048;border-radius:18px;background:linear-gradient(180deg,#0f1626,#0b1020)}.duel-ship{display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px;border:1px solid #243048;border-radius:16px;background:#11192b}.duel-ship img{max-width:100%;height:auto;object-fit:contain}.duel-ship.enemy img{transform:scaleX(-1)}.duel-name{font-size:18px;font-weight:700}.duel-qty{font-size:13px;color:#8f9ab2}.duel-mid{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;color:#9ca7be}.duel-mid b{font-size:24px;color:#dfe8ff}
+.disciples{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:start}.formation6v{display:grid;grid-template-columns:112px;grid-template-rows:repeat(6,78px);gap:8px;justify-content:center}.dcell{border:1px dashed #30405d;border-radius:16px;background:#0f1524;position:relative}.dunit{position:relative;border:1px solid #243048;border-radius:16px;background:#12192a;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;gap:4px;cursor:pointer;text-align:center;overflow:hidden}.dunit img{width:68px;height:40px;object-fit:contain}.dunit.enemy{background:#1a141c}.dunit.sel{outline:2px solid #86b1ff;border-color:#86b1ff;background:#15213b}.dunit span{font-size:11px;color:#9aa4b8}.dunit.big{font-weight:700}
+@media (max-width:960px){.depth-board,.dd-simple,.duel-stage,.disciples{grid-template-columns:1fr}.depth-gap,.dd-center,.duel-mid{order:-1}.formation6v{grid-template-columns:minmax(88px,112px)}}
+
+
+/* v8 stricter battle mockups */
+.depth-board{display:grid;grid-template-columns:1fr 180px 1fr;gap:20px;align-items:center}
+.depth-side{display:grid;gap:14px}
+.depth-row{display:flex;min-height:74px;align-items:center;padding:10px 12px;border:1px solid #243048;border-radius:16px;background:#12192a}
+.depth-row.enemy{background:#1a141c;justify-content:flex-start}.depth-row.ours{justify-content:flex-end}
+.depth-row.front{margin-inline-end:0}.depth-row.mid{margin-inline-end:24px}.depth-row.back{margin-inline-end:48px}
+.depth-side.enemy .depth-row.front{margin-inline-start:0}.depth-side.enemy .depth-row.mid{margin-inline-start:24px}.depth-side.enemy .depth-row.back{margin-inline-start:48px}
+.depth-ships{display:flex;gap:10px;flex-wrap:wrap}.depth-center{display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center}.depth-center .lane{width:100%;height:74px;border-top:1px dashed #32405f;border-bottom:1px dashed #1a2235;border-radius:12px;background:#0e1422}.depth-center .lane:nth-child(2){opacity:.8}.depth-center .lane:nth-child(3){opacity:.6}
+.dd-lineup{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center}.dd-track{display:flex;gap:10px;align-items:flex-end}.dd-track.enemy{justify-content:flex-start}.dd-track.our{justify-content:flex-end}.dd-slot2{width:118px}.dd-index{font-size:11px;color:#7f8aa0;text-align:center;margin-top:6px}.dd-unit{border:1px solid #243048;border-radius:16px;background:#12192a;padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;min-height:98px}.dd-unit img{width:80px;height:46px;object-fit:contain}.dd-unit.enemy{background:#1a141c}.dd-unit.sel{outline:2px solid #86b1ff;border-color:#86b1ff;background:#15213b}.dd-unit.target{box-shadow:inset 0 0 0 1px #875868;background:#231722}.dd-space{width:34px}
+.duel-board{display:flex;flex-direction:column;gap:16px}.initiative-static{display:flex;gap:8px;overflow:auto;padding-bottom:4px}.init-chip{min-width:86px;padding:8px 10px;border:1px solid #243048;border-radius:14px;background:#12192a;display:flex;align-items:center;gap:8px;white-space:nowrap}.init-chip img{width:36px;height:24px;object-fit:contain}.init-chip.current{outline:2px solid #86b1ff;border-color:#86b1ff;background:#15213b}.init-chip.enemy{background:#1a141c}
+.duel-stage{display:grid;grid-template-columns:1fr 54px 1fr;gap:20px;align-items:center;padding:10px 0;background:transparent;border:0}.duel-ship{display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px;border:0;background:transparent}.duel-ship img{max-width:100%;height:auto;object-fit:contain;filter:drop-shadow(0 14px 24px rgba(0,0,0,.35))}.duel-ship.enemy img{transform:scaleX(-1)}.duel-name,.duel-qty{display:none}.duel-gap{height:220px;border-left:1px solid #2d3a57;border-right:1px solid #0f1420;border-radius:999px;background:linear-gradient(180deg,rgba(33,45,73,.14),rgba(16,22,38,.02))}
+.disciples{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center}.formation6d{display:grid;grid-template-columns:repeat(2,108px);grid-template-rows:repeat(3,88px);gap:10px;justify-content:center}.dcell{border:1px dashed #30405d;border-radius:16px;background:#0f1524;position:relative}.dunit{position:relative;border:1px solid #243048;border-radius:16px;background:#12192a;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;gap:4px;cursor:pointer;text-align:center;overflow:hidden}.dunit img{width:70px;height:42px;object-fit:contain}.dunit.enemy{background:#1a141c}.dunit.sel{outline:2px solid #86b1ff;border-color:#86b1ff;background:#15213b}.dunit span{display:none}.dunit.big{font-weight:700}
+@media (max-width:1100px){.depth-board,.dd-lineup,.duel-stage,.disciples{grid-template-columns:1fr}.depth-center,.dd-space{display:none}.duel-gap{display:none}.dd-track.our,.dd-track.enemy{justify-content:center}}
+
+
+/* v9 — targeted cleanup for 3.2, 3.3, 3.4, 5.2 */
+.depth-columns{height:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) 28px repeat(3,minmax(0,1fr));gap:10px;align-items:stretch;padding:12px}
+.depth-col{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;min-width:0;border-left:1px dashed rgba(89,106,139,.28)}
+.depth-col:first-child,.depth-col.enemy-first{border-left:0}.depth-divider{position:relative}.depth-divider:before{content:"";position:absolute;left:50%;top:4%;bottom:4%;width:1px;background:#43506a}
+.depth-ship{width:min(100%,110px);height:76px;display:flex;align-items:center;justify-content:center}.depth-ship img{max-width:100%;max-height:68px;object-fit:contain;filter:drop-shadow(0 8px 12px rgba(0,0,0,.35))}.depth-ship.enemy img{transform:scaleX(-1);filter:hue-rotate(135deg) saturate(.75) drop-shadow(0 8px 12px rgba(0,0,0,.35))}
+.dd-lineup2{height:100%;display:grid;grid-template-columns:minmax(0,1fr) 46px minmax(0,1fr);align-items:center;padding:18px 10px;min-width:0}.dd-row2{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;min-width:0;align-items:end}.dd-slot3{min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px}.dd-unit3{width:100%;min-width:0;height:112px;border:1px solid #243048;border-radius:14px;background:#12192a;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:8px}.dd-unit3 img{max-width:92%;max-height:88px;object-fit:contain}.dd-unit3.enemy{background:#1a141c}.dd-unit3.enemy img{transform:scaleX(-1);filter:hue-rotate(135deg) saturate(.75)}.dd-unit3.sel{outline:2px solid #86b1ff;border-color:#86b1ff;background:#15213b}.dd-unit3.target{box-shadow:inset 0 0 0 2px #875868;background:#231722}.dd-posnum{font-size:11px;color:#748198}.dd-gap2{height:72%;border-left:1px solid #2f3a52;justify-self:center}
+.duel-board-clean{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);gap:12px}.initiative-clean{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px}.init-clean{flex:0 0 78px;height:54px;border:1px solid #243048;border-radius:12px;background:#12192a;display:flex;align-items:center;justify-content:center;gap:6px}.init-clean.enemy{background:#1a141c}.init-clean.current{outline:2px solid #86b1ff;border-color:#86b1ff;background:#15213b}.init-clean img{width:40px;height:28px;object-fit:contain}.init-clean.enemy img{transform:scaleX(-1);filter:hue-rotate(135deg) saturate(.75)}.init-clean b{font-size:11px;color:#9aa8c1}.duel-clean{min-height:0;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:24px;padding:8px 20px}.duel-clean-ship{min-width:0;display:flex;align-items:center;justify-content:center;height:100%}.duel-clean-ship img{width:min(100%,520px);max-height:340px;object-fit:contain;filter:drop-shadow(0 18px 30px rgba(0,0,0,.45))}.duel-clean-ship.enemy img{transform:scaleX(-1);filter:hue-rotate(135deg) saturate(.75) drop-shadow(0 18px 30px rgba(0,0,0,.45))}
+.disciples2{height:100%;display:grid;grid-template-columns:minmax(0,1fr) 46px minmax(0,1fr);align-items:center;padding:18px;gap:18px}.form6{display:grid;grid-template-columns:repeat(2,minmax(92px,130px));grid-template-rows:repeat(3,92px);gap:10px;justify-content:center}.form-cell{border:1px solid #30405d;border-radius:14px;background:#0f1524;min-width:0;min-height:0}.form-unit{border:1px solid #243048;border-radius:14px;background:#12192a;display:flex;align-items:center;justify-content:center;padding:7px;cursor:pointer;overflow:hidden}.form-unit.enemy{background:#1a141c}.form-unit.sel{outline:2px solid #86b1ff;border-color:#86b1ff;background:#15213b}.form-unit img{max-width:88%;max-height:78px;object-fit:contain}.form-unit.enemy img{transform:scaleX(-1);filter:hue-rotate(135deg) saturate(.75)}.form-vs-clean{text-align:center;color:#78849a;font-weight:700}
+@media (max-width:1050px){.depth-columns{grid-template-columns:repeat(3,minmax(90px,1fr)) 20px repeat(3,minmax(90px,1fr));min-width:700px;overflow-x:auto}.dd-lineup2{min-width:680px;overflow-x:auto}.dd-unit3{height:92px}.dd-unit3 img{max-height:72px}.duel-clean-ship img{max-height:280px}.disciples2{min-width:590px;overflow-x:auto}}
+
+</style></head><body><div id="root"></div><script>
+const SHIPS={"corvette":"../../game/content/ships/images/01-corvette.webp","frigate":"../../game/content/ships/images/02-frigate.webp","destroyer":"../../game/content/ships/images/03-destroyer.webp","missile":"../../game/content/ships/images/06-missile-destroyer.webp","cruiser":"../../game/content/ships/images/08-cruiser.webp","battleship":"../../game/content/ships/images/11-battleship.webp"};
+const N={corvette:'Corvette',frigate:'Frigate',destroyer:'Destroyer',missile:'Missile Destroyer',cruiser:'Cruiser',battleship:'Battleship'};
+const concepts=[[1,'Autoresolve','Result + losses'],[2,'Autoresolve + playback','Outcome already resolved'],[3,'Semi-automatic battle','Deployment → observation'],[4,'Semi-auto + decisions','Same + a decision each round'],[5,'Turn-based battle','Direct turn control'],[6,'Real-time with pause','Squad control']];
+let timer=null;
+const S={concept:+new URLSearchParams(location.search).get('concept')||3,v3:new URLSearchParams(location.search).get('v3')||'v2',v4base:'v2',v5:'v1',resolved:false,playing:false,playback:0,speed:1,deploySelected:'p2',deployRunning:false,round:1,decision:'focus',log:['Battle started.'],gridSelected:22,grid:{10:{t:'corvette',e:false,q:91},22:{t:'frigate',e:false,q:72},31:{t:'missile',e:false,q:38},42:{t:'cruiser',e:false,q:27},17:{t:'frigate',e:true,q:82},28:{t:'destroyer',e:true,q:44},39:{t:'cruiser',e:true,q:21},48:{t:'battleship',e:true,q:8}},miniSelected:0,miniOurs:['corvette','frigate','missile','cruiser','','','','','','','',''],miniEnemy:['frigate','destroyer','cruiser','battleship','','','','','','','',''],rtsPaused:true,rtsCommand:'move',rtsSelected:['r1','r2'],rts:[{id:'r1',t:'corvette',e:false,q:91,x:18,y:25},{id:'r2',t:'frigate',e:false,q:72,x:23,y:43},{id:'r3',t:'missile',e:false,q:38,x:18,y:64},{id:'r4',t:'cruiser',e:false,q:27,x:30,y:73},{id:'e1',t:'frigate',e:true,q:82,x:78,y:22},{id:'e2',t:'destroyer',e:true,q:44,x:81,y:41},{id:'e3',t:'cruiser',e:true,q:21,x:75,y:61},{id:'e4',t:'battleship',e:true,q:8,x:84,y:73}],
+  formation:['corvette','frigate','missile','cruiser',''], enemyFormation:['frigate','destroyer','cruiser','battleship',''],
+  echelons:[['corvette'],['frigate','missile'],[],[],['frigate','destroyer'],['cruiser','battleship']],
+  axis:[{id:'p1',t:'corvette',e:false,x:16},{id:'p2',t:'frigate',e:false,x:28},{id:'p3',t:'missile',e:false,x:39},{id:'e1',t:'frigate',e:true,x:63},{id:'e2',t:'destroyer',e:true,x:76},{id:'e3',t:'cruiser',e:true,x:88}],
+  hybrid:['corvette','frigate','missile','cruiser',''], hybridEnemy:['frigate','destroyer','cruiser','battleship',''],
+  ddOur:['corvette','frigate','missile','cruiser'], ddEnemy:['frigate','destroyer','cruiser','battleship'], ddSelected:1,
+  duelPairs:[{our:{t:'corvette',q:91},enemy:{t:'frigate',q:82},note:'light duel on the flank'},{our:{t:'frigate',q:72},enemy:{t:'destroyer',q:44},note:'main line'},{our:{t:'missile',q:38},enemy:{t:'cruiser',q:21},note:'missile salvo against a heavy target'},{our:{t:'cruiser',q:27},enemy:{t:'battleship',q:8},note:'slow heavy duel'}],
+  duelQueue:[{id:'q1',t:'corvette',side:'our',pair:0,label:'Corvette'},{id:'q2',t:'destroyer',side:'enemy',pair:1,label:'Destroyer'},{id:'q3',t:'frigate',side:'our',pair:1,label:'Frigate'},{id:'q4',t:'cruiser',side:'enemy',pair:2,label:'Cruiser'},{id:'q5',t:'missile',side:'our',pair:2,label:'Missile'},{id:'q6',t:'battleship',side:'enemy',pair:3,label:'Battleship'}],duelFocus:0,
+  discSelected:null,
+  discOurs:[{id:'o1',t:'corvette',size:1,start:0},{id:'o2',t:'cruiser',size:2,start:2},{id:'o3',t:'frigate',size:1,start:4},{id:'o4',t:'missile',size:1,start:5}],
+  discEnemy:[{id:'e1',t:'battleship',size:2,start:0},{id:'e2',t:'destroyer',size:1,start:2},{id:'e3',t:'frigate',size:1,start:4},{id:'e4',t:'cruiser',size:1,start:5}]
+};
+const $=q=>document.querySelector(q), $$=q=>[...document.querySelectorAll(q)];
+function shipPx(t){return ({corvette:220,frigate:250,missile:260,destroyer:280,cruiser:320,battleship:380}[t]||260)}
+function qtyFor(t){return (t==='battleship'?8:t==='cruiser'?27:t==='destroyer'?44:t==='frigate'?72:t==='corvette'?91:38)}
+function card(t,q,e=false,loss=''){return `<div class="u-card ${e?'enemy':''}">${loss?`<i class="loss">${loss}</i>`:''}<img src="${SHIPS[t]}"><b>${N[t]}</b><span>${q} ships</span></div>`}
+function roster(e=false,loss=false){const a=e?[['frigate',82,'−18'],['destroyer',44,'−16'],['cruiser',21,'−9'],['battleship',8,'−4']]:[['corvette',91,'−9'],['frigate',72,'−8'],['missile',38,'−12'],['cruiser',27,'−3']];return a.map(x=>card(x[0],x[1],e,loss?x[2]:'')).join('')}
+function ship(t,x,y,q,e=false,id='',sel=false){return `<div class="ship ${e?'enemy':''} ${sel?'selected':''}" ${id?`data-rts="${id}"`:''} style="left:${x}%;top:${y}%;transform:translate(-50%,-50%)"><img src="${SHIPS[t]}"><span class="count">${q}</span></div>`}
+function head(t,d,tabs=''){return `<div class="head"><div><h1>${t}</h1><p>${d}</p></div><div class="grow"></div>${tabs}</div>`}
+function render(){if(timer&&S.concept!==2){clearInterval(timer);timer=null;S.playing=false} $('#root').innerHTML=`<div class="app"><div class="top"><div class="brand">TOTAL SPACE</div><div class="crumb">Battle concepts</div><div class="grow"></div><span class="badge">interactive wireframe</span></div><div class="shell"><aside class="nav"><div class="nav-title">From strategic to tactical</div>${concepts.map(c=>`<button data-concept="${c[0]}" class="${S.concept===c[0]?'active':''}"><span class="num">${c[0]}</span><span><b>${c[1]}</b><small>${c[2]}</small></span></button>`).join('')}</aside><main class="stage">${[null,c1,c2,c3,c4,c5,c6][S.concept]()}</main></div></div>`; bind()}
+function bind(){ $$('[data-concept]').forEach(b=>b.onclick=()=>{S.concept=+b.dataset.concept;render()}); $$('[data-v3]').forEach(b=>b.onclick=()=>{S.v3=b.dataset.v3;S.deployRunning=false;S.deploySelected='p2';render()}); $$('[data-v4base]').forEach(b=>b.onclick=()=>{S.v4base=b.dataset.v4base;render()}); $$('[data-v5]').forEach(b=>b.onclick=()=>{S.v5=b.dataset.v5;render()}); $('[data-resolve]')?.addEventListener('click',()=>{S.resolved=!S.resolved;render()}); $('[data-play]')?.addEventListener('click',togglePlay); $('[data-skip]')?.addEventListener('click',()=>{S.playback=100;S.playing=false;if(timer){clearInterval(timer);timer=null}paintPlayback()}); $('[data-speed]')?.addEventListener('click',()=>{S.speed=S.speed===1?2:S.speed===2?4:1;$('[data-speed]').textContent='×'+S.speed}); $$('[data-form-slot]').forEach(s=>s.onclick=()=>formationClick(+s.dataset.formSlot)); $$('[data-ech-unit]').forEach(n=>n.onclick=()=>{S.deploySelected=n.dataset.echUnit;render()}); $$('[data-ech]').forEach(e=>e.onclick=()=>echelonClick(+e.dataset.ech)); $$('[data-axis]').forEach(n=>n.onclick=()=>{if(n.dataset.enemy!=='1'){S.deploySelected=n.dataset.axis;render()}}); $$('[data-axis-target]').forEach(t=>t.onclick=()=>axisMove(+t.dataset.axisTarget)); $$('[data-hslot]').forEach(s=>s.onclick=()=>hybridClick(+s.dataset.hslot)); $$('[data-dd-slot]').forEach(s=>s.onclick=()=>ddClick(s.dataset.side,+s.dataset.ddSlot)); $$('[data-queue]').forEach(s=>s.onclick=()=>{S.duelFocus=+s.dataset.queue;render()}); $$('[data-disc]').forEach(s=>s.onclick=()=>discClick(s.dataset.side,s.dataset.disc)); $('[data-start-auto]')?.addEventListener('click',()=>{S.deployRunning=true;render()}); $$('[data-choice]').forEach(c=>c.onclick=()=>{S.decision=c.dataset.choice;render()}); $('[data-next-round]')?.addEventListener('click',nextRound); $$('[data-cell]').forEach(c=>c.onclick=()=>gridClick(+c.dataset.cell)); $$('[data-mcell]').forEach(c=>c.onclick=()=>miniClick(+c.dataset.mcell,c.dataset.side)); $$('[data-rts]').forEach(n=>n.onclick=e=>{e.stopPropagation();rtsUnit(n.dataset.rts)}); $$('[data-cmd]').forEach(b=>b.onclick=()=>{S.rtsCommand=b.dataset.cmd;render()}); $('[data-rts-field]')?.addEventListener('click',rtsField); $('[data-pause]')?.addEventListener('click',()=>{S.rtsPaused=!S.rtsPaused;render()}); if(S.concept===2)paintPlayback() }
+function c1(){return `<section class="view">${head('1 · Autoresolve','No battlefield. Two armies and the battle conditions immediately produce a strategic result and a list of losses.')}<div class="body"><div class="result-grid"><div class="card fleet"><div class="fleet-head"><b>1st Fleet · Player</b><span>2 340</span></div><div class="roster">${roster(false,S.resolved)}</div></div><div class="card resolve">${S.resolved?`<div class="muted small">Result</div><div class="big win">VICTORY</div><div class="kv"><span>Our losses</span><b>32</b><span>Enemy losses</span><b>47</b><span>Resolution rounds</span><b>5</b></div><button class="btn" data-resolve style="margin-top:16px">Reset</button>`:`<div class="muted small">Forecast</div><div class="forecast"><i></i></div><b>56% · 44%</b><button class="btn primary" data-resolve style="margin-top:18px">Resolve battle</button>`}</div><div class="card fleet"><div class="fleet-head"><b>Raider Fleet · Enemy</b><span>1 980</span></div><div class="roster">${roster(true,S.resolved)}</div></div></div></div></section>`}
+function c2(){return `<section class="view">${head('2 · Autoresolve + playback','The result is already resolved as in option 1. Nothing done during playback can change the outcome — this is only a battle recording.')}<div class="body"><div class="play-grid"><div class="card fleet"><div class="fleet-head"><b>1st Fleet</b><span>2 340</span></div><div class="roster">${roster()}</div></div><div class="battlefield"><div class="phasebar"><span class="phase" data-phase="0">LONG</span><span class="phase" data-phase="1">MEDIUM</span><span class="phase" data-phase="2">CLOSE</span></div>${pbShip('a1','corvette',17,25,91,false)}${pbShip('a2','frigate',19,49,72,false)}${pbShip('a3','missile',17,70,38,false)}${pbShip('b1','frigate',83,25,82,true)}${pbShip('b2','cruiser',81,49,21,true)}${pbShip('b3','battleship',83,70,8,true)}<div class="flash" data-flash style="left:61%;top:42%"></div><div class="timeline"><button class="btn" data-play style="padding:5px 8px">${S.playing?'Ⅱ':'▶'}</button><span class="tiny" data-time>00:00</span><div class="progress"><i data-progress></i></div><span class="tiny">00:43</span><button class="btn" data-speed style="padding:5px 8px">×${S.speed}</button><button class="btn" data-skip style="padding:5px 8px">Skip</button></div></div><div class="card fleet"><div class="fleet-head"><b>Raider Fleet</b><span>1 980</span></div><div class="roster">${roster(true)}</div><div class="notice" style="margin-top:10px">The outcome is already fixed: player victory.</div></div></div></div></section>`}
+function pbShip(id,t,x,y,q,e){return `<div class="ship ${e?'enemy':''}" data-pb="${id}" style="left:${x}%;top:${y}%;transform:translate(-50%,-50%)"><img src="${SHIPS[t]}"><span class="count">${q}</span></div>`}
+function togglePlay(){S.playing=!S.playing;if(S.playing){if(!timer)timer=setInterval(()=>{S.playback=Math.min(100,S.playback+0.9*S.speed);paintPlayback();if(S.playback>=100){S.playing=false;clearInterval(timer);timer=null;$('[data-play]').textContent='▶'}},80);$('[data-play]').textContent='Ⅱ'}else{clearInterval(timer);timer=null;$('[data-play]').textContent='▶'}}
+function paintPlayback(){if(S.concept!==2)return; const p=$('[data-progress]'); if(!p)return;p.style.width=S.playback+'%';$('[data-time]').textContent='00:'+String(Math.round(43*S.playback/100)).padStart(2,'0');const ph=S.playback<33?0:S.playback<70?1:2;$$('[data-phase]').forEach((x,i)=>x.classList.toggle('active',i===ph));const k=S.playback/100,pos={a1:[17+32*k,25+6*k],a2:[19+30*k,49],a3:[17+31*k,70-8*k],b1:[83-30*k,25+7*k],b2:[81-29*k,49],b3:[83-31*k,70-7*k]};for(const [id,v] of Object.entries(pos)){const n=$(`[data-pb="${id}"]`);n.style.left=v[0]+'%';n.style.top=v[1]+'%'}$('[data-flash]').classList.toggle('on',(S.playback>38&&S.playback<46)||(S.playback>72&&S.playback<79))}
+function tabs3(attr='data-v3',val=S.v3){return `<div class="tabs">${[['v1','Formation'],['v2','Depth'],['v3','DD Positions'],['v4','1v1 Initiative']].map(x=>`<button ${attr}="${x[0]}" class="${val===x[0]?'active':''}">${x[0]} · ${x[1]}</button>`).join('')}</div>`}
+function formationBoard(){return `<div class="formation-board formations"><div class="formation">${S.formation.map((t,i)=>formSlot(t,i,false)).join('')}</div><div class="form-vs">VS<br><span class="tiny">order<br>squads</span></div><div class="formation">${S.enemyFormation.map((t,i)=>formSlot(t,i,true)).join('')}</div></div>`}
+function formSlot(t,i,e){return `<div class="form-slot ${e?'enemy':''} ${!e&&S.deploySelected==='f'+i?'active':''}" ${!e?`data-form-slot="${i}"`:''}>${t?`<img src="${SHIPS[t]}"><div><b>${N[t]}</b><div class="meta">Squad · position ${i+1}</div></div>`:`<span class="muted small">empty</span>`}</div>`}
+function formationClick(i){const sid=S.deploySelected;if(!sid||!sid.startsWith('f')){S.deploySelected='f'+i;render();return}const j=+sid.slice(1);[S.formation[i],S.formation[j]]=[S.formation[j],S.formation[i]];S.deploySelected='f'+i;render()}
+function echelonBoard(){
+  const ours=[S.echelons[2].length?S.echelons[2]:['cruiser'],S.echelons[1].length?S.echelons[1]:['frigate','missile'],S.echelons[0].length?S.echelons[0]:['corvette']];
+  const enemies=[S.echelons[5].length?S.echelons[5]:['frigate'],S.echelons[4].length?S.echelons[4]:['destroyer'],S.echelons[3].length?S.echelons[3]:['battleship']];
+  const col=(ships,enemy=false,extra='')=>`<div class="depth-col ${extra}">${ships.map(t=>`<div class="depth-ship ${enemy?'enemy':''}"><img src="${SHIPS[t]}"></div>`).join('')}</div>`;
+  return `<div class="formation-board depth-columns">${col(ours[0])}${col(ours[1])}${col(ours[2])}<div class="depth-divider"></div>${col(enemies[0],true,'enemy-first')}${col(enemies[1],true)}${col(enemies[2],true)}</div>`}
+const DD_ATTACKS={corvette:{from:[1,2],to:[1,2]},frigate:{from:[1,2,3],to:[1,2,3]},missile:{from:[2,3,4],to:[2,3,4]},cruiser:{from:[1,2,3,4],to:[1,2,3]},destroyer:{from:[1,2,3],to:[1,2]},battleship:{from:[1,2],to:[1,2,3]}};
+function ddBoard(){
+  const selected=S.ddOur[S.ddSelected], rules=DD_ATTACKS[selected]||DD_ATTACKS.frigate;
+  const ours=`<div class="dd-row2">${S.ddOur.map((t,i)=>`<div class="dd-slot3"><div class="dd-unit3 ${S.ddSelected===i?'sel':''}" data-dd-slot="${i}" data-side="our"><img src="${SHIPS[t]}"></div><div class="dd-posnum">${4-i}</div></div>`).join('')}</div>`;
+  const enemy=`<div class="dd-row2">${S.ddEnemy.map((t,i)=>`<div class="dd-slot3"><div class="dd-unit3 enemy ${rules.to.includes(i+1)?'target':''}"><img src="${SHIPS[t]}"></div><div class="dd-posnum">${i+1}</div></div>`).join('')}</div>`;
+  return `<div class="formation-board dd-lineup2">${ours}<div class="dd-gap2"></div>${enemy}</div>`}
+function ddClick(side,i){if(side==='enemy')return;S.ddSelected=i;render()}
+function duelBoard(){
+  const q=S.duelQueue[S.duelFocus],pair=S.duelPairs[q.pair];
+  const queue=`<div class="initiative-clean">${S.duelQueue.map((u,i)=>`<div class="init-clean ${u.side==='enemy'?'enemy':''} ${i===S.duelFocus?'current':''}"><b>${i+1}</b><img src="${SHIPS[u.t]}"></div>`).join('')}</div>`;
+  return `<div class="formation-board duel-board-clean">${queue}<div class="duel-clean"><div class="duel-clean-ship"><img src="${SHIPS[pair.our.t]}"></div><div class="duel-clean-ship enemy"><img src="${SHIPS[pair.enemy.t]}"></div></div></div>`}
+function boardBy(v){return v==='v1'?formationBoard():v==='v2'?echelonBoard():v==='v3'?ddBoard():duelBoard()}
+function c3(){return `<section class="view">${head('3 · Semi-automatic battle','The player deploys forces before the battle. Below are four different models for how the battle itself can work.',tabs3())}<div class="body"><div class="deploy-grid"><div class="card deploy-panel"><h3>${S.v3} · ${['','Formation without field','Depth echelons','DD Positions','1v1 Initiative'][+S.v3.slice(1)]}</h3>${boardBy(S.v3)}</div><div class="card side"><h3>Fleet</h3><div class="roster">${roster(false)}</div></div></div></div></section>`}
+function c4(){return `<section class="view">${head('4 · Semi-automatic battle + decisions','This is not a separate battlefield model: take any option from #3, but after each automatic round give the player one meaningful decision.',tabs3('data-v4base',S.v4base))}<div class="body"><div class="decision-grid"><div class="card deploy-panel"><div class="submode">Battle model: ${S.v4base}</div>${boardBy(S.v4base)}</div><div class="card side"><h3>Round ${S.round} complete</h3>${[['focus','Focus fire','Prioritize the selected enemy group.'],['range','Change distance','A general order for the next automatic round.'],['regroup','Regroup','Allow forces to be rearranged within the selected #3 model.']].map(x=>`<div class="choice ${S.decision===x[0]?'active':''}" data-choice="${x[0]}"><b>${x[1]}</b><span class="small muted">${x[2]}</span></div>`).join('')}<button class="btn primary" data-next-round style="margin-top:9px">Apply and resolve next round</button><div class="log">${S.log.slice(-4).reverse().map(x=>`<div>• ${x}</div>`).join('')}</div></div></div></div></section>`}
+function nextRound(){const m={focus:'Focus fire: the priority target took additional losses.',range:'The Fleet changed distance before the next automatic exchange of fire.',regroup:'Formation adjusted before the next round.'}[S.decision];S.round++;S.log.push(m);render()}
+function tabs5(){return `<div class="tabs">${[['v1','Shared 2D field'],['v2','Disciples 6 slots']].map(x=>`<button data-v5="${x[0]}" class="${S.v5===x[0]?'active':''}">${x[0]} · ${x[1]}</button>`).join('')}</div>`}
+function discGrid(units,side){
+  const occupied=new Set();for(const u of units){for(let k=0;k<u.size;k++)occupied.add(u.start+k)}
+  const empties=[];for(let i=0;i<6;i++){if(!occupied.has(i)){const col=(i%2)+1,row=Math.floor(i/2)+1;empties.push(`<div class="form-cell" style="grid-column:${col};grid-row:${row}"></div>`)}}
+  const rendered=units.map(u=>{const col=(u.start%2)+1,row=Math.floor(u.start/2)+1,sel=S.discSelected===side+'-'+u.id;return `<div class="form-unit ${side==='enemy'?'enemy':''} ${sel?'sel':''}" style="grid-column:${col} / span ${u.size};grid-row:${row}" data-disc="${u.id}" data-side="${side}"><img src="${SHIPS[u.t]}"></div>`}).join('');
+  return `<div class="form6">${empties.join('')}${rendered}</div>`}
+function c5(){let field;if(S.v5==='v1'){const cells=[];for(let i=0;i<60;i++){const o=S.grid[i];let cl='cell';if(i===S.gridSelected)cl+=' sel';if(o?.e)cl+=' enemy';if(S.gridSelected!==null&&!o&&dist(i,S.gridSelected)<=2)cl+=' reach';if(o?.e)cl+=' target';cells.push(`<div class="${cl}" data-cell="${i}">${o?`<img src="${SHIPS[o.t]}"><span class="tiny" style="position:absolute;right:3px;bottom:2px">${o.q}</span>`:''}</div>`)}field=`<div class="card gridbox"><div class="tgrid">${cells.join('')}</div></div>`}else{field=`<div class="card"><div class="disciples2">${discGrid(S.discOurs,'our')}<div class="form-vs-clean">VS</div>${discGrid(S.discEnemy,'enemy')}</div></div>`}const info=(S.discSelected||'our-o2').split('-');const pool=info[0]==='enemy'?S.discEnemy:S.discOurs;const unit=pool.find(u=>u.id===info[1])||pool[0];return `<section class="view">${head('5 · Turn-based battle','Here the player directly controls Squad actions.',tabs5())}<div class="body"><div class="grid-layout">${field}<div class="card side"><h3>Selected Squad</h3>${card(unit.t,qtyFor(unit.t),info[0]==='enemy')}<div class="kv"><span>Turn</span><b>ready</b><span>Size</span><b>${unit.size} cells</b></div></div></div></div></section>`}
+function discClick(side,id){S.discSelected=side+'-'+id;render()}
+function dist(a,b){return Math.abs(a%10-b%10)+Math.abs(Math.floor(a/10)-Math.floor(b/10))}
+function gridClick(i){const o=S.grid[i];if(o&&!o.e){S.gridSelected=i;render();return}if(S.gridSelected==null)return;const from=S.grid[S.gridSelected];if(!from||from.e)return;if(!o&&dist(i,S.gridSelected)<=2){S.grid[i]=from;delete S.grid[S.gridSelected];S.gridSelected=i;render()}else if(o?.e){o.q=Math.max(0,o.q-8);if(!o.q)delete S.grid[i];render()}}
+function miniClick(i,side){if(side==='our'){if(S.miniOurs[i]){S.miniSelected=i;render()}else if(S.miniOurs[S.miniSelected]){S.miniOurs[i]=S.miniOurs[S.miniSelected];S.miniOurs[S.miniSelected]='';S.miniSelected=i;render()}}else if(S.miniEnemy[i]&&S.miniSelected!=null){S.miniEnemy[i]='';render()}}
+function c6(){return `<section class="view">${head('6 · Real-time with pause','Full tactical control: Squads exist in shared space, time runs continuously, and pause lets the player issue orders calmly — Total War-like direction.')}<div class="body"><div class="rts-grid"><div class="battlefield" data-rts-field><button class="pause-badge btn" data-pause>${S.rtsPaused?'Ⅱ  PAUSED':'▶  BATTLE RUNNING'}</button>${S.rts.map(u=>ship(u.t,u.x,u.y,u.q,u.e,u.id,S.rtsSelected.includes(u.id))).join('')}<div class="hint">Click friendly Squads to select. Move → click the field. Attack → click an enemy.</div></div><div class="card side"><h3>Selected: ${S.rtsSelected.length}</h3><div class="roster">${S.rts.filter(x=>S.rtsSelected.includes(x.id)).map(x=>card(x.t,x.q)).join('')||'<span class="muted small">Nothing</span>'}</div><button class="cmd ${S.rtsCommand==='move'?'active':''}" data-cmd="move">→ Move</button><button class="cmd ${S.rtsCommand==='attack'?'active':''}" data-cmd="attack">◎ Attack</button><button class="cmd ${S.rtsCommand==='hold'?'active':''}" data-cmd="hold">◇ Hold position</button><div class="notice" style="margin-top:10px">${S.rtsPaused?'Paused: time is stopped and orders can be given to several Squads.':'The battle runs in real time.'}</div></div></div></div></section>`}
+function rtsUnit(id){const u=S.rts.find(x=>x.id===id);if(!u)return;if(u.e&&S.rtsCommand==='attack'&&S.rtsSelected.length){u.q=Math.max(0,u.q-6*S.rtsSelected.length);if(!u.q)S.rts=S.rts.filter(x=>x.id!==id);render();return}if(u.e)return;const i=S.rtsSelected.indexOf(id);if(i>=0)S.rtsSelected.splice(i,1);else S.rtsSelected.push(id);render()}
+function rtsField(e){if(S.rtsCommand!=='move'||!S.rtsSelected.length)return;const r=e.currentTarget.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*100,y=(e.clientY-r.top)/r.height*100;S.rts.filter(u=>S.rtsSelected.includes(u.id)).forEach((u,i)=>{u.x=Math.max(6,Math.min(94,x+i*4));u.y=Math.max(10,Math.min(90,y+i*5))});render()}
+render();
+</script></body></html>

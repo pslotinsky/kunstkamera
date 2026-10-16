@@ -1,0 +1,14 @@
+.diagram {
+  min-height: 3rem;
+}
+
+.diagram[data-rendered] {
+  text-align: center;
+  background: transparent;
+}
+
+.diagram svg {
+  min-width: min(100%, 600px);
+  max-width: 100%;
+  height: auto;
+}

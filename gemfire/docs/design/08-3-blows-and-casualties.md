@@ -1,4 +1,4 @@
-# 8.3 Blows and Casualties — Design
+# 8.3 Blows and Casualties
 
 ## Description
 

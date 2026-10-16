@@ -23,9 +23,9 @@ Commands and goodwill values belong to Appendix D.
 
 ---
 
-# C.1 Standard Battle Units
+## C.1 Standard Battle Units
 
-## Overview
+### Overview
 
 In tactical battle, regular troops are automatically divided into four standard units:
 
@@ -42,7 +42,7 @@ The player does not recruit these unit types separately.
 
 ---
 
-## Standard Unit Table
+### Standard Unit Table
 
 | Unit      | Move | Range         | Notes                                      |
 | --------- | ---: | ------------- | ------------------------------------------ |
@@ -53,7 +53,7 @@ The player does not recruit these unit types separately.
 
 ---
 
-## Standard Unit Roles
+### Standard Unit Roles
 
 | Unit      | Battlefield Role                                    |
 | --------- | --------------------------------------------------- |
@@ -64,7 +64,7 @@ The player does not recruit these unit types separately.
 
 ---
 
-## Archer Notes
+### Archer Notes
 
 Archers are tactically distinct from melee units:
 
@@ -75,9 +75,9 @@ Archers are tactically distinct from melee units:
 
 ---
 
-# C.2 Fifth Unit Categories
+## C.2 Fifth Unit Categories
 
-## Overview
+### Overview
 
 Each army may include one Fifth Unit.
 
@@ -94,7 +94,7 @@ Army
 
 ---
 
-## Fifth Unit Types
+### Fifth Unit Types
 
 | Category         | Description                                  |
 | ---------------- | -------------------------------------------- |
@@ -104,7 +104,7 @@ Army
 
 ---
 
-## Category Comparison
+### Category Comparison
 
 | Aspect                     | Gem Guardian           | Hired Fifth Unit         | Pastha         |
 | -------------------------- | ---------------------- | ------------------------ | -------------- |
@@ -119,9 +119,9 @@ Army
 
 ---
 
-# C.3 Gem Guardians
+## C.3 Gem Guardians
 
-## Overview
+### Overview
 
 Gem Guardians are powerful Fifth Units associated with Gems.
 
@@ -133,7 +133,7 @@ After use, they enter cooldown.
 
 ---
 
-## Gem Guardian Table
+### Gem Guardian Table
 
 | Guardian | Strength | Move | Range            | Ownership Notes                   |
 | -------- | -------: | ---: | ---------------- | --------------------------------- |
@@ -147,7 +147,7 @@ After use, they enter cooldown.
 
 ---
 
-## Notes
+### Notes
 
 Skulryk's range is **Circular** (some sources label it "Round" or "Outer").
 Gemfire has exactly four ranges (Short / Close, Long, Circular, Largest).
@@ -155,9 +155,9 @@ See §C.6 for the tile diagrams.
 
 ---
 
-# C.4 Hired Fifth Units
+## C.4 Hired Fifth Units
 
-## Overview
+### Overview
 
 Hired Fifth Units are special province-based units obtained through the **Hire Monster** command.
 
@@ -165,7 +165,7 @@ Despite the command name, this category includes both monsters and elite human u
 
 ---
 
-## Hired Fifth Unit Table
+### Hired Fifth Unit Table
 
 | Unit      | Category    | Strength | Cost / Upkeep | Move | Range         | Notes                    |
 | --------- | ----------- | -------: | ------------: | ---: | ------------- | ------------------------ |
@@ -189,7 +189,7 @@ Despite the command name, this category includes both monsters and elite human u
 
 ---
 
-## Province Ownership
+### Province Ownership
 
 Hired Fifth Units belong to provinces.
 
@@ -204,9 +204,9 @@ flowchart TD
 
 ---
 
-# C.5 Pastha
+## C.5 Pastha
 
-## Overview
+### Overview
 
 Pastha is a special event-based Fifth Unit.
 
@@ -214,7 +214,7 @@ It is neither a Gem Guardian nor a hired unit.
 
 ---
 
-## Pastha Data
+### Pastha Data
 
 | Unit   | Strength | Cost | Upkeep | Move | Range         | Notes                            |
 | ------ | -------: | ---: | -----: | ---: | ------------- | -------------------------------- |
@@ -222,7 +222,7 @@ It is neither a Gem Guardian nor a hired unit.
 
 ---
 
-## Pastha Notes
+### Pastha Notes
 
 Pastha:
 
@@ -235,9 +235,9 @@ Pastha:
 
 ---
 
-# C.6 Range Patterns
+## C.6 Range Patterns
 
-## Overview
+### Overview
 
 Units use named attack range patterns.
 
@@ -245,7 +245,7 @@ Some range patterns are understood at a high level, but exact tile diagrams stil
 
 ---
 
-## Range Pattern Table
+### Range Pattern Table
 
 | Range Pattern    | Meaning                                                         | Example Units                         |
 | ---------------- | --------------------------------------------------------------- | ------------------------------------- |
@@ -256,7 +256,7 @@ Some range patterns are understood at a high level, but exact tile diagrams stil
 
 ---
 
-## Short / Close
+### Short / Close
 
 Used by melee units.
 
@@ -270,7 +270,7 @@ Typical units:
 
 ---
 
-## Long
+### Long
 
 Used by ranged units.
 
@@ -285,7 +285,7 @@ Long-range attacks do not cause backlash / counter-damage to the attacker.
 
 ---
 
-## Circular
+### Circular
 
 Used by some magical or special units.
 
@@ -297,7 +297,7 @@ Typical units:
 
 ---
 
-## Largest
+### Largest
 
 Used by the widest attack-pattern units.
 
@@ -306,7 +306,7 @@ Typical units:
 - Dragon;
 - Fachan.
 
-## Range tile diagrams
+### Range tile diagrams
 
 Attack ranges (`.` = attacking unit, `X` = a cell it can hit):
 
@@ -324,9 +324,9 @@ exactly four ranges; "Outer" is not a distinct pattern.
 
 ---
 
-# C.7 Movement Traits
+## C.7 Movement Traits
 
-## Movement Values
+### Movement Values
 
 Movement value determines how many cells a unit can move during its activation.
 
@@ -338,7 +338,7 @@ Movement value determines how many cells a unit can move during its activation.
 
 ---
 
-## Flying
+### Flying
 
 Flying units can move over certain obstacles.
 
@@ -351,7 +351,7 @@ Confirmed flying units:
 
 ---
 
-## Flying Movement Effects
+### Flying Movement Effects
 
 Flying units can pass over:
 
@@ -361,7 +361,7 @@ Flying units can pass over:
 
 ---
 
-## Fence Builder
+### Fence Builder
 
 Only Knights can build fences.
 
@@ -375,9 +375,9 @@ Only Knights can build fences.
 
 ---
 
-# C.8 Strength
+## C.8 Strength
 
-## Overview
+### Overview
 
 Fifth Units use **Strength** instead of troop count.
 
@@ -389,7 +389,7 @@ Strength represents:
 
 ---
 
-## Strength Users
+### Strength Users
 
 | Unit Type         | Uses Strength       |
 | ----------------- | ------------------- |
@@ -400,7 +400,7 @@ Strength represents:
 
 ---
 
-## Strength Notes
+### Strength Notes
 
 For Hired Fifth Units:
 
@@ -416,9 +416,9 @@ For Gem Guardians:
 
 ---
 
-# C.9 Naming and Version Notes
+## C.9 Naming and Version Notes
 
-## Orks
+### Orks
 
 This document uses:
 
@@ -436,7 +436,7 @@ because `Orks` is the spelling found in referenced game data and guides.
 
 ---
 
-## Short vs Close
+### Short vs Close
 
 Some sources use:
 
@@ -460,7 +460,7 @@ to indicate the same melee-range category.
 
 ---
 
-## Circular vs Outer — resolved
+### Circular vs Outer — resolved
 
 Gemfire has exactly four ranges: Short / Close, Long, Circular, Largest.
 "Outer" is not a separate pattern. Skulryk's range is **Circular** (some sources
@@ -468,7 +468,7 @@ label it "Round"). See §C.6 for the tile diagrams.
 
 ---
 
-## Gargoyles / Wyverns Movement
+### Gargoyles / Wyverns Movement
 
 Movement written as:
 
@@ -484,7 +484,7 @@ Move 3 with flying trait
 
 ---
 
-## Chylla and Scylla
+### Chylla and Scylla
 
 Chylla and Scylla are different Gem Guardians.
 
@@ -497,9 +497,9 @@ They should not be merged:
 
 ---
 
-# C.10 Data Summary
+## C.10 Data Summary
 
-## Standard Army Data
+### Standard Army Data
 
 ```text
 Standard Army
@@ -512,7 +512,7 @@ Standard Army
 
 ---
 
-## Fifth Unit Data Model
+### Fifth Unit Data Model
 
 ```mermaid
 flowchart TD
@@ -533,7 +533,7 @@ flowchart TD
 
 ---
 
-## Key Military Data Principles
+### Key Military Data Principles
 
 1. Standard troops become fixed battlefield units.
 2. Fifth Units are the primary source of military asymmetry.
@@ -544,7 +544,7 @@ flowchart TD
 
 ---
 
-# Open Data Questions
+## Open Data Questions
 
 The following data remains to be fully verified:
 
@@ -559,7 +559,7 @@ The following data remains to be fully verified:
 
 ---
 
-# Summary
+## Summary
 
 Appendix C defines Gemfire’s military unit data.
 

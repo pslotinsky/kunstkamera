@@ -1,4 +1,4 @@
-# 4. Generals & lords — Design
+# 4. Generals & lords
 
 ## Description
 

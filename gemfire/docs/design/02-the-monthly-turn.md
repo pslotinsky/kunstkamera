@@ -1,4 +1,4 @@
-# 2. The monthly turn — Design
+# 2. The monthly turn
 
 ## Description
 

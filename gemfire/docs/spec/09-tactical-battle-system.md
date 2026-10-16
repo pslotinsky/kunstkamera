@@ -19,9 +19,9 @@ The tactical system resolves conflict between two armies through:
 
 ---
 
-# 9.1 Battle Overview
+## 9.1 Battle Overview
 
-## Confirmed Facts
+### Confirmed Facts
 
 Tactical battle takes place on a separate grid-based battlefield.
 
@@ -41,7 +41,7 @@ The commander influences army effectiveness through character stats.
 
 ---
 
-## Battle Model
+### Battle Model
 
 ```mermaid
 flowchart TD
@@ -63,7 +63,7 @@ flowchart TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 Gemfire’s battles are compact tactical encounters, not large-scale wargame simulations.
 
@@ -79,9 +79,9 @@ The system creates tactical depth through a small number of strong rules:
 
 ---
 
-# 9.2 Battlefield Layout
+## 9.2 Battlefield Layout
 
-## Grid
+### Grid
 
 The battlefield uses a fixed-size grid:
 
@@ -91,7 +91,7 @@ The battlefield uses a fixed-size grid:
 
 ---
 
-## Deployment
+### Deployment
 
 Known starting layout:
 
@@ -102,7 +102,7 @@ Known starting layout:
 
 ---
 
-## Flags
+### Flags
 
 Each side has its own flag.
 
@@ -112,7 +112,7 @@ Capturing the enemy flag is one way to win the battle immediately.
 
 ---
 
-## Province-Specific Battlefields
+### Province-Specific Battlefields
 
 Battlefield layout depends on the province, and all thirty layouts are known: each is
 eighty tiles, ten columns by eight rows, canonical in `data/battlefields.json`.
@@ -131,7 +131,7 @@ plains — against whole-map averages of 5.6 woods, 2.8 river and 1.7 boulder.
 
 ---
 
-## Design Observation
+### Design Observation
 
 The tactical map acts like a compact capture-the-flag arena.
 
@@ -139,9 +139,9 @@ The player can win not only by destroying the enemy, but also by manoeuvring tow
 
 ---
 
-# 9.3 Battle Participants
+## 9.3 Battle Participants
 
-## Standard Units
+### Standard Units
 
 Before battle, strategic Troops are automatically converted into four standard units:
 
@@ -156,7 +156,7 @@ If Troops do not divide evenly, the remainder is assigned to Horsemen.
 
 ---
 
-## Fifth Unit
+### Fifth Unit
 
 The fifth slot is occupied by one special unit:
 
@@ -168,7 +168,7 @@ An army can have only one Fifth Unit.
 
 ---
 
-## Commander
+### Commander
 
 The commander:
 
@@ -179,7 +179,7 @@ The commander:
 
 ---
 
-## Battle Composition
+### Battle Composition
 
 ```mermaid
 flowchart TD
@@ -195,9 +195,9 @@ flowchart TD
 
 ---
 
-# 9.4 Battle Setup
+## 9.4 Battle Setup
 
-## Inputs
+### Inputs
 
 Before battle, the system uses:
 
@@ -213,19 +213,19 @@ Before battle, the system uses:
 
 ---
 
-## Deployment Cost
+### Deployment Cost
 
 An attack requires Gold to deploy; the deployment cost is set on the strategic side (military chapter §6).
 
 ---
 
-## Food Requirement
+### Food Requirement
 
 Food determines how many days the army can remain in battle; the daily consumption rate is set on the strategic side (military chapter §6), and Gem Guardians do not count toward it.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Supply is part of the tactical battle system, not only strategic logistics.
 
@@ -233,21 +233,21 @@ The player must plan both army strength and battle duration.
 
 ---
 
-# 9.5 Battle Time and Food
+## 9.5 Battle Time and Food
 
-## Days
+### Days
 
 Battle is measured in days. One battle day is 4 turns per side.
 
 ---
 
-## Time of Day
+### Time of Day
 
 Battle phases visually correspond to time of day. The day cycles sunrise → noon → sunset → night.
 
 ---
 
-## Food Timer
+### Food Timer
 
 During battle, the interface tracks:
 
@@ -258,7 +258,7 @@ If an army runs out of Food, it can lose the battle.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Food works as a pressure timer.
 
@@ -266,9 +266,9 @@ The attacker cannot fight indefinitely and must achieve victory before supply ru
 
 ---
 
-# 9.6 Turn Structure
+## 9.6 Turn Structure
 
-## Side-Based Turns
+### Side-Based Turns
 
 Tactical battle uses side-based turns.
 
@@ -276,7 +276,7 @@ On its turn, a side activates its units.
 
 ---
 
-## Unit Activation
+### Unit Activation
 
 A typical unit activation follows this pattern:
 
@@ -292,7 +292,7 @@ After acting, the unit ends its activation for the current turn.
 
 ---
 
-## Battle Turn Flow
+### Battle Turn Flow
 
 ```mermaid
 flowchart TD
@@ -320,9 +320,9 @@ flowchart TD
 
 ---
 
-# 9.7 Battle Commands
+## 9.7 Battle Commands
 
-## Unit Commands
+### Unit Commands
 
 | Command | Availability                       | Effect                      |
 | ------- | ---------------------------------- | --------------------------- |
@@ -334,7 +334,7 @@ flowchart TD
 
 ---
 
-## Army-Level Commands
+### Army-Level Commands
 
 | Command | Effect                              |
 | ------- | ----------------------------------- |
@@ -343,7 +343,7 @@ flowchart TD
 
 ---
 
-## Non-Mechanical Options
+### Non-Mechanical Options
 
 Battle may include interface options, such as animation settings.
 
@@ -351,19 +351,19 @@ These options do not change battle mechanics.
 
 ---
 
-# 9.8 Standard Unit Rules
+## 9.8 Standard Unit Rules
 
-## Horsemen
+### Horsemen
 
-### Role
+#### Role
 
 Fast melee unit.
 
-### Properties
+#### Properties
 
 Movement 3, Short/Close range; canonical stats in Appendix C §C.1.
 
-### Design Role
+#### Design Role
 
 Horsemen are useful for:
 
@@ -375,50 +375,50 @@ Horsemen are useful for:
 
 ---
 
-## Knights
+### Knights
 
-### Role
+#### Role
 
 Frontline melee unit.
 
-### Properties
+#### Properties
 
 Movement 2, Short/Close range; canonical stats in Appendix C §C.1.
 
-### Special Ability
+#### Special Ability
 
 Knights can build fences.
 
 ---
 
-## Knights 2
+### Knights 2
 
 The second Knights unit appears to be mechanically identical to the first.
 
-### Design Role
+#### Design Role
 
 Having two Knights units creates a stable frontline and gives the player more control over space.
 
 ---
 
-## Archers
+### Archers
 
-### Role
+#### Role
 
 Ranged support unit.
 
-### Properties
+#### Properties
 
 Movement 2, Long range; canonical stats in Appendix C §C.1.
 
-### Restrictions
+#### Restrictions
 
 Archers:
 
 - cannot attack adjacent cells;
 - cannot attack diagonally.
 
-### Advantages
+#### Advantages
 
 Archers:
 
@@ -428,9 +428,9 @@ Archers:
 
 ---
 
-# 9.9 Fifth Unit Rules
+## 9.9 Fifth Unit Rules
 
-## Overview
+### Overview
 
 A Fifth Unit is a special battlefield unit.
 
@@ -444,7 +444,7 @@ It may have unique values for:
 
 ---
 
-## Categories
+### Categories
 
 A Fifth Unit can be:
 
@@ -454,7 +454,7 @@ A Fifth Unit can be:
 
 ---
 
-## Strength
+### Strength
 
 Fifth Units use Strength instead of ordinary troop count.
 
@@ -462,15 +462,15 @@ Strength represents combat effectiveness and durability.
 
 ---
 
-## Range Patterns
+### Range Patterns
 
 The four range categories (Short/Close, Long, Circular, Largest) and their tile diagrams are canonical in Appendix C §C.6. "Outer" is not a distinct range — Skulryk's range is Circular.
 
 ---
 
-# 9.10 Movement Rules
+## 9.10 Movement Rules
 
-## Movement Points
+### Movement Points
 
 Each unit has a movement value.
 
@@ -478,7 +478,7 @@ Movement determines how many cells a unit can move during activation.
 
 ---
 
-## Obstacles
+### Obstacles
 
 Movement may be blocked by:
 
@@ -489,7 +489,7 @@ Movement may be blocked by:
 
 ---
 
-## Flying Units
+### Flying Units
 
 Some Fifth Units can fly.
 
@@ -506,7 +506,7 @@ Flying units can pass over:
 
 ---
 
-## Design Observation
+### Design Observation
 
 Movement rules make Fifth Units tactically distinct.
 
@@ -514,15 +514,15 @@ Even with similar Strength, a flying unit can be more valuable because it ignore
 
 ---
 
-# 9.11 Attack Resolution
+## 9.11 Attack Resolution
 
-## Attack Types
+### Attack Types
 
 Attacks differ by range pattern (Short/Close melee, Long ranged, Circular and Largest area attacks); the canonical patterns are in Appendix C §C.6.
 
 ---
 
-## Backlash / Counter-Damage
+### Backlash / Counter-Damage
 
 Melee attacks may cause backlash / counter-damage to the attacker.
 
@@ -530,7 +530,7 @@ Long-range attacks do not cause backlash.
 
 ---
 
-## Commander Influence
+### Commander Influence
 
 The commander’s WAR / Military rating affects combat results.
 
@@ -540,7 +540,7 @@ Exact damage formulas remain unresolved.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Even on a small grid, the battle system creates meaningful tactical choices:
 
@@ -552,15 +552,15 @@ risky melee attack with stronger positional potential
 
 ---
 
-# 9.12 Facing System
+## 9.12 Facing System
 
-## Attack Direction
+### Attack Direction
 
 Attack effectiveness depends on direction: front is the worst attack direction, flank is better, and rear is best. Exact numeric modifiers are unknown.
 
 ---
 
-## Rear Attack
+### Rear Attack
 
 Rear attacks produce the strongest results and reduce retaliation risk.
 
@@ -568,7 +568,7 @@ Exact numeric modifiers remain unresolved.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Facing is one of the main sources of positional depth.
 
@@ -576,9 +576,9 @@ A well-executed manoeuvre can decide the battle even when unit strength is simil
 
 ---
 
-# 9.13 Fences
+## 9.13 Fences
 
-## Overview
+### Overview
 
 Fences are temporary battlefield obstacles.
 
@@ -591,7 +591,7 @@ They are used to:
 
 ---
 
-## Building Fences
+### Building Fences
 
 Only Knights can build fences.
 
@@ -603,7 +603,7 @@ Fence
 
 ---
 
-## Breaking Fences
+### Breaking Fences
 
 Any unit can attempt to destroy a fence.
 
@@ -615,7 +615,7 @@ Break
 
 ---
 
-## Failure Chance
+### Failure Chance
 
 Fence construction and destruction can fail.
 
@@ -625,13 +625,13 @@ The exact formula is not confirmed.
 
 ---
 
-## Flying Units
+### Flying Units
 
 Flying units can ignore fences.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Fences turn battle into a space-control problem.
 
@@ -639,9 +639,9 @@ They are especially important for defenders because they help protect access to 
 
 ---
 
-# 9.14 Victory Conditions
+## 9.14 Victory Conditions
 
-## Confirmed Victory Conditions
+### Confirmed Victory Conditions
 
 A side wins by:
 
@@ -653,7 +653,7 @@ A side wins by:
 
 ---
 
-## Flag Capture
+### Flag Capture
 
 Capturing the enemy flag is an immediate victory condition.
 
@@ -661,19 +661,19 @@ There is no confirmed requirement to hold the flag for multiple turns.
 
 ---
 
-## Defender Endurance
+### Defender Endurance
 
 The defender can win by preventing flag capture for long enough — holding the flag for 5 days.
 
 ---
 
-## Starvation
+### Starvation
 
 If an army runs out of Food, it can lose regardless of remaining units.
 
 ---
 
-## Design Observation
+### Design Observation
 
 The victory system creates several valid battle plans:
 
@@ -687,21 +687,21 @@ The victory system creates several valid battle plans:
 
 ---
 
-# 9.15 Retreat
+## 9.15 Retreat
 
-## Overview
+### Overview
 
 An army can attempt to retreat from battle.
 
 ---
 
-## Effects
+### Effects
 
 Retreat ends the battle and preserves part of the army.
 
 ---
 
-## Commander Risk
+### Commander Risk
 
 The commander may still be captured after retreat.
 
@@ -709,7 +709,7 @@ Exact risk is unresolved.
 
 ---
 
-## Restrictions
+### Restrictions
 
 Retreat may be unavailable if there is no suitable neighbouring territory to retreat into.
 
@@ -717,9 +717,9 @@ Exact retreat availability rules require further verification.
 
 ---
 
-# 9.16 Tactical AI
+## 9.16 Tactical AI
 
-## Observed Behaviour
+### Observed Behaviour
 
 Battle AI appears to consider relative strength and supply.
 
@@ -735,9 +735,9 @@ Exact AI rules remain unresolved.
 
 ---
 
-# 9.17 Tactical Battle Summary
+## 9.17 Tactical Battle Summary
 
-## Reconstructed Battle System
+### Reconstructed Battle System
 
 ```mermaid
 flowchart TD
@@ -760,7 +760,7 @@ flowchart TD
 
 ---
 
-# Open Questions
+## Open Questions
 
 The following tactical battle details remain unresolved:
 
@@ -776,7 +776,7 @@ The following tactical battle details remain unresolved:
 
 ---
 
-# Summary
+## Summary
 
 Gemfire’s tactical battle is a compact turn-based system on a 10×8 grid.
 

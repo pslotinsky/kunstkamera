@@ -1,4 +1,4 @@
-# Strategic AI — Design
+# 12. Strategic AI
 
 ## Description
 

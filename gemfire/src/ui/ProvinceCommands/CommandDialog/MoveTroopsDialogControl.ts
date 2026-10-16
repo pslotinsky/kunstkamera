@@ -3,6 +3,7 @@ import type { HiredUnit } from '@/core/domain/HiredUnit';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
 import { isDefined } from '@/lib/value/isDefined';
+import { getFifthUnitPortraitUrl } from '@/ui/art/getFifthUnitPortraitUrl';
 import { DropdownControl } from '@/ui/Dropdown/DropdownControl';
 import type { DropdownOption } from '@/ui/Dropdown/DropdownView';
 
@@ -119,7 +120,7 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
       ...units.map((unit) => ({
         value: unit.name,
         label: unit.name,
-        icon: unit.portrait,
+        icon: getFifthUnitPortraitUrl(unit),
         note: String(unit.strength),
       })),
     ];

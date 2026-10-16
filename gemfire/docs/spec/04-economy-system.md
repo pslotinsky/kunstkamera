@@ -10,9 +10,9 @@ Gemfire’s economy is not a separate victory system. Its main role is to suppor
 
 ---
 
-# 4.1 Economic Model
+## 4.1 Economic Model
 
-## Confirmed Facts
+### Confirmed Facts
 
 Each province stores its own resources.
 
@@ -31,7 +31,7 @@ Gold, Food, and Troops each cap at 999 per province.
 
 ---
 
-## Province-Local Economy
+### Province-Local Economy
 
 Most economic decisions are local.
 
@@ -41,7 +41,7 @@ This means a rich rear province does not automatically solve the needs of a poor
 
 ---
 
-## Design Observation
+### Design Observation
 
 Gemfire’s economy is intentionally compact.
 
@@ -60,9 +60,9 @@ The result is a local economy that constantly forces tradeoffs between short-ter
 
 ---
 
-# 4.2 Core Economic Resources
+## 4.2 Core Economic Resources
 
-## Resource Overview
+### Resource Overview
 
 | Resource    | Role                                                  |
 | ----------- | ----------------------------------------------------- |
@@ -75,7 +75,7 @@ The result is a local economy that constantly forces tradeoffs between short-ter
 
 ---
 
-## Not Confirmed: Population
+### Not Confirmed: Population
 
 Population is not currently confirmed as a province stat in Gemfire.
 
@@ -93,9 +93,9 @@ Troops
 
 ---
 
-# 4.3 Gold
+## 4.3 Gold
 
-## Confirmed Facts
+### Confirmed Facts
 
 Gold is the main local spending resource.
 
@@ -109,7 +109,7 @@ Gold is used for:
 
 ---
 
-## Income
+### Income
 
 Major Gold income is associated with the yearly September processing.
 
@@ -119,13 +119,13 @@ The exact tax formula remains unresolved.
 
 ---
 
-## Spending
+### Spending
 
 Recruiting costs 2 Gold per soldier, and each Develop action (Cultivation or Protection) costs 10 Gold. Hired Fifth Unit prices vary by unit and are listed in Appendix C §C.4.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Gold is the main limiter of military growth.
 
@@ -133,9 +133,9 @@ A province may have Food and good development, but it cannot recruit or hire eff
 
 ---
 
-# 4.4 Food
+## 4.4 Food
 
-## Confirmed Facts
+### Confirmed Facts
 
 Food is a fundamental economic and military resource.
 
@@ -148,7 +148,7 @@ Food is used for:
 
 ---
 
-## Harvest
+### Harvest
 
 Major Food gain is associated with September harvest processing.
 
@@ -162,7 +162,7 @@ Confidence: Medium. Whether Protection truly contributes is unconfirmed.
 
 ---
 
-## Trade
+### Trade
 
 Food can be bought or sold through Trade.
 
@@ -180,7 +180,7 @@ The exact timing of market rate changes remains unresolved.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Food is both an economic and military resource.
 
@@ -190,9 +190,9 @@ This makes Food one of the most strategically flexible resources in the game.
 
 ---
 
-# 4.5 Troops
+## 4.5 Troops
 
-## Confirmed Facts
+### Confirmed Facts
 
 Troops represent the province’s local military manpower.
 
@@ -204,7 +204,7 @@ When a battle begins, Troops are converted into standard tactical units.
 
 ---
 
-## Recruitment
+### Recruitment
 
 Recruiting costs 2 Gold per soldier.
 
@@ -214,7 +214,7 @@ No confirmed population cost has been found.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Troops are the bridge between economy and war.
 
@@ -222,9 +222,9 @@ Gold becomes Troops through Recruit, and Troops become battlefield power through
 
 ---
 
-# 4.6 Loyalty
+## 4.6 Loyalty
 
-## Confirmed Facts
+### Confirmed Facts
 
 Loyalty represents the population’s support for the current ruler of the province.
 
@@ -239,7 +239,7 @@ Low Loyalty reduces province efficiency.
 
 ---
 
-## Give Food
+### Give Food
 
 The main known way to increase Loyalty is the Give Food command. Loyalty gain scales with the acting lord’s Charm and the amount of Food given:
 
@@ -253,7 +253,7 @@ Give Food consumes the province’s monthly action and has positive goodwill in 
 
 ---
 
-## Economic Role
+### Economic Role
 
 ```mermaid
 flowchart TD
@@ -265,7 +265,7 @@ flowchart TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 Loyalty links public support to economic power.
 
@@ -281,9 +281,9 @@ invest Food into long-term province loyalty
 
 ---
 
-# 4.7 Cultivation
+## 4.7 Cultivation
 
-## Confirmed Facts
+### Confirmed Facts
 
 Cultivation represents the agricultural development of a province.
 
@@ -293,13 +293,13 @@ Cultivation can be increased through Develop.
 
 ---
 
-## Develop: Cultivation
+### Develop: Cultivation
 
 Develop: Cultivation costs 10 Gold and consumes the province’s monthly action. It raises the stat by +2 to +5 per use, scaling with the acting character’s INT / Domestic ability (minimum +2; exact thresholds unverified).
 
 ---
 
-## Degradation
+### Degradation
 
 Cultivation can be reduced by:
 
@@ -312,7 +312,7 @@ Exact reduction formulas remain unresolved.
 
 ---
 
-## Economic Role
+### Economic Role
 
 ```mermaid
 flowchart TD
@@ -324,7 +324,7 @@ flowchart TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 Cultivation is a long-term investment.
 
@@ -332,9 +332,9 @@ The player spends Gold and a province action now to increase future Food product
 
 ---
 
-# 4.8 Protection
+## 4.8 Protection
 
-## Confirmed Facts
+### Confirmed Facts
 
 Protection represents a province’s resilience against harmful outcomes.
 
@@ -342,13 +342,13 @@ Protection can be increased through Develop.
 
 ---
 
-## Develop: Protection
+### Develop: Protection
 
 Develop: Protection costs 10 Gold and consumes the province’s monthly action. Like Cultivation, the result scales with the acting character’s INT / Domestic ability.
 
 ---
 
-## Effects
+### Effects
 
 High Protection helps reduce or resist:
 
@@ -360,7 +360,7 @@ There is evidence that Protection may also influence harvest, but this is not fu
 
 ---
 
-## Protection and Goodwill
+### Protection and Goodwill
 
 The Protection stat and the Protect / Develop action should not be confused.
 
@@ -370,7 +370,7 @@ The Protection stat itself is primarily understood as defensive mitigation again
 
 ---
 
-## Degradation
+### Degradation
 
 Protection can be reduced by:
 
@@ -383,7 +383,7 @@ Exact reduction formulas remain unresolved.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Protection is a defensive investment.
 
@@ -391,9 +391,9 @@ It does not primarily create immediate wealth. Instead, it helps preserve provin
 
 ---
 
-# 4.9 Trade
+## 4.9 Trade
 
-## Confirmed Facts
+### Confirmed Facts
 
 Trade allows the player to buy or sell Food.
 
@@ -403,7 +403,7 @@ Trade does not consume the province’s main monthly action.
 
 ---
 
-## Strategic Role
+### Strategic Role
 
 Trade lets the player correct local resource imbalances before choosing a major province action.
 
@@ -416,7 +416,7 @@ A province with surplus Food can sell some to fund development or recruitment.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Because Trade is not turn-consuming, it acts as an economic adjustment tool rather than a major strategic commitment.
 
@@ -424,9 +424,9 @@ The major commitment comes from what the province does after trading.
 
 ---
 
-# 4.10 Transport
+## 4.10 Transport
 
-## Confirmed Facts
+### Confirmed Facts
 
 Two distinct commands move things between provinces:
 
@@ -439,7 +439,7 @@ Both consume the province's monthly action.
 
 ---
 
-## Strategic Role
+### Strategic Role
 
 Transport connects the local province economies into a wider logistical network.
 
@@ -452,7 +452,7 @@ Rear provinces can support frontier provinces by sending:
 
 ---
 
-## Design Observation
+### Design Observation
 
 Because resources are local, logistics matters.
 
@@ -460,9 +460,9 @@ A strong economy in the wrong province is not automatically useful unless resour
 
 ---
 
-# 4.11 Economic Loop
+## 4.11 Economic Loop
 
-## Reconstructed Economic Loop
+### Reconstructed Economic Loop
 
 ```mermaid
 flowchart TD
@@ -493,7 +493,7 @@ The dashed Protection → Harvest relationship is supported by some evidence but
 
 ---
 
-# 4.12 Economy Summary
+## 4.12 Economy Summary
 
 Gemfire’s economy is based on local province values rather than a single centralized national economy.
 
@@ -514,7 +514,7 @@ A well-managed province can support expansion, survive disasters, maintain loyal
 
 ---
 
-# Open Questions
+## Open Questions
 
 The following economy details remain unresolved:
 

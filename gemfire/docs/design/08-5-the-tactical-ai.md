@@ -1,4 +1,4 @@
-# 8.5 The Tactical AI — Design
+# 8.5 The Tactical AI
 
 ## Description
 

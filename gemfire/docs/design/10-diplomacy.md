@@ -1,4 +1,4 @@
-# Diplomacy — Design
+# 10. Diplomacy
 
 ## Description
 

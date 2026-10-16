@@ -6,6 +6,8 @@ import type { Gem } from '@/core/domain/Gem';
 import type { General, GeneralRank } from '@/core/domain/General';
 import type { HiredUnit } from '@/core/domain/HiredUnit';
 import type { Province, ProvinceStatus } from '@/core/domain/Province';
+import { getFifthUnitPortraitUrl } from '@/ui/art/getFifthUnitPortraitUrl';
+import { getGeneralPortraitUrl } from '@/ui/art/getGeneralPortraitUrl';
 import { CommandDialogView } from '@/ui/ProvinceCommands/CommandDialog/CommandDialogView';
 
 import { FamilyOverviewTabSelectedEvent } from './FamilyOverviewTabSelectedEvent';
@@ -112,7 +114,7 @@ export class FamilyOverviewView extends CommandDialogView {
 
     return `
       <div class="${styles.card}">
-        <img class="${styles.portrait}" src="${general.portrait}" alt="${general.name}" />
+        <img class="${styles.portrait}" src="${getGeneralPortraitUrl(general)}" alt="${general.name}" />
         <div class="${styles.identity}">
           <span class="${styles.title}">${row.rank}</span>
           <span class="${styles.name}">${general.name}</span>
@@ -177,7 +179,7 @@ export class FamilyOverviewView extends CommandDialogView {
   private renderUnitCard(unit: FifthUnit, kind: string): string {
     return `
       <div class="${styles.card}">
-        <img class="${styles.unitPortrait}" src="${unit.portrait}" alt="${unit.name}" />
+        <img class="${styles.unitPortrait}" src="${getFifthUnitPortraitUrl(unit)}" alt="${unit.name}" />
         <div class="${styles.identity}">
           <span class="${styles.title}">${kind}</span>
           <span class="${styles.name}">${unit.name}</span>

@@ -17,9 +17,9 @@ The Gem system connects:
 
 ---
 
-# 7.1 Gemfire and Gems
+## 7.1 Gemfire and Gems
 
-## Overview
+### Overview
 
 Gemfire is a magical crown in which the king inlaid seven Gems:
 
@@ -34,7 +34,7 @@ The Dragon is therefore the crown itself, still in Eselred's hands at Lankshire 
 
 ---
 
-## Narrative Role
+### Narrative Role
 
 Gems are both magical artifacts and symbols of political authority.
 
@@ -42,7 +42,7 @@ Control over a Gem gives a house military power through its Guardian, but it als
 
 ---
 
-## Design Observation
+### Design Observation
 
 Gems are one of the main ways Gemfire ties lore to mechanics.
 
@@ -58,9 +58,9 @@ Battlefield Fifth Unit access
 
 ---
 
-# 7.2 Gem Ownership
+## 7.2 Gem Ownership
 
-## Confirmed Facts
+### Confirmed Facts
 
 A Gem is not owned by an individual general.
 
@@ -78,7 +78,7 @@ Gem Guardian
 
 ---
 
-## Ownership Model
+### Ownership Model
 
 ```mermaid
 flowchart TD
@@ -89,7 +89,7 @@ flowchart TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 A Gem is more flexible than a hired Fifth Unit.
 
@@ -97,9 +97,9 @@ A hired Fifth Unit is tied to a province and must be moved through logistics. A 
 
 ---
 
-# 7.3 Gem Guardians
+## 7.3 Gem Guardians
 
-## Overview
+### Overview
 
 Each Gem allows the owning house to use its associated Gem Guardian.
 
@@ -109,13 +109,13 @@ Gem Guardians use Strength instead of normal troop count.
 
 ---
 
-## Confirmed Gem Guardians
+### Confirmed Gem Guardians
 
 There are seven Gem Guardians, including the royal Dragon retained by Lankshire / Eselred; their full stats (Strength, Move, Range) and owning house are canonical in Appendix C §C.3, with per-scenario ownership in Appendix B §B.3 and each guardian's gemstone and element in Appendix E §E.6.
 
 ---
 
-## Battlefield Role
+### Battlefield Role
 
 Gem Guardians are among the strongest Fifth Units in the game.
 
@@ -125,9 +125,9 @@ Exact Guardian statistics, movement values, and range patterns are maintained in
 
 ---
 
-# 7.4 Gem Guardians as Fifth Units
+## 7.4 Gem Guardians as Fifth Units
 
-## Usage
+### Usage
 
 If a house owns a Gem and the Gem is available, its Guardian may be selected as the army’s Fifth Unit.
 
@@ -143,7 +143,7 @@ Gem enters cooldown
 
 ---
 
-## Difference from Hired Fifth Units
+### Difference from Hired Fifth Units
 
 | Aspect          | Gem Guardian           | Hired Fifth Unit                  |
 | --------------- | ---------------------- | --------------------------------- |
@@ -156,7 +156,7 @@ Gem enters cooldown
 
 ---
 
-## Design Observation
+### Design Observation
 
 Gem Guardians are reusable elite Fifth Units.
 
@@ -164,9 +164,9 @@ They are powerful and reliable, but limited by cooldown and Strength attrition.
 
 ---
 
-# 7.5 Cooldown System
+## 7.5 Cooldown System
 
-## Confirmed Facts
+### Confirmed Facts
 
 A Gem cannot be used continuously.
 
@@ -174,13 +174,13 @@ After being used in battle, a Gem becomes unavailable for a period of time.
 
 ---
 
-## Cooldown Rules
+### Cooldown Rules
 
 A Gem enters cooldown for 3 months after being used in battle, or 5 months after being defeated.
 
 ---
 
-## Conceptual Flow
+### Conceptual Flow
 
 ```mermaid
 flowchart TD
@@ -200,7 +200,7 @@ flowchart TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 Cooldown prevents Gem Guardians from dominating every battle.
 
@@ -214,9 +214,9 @@ save it for a more important battle
 
 ---
 
-# 7.6 Strength and Battle Limits
+## 7.6 Strength and Battle Limits
 
-## Strength
+### Strength
 
 Gem Guardians use Strength instead of troop count.
 
@@ -224,7 +224,7 @@ Strength represents the Guardian’s combat power and durability.
 
 ---
 
-## Strength Loss
+### Strength Loss
 
 Gem Guardians lose Strength when attacking.
 
@@ -232,7 +232,7 @@ A Gem Guardian loses 10% Strength per attack (this applies when it attacks), eve
 
 ---
 
-## Death Immunity
+### Death Immunity
 
 A Gem Guardian cannot permanently die.
 
@@ -240,7 +240,7 @@ If defeated, it enters the longer cooldown instead of being destroyed.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Gem Guardians combine high power with built-in attrition.
 
@@ -248,9 +248,9 @@ They are not disposable units, but they also cannot be used carelessly. A Gem Gu
 
 ---
 
-# 7.7 Gem Transfer
+## 7.7 Gem Transfer
 
-## Province Capture
+### Province Capture
 
 Capturing a single province does not automatically transfer the enemy house’s Gem.
 
@@ -266,7 +266,7 @@ Enemy family keeps Gem if the family still exists
 
 ---
 
-## Family Absorption
+### Family Absorption
 
 A Gem transfers with the family. If a family surrenders, the victor gains its Gems. If a ruler is recruited and the family absorbed, the victor gains its Gems. If a ruler is banished with no heirs, the banisher gains its Gems. Capturing a single province does not transfer Gem ownership while the family still exists. Exact edge cases remain unresolved.
 
@@ -278,7 +278,7 @@ Per the manuals, the Search command can also look for Gems: Search reveals which
 
 ---
 
-## Transfer Model
+### Transfer Model
 
 ```mermaid
 flowchart TD
@@ -294,7 +294,7 @@ flowchart TD
 
 ---
 
-## Design Observation
+### Design Observation
 
 Gem transfer reinforces the importance of rulers and family survival.
 
@@ -302,9 +302,9 @@ The fastest path to acquiring a Gem is not necessarily conquering every province
 
 ---
 
-# 7.8 Multiple Gems
+## 7.8 Multiple Gems
 
-## Overview
+### Overview
 
 A house can control more than one Gem.
 
@@ -317,7 +317,7 @@ This can happen through:
 
 ---
 
-## Strategic Effect
+### Strategic Effect
 
 Multiple Gems give a house several advantages:
 
@@ -328,7 +328,7 @@ Multiple Gems give a house several advantages:
 
 ---
 
-## Design Observation
+### Design Observation
 
 Gem accumulation acts as a strategic snowball mechanic.
 
@@ -336,9 +336,9 @@ A successful house becomes more dangerous not only because it controls more prov
 
 ---
 
-# 7.9 Pastha Exception
+## 7.9 Pastha Exception
 
-## Overview
+### Overview
 
 Pastha is a special Fifth Unit, but it is not a Gem Guardian and not a hired Fifth Unit.
 
@@ -346,7 +346,7 @@ Pastha is obtained through a favourable event.
 
 ---
 
-## Key Differences
+### Key Differences
 
 | Aspect      | Pastha                 |
 | ----------- | ---------------------- |
@@ -358,7 +358,7 @@ Pastha is obtained through a favourable event.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Pastha is useful as a comparison point because it also occupies the Fifth Unit slot.
 
@@ -366,9 +366,9 @@ However, Pastha is not part of Gem ownership. It belongs to the event system and
 
 ---
 
-# 7.10 Strategic Role of Gems
+## 7.10 Strategic Role of Gems
 
-## Military Role
+### Military Role
 
 Gem Guardians provide powerful Fifth Units for tactical battles.
 
@@ -376,7 +376,7 @@ They can help a house win battles that would be difficult with standard troops a
 
 ---
 
-## Political Role
+### Political Role
 
 Gems are tied to family survival and absorption.
 
@@ -384,7 +384,7 @@ Acquiring an enemy Gem is part of consolidating power over Ishmeria.
 
 ---
 
-## Economic Role
+### Economic Role
 
 Gem Guardians reduce dependence on hired Fifth Units.
 
@@ -392,7 +392,7 @@ Because they do not require upkeep, they are more reliable than mercenary or mon
 
 ---
 
-## Strategic Tradeoff
+### Strategic Tradeoff
 
 Gem Guardians are powerful but limited by:
 
@@ -410,9 +410,9 @@ The player must decide:
 
 ---
 
-# 7.11 Gem System Summary
+## 7.11 Gem System Summary
 
-## Reconstructed Gem System
+### Reconstructed Gem System
 
 ```mermaid
 flowchart TD
@@ -436,7 +436,7 @@ flowchart TD
 
 ---
 
-# Open Questions
+## Open Questions
 
 The following Gem-system details remain unresolved:
 
@@ -448,7 +448,7 @@ The following Gem-system details remain unresolved:
 
 ---
 
-# Summary
+## Summary
 
 The Gem system is one of Gemfire’s central systems.
 

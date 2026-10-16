@@ -1,4 +1,4 @@
-# Character lifecycle — Design
+# 11. Character lifecycle
 
 ## Description
 

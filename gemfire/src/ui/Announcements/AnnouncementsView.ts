@@ -23,6 +23,9 @@ import type {
 import type { ChildrenViews } from '@/lib/Control';
 import type { EventBus } from '@/lib/EventBus';
 import { View } from '@/lib/View';
+import { getFamilyCrestUrl } from '@/ui/art/getFamilyCrestUrl';
+import { getFifthUnitPortraitUrl } from '@/ui/art/getFifthUnitPortraitUrl';
+import { getGeneralPortraitUrl } from '@/ui/art/getGeneralPortraitUrl';
 import type { DropdownControl } from '@/ui/Dropdown/DropdownControl';
 
 import { AnnouncementDismissedEvent } from './AnnouncementDismissedEvent';
@@ -129,7 +132,7 @@ export class AnnouncementsView extends View<
     this.tell(
       {
         text: `The ${unit.name} of ${province.name} ${DESERTION_REASONS[reason]} and deserted.`,
-        icon: unit.portrait,
+        icon: getFifthUnitPortraitUrl(unit),
       },
       pending,
     );
@@ -166,7 +169,7 @@ export class AnnouncementsView extends View<
     this.tell(
       {
         text: `${captive.captor.name} ${VERDICTS[outcome]} ${captive.general.name}.`,
-        icon: captive.general.portrait,
+        icon: getGeneralPortraitUrl(captive.general),
       },
       pending,
     );
@@ -178,7 +181,7 @@ export class AnnouncementsView extends View<
     this.ask(
       {
         text: `${proposer.ruler.name} of ${proposer.name} proposes an alliance.`,
-        icon: proposer.crest,
+        icon: getFamilyCrestUrl(proposer),
       },
       { label: '', action: 'Accept', decline: 'Decline' },
       pending,
@@ -189,7 +192,10 @@ export class AnnouncementsView extends View<
     const { general } = event;
 
     this.tell(
-      { text: `${general.name} has died of old age.`, icon: general.portrait },
+      {
+        text: `${general.name} has died of old age.`,
+        icon: getGeneralPortraitUrl(general),
+      },
       pending,
     );
   }
@@ -203,7 +209,10 @@ export class AnnouncementsView extends View<
         : this.describeDisbanding(outcome);
 
     this.tell(
-      { text: `${departure} ${consequence}`, icon: outcome.family.crest },
+      {
+        text: `${departure} ${consequence}`,
+        icon: getFamilyCrestUrl(outcome.family),
+      },
       pending,
     );
   }
@@ -215,7 +224,7 @@ export class AnnouncementsView extends View<
       {
         text: this.describeDeparture(outcome, cause),
         detail: `Who takes the throne of ${outcome.family.name}?`,
-        icon: outcome.family.crest,
+        icon: getFamilyCrestUrl(outcome.family),
       },
       { label: 'The heir', action: 'Crown' },
       pending,
@@ -263,22 +272,22 @@ export class AnnouncementsView extends View<
           text: outcome.accepted
             ? `${outcome.family.name} accepts. Peace holds between ${you} and ${outcome.family.name}.`
             : `${outcome.family.name} will not ally with you.`,
-          icon: outcome.family.crest,
+          icon: getFamilyCrestUrl(outcome.family),
         };
       case 'break':
         return {
           text: `The alliance with ${outcome.family.name} is broken.`,
-          icon: outcome.family.crest,
+          icon: getFamilyCrestUrl(outcome.family),
         };
       case 'defection':
         return {
           text: this.describeDefection(outcome, you),
-          icon: outcome.general.portrait,
+          icon: getGeneralPortraitUrl(outcome.general),
         };
       case 'surrender':
         return {
           text: this.describeSurrender(outcome, you),
-          icon: outcome.family.crest,
+          icon: getFamilyCrestUrl(outcome.family),
         };
       case 'sabotage':
         return {
@@ -305,7 +314,7 @@ export class AnnouncementsView extends View<
       case 'defection':
         return {
           text: this.describeLoss(outcome, rival),
-          icon: outcome.general.portrait,
+          icon: getGeneralPortraitUrl(outcome.general),
         };
       case 'sabotage':
         return {

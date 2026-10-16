@@ -2,6 +2,7 @@ import { BattleSide } from '@/core/domain/BattleSide';
 import type { BattleUnit } from '@/core/domain/BattleUnit';
 import type { Facing } from '@/core/domain/Facing';
 import { compact } from '@/lib/array/compact';
+import { getPublicAssetUrl } from '@/ui/art/getPublicAssetUrl';
 
 const LIVERIES = new Map<BattleSide, string>([
   [BattleSide.attacker, 'red'],
@@ -19,5 +20,5 @@ export function unitPiece(
   ];
   const name = compact(parts).join('-');
 
-  return `/battle-unit/${name}.webp`;
+  return getPublicAssetUrl(`battle-unit/${name}.webp`);
 }

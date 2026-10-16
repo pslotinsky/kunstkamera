@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - showcase/**
+      - gemfire/**
+      - total-space/**
+      - .github/workflows/ci.yml
+      - .github/workflows/gemfire-ci.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - showcase/**
+      - gemfire/**
+      - total-space/**
+      - .github/workflows/ci.yml
+      - .github/workflows/gemfire-ci.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  gemfire:
+    name: Gemfire
+    uses: ./.github/workflows/gemfire-ci.yml
+
+  showcase:
+    name: Showcase
+    needs: gemfire
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: gemfire/.nvmrc
+          cache: npm
+          cache-dependency-path: showcase/package-lock.json
+      - name: Install showcase dependencies
+        run: npm ci --prefix showcase
+      - name: Check showcase
+        run: npm run check:ci --prefix showcase
+      - name: Build showcase
+        env:
+          SHOWCASE_BASE: /${{ github.event.repository.name }}/
+        run: npm run build --prefix showcase
+      - name: Download game build
+        uses: actions/download-artifact@v4
+        with:
+          name: gemfire-game
+          path: showcase/dist/public/gemfire/game
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: showcase/dist/public
+
+  deploy:
+    name: Deploy GitHub Pages
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: [gemfire, showcase]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

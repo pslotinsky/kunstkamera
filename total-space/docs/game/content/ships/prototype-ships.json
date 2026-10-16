@@ -1,0 +1,534 @@
+{
+  "ships": [
+    {
+      "id": "corvette",
+      "name": "Corvette",
+      "chain": "light",
+      "unlockLevel": 1,
+      "size": "LIGHT",
+      "hull": 110,
+      "evasion": 0.3,
+      "pointDefence": 0,
+      "strategicSpeed": 10,
+      "cost": 100,
+      "upkeep": 5,
+      "productionRounds": 1,
+      "weapons": [
+        {
+          "name": "Light Guns",
+          "damage": 15,
+          "accuracy": 0.78,
+          "rangeEffectiveness": {
+            "LONG": 0.0,
+            "MEDIUM": 1.0,
+            "CLOSE": 1.1
+          },
+          "targetSizeModifiers": {
+            "LIGHT": 1.15,
+            "MEDIUM": 1.0,
+            "HEAVY": 0.75,
+            "CAPITAL": 0.55
+          },
+          "pointDefenceVulnerable": false
+        }
+      ]
+    },
+    {
+      "id": "frigate",
+      "name": "Frigate",
+      "chain": "light",
+      "unlockLevel": 2,
+      "size": "LIGHT",
+      "hull": 220,
+      "evasion": 0.22,
+      "pointDefence": 2,
+      "strategicSpeed": 9,
+      "cost": 180,
+      "upkeep": 9,
+      "productionRounds": 1,
+      "weapons": [
+        {
+          "name": "Escort Guns",
+          "damage": 22,
+          "accuracy": 0.8,
+          "rangeEffectiveness": {
+            "LONG": 0.0,
+            "MEDIUM": 1.0,
+            "CLOSE": 1.1
+          },
+          "targetSizeModifiers": {
+            "LIGHT": 1.25,
+            "MEDIUM": 1.0,
+            "HEAVY": 0.75,
+            "CAPITAL": 0.55
+          },
+          "pointDefenceVulnerable": false
+        }
+      ]
+    },
+    {
+      "id": "destroyer",
+      "name": "Destroyer",
+      "chain": "light",
+      "unlockLevel": 3,
+      "size": "MEDIUM",
+      "hull": 380,
+      "evasion": 0.13,
+      "pointDefence": 4,
+      "strategicSpeed": 8,
+      "cost": 300,
+      "upkeep": 15,
+      "productionRounds": 2,
+      "weapons": [
+        {
+          "name": "Anti-Light Battery",
+          "damage": 38,
+          "accuracy": 0.82,
+          "rangeEffectiveness": {
+            "LONG": 0.0,
+            "MEDIUM": 1.0,
+            "CLOSE": 1.1
+          },
+          "targetSizeModifiers": {
+            "LIGHT": 1.45,
+            "MEDIUM": 1.05,
+            "HEAVY": 0.75,
+            "CAPITAL": 0.6
+          },
+          "pointDefenceVulnerable": false
+        }
+      ]
+    },
+    {
+      "id": "gunship",
+      "name": "Gunship",
+      "chain": "strike",
+      "unlockLevel": 1,
+      "size": "LIGHT",
+      "hull": 120,
+      "evasion": 0.24,
+      "pointDefence": 0,
+      "strategicSpeed": 9,
+      "cost": 140,
+      "upkeep": 7,
+      "productionRounds": 1,
+      "weapons": [
+        {
+          "name": "Assault Guns",
+          "damage": 30,
+          "accuracy": 0.76,
+          "rangeEffectiveness": {
+            "LONG": 0.0,
+            "MEDIUM": 1.0,
+            "CLOSE": 1.15
+          },
+          "targetSizeModifiers": {
+            "LIGHT": 1.0,
+            "MEDIUM": 1.1,
+            "HEAVY": 1.0,
+            "CAPITAL": 0.85
+          },
+          "pointDefenceVulnerable": false
+        }
+      ]
+    },
+    {
+      "id": "torpedo_ship",
+      "name": "Torpedo Ship",
+      "chain": "strike",
+      "unlockLevel": 2,
+      "size": "LIGHT",
+      "hull": 150,
+      "evasion": 0.22,
+      "pointDefence": 0,
+      "strategicSpeed": 9,
+      "cost": 200,
+      "upkeep": 10,
+      "productionRounds": 1,
+      "weapons": [
+        {
+          "name": "Torpedoes",
+          "damage": 80,
+          "accuracy": 0.66,
+          "rangeEffectiveness": {
+            "LONG": 0.0,
+            "MEDIUM": 0.3,
+            "CLOSE": 1.0
+          },
+          "targetSizeModifiers": {
+            "LIGHT": 0.3,
+            "MEDIUM": 0.75,
+            "HEAVY": 1.5,
+            "CAPITAL": 2.1
+          },
+          "pointDefenceVulnerable": true
+        }
+      ]
+    },
+    {
+      "id": "missile_destroyer",
+      "name": "Missile Destroyer",
+      "chain": "strike",
+      "unlockLevel": 3,
+      "size": "MEDIUM",
+      "hull": 280,
+      "evasion": 0.11,
+      "pointDefence": 0,
+      "strategicSpeed": 7,
+      "cost": 320,
+      "upkeep": 16,
+      "productionRounds": 2,
+      "weapons": [
+        {
+          "name": "Missiles",
+          "damage": 62,
+          "accuracy": 0.74,
+          "rangeEffectiveness": {
+            "LONG": 1.1,
+            "MEDIUM": 1.0,
+            "CLOSE": 0.8
+          },
+          "targetSizeModifiers": {
+            "LIGHT": 0.75,
+            "MEDIUM": 1.0,
+            "HEAVY": 1.15,
+            "CAPITAL": 1.25
+          },
+          "pointDefenceVulnerable": true
+        }
+      ]
+    },
+    {
+      "id": "artillery_cruiser",
+      "name": "Artillery Cruiser",
+      "chain": "strike",
+      "unlockLevel": 4,
+      "size": "HEAVY",
+      "hull": 700,
+      "evasion": 0.05,
+      "pointDefence": 0,
+      "strategicSpeed": 5,
+      "cost": 700,
+      "upkeep": 35,
+      "productionRounds": 3,
+      "weapons": [
+        {
+          "name": "Artillery",
+          "damage": 155,
+          "accuracy": 0.76,
+          "rangeEffectiveness": {
+            "LONG": 1.2,
+            "MEDIUM": 1.0,
+            "CLOSE": 0.5
+          },
+          "targetSizeModifiers": {
+            "LIGHT": 0.5,
+            "MEDIUM": 0.9,
+            "HEAVY": 1.2,
+            "CAPITAL": 1.35
+          },
+          "pointDefenceVulnerable": false
+        },
+        {
+          "name": "Secondary Battery",
+          "damage": 18,
+          "accuracy": 0.78,
+          "rangeEffectiveness": {
+            "LONG": 0.0,
+            "MEDIUM": 0.65,
+            "CLOSE": 1.0
+          },
+          "targetSizeModifiers": {
+            "LIGHT": 1.35,
+            "MEDIUM": 1.05,
+            "HEAVY": 0.55,
+            "CAPITAL": 0.35
+          },
+          "pointDefenceVulnerable": false
+        }
+      ]
+    },
+    {
+      "id": "cruiser",
+      "name": "Cruiser",
+      "chain": "line",
+      "unlockLevel": 2,
+      "size": "MEDIUM",
+      "hull": 650,
+      "evasion": 0.1,
+      "pointDefence": 1,
+      "strategicSpeed": 7,
+      "cost": 450,
+      "upkeep": 22,
+      "productionRounds": 2,
+      "weapons": [
+        {
+          "name": "Main Battery",
+          "damage": 70,
+          "accuracy": 0.8,
+          "rangeEffectiveness": {
+            "LONG": 0.0,
+            "MEDIUM": 1.0,
+            "CLOSE": 1.1
+          },
+          "targetSizeModifiers": {
+            "LIGHT": 0.8,
+            "MEDIUM": 1.0,
+            "HEAVY": 1.0,
+            "CAPITAL": 0.95
+          },
+          "pointDefenceVulnerable": false
+        }
+      ]
+    },
+    {
+      "id": "heavy_cruiser",
+      "name": "Heavy Cruiser",
+      "chain": "line",
+      "unlockLevel": 3,
+      "size": "HEAVY",
+      "hull": 1100,
+      "evasion": 0.05,
+      "pointDefence": 2,
+      "strategicSpeed": 6,
+      "cost": 750,
+      "upkeep": 36,
+      "productionRounds": 3,
+      "weapons": [
+        {
+          "name": "Heavy Battery",
+          "damage": 105,
+          "accuracy": 0.82,
+          "rangeEffectiveness": {
+            "LONG": 0.3,
+            "MEDIUM": 1.0,
+            "CLOSE": 1.05
+          },
+          "targetSizeModifiers": {
+            "LIGHT": 0.65,
+            "MEDIUM": 0.95,
+            "HEAVY": 1.05,
+            "CAPITAL": 1.0
+          },
+          "pointDefenceVulnerable": false
+        },
+        {
+          "name": "Secondary Battery",
+          "damage": 16,
+          "accuracy": 0.78,
+          "rangeEffectiveness": {
+            "LONG": 0.0,
+            "MEDIUM": 0.65,
+            "CLOSE": 1.0
+          },
+          "targetSizeModifiers": {
+            "LIGHT": 1.35,
+            "MEDIUM": 1.05,
+            "HEAVY": 0.55,
+            "CAPITAL": 0.35
+          },
+          "pointDefenceVulnerable": false
+        }
+      ]
+    },
+    {
+      "id": "battlecruiser",
+      "name": "Battlecruiser",
+      "chain": "line",
+      "unlockLevel": 4,
+      "size": "HEAVY",
+      "hull": 1400,
+      "evasion": 0.05,
+      "pointDefence": 1,
+      "strategicSpeed": 8,
+      "cost": 1100,
+      "upkeep": 55,
+      "productionRounds": 4,
+      "weapons": [
+        {
+          "name": "Heavy Assault Battery",
+          "damage": 175,
+          "accuracy": 0.8,
+          "rangeEffectiveness": {
+            "LONG": 0.3,
+            "MEDIUM": 1.0,
+            "CLOSE": 1.1
+          },
+          "targetSizeModifiers": {
+            "LIGHT": 0.6,
+            "MEDIUM": 0.9,
+            "HEAVY": 1.1,
+            "CAPITAL": 1.05
+          },
+          "pointDefenceVulnerable": false
+        },
+        {
+          "name": "Secondary Battery",
+          "damage": 22,
+          "accuracy": 0.78,
+          "rangeEffectiveness": {
+            "LONG": 0.0,
+            "MEDIUM": 0.65,
+            "CLOSE": 1.0
+          },
+          "targetSizeModifiers": {
+            "LIGHT": 1.35,
+            "MEDIUM": 1.05,
+            "HEAVY": 0.55,
+            "CAPITAL": 0.35
+          },
+          "pointDefenceVulnerable": false
+        }
+      ]
+    },
+    {
+      "id": "battleship",
+      "name": "Battleship",
+      "chain": "line",
+      "unlockLevel": 5,
+      "size": "CAPITAL",
+      "hull": 2700,
+      "evasion": 0.02,
+      "pointDefence": 4,
+      "strategicSpeed": 4,
+      "cost": 1800,
+      "upkeep": 95,
+      "productionRounds": 5,
+      "weapons": [
+        {
+          "name": "Capital Battery",
+          "damage": 310,
+          "accuracy": 0.84,
+          "rangeEffectiveness": {
+            "LONG": 0.6,
+            "MEDIUM": 1.0,
+            "CLOSE": 1.05
+          },
+          "targetSizeModifiers": {
+            "LIGHT": 0.45,
+            "MEDIUM": 0.8,
+            "HEAVY": 1.0,
+            "CAPITAL": 1.15
+          },
+          "pointDefenceVulnerable": false
+        },
+        {
+          "name": "Secondary Battery",
+          "damage": 38,
+          "accuracy": 0.78,
+          "rangeEffectiveness": {
+            "LONG": 0.0,
+            "MEDIUM": 0.65,
+            "CLOSE": 1.0
+          },
+          "targetSizeModifiers": {
+            "LIGHT": 1.35,
+            "MEDIUM": 1.05,
+            "HEAVY": 0.55,
+            "CAPITAL": 0.35
+          },
+          "pointDefenceVulnerable": false
+        }
+      ]
+    },
+    {
+      "id": "light_carrier",
+      "name": "Light Carrier",
+      "chain": "carrier",
+      "unlockLevel": 2,
+      "size": "HEAVY",
+      "hull": 650,
+      "evasion": 0.05,
+      "pointDefence": 0,
+      "strategicSpeed": 6,
+      "cost": 600,
+      "upkeep": 30,
+      "productionRounds": 2,
+      "weapons": [
+        {
+          "name": "Strike Craft",
+          "damage": 110,
+          "accuracy": 0.77,
+          "rangeEffectiveness": {
+            "LONG": 1.0,
+            "MEDIUM": 1.0,
+            "CLOSE": 1.0
+          },
+          "targetSizeModifiers": {
+            "LIGHT": 0.7,
+            "MEDIUM": 1.0,
+            "HEAVY": 1.2,
+            "CAPITAL": 1.25
+          },
+          "pointDefenceVulnerable": true
+        }
+      ]
+    },
+    {
+      "id": "carrier",
+      "name": "Carrier",
+      "chain": "carrier",
+      "unlockLevel": 3,
+      "size": "CAPITAL",
+      "hull": 1100,
+      "evasion": 0.02,
+      "pointDefence": 1,
+      "strategicSpeed": 5,
+      "cost": 1000,
+      "upkeep": 50,
+      "productionRounds": 3,
+      "weapons": [
+        {
+          "name": "Strike Craft",
+          "damage": 185,
+          "accuracy": 0.8,
+          "rangeEffectiveness": {
+            "LONG": 1.0,
+            "MEDIUM": 1.0,
+            "CLOSE": 1.0
+          },
+          "targetSizeModifiers": {
+            "LIGHT": 0.65,
+            "MEDIUM": 1.0,
+            "HEAVY": 1.25,
+            "CAPITAL": 1.35
+          },
+          "pointDefenceVulnerable": true
+        }
+      ]
+    },
+    {
+      "id": "fleet_carrier",
+      "name": "Fleet Carrier",
+      "chain": "carrier",
+      "unlockLevel": 5,
+      "size": "CAPITAL",
+      "hull": 2100,
+      "evasion": 0.02,
+      "pointDefence": 2,
+      "strategicSpeed": 4,
+      "cost": 1900,
+      "upkeep": 100,
+      "productionRounds": 5,
+      "weapons": [
+        {
+          "name": "Strike Craft",
+          "damage": 400,
+          "accuracy": 0.82,
+          "rangeEffectiveness": {
+            "LONG": 1.0,
+            "MEDIUM": 1.0,
+            "CLOSE": 1.0
+          },
+          "targetSizeModifiers": {
+            "LIGHT": 0.6,
+            "MEDIUM": 1.0,
+            "HEAVY": 1.3,
+            "CAPITAL": 1.4
+          },
+          "pointDefenceVulnerable": true
+        }
+      ]
+    }
+  ]
+}

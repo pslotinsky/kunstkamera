@@ -3,4 +3,4 @@ dist/
 *.local
 .vscode/
 
-art
+/art/

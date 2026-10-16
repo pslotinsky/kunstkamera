@@ -15,9 +15,9 @@ This appendix covers:
 
 ---
 
-# D.1 Command Categories
+## D.1 Command Categories
 
-## Overview
+### Overview
 
 Commands in Gemfire can be grouped by function.
 
@@ -32,7 +32,7 @@ Commands in Gemfire can be grouped by function.
 
 ---
 
-## Core Rule
+### Core Rule
 
 Most important strategic commands consume the monthly action of a province.
 
@@ -54,9 +54,9 @@ Search
 
 ---
 
-# D.2 Strategic Command Table
+## D.2 Strategic Command Table
 
-## Province Commands
+### Province Commands
 
 | Command              | Category       | Consumes Monthly Action           | Primary Effect                          |
 | -------------------- | -------------- | --------------------------------- | --------------------------------------- |
@@ -83,7 +83,7 @@ Search
 
 ---
 
-## Notes
+### Notes
 
 Some commands have unclear action-cost behaviour across versions.
 
@@ -95,9 +95,9 @@ Needs verification
 
 ---
 
-# D.3 Tactical Battle Command Table
+## D.3 Tactical Battle Command Table
 
-## Unit-Level Commands
+### Unit-Level Commands
 
 | Command | Available To            | Effect                     |
 | ------- | ----------------------- | -------------------------- |
@@ -109,7 +109,7 @@ Needs verification
 
 ---
 
-## Army-Level Commands
+### Army-Level Commands
 
 | Command | Effect                              |
 | ------- | ----------------------------------- |
@@ -118,7 +118,7 @@ Needs verification
 
 ---
 
-## Battle Command Flow
+### Battle Command Flow
 
 A battle unit generally follows this activation structure:
 
@@ -141,9 +141,9 @@ Wait
 
 ---
 
-# D.4 Monthly Action Rules
+## D.4 Monthly Action Rules
 
-## Core Rule
+### Core Rule
 
 Each province usually performs one significant action per month.
 
@@ -157,7 +157,7 @@ This action may be:
 
 ---
 
-## Turn-Consuming Actions
+### Turn-Consuming Actions
 
 Confirmed or strongly supported turn-consuming actions include:
 
@@ -174,7 +174,7 @@ Confirmed or strongly supported turn-consuming actions include:
 
 ---
 
-## Non-Turn-Consuming Actions
+### Non-Turn-Consuming Actions
 
 | Action                    | Notes                                        |
 | ------------------------- | -------------------------------------------- |
@@ -184,7 +184,7 @@ Confirmed or strongly supported turn-consuming actions include:
 
 ---
 
-## Rule Implication
+### Rule Implication
 
 Trade being free is important.
 
@@ -192,9 +192,9 @@ It allows the player to correct resource imbalances before spending the province
 
 ---
 
-# D.5 Goodwill Rules
+## D.5 Goodwill Rules
 
-## Goodwill Values
+### Goodwill Values
 
 Each turn-based province command applies the following goodwill modifier; this table is the canonical home for those per-command values.
 
@@ -221,7 +221,7 @@ Each turn-based province command applies the following goodwill modifier; this t
 
 ---
 
-# D.6 Unknown Formula Register
+## D.6 Unknown Formula Register
 
 The following formulas remain unresolved:
 
@@ -248,9 +248,9 @@ The following formulas remain unresolved:
 
 ---
 
-# D.7 Data Confidence Notes
+## D.7 Data Confidence Notes
 
-## Confidence Levels
+### Confidence Levels
 
 | Level       | Meaning                                                 |
 | ----------- | ------------------------------------------------------- |
@@ -262,7 +262,7 @@ The following formulas remain unresolved:
 
 ---
 
-## Documentation Rule
+### Documentation Rule
 
 When a rule is uncertain, it should be marked as:
 
@@ -282,7 +282,7 @@ instead of being presented as confirmed.
 
 ---
 
-# Summary
+## Summary
 
 Appendix D is the canonical data layer for Gemfire's commands.
 

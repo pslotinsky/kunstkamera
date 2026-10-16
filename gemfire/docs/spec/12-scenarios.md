@@ -25,9 +25,9 @@ They differ in:
 
 ---
 
-# 12.1 Scenario System Overview
+## 12.1 Scenario System Overview
 
-## Core Concept
+### Core Concept
 
 Each scenario defines an initial political state of Ishmeria.
 
@@ -49,7 +49,7 @@ Different:
 
 ---
 
-## Design Observation
+### Design Observation
 
 Scenarios function as historical snapshots of one civil war.
 
@@ -57,9 +57,9 @@ The player can start the campaign at different points in the conflict and experi
 
 ---
 
-# 12.2 Shared Map and Victory Condition
+## 12.2 Shared Map and Victory Condition
 
-## Map
+### Map
 
 All scenarios use the same map of Ishmeria.
 
@@ -71,7 +71,7 @@ The map consists of:
 
 ---
 
-## Victory Condition
+### Victory Condition
 
 The global objective is the same in all scenarios:
 
@@ -83,7 +83,7 @@ The player wins by gaining control over the whole map and eliminating or absorbi
 
 ---
 
-## Design Observation
+### Design Observation
 
 Scenarios change the path to victory, not the goal.
 
@@ -91,9 +91,9 @@ The same world feels different because province ownership, house strength, and G
 
 ---
 
-# 12.3 Scenario Timeline
+## 12.3 Scenario Timeline
 
-## Timeline
+### Timeline
 
 Gemfire contains four main scenarios set at five-year intervals:
 
@@ -108,7 +108,7 @@ All four scenarios use the same fixed 30-province map; only the political state 
 
 ---
 
-## Timeline Model
+### Timeline Model
 
 ```mermaid
 flowchart LR
@@ -124,7 +124,7 @@ flowchart LR
 
 ---
 
-## Design Observation
+### Design Observation
 
 The scenarios are best understood as later states of the same conflict rather than alternate histories.
 
@@ -132,9 +132,9 @@ This creates a sense of historical continuity without requiring separate campaig
 
 ---
 
-# 12.4 Scenario Data Fields
+## 12.4 Scenario Data Fields
 
-## Overview
+### Overview
 
 A complete scenario definition requires several data layers:
 
@@ -154,7 +154,7 @@ A complete scenario definition requires several data layers:
 
 ---
 
-## Data Boundary
+### Data Boundary
 
 This chapter describes scenarios at the level of structure, timeline, political context, and strategic role.
 
@@ -170,15 +170,15 @@ Full tabular data should be kept in structured reference data:
 
 ---
 
-# 12.5 Active Families
+## 12.5 Active Families
 
-## Overview
+### Overview
 
 Gemfire includes more active houses than only the main early rebel families. The full list of active families is canonical in Appendix A §A.6 (and per-scenario in Appendix B §B.3).
 
 ---
 
-## General Roles
+### General Roles
 
 | Family    | General Role                                                 |
 | --------- | ------------------------------------------------------------ |
@@ -196,7 +196,7 @@ Gemfire includes more active houses than only the main early rebel families. The
 
 ---
 
-## Design Observation
+### Design Observation
 
 Scenarios use houses to show the evolution of the war.
 
@@ -204,15 +204,15 @@ Some houses disappear, new ones appear, and older houses shift in political weig
 
 ---
 
-# 12.6 Erin & Ander
+## 12.6 Erin & Ander
 
-## Time Position
+### Time Position
 
 First scenario, at Year 0.
 
 ---
 
-## Narrative Premise
+### Narrative Premise
 
 The noble uprising against Lankshire begins.
 
@@ -222,7 +222,7 @@ Lankshire remains a powerful royal house.
 
 ---
 
-## Strategic Situation
+### Strategic Situation
 
 The war is still in an early state.
 
@@ -232,7 +232,7 @@ The political map is less polarized than in later scenarios.
 
 ---
 
-## Strategic Role
+### Strategic Role
 
 Erin & Ander is the most open and long-form scenario.
 
@@ -240,7 +240,7 @@ It lets the player shape the war from its earliest playable state.
 
 ---
 
-## Key Strategic Features
+### Key Strategic Features
 
 - Lankshire is still strong.
 - Multiple noble houses remain active.
@@ -250,7 +250,7 @@ It lets the player shape the war from its earliest playable state.
 
 ---
 
-## Design Observation
+### Design Observation
 
 Erin & Ander functions as the classic start.
 
@@ -258,15 +258,15 @@ It is the best scenario for understanding the game’s baseline political struct
 
 ---
 
-# 12.7 Flax’s Shame
+## 12.7 Flax’s Shame
 
-## Time Position
+### Time Position
 
 Second scenario, at Year +5.
 
 ---
 
-## Narrative Premise
+### Narrative Premise
 
 The scenario takes place five years after the beginning of the war.
 
@@ -280,7 +280,7 @@ Terian has broken from the king and formed Tate as a new political force.
 
 ---
 
-## Known Political Changes
+### Known Political Changes
 
 Known changes between the first and second scenario include:
 
@@ -297,7 +297,7 @@ Known changes between the first and second scenario include:
 
 ---
 
-## Strategic Role
+### Strategic Role
 
 Flax’s Shame is a mid-war scenario.
 
@@ -305,7 +305,7 @@ The war has already reshaped the map, but the conflict is not yet fully consolid
 
 ---
 
-## Design Observation
+### Design Observation
 
 This scenario shows Ishmeria after the first major upheavals.
 
@@ -313,15 +313,15 @@ Some houses have already collapsed or shifted position, while others remain capa
 
 ---
 
-# 12.8 Terian’s War
+## 12.8 Terian’s War
 
-## Time Position
+### Time Position
 
 Third scenario, at Year +10.
 
 ---
 
-## Narrative Premise
+### Narrative Premise
 
 The scenario takes place ten years after the beginning of the war.
 
@@ -333,7 +333,7 @@ Larger blocs become more important than the smaller early-war houses.
 
 ---
 
-## Known Political Situation
+### Known Political Situation
 
 Known high-level changes include:
 
@@ -346,7 +346,7 @@ Known high-level changes include:
 
 ---
 
-## Strategic Role
+### Strategic Role
 
 Terian’s War represents a harsher, more consolidated phase of the conflict.
 
@@ -354,7 +354,7 @@ The player starts in a world where several early factions have already failed, a
 
 ---
 
-## Design Observation
+### Design Observation
 
 This scenario has less early-war openness.
 
@@ -362,15 +362,15 @@ It is better suited for campaigns with established power centers and fewer survi
 
 ---
 
-# 12.9 Gemfire
+## 12.9 Gemfire
 
-## Time Position
+### Time Position
 
 Fourth scenario, at Year +15.
 
 ---
 
-## Narrative Premise
+### Narrative Premise
 
 This is the late-war scenario.
 
@@ -382,7 +382,7 @@ The political map has already been heavily reshaped by years of conflict.
 
 ---
 
-## Known Political Situation
+### Known Political Situation
 
 Known high-level data includes:
 
@@ -395,7 +395,7 @@ Known high-level data includes:
 
 ---
 
-## Divas Challenge Start
+### Divas Challenge Start
 
 Divas is one of the hardest starts in the late scenario.
 
@@ -409,7 +409,7 @@ Known features:
 
 ---
 
-## Strategic Role
+### Strategic Role
 
 Gemfire is a late-war scenario with larger blocs and more obvious strong and weak starts.
 
@@ -417,7 +417,7 @@ It creates a shorter, more pressured campaign because some houses are already cl
 
 ---
 
-## Design Observation
+### Design Observation
 
 This scenario shows the war near its final state.
 
@@ -425,9 +425,9 @@ The player does not begin with a relatively open early conflict, but with the ac
 
 ---
 
-# 12.10 Scenario Difficulty
+## 12.10 Scenario Difficulty
 
-## Difficulty Factors
+### Difficulty Factors
 
 Scenario difficulty depends on several starting conditions:
 
@@ -444,7 +444,7 @@ Scenario difficulty depends on several starting conditions:
 
 ---
 
-## Strong Starts
+### Strong Starts
 
 Strong starts usually have:
 
@@ -462,7 +462,7 @@ Examples include:
 
 ---
 
-## Challenge Starts
+### Challenge Starts
 
 Difficult starts usually have:
 
@@ -478,7 +478,7 @@ Example:
 
 ---
 
-## Design Observation
+### Design Observation
 
 Scenario difficulty is created mostly by initial world state, not by explicit difficulty modifiers.
 
@@ -486,9 +486,9 @@ Gemfire uses asymmetric starts: different houses present different strategic pro
 
 ---
 
-# 12.11 Scenario Design Role
+## 12.11 Scenario Design Role
 
-## Fixed Map, Changing Politics
+### Fixed Map, Changing Politics
 
 All scenarios use the same map.
 
@@ -496,7 +496,7 @@ This lets the player learn Ishmeria’s geography while experiencing different p
 
 ---
 
-## Historical Continuity
+### Historical Continuity
 
 Scenarios show the consequences of earlier phases of war:
 
@@ -509,7 +509,7 @@ Scenarios show the consequences of earlier phases of war:
 
 ---
 
-## Replayability
+### Replayability
 
 Scenarios increase replayability through:
 
@@ -521,7 +521,7 @@ Scenarios increase replayability through:
 
 ---
 
-## Design Observation
+### Design Observation
 
 Gemfire uses scenarios to create replayability without random map generation.
 
@@ -529,9 +529,9 @@ The world remains fixed, but its political state changes.
 
 ---
 
-# 12.12 Scenario System Summary
+## 12.12 Scenario System Summary
 
-## Reconstructed Scenario System
+### Reconstructed Scenario System
 
 ```mermaid
 flowchart TD
@@ -555,7 +555,7 @@ flowchart TD
 
 ---
 
-# Open Questions
+## Open Questions
 
 The following scenario details remain unresolved or require final structured extraction:
 
@@ -568,7 +568,7 @@ The following scenario details remain unresolved or require final structured ext
 
 ---
 
-# Summary
+## Summary
 
 Gemfire’s scenarios are time slices of one war for Ishmeria.
 

@@ -25,9 +25,9 @@ Lore and narrative facts belong to Appendix E.
 
 ---
 
-# B.1 Source Notes
+## B.1 Source Notes
 
-## Main Data Sources
+### Main Data Sources
 
 Scenario and character data is reconstructed primarily from:
 
@@ -36,7 +36,7 @@ Scenario and character data is reconstructed primarily from:
 - official manual scenario references;
 - cross-checks against scenario pages and map data.
 
-## Confidence Notes
+### Confidence Notes
 
 The following data is high-confidence:
 
@@ -58,9 +58,9 @@ established. Per-province starting stats and hire pools remain to be tabulated.
 
 ---
 
-# B.2 Character Data Format
+## B.2 Character Data Format
 
-## Character Count
+### Character Count
 
 Gemfire contains 64 generals (confirmed). Each has INT / WAR / CHA, a birth year,
 and an associated family; stats vary by scenario and with age.
@@ -78,7 +78,7 @@ Character data includes:
 
 ---
 
-## Recommended Character Record Format
+### Recommended Character Record Format
 
 | Field            | Description                                                  |
 | ---------------- | ------------------------------------------------------------ |
@@ -94,7 +94,7 @@ Character data includes:
 
 ---
 
-## Recommended Full 64-General Table Format
+### Recommended Full 64-General Table Format
 
 The full character table should be maintained as structured data.
 
@@ -119,9 +119,9 @@ The full character table should be maintained as structured data.
 
 ---
 
-# B.3 Families and Gems by Scenario
+## B.3 Families and Gems by Scenario
 
-## Scenario 1 — Erin & Ander
+### Scenario 1 — Erin & Ander
 
 | Family    | Head    | Gems    |
 | --------- | ------- | ------- |
@@ -135,7 +135,7 @@ The full character table should be maintained as structured data.
 
 ---
 
-## Scenario 2 — Flax’s Shame
+### Scenario 2 — Flax’s Shame
 
 | Family    | Head    | Gems    |
 | --------- | ------- | ------- |
@@ -149,7 +149,7 @@ The full character table should be maintained as structured data.
 
 ---
 
-## Scenario 3 — Terian’s War
+### Scenario 3 — Terian’s War
 
 | Family    | Head          | Gems            |
 | --------- | ------------- | --------------- |
@@ -160,7 +160,7 @@ The full character table should be maintained as structured data.
 | Tate      | Terian        | Empyron         |
 | Tordin    | Gweyn         | None            |
 
-### Data Note
+#### Data Note
 
 Tordin's Scenario-3 ruler is **Gweyn** (Princess Gweyn of Tordin). Erven is an
 unrelated free officer (Family: None); the earlier "Erven / Gweyn" ambiguity is
@@ -168,7 +168,7 @@ resolved.
 
 ---
 
-## Scenario 4 — Gemfire
+### Scenario 4 — Gemfire
 
 | Family    | Head    | Gems            |
 | --------- | ------- | --------------- |
@@ -181,9 +181,9 @@ resolved.
 
 ---
 
-# B.4 Playable Families and Difficulty Notes
+## B.4 Playable Families and Difficulty Notes
 
-## Scenario 1 — Erin & Ander
+### Scenario 1 — Erin & Ander
 
 | Family    | Playable | Difficulty Notes        |
 | --------- | -------- | ----------------------- |
@@ -197,7 +197,7 @@ resolved.
 
 ---
 
-## Scenario 2 — Flax’s Shame
+### Scenario 2 — Flax’s Shame
 
 | Family    | Status | Notes                                       |
 | --------- | ------ | ------------------------------------------- |
@@ -213,7 +213,7 @@ Playable families: Lyle, Blanche, Flax, Molbrew.
 
 ---
 
-## Scenario 3 — Terian’s War
+### Scenario 3 — Terian’s War
 
 | Family    | Playable | Notes                            |
 | --------- | -------- | -------------------------------- |
@@ -226,7 +226,7 @@ Playable families: Lyle, Blanche, Flax, Molbrew.
 
 ---
 
-## Scenario 4 — Gemfire
+### Scenario 4 — Gemfire
 
 | Family    | Playable | Notes                    |
 | --------- | -------- | ------------------------ |
@@ -239,7 +239,7 @@ Playable families: Lyle, Blanche, Flax, Molbrew.
 
 ---
 
-# B.5 Province Ownership by Scenario
+## B.5 Province Ownership by Scenario
 
 |   # | Province | Erin & Ander | Flax’s Shame | Terian’s War | Gemfire   |
 | --: | -------- | ------------ | ------------ | ------------ | --------- |
@@ -276,9 +276,9 @@ Playable families: Lyle, Blanche, Flax, Molbrew.
 
 ---
 
-# B.6 Known Lord Tables
+## B.6 Known Lord Tables
 
-## Scenario 1 — Erin & Ander
+### Scenario 1 — Erin & Ander
 
 | Province  | Family    | Lord        |
 | --------- | --------- | ----------- |
@@ -307,7 +307,7 @@ Playable families: Lyle, Blanche, Flax, Molbrew.
 
 ---
 
-## Scenario 2 — Flax’s Shame
+### Scenario 2 — Flax’s Shame
 
 Known lords:
 
@@ -326,7 +326,7 @@ Additional lord data requires full scenario extraction.
 
 ---
 
-## Scenario 3 — Terian’s War
+### Scenario 3 — Terian’s War
 
 Known ownership blocks:
 
@@ -343,7 +343,7 @@ Lord-level table requires full extraction.
 
 ---
 
-## Scenario 4 — Gemfire
+### Scenario 4 — Gemfire
 
 Known ownership blocks:
 
@@ -360,7 +360,7 @@ Lord-level table requires full extraction.
 
 ---
 
-# B.7 Rulers by Scenario
+## B.7 Rulers by Scenario
 
 | Scenario     | Family    | Ruler         |
 | ------------ | --------- | ------------- |
@@ -393,7 +393,7 @@ Lord-level table requires full extraction.
 
 ---
 
-# B.8 Character Continuity Notes
+## B.8 Character Continuity Notes
 
 This section records only data-relevant continuity cases.
 
@@ -412,9 +412,9 @@ It should not be expanded into personality or ideology notes unless supported by
 
 ---
 
-# B.9 Extended Scenario State Tables
+## B.9 Extended Scenario State Tables
 
-## Not Included in This Version
+### Not Included in This Version
 
 The following data is not included in this version of Appendix B:
 
@@ -432,7 +432,7 @@ revision.
 
 ---
 
-## Recommended Future Format
+### Recommended Future Format
 
 | Scenario | Province | Owner | Lord | Gold | Food | Troops | Loyalty | Cultivation | Protection | Fifth Unit |
 | -------- | -------- | ----- | ---- | ---: | ---: | -----: | ------: | ----------: | ---------: | ---------- |
@@ -441,9 +441,9 @@ This table should be maintained separately or generated from structured data.
 
 ---
 
-# B.10 Scenario Data Summary
+## B.10 Scenario Data Summary
 
-## Scenario Data Model
+### Scenario Data Model
 
 ```mermaid
 flowchart TD
@@ -465,7 +465,7 @@ flowchart TD
 
 ---
 
-## Key Data Facts
+### Key Data Facts
 
 The most important confirmed scenario data includes:
 
@@ -477,7 +477,7 @@ The most important confirmed scenario data includes:
 
 ---
 
-# Open Data Questions
+## Open Data Questions
 
 The following data requires final verification or extraction:
 
@@ -493,7 +493,7 @@ The following data requires final verification or extraction:
 
 ---
 
-# Summary
+## Summary
 
 Appendix B defines Gemfire’s political and character data structure.
 

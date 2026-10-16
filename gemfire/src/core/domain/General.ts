@@ -34,10 +34,6 @@ export class General {
     this.deathDate = params.deathDate ?? params.birth.plus(LIFESPAN_MONTHS);
   }
 
-  public get portrait(): string {
-    return `/portraits/${this.name.toLowerCase()}.webp`;
-  }
-
   public age(amount: number): void {
     this.stats = this.stats.increase({
       intelligence: amount,

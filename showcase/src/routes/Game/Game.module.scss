@@ -1,0 +1,41 @@
+.container {
+  grid-area: main;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  height: calc(100dvh - var(--fd-header-height));
+  overflow: hidden;
+}
+
+.pageTitle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.stage {
+  display: grid;
+  flex: 1;
+  min-height: 0;
+  place-items: center;
+  overflow: auto;
+}
+
+.frame {
+  display: block;
+  width: min(100%, calc((100dvh - var(--fd-header-height)) * 16 / 9));
+  aspect-ratio: 16 / 9;
+  max-height: 100%;
+  border: 0;
+  background: #000;
+}
+
+@media (max-width: 760px) {
+  .stage {
+    align-items: start;
+  }
+}
