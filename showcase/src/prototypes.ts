@@ -11,6 +11,14 @@ interface PrototypeConfig {
 
 export const prototypes: readonly PrototypeConfig[] = [
   {
+    project: 'sink-city',
+    slug: 'map-lab',
+    name: 'Map Lab',
+    sourceFile: '../sink-city/docs/mockups/map-lab.html',
+    documentPath: 'mockups/map-lab.html',
+    publishedPath: 'sink-city/interactive/map-lab/',
+  },
+  {
     project: 'total-space',
     slug: 'campaign',
     name: 'Campaign',

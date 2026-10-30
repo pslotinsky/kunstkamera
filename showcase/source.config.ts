@@ -30,6 +30,19 @@ export const totalSpaceDocs = defineDocs({
   meta: { files: [] },
 });
 
+export const sinkCityDocs = defineDocs({
+  dir: '../sink-city/docs',
+  docs: {
+    async: true,
+    files: ['README.md', 'game/**/*.md', 'tech/**/*.md', 'mockups/**/*.md'],
+    schema: ({ source, path }) =>
+      pageSchema.extend({
+        title: z.string().default(source.match(/^#\s+(.+)$/m)?.[1] || path),
+      }),
+  },
+  meta: { files: [] },
+});
+
 export default defineConfig({
   mdxOptions: {
     // Existing documents are Markdown, including literal angle brackets.

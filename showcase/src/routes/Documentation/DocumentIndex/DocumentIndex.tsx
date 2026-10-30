@@ -12,7 +12,10 @@ export function DocumentIndex({
   readonly project: ProjectId;
   readonly sections: readonly DocumentSection[];
 }) {
-  const title = `${projectNames[project]} documentation`;
+  const russian = project === 'sink-city';
+  const title = russian
+    ? `${projectNames[project]} — документация`
+    : `${projectNames[project]} documentation`;
   return (
     <FocusedDocsPage
       breadcrumb={{ enabled: false }}
@@ -21,22 +24,27 @@ export function DocumentIndex({
       <PageTitle title={title} />
       <DocsTitle>{title}</DocsTitle>
       <DocsBody>
-        <p>
-          Choose an area to explore. Browse individual articles in the sidebar.
-        </p>
+        {!russian && (
+          <p>
+            Choose an area to explore. Browse individual articles in the
+            sidebar.
+          </p>
+        )}
         <Cards>
           {sections.map((section) => {
             const first = section.documents[0];
             if (!first) return null;
             return (
               <Card
-                id={section.title.toLowerCase().replace(/\W+/g, '-')}
+                id={section.title
+                  .toLowerCase()
+                  .replace(/[^\p{L}\p{N}]+/gu, '-')}
                 key={section.title}
                 href={first.url}
                 title={section.title}
                 description={section.description}
               >
-                Start with {first.title}
+                {!russian && <>Start with {first.title}</>}
               </Card>
             );
           })}

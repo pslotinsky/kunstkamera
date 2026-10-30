@@ -31,7 +31,7 @@ Custom components use SCSS modules for spacing and layout, with Fumadocs theme t
 
 ## Published documentation
 
-The Gemfire collection reads visitor-facing documents directly from `gemfire/docs`: `ROADMAP.md`, numbered `design/[0-9]*.md` pages, `spec/*.md`, and `guides/README.md`. The Total Space collection reads `README.md` and the Markdown under `game/`, `tech/`, and `mockups/` from `total-space/docs`. Content is compiled during development and builds and loaded through Fumadocs' generated modules. Contributor conventions and the Gemfire design template remain in the repository but are not published.
+The Gemfire collection reads visitor-facing documents directly from `gemfire/docs`: `ROADMAP.md`, numbered `design/[0-9]*.md` pages, `spec/*.md`, and `guides/README.md`. The Total Space collection reads `README.md` and the Markdown under `game/`, `tech/`, and `mockups/` from `total-space/docs`. The Sink City collection uses the same publication pattern as Total Space in `sink-city/docs`, with Russian design text. The Sink City Map Lab prototype is available at `/kunstkamera/sink-city/prototypes/map-lab/` and shares its building artwork with the illustrated content roster. Content is compiled during development and builds and loaded through Fumadocs' generated modules. Contributor conventions and the Gemfire design template remain in the repository but are not published.
 
 Third-party guides and manual transcriptions are excluded. The authored references page links to their external sources. Archer remains outside the published scope. Generated `.source/`, `.react-router/`, and `dist/` directories are ignored.
 
@@ -67,7 +67,7 @@ npm run build:game --prefix showcase
 npm run preview --prefix showcase
 ```
 
-The showcase build generates Fumadocs modules and React Router types, checks TypeScript, pre-renders pages and a combined search database, packages them in `dist/public`, and copies the Total Space prototypes and their images and data into `dist/public/total-space/`. For local preview, run `build:game` afterward to build Gemfire into `dist/public/gemfire/game/`. The showcase build recreates `dist/public`, so game files must be added after it finishes.
+The showcase build generates Fumadocs modules and React Router types, checks TypeScript, pre-renders pages and a combined search database, packages them in `dist/public`, and copies the registered Total Space and Sink City prototypes and published assets into their project directories. For local preview, run `build:game` afterward to build Gemfire into `dist/public/gemfire/game/`. The showcase build recreates `dist/public`, so game files must be added after it finishes.
 
 Preview serves exactly that static artifact at `http://127.0.0.1:4173/kunstkamera/`, without the framework's development or SSR middleware. Search runs in the browser against the pre-rendered database.
 

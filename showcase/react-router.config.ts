@@ -1,6 +1,6 @@
 import { globSync } from 'node:fs';
 import type { Config } from '@react-router/dev/config';
-import { docs, totalSpaceDocs } from './source.config.ts';
+import { docs, sinkCityDocs, totalSpaceDocs } from './source.config.ts';
 import { collectionNames } from './src/documentation/config.ts';
 import { getDocumentPath } from './src/documentation/getDocumentPath.ts';
 import { games } from './src/games.ts';
@@ -8,7 +8,7 @@ import { mapProjects } from './src/projects.ts';
 import { getPrototypeUrl, prototypes } from './src/prototypes.ts';
 
 const basename = process.env.SHOWCASE_BASE || '/kunstkamera/';
-const collections = { docs, totalSpaceDocs };
+const collections = { docs, sinkCityDocs, totalSpaceDocs };
 
 export default {
   appDirectory: 'src',

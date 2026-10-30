@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import type { Plugin } from 'vite';
+import { prototypeHtml } from '../build/prototypeHtml.ts';
 import { prototypes } from '../src/prototypes.ts';
 import { getPublishedAsset } from '../src/publishedAssets.ts';
 
@@ -41,7 +42,12 @@ export function servePublishedArtifacts(): Plugin {
         if (!match) return next();
 
         try {
-          const body = await readFile(match.file);
+          const prototype = prototypes.find(
+            (item) => item.publishedPath === relative,
+          );
+          const body = prototype
+            ? await prototypeHtml(prototype)
+            : await readFile(match.file);
           response.setHeader('Content-Type', match.contentType);
           response.end(body);
         } catch (error) {
