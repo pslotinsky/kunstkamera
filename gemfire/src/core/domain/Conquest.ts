@@ -52,6 +52,7 @@ export class Conquest {
     const isEnded = isDefined(victor) && this.hasFallen(house);
 
     if (isEnded) {
+      this.world.campaign.recordFall(house, 'last-province-lost', victor);
       this.world.dissolve(house, victor);
     }
 

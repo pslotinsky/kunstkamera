@@ -1,3 +1,4 @@
+import { CommandExecutor } from '@/core/CommandExecutor';
 import { DefendCommand } from '@/core/commands/DefendCommand';
 import type { DefenderAnswer } from '@/core/domain/DefensePolicy';
 import type { FifthUnit } from '@/core/domain/FifthUnit';
@@ -29,6 +30,7 @@ export class DefenseDialogControl extends Control<
   DefenseDialogView,
   DefenseDialogControls
 > {
+  private readonly executor: CommandExecutor;
   private readonly defend: DefendCommand;
   private readonly turnHold: TurnHold;
 
@@ -40,6 +42,7 @@ export class DefenseDialogControl extends Control<
       unit: new DropdownControl({ name: 'unit' }),
       refuge: new DropdownControl({ name: 'refuge' }),
     });
+    this.executor = new CommandExecutor(context);
     this.defend = new DefendCommand(context);
     this.turnHold = new TurnHold(context.events);
   }
@@ -139,7 +142,7 @@ export class DefenseDialogControl extends Control<
     this.invasion = undefined;
     this.view.hide();
     this.defend.defend(invasion, choice);
-    this.defend.execute();
+    this.executor.execute(this.defend);
 
     if (!this.defend.suspendsTurn()) {
       events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));

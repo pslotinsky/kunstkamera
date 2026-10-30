@@ -189,7 +189,7 @@ describe('WorldEngine', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     new WorldEngine(world, events).start();
 
-    expect(world.isDefeated).toBe(true);
+    expect(world.campaign.outcome?.isVictory === false).toBe(true);
     expect(world.date.equals(now)).toBe(true);
   });
 

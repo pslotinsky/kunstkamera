@@ -20,9 +20,18 @@ export class CrownCommand extends WorldCommand {
     return false;
   }
 
+  public override isBlocked(): boolean {
+    return this.context.world.campaign.isEnded;
+  }
+
   public execute(): void {
-    if (this.coronation && this.heir) {
+    if (
+      this.coronation &&
+      this.heir &&
+      this.coronation.heirs.includes(this.heir)
+    ) {
       this.coronation.crown(this.heir);
+      this.context.world.campaign.confirmHeir(this.coronation);
       this.publishUpdates(this.coronation.provinces);
     }
   }

@@ -26,6 +26,10 @@ export abstract class WorldCommand {
 
   public abstract execute(): void;
 
+  public isBlocked(): boolean {
+    return !this.context.world.campaign.canProgress;
+  }
+
   public canExecute(): boolean {
     return true;
   }

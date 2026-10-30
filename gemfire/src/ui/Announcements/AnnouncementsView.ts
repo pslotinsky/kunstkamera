@@ -309,6 +309,11 @@ export class AnnouncementsView extends View<
     rival: string,
   ): Announcement {
     switch (outcome.kind) {
+      case 'surrender':
+        return {
+          text: this.describeSurrender(outcome, rival),
+          icon: getFamilyCrestUrl(outcome.family),
+        };
       case 'break':
         return { text: `${rival} has broken the alliance with you.` };
       case 'defection':

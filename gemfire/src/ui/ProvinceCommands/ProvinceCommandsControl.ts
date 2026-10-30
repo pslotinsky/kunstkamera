@@ -1,7 +1,9 @@
+import { CommandExecutor } from '@/core/CommandExecutor';
 import type { CommandGroup } from '@/core/commands/province/catalog';
 import type { WorldCommand } from '@/core/commands/WorldCommand';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
+import { CampaignEndedEvent } from '@/core/events/CampaignEndedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { Control } from '@/lib/Control';
 import type { EventBus } from '@/lib/EventBus';
@@ -22,6 +24,7 @@ interface PendingDialog {
 }
 
 export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
+  private readonly executor: CommandExecutor;
   private readonly dialogs: CommandDialogsControl;
 
   private pending: PendingDialog | null = null;
@@ -33,6 +36,7 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
     dialogs: CommandDialogsControl,
   ) {
     super(ProvinceCommandsView, { world, commands, events });
+    this.executor = new CommandExecutor({ world, events });
     this.dialogs = dialogs;
   }
 
@@ -52,6 +56,15 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
   }
 
   protected override onMount(): void {
+    this.context.events.subscribe(
+      CampaignEndedEvent,
+      () => {
+        this.closeDialog();
+        this.view.disableActions();
+        this.hide();
+      },
+      this.signal,
+    );
     this.subscribe(CommandSelectedEvent, (event) =>
       this.selectCommand(event.command),
     );
@@ -77,7 +90,7 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
 
     this.closeDialog();
 
-    if (!alreadyOpen) {
+    if (!alreadyOpen && !this.context.world.campaign.isEnded) {
       this.runCommand(command);
     }
   }
@@ -100,7 +113,7 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
         );
       }
     } else {
-      command.execute();
+      this.executor.execute(command);
 
       if (command.consumesTurn() && !command.suspendsTurn()) {
         this.finishTurn();
@@ -122,7 +135,7 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
 
   private commitTurn(pending: PendingDialog): void {
     this.closeDialog();
-    pending.command.execute();
+    this.executor.execute(pending.command);
 
     if (pending.command.suspendsTurn()) {
       this.holdTurn();
@@ -149,7 +162,7 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
   }
 
   private executeAndRefresh(pending: PendingDialog): void {
-    pending.command.execute();
+    this.executor.execute(pending.command);
     pending.dialog.refresh();
   }
 

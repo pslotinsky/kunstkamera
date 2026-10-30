@@ -1,3 +1,4 @@
+import { CommandExecutor } from '@/core/CommandExecutor';
 import { JudgeCaptiveCommand } from '@/core/commands/JudgeCaptiveCommand';
 import type { Captive } from '@/core/domain/Captive';
 import type { Disposal } from '@/core/domain/Captivity';
@@ -13,11 +14,13 @@ import { CaptiveDismissedEvent } from './CaptiveDismissedEvent';
 import { DisposalChosenEvent } from './DisposalChosenEvent';
 
 export class CaptiveDialogControl extends Control<CaptiveDialogView> {
+  private readonly executor: CommandExecutor;
   private readonly judge: JudgeCaptiveCommand;
   private readonly turnHold: TurnHold;
 
   public constructor(context: CaptiveDialogContext) {
     super(CaptiveDialogView, context);
+    this.executor = new CommandExecutor(context);
     this.judge = new JudgeCaptiveCommand(context);
     this.turnHold = new TurnHold(context.events);
   }
@@ -53,12 +56,16 @@ export class CaptiveDialogControl extends Control<CaptiveDialogView> {
 
     if (captive) {
       this.judge.judge(captive, disposal);
-      this.judge.execute();
+      this.executor.execute(this.judge);
       this.view.showOutcome(captive, this.judge.outcome!);
     }
   }
 
   private findCaptive(): Captive | undefined {
-    return this.context.world.findCaptiveOf(this.context.world.player);
+    const { world } = this.context;
+
+    return world.campaign.isEnded
+      ? undefined
+      : world.findCaptiveOf(world.player);
   }
 }
