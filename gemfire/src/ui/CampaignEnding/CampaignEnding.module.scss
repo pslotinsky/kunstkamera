@@ -1,0 +1,67 @@
+@use '@/ui/kit';
+
+.root {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.panel {
+  @include kit.dialog(36rem);
+
+  padding: 2.5rem 3rem;
+  text-align: center;
+  pointer-events: auto;
+}
+
+.crest {
+  width: 7rem;
+  height: 7rem;
+  object-fit: contain;
+}
+
+.date {
+  color: var(--ink-muted);
+  font-size: 1rem;
+}
+
+.title {
+  @include kit.display-type;
+
+  margin: 0.5rem 0 1rem;
+  font-size: 3rem;
+}
+
+.account {
+  margin: 0 0 2rem;
+  line-height: 1.6;
+}
+
+.action,
+.reopen {
+  padding: 0.65rem 1.1rem;
+  color: var(--ink);
+  font: inherit;
+  background: var(--button);
+  border: 1px solid var(--trim);
+  border-radius: 3px;
+  cursor: pointer;
+  pointer-events: auto;
+
+  &:hover,
+  &:focus-visible {
+    @include kit.selected;
+  }
+}
+
+.reopen {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  font-size: 1.15rem;
+}
+
+.hidden {
+  display: none;
+}

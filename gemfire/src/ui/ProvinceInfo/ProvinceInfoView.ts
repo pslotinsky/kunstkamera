@@ -32,6 +32,8 @@ const STATS_META: Record<StatKey, { label: string; icon: string }> = {
 export class ProvinceInfoView extends View {
   protected readonly rootClass = styles.root!;
 
+  private readonly animations = new Map<string, () => void>();
+
   public get template(): TemplateResult {
     return html`<section class=${styles.root}></section>`;
   }
@@ -40,11 +42,17 @@ export class ProvinceInfoView extends View {
     this.showHint();
   }
 
+  protected override onUnmount(): void {
+    this.cancelAnimations();
+  }
+
   public showHint(): void {
+    this.cancelAnimations();
     render(this.renderHint(), this.element);
   }
 
   public showProvince(province: Province): void {
+    this.cancelAnimations();
     render(this.renderProvince(province), this.element);
     this.refreshHeader(province);
     this.refreshGovernor(province);
@@ -76,6 +84,9 @@ export class ProvinceInfoView extends View {
   }
 
   private animateStat(key: string, to: number): void {
+    this.animations.get(key)?.();
+    this.animations.delete(key);
+
     const statElement = this.getStatElement(key);
     const valueElement = this.getStatValue(key);
 
@@ -84,8 +95,18 @@ export class ProvinceInfoView extends View {
     if (statElement && valueElement && from !== to) {
       statElement.classList.remove(styles.changed!);
       statElement.classList.add(styles.changed!);
-      countTo(valueElement, from, to);
+      const cancel = countTo(valueElement, from, to);
+
+      this.animations.set(key, cancel);
     }
+  }
+
+  private cancelAnimations(): void {
+    for (const cancel of this.animations.values()) {
+      cancel();
+    }
+
+    this.animations.clear();
   }
 
   private refreshGovernor(province: Province): void {

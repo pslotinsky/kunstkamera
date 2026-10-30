@@ -1,6 +1,7 @@
 import { html, type TemplateResult } from 'lit-html';
 
 import type { CalendarDate } from '@/core/domain/CalendarDate';
+import type { CampaignOutcome } from '@/core/domain/CampaignOutcome';
 import type { Province } from '@/core/domain/Province';
 import { View } from '@/lib/View';
 
@@ -34,6 +35,7 @@ export class GameScreenView extends View<GameScreenContext, GameScreenViews> {
           ${views.captiveDialog.template}
           ${views.announcements.template}
           ${views.defenseDialog.template}
+          ${views.campaignEnding.template}
         </div>
       </div>
     `;
@@ -41,6 +43,14 @@ export class GameScreenView extends View<GameScreenContext, GameScreenViews> {
 
   protected override onMount(): void {
     this.watchOverlays();
+  }
+
+  public showEnding(outcome: CampaignOutcome): void {
+    this.showDate(outcome.date);
+    this.setText(
+      styles.status!,
+      `${outcome.isVictory ? 'Victory' : 'Defeat'} — ${outcome.house}`,
+    );
   }
 
   public showDate(date: CalendarDate): void {

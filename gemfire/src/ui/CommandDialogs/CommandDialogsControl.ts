@@ -40,66 +40,57 @@ export class CommandDialogsControl extends Control<
   CommandDialogsView,
   CommandDialogsControls
 > {
-  private readonly dialogs: ReadonlyMap<string, AnyCommandDialogControl>;
+  private readonly dialogs: ReadonlyMap<object, AnyCommandDialogControl>;
 
   public constructor(context: CommandDialogsContext) {
     const { world } = context;
 
     super(CommandDialogsView, context, {
-      attackDialog: new AttackDialogControl(AttackCommand.name, world),
-      recruitDialog: new RecruitDialogControl(RecruitCommand.name, world),
-      moveTroopsDialog: new MoveTroopsDialogControl(
-        MoveTroopsCommand.name,
-        world,
-      ),
-      hireMonsterDialog: new HireMonsterDialogControl(
-        HireMonsterCommand.name,
-        world,
-      ),
-      developDialog: new DevelopDialogControl(DevelopCommand.name),
-      tradeDialog: new TradeDialogControl(TradeCommand.name, world),
-      giveFoodDialog: new GiveFoodDialogControl(GiveFoodCommand.name, world),
-      transportDialog: new TransportDialogControl(TransportCommand.name, world),
-      allyDialog: new AllyDialogControl(AllyCommand.name, world),
-      negotiateDialog: new NegotiateDialogControl(NegotiateCommand.name, world),
+      attackDialog: new AttackDialogControl('attack', world),
+      recruitDialog: new RecruitDialogControl('recruit', world),
+      moveTroopsDialog: new MoveTroopsDialogControl('move-troops', world),
+      hireMonsterDialog: new HireMonsterDialogControl('hire-monster', world),
+      developDialog: new DevelopDialogControl('develop'),
+      tradeDialog: new TradeDialogControl('trade', world),
+      giveFoodDialog: new GiveFoodDialogControl('give-food', world),
+      transportDialog: new TransportDialogControl('transport', world),
+      allyDialog: new AllyDialogControl('ally', world),
+      negotiateDialog: new NegotiateDialogControl('negotiate', world),
       sabotageDialog: new InfiltrationDialogControl({
-        name: SabotageCommand.name,
+        name: 'sabotage',
         question: 'Sabotage whose land?',
         aim: (target) => `Sabotage ${target}`,
       }),
       plunderDialog: new InfiltrationDialogControl({
-        name: PlunderCommand.name,
+        name: 'plunder',
         question: 'Plunder whose land?',
         aim: (target) => `Plunder ${target}`,
       }),
-      familyOverview: new FamilyOverviewControl(ViewCommand.name, world),
-      changeLordDialog: new ChangeLordDialogControl(
-        ChangeLordCommand.name,
-        world,
-      ),
-      entrustDialog: new EntrustDialogControl(EntrustCommand.name),
-      searchDialog: new SearchDialogControl(SearchCommand.name),
+      familyOverview: new FamilyOverviewControl('view', world),
+      changeLordDialog: new ChangeLordDialogControl('change-lord', world),
+      entrustDialog: new EntrustDialogControl('entrust'),
+      searchDialog: new SearchDialogControl('search'),
     });
 
     const dialogs = this.controls;
 
-    this.dialogs = new Map<string, AnyCommandDialogControl>([
-      [AttackCommand.name, dialogs.attackDialog],
-      [RecruitCommand.name, dialogs.recruitDialog],
-      [MoveTroopsCommand.name, dialogs.moveTroopsDialog],
-      [HireMonsterCommand.name, dialogs.hireMonsterDialog],
-      [DevelopCommand.name, dialogs.developDialog],
-      [TradeCommand.name, dialogs.tradeDialog],
-      [GiveFoodCommand.name, dialogs.giveFoodDialog],
-      [TransportCommand.name, dialogs.transportDialog],
-      [AllyCommand.name, dialogs.allyDialog],
-      [NegotiateCommand.name, dialogs.negotiateDialog],
-      [SabotageCommand.name, dialogs.sabotageDialog],
-      [PlunderCommand.name, dialogs.plunderDialog],
-      [ViewCommand.name, dialogs.familyOverview],
-      [ChangeLordCommand.name, dialogs.changeLordDialog],
-      [EntrustCommand.name, dialogs.entrustDialog],
-      [SearchCommand.name, dialogs.searchDialog],
+    this.dialogs = new Map<object, AnyCommandDialogControl>([
+      [AttackCommand, dialogs.attackDialog],
+      [RecruitCommand, dialogs.recruitDialog],
+      [MoveTroopsCommand, dialogs.moveTroopsDialog],
+      [HireMonsterCommand, dialogs.hireMonsterDialog],
+      [DevelopCommand, dialogs.developDialog],
+      [TradeCommand, dialogs.tradeDialog],
+      [GiveFoodCommand, dialogs.giveFoodDialog],
+      [TransportCommand, dialogs.transportDialog],
+      [AllyCommand, dialogs.allyDialog],
+      [NegotiateCommand, dialogs.negotiateDialog],
+      [SabotageCommand, dialogs.sabotageDialog],
+      [PlunderCommand, dialogs.plunderDialog],
+      [ViewCommand, dialogs.familyOverview],
+      [ChangeLordCommand, dialogs.changeLordDialog],
+      [EntrustCommand, dialogs.entrustDialog],
+      [SearchCommand, dialogs.searchDialog],
     ]);
   }
 
@@ -110,6 +101,6 @@ export class CommandDialogsControl extends Control<
   public findDialog(
     command: WorldCommand,
   ): AnyCommandDialogControl | undefined {
-    return this.dialogs.get(command.constructor.name);
+    return this.dialogs.get(command.constructor);
   }
 }

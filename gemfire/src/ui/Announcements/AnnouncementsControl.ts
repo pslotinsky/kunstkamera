@@ -1,3 +1,4 @@
+import { CommandExecutor } from '@/core/CommandExecutor';
 import { AllianceAnswerCommand } from '@/core/commands/AllianceAnswerCommand';
 import { CrownCommand } from '@/core/commands/CrownCommand';
 import { GrantArtifactCommand } from '@/core/commands/GrantArtifactCommand';
@@ -44,6 +45,7 @@ export class AnnouncementsControl extends Control<
   AnnouncementsView,
   AnnouncementsControls
 > {
+  private readonly executor: CommandExecutor;
   private readonly grantArtifact: GrantArtifactCommand;
   private readonly crown: CrownCommand;
   private readonly answerAlliance: AllianceAnswerCommand;
@@ -55,6 +57,7 @@ export class AnnouncementsControl extends Control<
     super(AnnouncementsView, context, {
       recipient: new DropdownControl({ name: 'recipient' }),
     });
+    this.executor = new CommandExecutor(context);
     this.grantArtifact = new GrantArtifactCommand(context);
     this.crown = new CrownCommand(context);
     this.answerAlliance = new AllianceAnswerCommand(context);
@@ -127,6 +130,7 @@ export class AnnouncementsControl extends Control<
       case 'plunder':
         return outcome.target.belongsTo(player);
       case 'defection':
+      case 'surrender':
       case 'break':
         return outcome.family.isEqual(player);
       default:
@@ -152,7 +156,7 @@ export class AnnouncementsControl extends Control<
 
     if (head instanceof AllianceOfferedEvent) {
       this.answerAlliance.answer(head.proposer, accepted);
-      this.answerAlliance.execute();
+      this.executor.execute(this.answerAlliance);
       this.dismiss();
       events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
     }
@@ -168,7 +172,7 @@ export class AnnouncementsControl extends Control<
 
     if (recipient) {
       this.grantArtifact.grant(found.artifact, recipient);
-      this.grantArtifact.execute();
+      this.executor.execute(this.grantArtifact);
       this.dismiss();
     }
   }
@@ -181,7 +185,7 @@ export class AnnouncementsControl extends Control<
 
       if (heir) {
         this.crown.crown(outcome, heir);
-        this.crown.execute();
+        this.executor.execute(this.crown);
         this.dismiss();
       }
     }

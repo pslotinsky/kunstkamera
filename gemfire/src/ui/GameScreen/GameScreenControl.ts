@@ -1,4 +1,6 @@
+import type { CampaignOutcome } from '@/core/domain/CampaignOutcome';
 import type { Province } from '@/core/domain/Province';
+import { CampaignEndedEvent } from '@/core/events/CampaignEndedEvent';
 import { MonthStartedEvent } from '@/core/events/MonthStartedEvent';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
@@ -7,6 +9,7 @@ import { Control } from '@/lib/Control';
 import type { EventClass } from '@/lib/EventBus';
 import { AnnouncementsControl } from '@/ui/Announcements/AnnouncementsControl';
 import { BattleReportControl } from '@/ui/BattleReport/BattleReportControl';
+import { CampaignEndingControl } from '@/ui/CampaignEnding/CampaignEndingControl';
 import { CaptiveDialogControl } from '@/ui/CaptiveDialog/CaptiveDialogControl';
 import { CommandDialogsControl } from '@/ui/CommandDialogs/CommandDialogsControl';
 import { DefenseDialogControl } from '@/ui/DefenseDialog/DefenseDialogControl';
@@ -66,6 +69,7 @@ export class GameScreenControl extends Control<
         world: context.world,
         events: context.events,
       }),
+      campaignEnding: new CampaignEndingControl(context),
     });
     this.turnHold = new TurnHold(context.events);
   }
@@ -74,9 +78,11 @@ export class GameScreenControl extends Control<
     this.controls.worldMap.onProvinceSelected((province) => {
       this.selectProvince(province);
     });
-    this.onWorldEvent(MonthStartedEvent, (event) =>
-      this.view.showDate(event.date),
-    );
+    this.onWorldEvent(MonthStartedEvent, (event) => {
+      if (!this.context.world.campaign.isEnded) {
+        this.view.showDate(event.date);
+      }
+    });
     this.onWorldEvent(TurnStartedEvent, (event) => this.handleTurnStart(event));
     this.onWorldEvent(ProvinceUpdatedEvent, (event) => {
       this.controls.worldMap.actualizeProvince(event.province);
@@ -98,11 +104,38 @@ export class GameScreenControl extends Control<
       ),
     );
 
+    this.onWorldEvent(CampaignEndedEvent, (event) =>
+      this.finishCampaign(event.outcome),
+    );
+
     const current = this.context.world.turnQueue.current;
 
     if (current) {
       this.showProvince(current);
     }
+
+    const outcome = this.context.world.campaign.outcome;
+
+    if (outcome) {
+      this.finishCampaign(outcome);
+    }
+  }
+
+  private finishCampaign(outcome: CampaignOutcome): void {
+    this.selectable = undefined;
+    this.inspectsTarget = false;
+    this.controls.gamePanel.hideCommands();
+    this.showFinalMap();
+    this.view.showEnding(outcome);
+  }
+
+  private showFinalMap(): void {
+    const provinces = this.context.world.map.provinces.map(
+      (province) => province.number,
+    );
+
+    this.controls.worldMap.clearHighlighting();
+    this.controls.worldMap.showSelectable(provinces);
   }
 
   private onWorldEvent<EventType extends object>(
@@ -113,6 +146,10 @@ export class GameScreenControl extends Control<
   }
 
   private handleTurnStart(event: TurnStartedEvent): void {
+    if (this.context.world.campaign.isEnded) {
+      return;
+    }
+
     const { province, turnNumber } = event;
 
     const { world } = this.context;
@@ -135,16 +172,36 @@ export class GameScreenControl extends Control<
   }
 
   private selectProvince(province: Province): void {
-    if (this.selectable?.has(province.number)) {
-      this.pickTarget(province);
-
-      if (this.inspectsTarget) {
-        this.displayed = province.number;
-        this.controls.gamePanel.showProvinceInfo(province);
-      }
-
-      this.renderTargeting(province.number);
+    if (this.context.world.campaign.isEnded) {
+      this.inspectProvince(province);
+    } else {
+      this.selectTarget(province);
     }
+  }
+
+  private inspectProvince(province: Province): void {
+    this.showProvinceInfo(province);
+    this.showFinalMap();
+    this.controls.worldMap.showSelected(province.number);
+  }
+
+  private selectTarget(province: Province): void {
+    if (!this.selectable?.has(province.number)) {
+      return;
+    }
+
+    this.pickTarget(province);
+
+    if (this.inspectsTarget) {
+      this.showProvinceInfo(province);
+    }
+
+    this.renderTargeting(province.number);
+  }
+
+  private showProvinceInfo(province: Province): void {
+    this.displayed = province.number;
+    this.controls.gamePanel.showProvinceInfo(province);
   }
 
   private pickTarget(province: Province): void {
@@ -174,10 +231,9 @@ export class GameScreenControl extends Control<
 
   private showCurrentInfo(): void {
     if (this.selected) {
-      this.displayed = this.selected;
-      this.controls.gamePanel.showProvinceInfo(
-        this.context.world.map.getProvince(this.selected),
-      );
+      const province = this.context.world.map.getProvince(this.selected);
+
+      this.showProvinceInfo(province);
     }
   }
 

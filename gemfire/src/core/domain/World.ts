@@ -2,6 +2,7 @@ import { BREAKAWAY_NAMES } from '@/config/families';
 import type { Collection } from '@/lib/Collection';
 
 import type { CalendarDate } from './CalendarDate';
+import { Campaign } from './Campaign';
 import type { Captive } from './Captive';
 import { Family } from './Family';
 import type { FifthUnit } from './FifthUnit';
@@ -22,6 +23,7 @@ export interface WorldParams {
 export class World {
   public date: CalendarDate;
   public readonly market = new Market();
+  public readonly campaign: Campaign;
   public readonly turnQueue: TurnQueue;
   public readonly map: WorldMap;
   public readonly families: Collection<string, Family>;
@@ -38,6 +40,7 @@ export class World {
     this.generals = params.generals;
     this.player = params.player;
     this.turnQueue = new TurnQueue(this.map.provinces);
+    this.campaign = new Campaign(this);
   }
 
   public hold(captive: Captive): void {
@@ -67,10 +70,6 @@ export class World {
 
   public isHeld(general: General): boolean {
     return this.held.some((captive) => captive.general.isEqual(general));
-  }
-
-  public get isDefeated(): boolean {
-    return !this.families.has(this.player.name);
   }
 
   public bury(general: General): void {
@@ -133,6 +132,8 @@ export class World {
   }
 
   public absorb(family: Family, victor: Family): void {
+    this.campaign.recordFall(family, 'absorption', victor);
+
     for (const province of this.getFamilyProvinces(family)) {
       province.claim(victor);
     }
@@ -147,9 +148,16 @@ export class World {
   public transfer(general: General, to: Family): void {
     const province = this.getRuledProvince(general);
 
-    this.findFamilyOf(general)?.discharge(general);
+    const former = this.findFamilyOf(general);
+
+    former?.discharge(general);
     to.enlist(general);
     province?.claim(to);
+
+    if (former && this.countProvinces(former) === 0) {
+      this.campaign.recordFall(former, 'last-province-lost', to);
+      this.dissolve(former, to);
+    }
   }
 
   public findFamilyOf(general: General): Family | undefined {

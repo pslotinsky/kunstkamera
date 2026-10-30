@@ -8,12 +8,27 @@ export class EventBus {
   private readonly pending: object[] = [];
 
   private isDispatching = false;
+  private batchDepth = 0;
 
   public publish(event: object): void {
     this.pending.push(event);
 
-    if (!this.isDispatching) {
+    if (!this.isDispatching && this.batchDepth === 0) {
       this.dispatchPending();
+    }
+  }
+
+  public batch(action: () => void): void {
+    this.batchDepth += 1;
+
+    try {
+      action();
+    } finally {
+      this.batchDepth -= 1;
+
+      if (!this.isDispatching && this.batchDepth === 0) {
+        this.dispatchPending();
+      }
     }
   }
 

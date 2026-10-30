@@ -171,9 +171,9 @@ Music and sound effects across the game.
 
 How the campaign ends.
 
-- [ ] win by unifying Ishmeria
-- [ ] be knocked out when your last province falls
-- [ ] see the campaign's ending
+- [x] win by unifying the island
+- [x] be knocked out when your last province falls
+- [x] see the campaign's ending
 
 ## 15. Events
 

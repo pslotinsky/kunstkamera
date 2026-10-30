@@ -41,11 +41,14 @@ export class Succession {
     });
 
     coronation.crown(heir);
+    this.world.campaign.awaitHeir(coronation);
 
     return coronation;
   }
 
   private disband(family: Family, banisher: Family | undefined): Disbanding {
+    this.world.campaign.recordFall(family, 'no-heir', banisher);
+
     const { ruler: deposed, gems } = family;
     const provinces = this.world.getFamilyProvinces(family);
     const breakaways = compact(

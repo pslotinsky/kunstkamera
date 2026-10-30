@@ -56,6 +56,10 @@ export class GamePanelControl extends Control<
   private isCommandsVisible(province: Province): boolean {
     const { world } = this.context;
 
-    return world.isProvinceTurn(province) && world.isPlayerRun(province);
+    return (
+      !world.campaign.isEnded &&
+      world.isProvinceTurn(province) &&
+      world.isPlayerRun(province)
+    );
   }
 }

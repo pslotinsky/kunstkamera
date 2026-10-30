@@ -1,3 +1,4 @@
+import { CommandExecutor } from '@/core/CommandExecutor';
 import type {
   WorldCommand,
   WorldCommandContext,
@@ -11,6 +12,7 @@ import { EconomyPolicy } from './EconomyPolicy';
 import { WarPolicy } from './WarPolicy';
 
 export class ComputerPlayer {
+  private readonly executor: CommandExecutor;
   private readonly context: WorldCommandContext;
   private readonly captor: CaptorPolicy;
   private readonly diplomacy: DiplomacyPolicy;
@@ -18,6 +20,7 @@ export class ComputerPlayer {
   private readonly economy: EconomyPolicy;
 
   public constructor(context: WorldCommandContext) {
+    this.executor = new CommandExecutor(context);
     this.context = context;
     this.captor = new CaptorPolicy(context);
     this.diplomacy = new DiplomacyPolicy(context);
@@ -26,36 +29,48 @@ export class ComputerPlayer {
   }
 
   public play(province: Province): boolean {
+    const { world } = this.context;
     const family = province.family;
-    let suspended = false;
 
-    if (family && this.context.world.isComputerRun(province)) {
-      this.judgeCaptives(family);
-      this.takeFreeActions(province);
-
-      const order = this.chooseOrder(province);
-
-      order?.execute();
-      suspended = order?.suspendsTurn() ?? false;
+    if (
+      !family ||
+      !world.isComputerRun(province) ||
+      !world.campaign.canProgress
+    ) {
+      return false;
     }
 
-    return suspended;
+    this.judgeCaptives(family);
+
+    if (!world.campaign.canProgress) {
+      return false;
+    }
+
+    this.takeFreeActions(province);
+
+    const order = this.chooseOrder(province);
+
+    this.executor.execute(order);
+
+    return order?.suspendsTurn() ?? false;
   }
 
   private judgeCaptives(family: Family): void {
     if (!family.isEqual(this.context.world.player)) {
       for (const judgement of this.captor.chooseJudgements(family)) {
-        judgement.execute();
+        this.executor.execute(judgement);
       }
     }
   }
 
   private takeFreeActions(province: Province): void {
     for (const appointment of this.economy.chooseLords(province)) {
-      appointment.execute();
+      this.executor.execute(appointment);
     }
 
-    this.economy.chooseTrade(province)?.execute();
+    const trade = this.economy.chooseTrade(province);
+
+    this.executor.execute(trade);
   }
 
   private chooseOrder(province: Province): WorldCommand | undefined {

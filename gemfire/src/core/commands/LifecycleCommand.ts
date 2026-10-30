@@ -1,3 +1,4 @@
+import { CommandExecutor } from '@/core/CommandExecutor';
 import type { CalendarDate } from '@/core/domain/CalendarDate';
 import type { General } from '@/core/domain/General';
 import { Succession } from '@/core/domain/Succession';
@@ -10,22 +11,50 @@ const JANUARY = 1;
 const GROWTH_ODDS = 1 / 3;
 
 export class LifecycleCommand extends WorldCommand {
+  private readonly executor: CommandExecutor;
   private readonly succession: Succession;
+  private remaining: General[] | undefined;
 
   public constructor(context: WorldCommandContext) {
     super('Lifecycle', context);
+    this.executor = new CommandExecutor(context);
     this.succession = new Succession(context.world);
   }
 
+  public get isComplete(): boolean {
+    return this.remaining === undefined;
+  }
+
   public execute(): void {
+    this.remaining ??= this.prepareMonth();
+    this.processDeaths(this.remaining);
+
+    if (!this.context.world.campaign.isAwaitingHeir) {
+      this.remaining = undefined;
+    }
+  }
+
+  private prepareMonth(): General[] {
     const { date } = this.context.world;
 
     if (date.isMonth(JANUARY)) {
       this.turnYear(date);
     }
 
-    for (const general of this.chooseTheDead(date)) {
-      this.mourn(general);
+    return [...this.chooseTheDead(date)];
+  }
+
+  private processDeaths(remaining: General[]): void {
+    const { world } = this.context;
+    const { campaign } = world;
+
+    while (remaining.length && campaign.canProgress) {
+      const general = remaining.shift()!;
+
+      if (world.generals.all.includes(general)) {
+        this.mourn(general);
+        this.executor.assess();
+      }
     }
   }
 
