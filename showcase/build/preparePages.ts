@@ -2,6 +2,7 @@ import { globSync } from 'node:fs';
 import { access, cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { prototypes } from '../src/prototypes.ts';
 import { publishedAssets } from '../src/publishedAssets.ts';
+import { prototypeHtml } from './prototypeHtml.ts';
 
 // React Router writes prerendered routes under the basename, while assets live
 // at the client root. GitHub Pages needs both in one publishable directory.
@@ -24,9 +25,9 @@ if (basename)
 for (const prototype of prototypes) {
   const directory = new URL(prototype.publishedPath, output);
   await mkdir(directory, { recursive: true });
-  await cp(
-    new URL(prototype.sourceFile, showcase),
+  await writeFile(
     new URL('index.html', directory),
+    await prototypeHtml(prototype),
   );
 }
 for (const asset of publishedAssets) {

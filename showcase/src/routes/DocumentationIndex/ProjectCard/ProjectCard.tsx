@@ -6,9 +6,10 @@ export interface ProjectCardProps {
   readonly name: string;
   readonly label: string;
   readonly description: string;
-  readonly image: string;
-  readonly imageAlt: string;
-  readonly imageFit: 'cover' | 'contain';
+  readonly image?: string;
+  readonly imageAlt?: string;
+  readonly imageFit?: 'cover' | 'contain';
+  readonly imageScale?: number;
   readonly links: readonly { title: string; url: string }[];
 }
 
@@ -19,13 +20,20 @@ export function ProjectCard({
   image,
   imageAlt,
   imageFit,
+  imageScale = 1,
   links,
 }: ProjectCardProps) {
   return (
-    <article className={styles.card}>
-      <div className={styles.preview} data-fit={imageFit}>
-        <img src={image} alt={imageAlt} />
-      </div>
+    <article className={styles.card} data-has-image={Boolean(image)}>
+      {image && (
+        <div className={styles.preview} data-fit={imageFit}>
+          <img
+            src={image}
+            alt={imageAlt}
+            style={{ transform: `scale(${imageScale})` }}
+          />
+        </div>
+      )}
       <div className={styles.details}>
         <p className={styles.label}>{label}</p>
         <h2>{name}</h2>

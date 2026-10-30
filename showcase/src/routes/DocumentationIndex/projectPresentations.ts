@@ -1,9 +1,19 @@
 import gemfireFachan from '../../../../gemfire/public/unit/fachan.webp';
+import sinkCityAlcomarket from '../../../../sink-city/docs/game/content/buildings/images/objects/alcohol-08.webp';
 import fleetCarrier from '../../../../total-space/docs/game/content/ships/images/14-fleet-carrier.webp';
 import type { ProjectId } from '../../projects';
 import type { ProjectCardProps } from './ProjectCard';
 
 export const projectPresentations = {
+  'sink-city': {
+    label: 'City-building strategy',
+    description:
+      'Transform a thriving city through regression disguised as progress. Explore the design and experiment with Map Lab.',
+    image: sinkCityAlcomarket,
+    imageAlt: 'Sink City alcomarket by a bus stop',
+    imageFit: 'contain',
+    imageScale: 1.65,
+  },
   gemfire: {
     label: 'Turn-based strategy',
     description:

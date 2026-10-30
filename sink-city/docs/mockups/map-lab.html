@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#1c242b"><title>Snik City — Map Lab v1.1.1 (21 types)</title><style>:root{color-scheme:dark;--bg:#151a20;--panel:#20262e;--panel2:#262e38;--border:#37414b;--text:#e8e9e4;--muted:#929ea8;--accent:#d6b174;--accent-hover:#f1cb8b;--green:#80b7a0;--soft:#2c343c;--f: 'DM Sans',system-ui,sans-serif;--h:'Space Grotesk',var(--f)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;font:14px var(--f);background:var(--bg);color:var(--text)}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.4;cursor:not-allowed}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.shell{display:grid;grid-template-columns:318px minmax(0,1fr);height:100dvh;min-height:470px}.sidebar{background:linear-gradient(180deg,#232b33,#1c242b);border-right:1px solid #3a434b;display:flex;flex-direction:column;min-height:0;box-shadow:8px 0 35px #070d151f;z-index:2}.brand{padding:21px 22px 18px;border-bottom:1px solid var(--border)}.brand-eyebrow{font:700 10px var(--h);letter-spacing:2.7px;text-transform:uppercase;color:var(--accent)}.brand h1{font:600 28px/1 var(--h);margin:7px 0 7px;letter-spacing:-1.3px}.brand p{font-size:12px;color:var(--muted);margin:0;line-height:1.45}.scroll{overflow-y:auto;min-height:0;flex:1;padding:0 18px 12px;scrollbar-color:#404952 transparent;scrollbar-width:thin}.section{padding:20px 3px 18px;border-bottom:1px solid var(--border)}.section h2{display:flex;align-items:center;gap:8px;font:600 11px var(--h);letter-spacing:1.5px;text-transform:uppercase;color:#c6d1d3;margin:0 0 15px}.section h2 .index{color:var(--accent);font-size:10px}.twocol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.field{display:flex;flex-direction:column;gap:6px}.field label,.label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.3px}.field input,.field select,.wide-select{width:100%;background:#171e24;border:1px solid #47535e;color:#e4e7e5;border-radius:8px;padding:9px 10px;min-height:36px;outline:none}.field input[type=number]{font-variant-numeric:tabular-nums}.subtext{color:#87939d;font-size:11px;line-height:1.5;margin:8px 0 0}.buttons{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid #48535d;border-radius:9px;background:#303944;color:#e4e8e6;padding:10px 11px;font-weight:600;font-size:12px;display:inline-flex;justify-content:center;align-items:center;gap:7px;white-space:nowrap;transition:background .15s,border-color .15s}.btn:hover{background:#404b57;border-color:#687682}.btn.primary{background:var(--accent);color:#1c2329;border-color:var(--accent);font-weight:700}.btn.primary:hover{background:var(--accent-hover)}.btn.ghost{background:transparent}.btn.mini{font-size:11px;padding:7px 9px;border-radius:7px}.btn.wide{flex:1}.button-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.slider-line{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}.slider-line strong{color:var(--accent);font:600 12px var(--h)}input[type=range]{accent-color:var(--accent);width:100%;margin:0;height:18px}.radio-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.mode{padding:9px 5px;font-size:12px;border:1px solid #46515c;border-radius:8px;color:#aab6bf;background:#192128}.mode.active{color:#1c2327;background:var(--accent);border-color:var(--accent);font-weight:700}.tile-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:10px}.tile-btn{background:#182026;border:1px solid #3c4853;border-radius:8px;min-width:0;padding:5px 2px 6px;display:flex;flex-direction:column;gap:1px;align-items:center}.tile-btn img{width:100%;aspect-ratio:1.05;object-fit:contain}.tile-btn span{font:600 10px var(--h);color:#98a5ac}.tile-btn.active{border:2px solid var(--accent);padding:4px 1px 5px;background:#3f4039}.tile-btn.active span{color:var(--accent)}.asset-actions{margin-top:11px;display:flex;align-items:center;flex-wrap:wrap;gap:7px}.asset-actions input{display:none}.asset-actions .btn{font-size:11px}.checkrow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 10px}.checkrow label{font-size:12px;color:#cbd2d1}.checkrow input{accent-color:var(--accent);width:17px;height:17px}.bottom-side{border-top:1px solid var(--border);padding:11px 21px;font-size:11px;color:#85949f;display:flex;align-items:center;justify-content:space-between}.bottom-side b{color:var(--green);font-weight:500}
+.workspace{min-width:0;min-height:0;display:flex;flex-direction:column;position:relative;background:#171d23}.topbar{height:66px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 22px;background:#1b232b;border-bottom:1px solid #343f49;z-index:1}.topbar .title{font:600 17px var(--h);letter-spacing:-.4px}.topbar .hint{font-size:11px;color:var(--muted);margin-top:4px}.topbar .toolbar{display:flex;gap:8px;align-items:center}.toolbar .btn{padding:9px 11px}.stage{flex:1;min-height:0;position:relative;overflow:hidden;background:radial-gradient(ellipse at 55% 35%,#35434c 0%,#202931 48%,#171e26 100%)}.stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}.stage canvas.pan{cursor:grab}.stage canvas.dragging{cursor:grabbing}.stage-overlay{pointer-events:none;position:absolute;left:20px;top:20px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}.pill{padding:8px 10px;background:#131b24ba;border:1px solid #53616b66;color:#c6d1d2;font:600 11px var(--h);border-radius:8px;backdrop-filter:blur(8px)}.pill strong{color:var(--accent);margin-left:5px}.zoom-controls{position:absolute;bottom:22px;right:23px;display:flex;flex-direction:column;gap:5px}.zoom-controls button{border:1px solid #57636b;background:#1d2830df;color:#e0e5e3;font-size:19px;width:39px;height:39px;border-radius:9px}.zoom-controls button:hover{background:#394954}.statusbar{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:11px 20px;border-top:1px solid #35414b;color:#9daeb9;font-size:11px;min-height:43px}.statusbar .right{white-space:nowrap;color:#78919b;flex-shrink:0}.statusbar #status{min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.toast{position:absolute;z-index:10;bottom:76px;left:50%;transform:translateX(-50%);background:#e1be85;color:#263037;border-radius:8px;padding:12px 17px;box-shadow:0 10px 35px #0008;font-weight:600;font-size:12px;display:none;max-width:90%;text-align:center}.toast.show{display:block}.tag{border:1px solid #4b6063;color:#8fb49d;border-radius:5px;padding:3px 6px;font-size:10px;font-weight:700}.small-btn-text{display:none}
+@media(max-width:950px){.shell{grid-template-columns:275px minmax(0,1fr)}.topbar{padding:0 14px}.topbar .hint{display:none}.topbar .toolbar{gap:5px}.topbar .toolbar .btn{padding:8px}.small-btn-text{display:none}}@media(max-width:640px){html,body{overflow:auto;height:auto}.shell{display:flex;flex-direction:column;height:100dvh;min-height:560px}.sidebar{height:39vh;min-height:225px;border-right:0;border-bottom:1px solid var(--border)}.brand{padding:12px 16px}.brand h1{font-size:21px;margin:3px 0}.brand p{display:none}.scroll{padding:0 14px}.section{padding:12px 3px}.bottom-side{display:none}.workspace{flex:1;min-height:260px}.topbar{height:45px}.topbar .title{font-size:13px}.topbar .toolbar .btn{padding:6px 7px;font-size:11px}.statusbar{padding:7px 10px}.statusbar .right{display:none}.stage-overlay{left:8px;top:8px}.pill{padding:5px 6px}.zoom-controls{right:9px;bottom:9px}}
+
+/* V1.1.1: preserve interactive map space in the embedded HTML preview */
+.tile-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.tile-btn{padding:7px 4px 8px;gap:5px}
+.tile-btn img{height:66px;max-height:66px;width:100%;aspect-ratio:auto;object-fit:contain}
+.tile-btn .tile-caption{font:600 10px/1.2 var(--f);color:#c5cdd2;min-height:25px;text-align:center;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tile-btn.active{padding:6px 3px 7px}
+.side-close,.menu-toggle,.panel-backdrop{display:none}
+.map-title{min-width:0}
+@media(max-width:900px){
+ html,body{height:100%;overflow:hidden}
+ .shell{display:block;height:100dvh;min-height:0}
+ .workspace{width:100%;height:100dvh;min-height:0;display:flex}
+ .sidebar{position:fixed;top:0;bottom:0;left:0;height:100dvh;min-height:0;width:min(370px,90vw);max-width:100%;border-right:1px solid var(--border);border-bottom:0;transform:translateX(-105%);transition:transform .18s ease-out;z-index:30;box-shadow:12px 0 36px #0008}
+ .shell.panel-open .sidebar{transform:translateX(0)}
+ .sidebar .brand{padding:18px 55px 17px 20px}
+ .sidebar .brand h1{font-size:25px;margin:6px 0}
+ .sidebar .brand p{display:block}
+ .sidebar .scroll{padding:0 18px 12px}
+ .sidebar .section{padding:20px 3px 18px}
+ .sidebar .bottom-side{display:flex}
+ .side-close{display:block;position:absolute;right:13px;top:17px;width:36px;height:36px;background:#303b44;border:1px solid #61707b;color:#fff;border-radius:9px;font-size:24px;cursor:pointer}
+ .panel-backdrop{display:none;position:fixed;inset:0;background:#04080dbb;border:0;width:100%;height:100%;z-index:20;cursor:pointer}
+ .shell.panel-open .panel-backdrop{display:block}
+ .menu-toggle{display:inline-flex;flex-shrink:0;font-size:12px;padding:9px 12px}
+ .topbar{height:60px;padding:0 14px;gap:12px}
+ .topbar .title{font-size:16px}
+ .topbar .hint{display:none}
+ .topbar .toolbar{margin-left:auto;gap:6px}
+ .topbar .toolbar .btn{padding:9px 10px}
+ .statusbar{min-height:37px;padding:8px 13px}
+ .statusbar .right{display:block}
+ .stage{flex:1;min-height:0}
+ .stage-overlay{left:12px;top:12px}
+ .zoom-controls{right:12px;bottom:13px}
+}
+@media(max-width:530px){
+ .topbar{height:52px;padding:0 9px;gap:8px}
+ .menu-toggle{padding:8px 9px;font-size:11px}
+ .topbar .map-title .title{font-size:14px}
+ .topbar .map-title .title span{display:none}
+ .topbar .toolbar .btn{font-size:0;width:31px;min-width:31px;height:34px;padding:0;display:flex;align-items:center;justify-content:center}
+ #fit::before{content:'⤢';font-size:19px}
+ #undo::before{content:'↶';font-size:19px}
+ #redo::before{content:'↷';font-size:19px}
+ .stage-overlay{left:8px;top:9px}
+ .pill{padding:6px 8px}
+ .statusbar .right{display:none}
+ .sidebar{width:min(370px,94vw)}
+}
+@media(prefers-reduced-motion:reduce){.sidebar{transition:none}}
+</style></head>
+<body><div class="shell" id="appShell">
+<aside class="sidebar" id="sidebar"><header class="brand"><button type="button" class="side-close" id="panelClose" aria-label="Закрыть настройки">×</button><div class="brand-eyebrow">WORLD BUILDER / EXPERIMENT 11</div><h1>SNIK <span style="color:#d6b174">CITY</span><span style="font-weight:400;color:#8698a5"> / LAB</span></h1><p>Визуальный редактор. Художественные участки + процедурные улицы.</p><p id="canvasAccessNotice" hidden style="margin-top:10px;color:var(--accent)">Браузер ограничивает доступ к изображениям. Откройте редактор через HTTP для точного выбора зданий и экспорта PNG.</p></header>
+<div class="scroll">
+<section class="section"><h2><span class="index">01 /</span> Генерация</h2><div class="twocol"><div class="field"><label for="cols">Ширина · участков</label><input id="cols" type="number" min="2" max="16" value="6"></div><div class="field"><label for="rows">Высота · участков</label><input id="rows" type="number" min="2" max="16" value="5"></div></div><div class="field" style="margin-top:12px"><label for="seed">Seed · воспроизводимость</label><input id="seed" value="SNIK-042" spellcheck="false" maxlength="80"></div><div class="field" style="margin-top:12px"><label for="preset">Характер района</label><select id="preset"><option value="mixed">Смешанный город</option><option value="downtown">Центр</option><option value="green">Зелёный район</option><option value="abandoned">Заброшенный</option></select></div><div class="buttons"><button id="generate" class="btn primary wide">✦ Новый город</button><button id="randomize" class="btn wide">↻ Случайный seed</button></div><div class="button-grid" style="margin-top:8px"><button id="rerollBlocks" class="btn ghost">↻ Здания</button></div></section>
+<section class="section"><h2><span class="index">02 /</span> Редактирование</h2><div class="radio-row"><button class="mode active" data-mode="build">Участки</button><button class="mode" data-mode="pan">Рука</button></div><p class="subtext" id="modeHint">Нажмите на участок, чтобы заменить тип здания. Перетаскивайте с пробелом для перемещения.</p><div style="margin-top:12px" class="label">Каталог участков</div><div id="tiles" class="tile-grid"></div><div style="margin-top:11px" class="field"><label for="chosenType">Выбранный тип</label><select id="chosenType" class="wide-select"></select></div><div class="asset-actions"><label class="btn mini" for="objectUpload">↑ Объект PNG</label><input id="objectUpload" type="file" accept="image/png,image/webp"><button class="btn mini ghost" id="resetAsset">Сбросить</button></div><p class="subtext">Для замены спрайта: PNG 620×540, прозрачность, якорь (310, 205). Замена применяется ко всем объектам выбранного типа.</p></section>
+<section class="section"><h2><span class="index">03 /</span> Слои</h2><div class="checkrow"><label for="showRoads">Улицы (отдельный слой)</label><input type="checkbox" id="showRoads" checked></div><div class="checkrow"><label for="showObjects">Здания и декор</label><input type="checkbox" id="showObjects" checked></div><div class="checkrow"><label for="showCoords">Координаты участков</label><input type="checkbox" id="showCoords"></div></section>
+<section class="section" style="border-bottom:0"><h2><span class="index">04 /</span> Сохранение</h2><div class="button-grid"><button id="exportPNG" class="btn">↓ PNG-карта</button><button id="exportJSON" class="btn">↓ JSON-проект</button></div><div class="asset-actions"><label class="btn mini" for="importJSON">↑ Загрузить JSON</label><input id="importJSON" type="file" accept="application/json,.json"><span class="tag">OFFLINE</span></div><p class="subtext">В JSON сохраняются размеры, типы участков, seed и пользовательские спрайты. Улицы всегда вокруг участков. Никакого сервера.</p></section>
+</div><div class="bottom-side"><span>v1.1.1 · HTML Canvas / JS</span><b>● LOCAL ENGINE</b></div></aside>
+<button type="button" class="panel-backdrop" id="panelBackdrop" aria-label="Закрыть настройки"></button>
+<main class="workspace"><div class="topbar"><button type="button" id="panelToggle" class="btn menu-toggle" aria-controls="sidebar" aria-expanded="false">☰ Участки</button><div class="map-title"><div class="title">City map <span style="font-size:12px;color:#80909a;font-weight:400">/ Sandbox</span></div><div class="hint">Изометрическая сетка · отдельные слои · ручная правка</div></div><div class="toolbar"><button class="btn ghost" id="fit">⤢ Вписать</button><button class="btn" id="undo">↶ Назад</button><button class="btn" id="redo">↷ Вперёд</button></div></div><div class="stage" id="stage"><canvas id="map" aria-label="Редактируемая изометрическая карта"></canvas><div class="stage-overlay"><span class="pill">УЧАСТКОВ <strong id="plotCount">30</strong></span><span class="pill">СЕТКА <strong id="gridLabel">6 × 5</strong></span></div><div class="zoom-controls"><button id="zoomPlus" title="Увеличить">+</button><button id="zoomMinus" title="Уменьшить">−</button><button id="zoomFit" title="Вписать карту">⌗</button></div></div><div class="statusbar"><span id="status">Выберите тип и щёлкните по участку • Колесо мыши — масштаб • Space + drag — перемещение</span><span class="right" id="zoomLabel">100%</span></div><div class="toast" id="toast" role="status"></div></main>
+</div><script>window.SNIK_SPRITES={"objects":{"empty":"../game/content/buildings/images/objects/empty.webp","mall":"../game/content/buildings/images/objects/mall.webp","park":"../game/content/buildings/images/objects/park.webp","construction":"../game/content/buildings/images/objects/construction.webp","market":"../game/content/buildings/images/objects/market.webp","diner":"../game/content/buildings/images/objects/diner.webp","library":"../game/content/buildings/images/objects/library.webp","alcohol_08":"../game/content/buildings/images/objects/alcohol-08.webp","fastfood_09":"../game/content/buildings/images/objects/fastfood-09.webp","credit_10":"../game/content/buildings/images/objects/credit-10.webp","luxury_11":"../game/content/buildings/images/objects/luxury-11.webp","feed_12":"../game/content/buildings/images/objects/feed-12.webp","festival_13":"../game/content/buildings/images/objects/festival-13.webp","repair_14":"../game/content/buildings/images/objects/repair-14.webp","approvals_15":"../game/content/buildings/images/objects/approvals-15.webp","bot_16":"../game/content/buildings/images/objects/bot-16.webp","school_17":"../game/content/buildings/images/objects/school-17.webp","diplomas_18":"../game/content/buildings/images/objects/diplomas-18.webp","promotion_19":"../game/content/buildings/images/objects/promotion-19.webp","system_20":"../game/content/buildings/images/objects/system-20.webp","library_21":"../game/content/buildings/images/objects/library-21.webp"}};</script><script>/* Snik City visual map editor v0.5 — entirely client side.
+   Maps store semantic cells and streets; artwork is an exchangeable renderer layer.
+   Original sprite geometry from v0.3: block 104, street 20, pitch 124,
+   projection (x-y)*2.05, (x+y)*1.025-z*1.9, anchor (310,205). */
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const TYPES = [
+  {id:'empty',ru:'Пустой участок'}, {id:'mall',ru:'Торговый центр'},
+  {id:'park',ru:'Платный парк'}, {id:'construction',ru:'Ночная стройка'},
+  {id:'market',ru:'Алкомаркет'}, {id:'diner',ru:'Фастфуд'},
+  {id:'library',ru:'Закрытая библиотека'},
+  {id:'alcohol_08',ru:'Алкомаркет у остановки'},
+  {id:'fastfood_09',ru:'Фастфуд и парковка'},
+  {id:'credit_10',ru:'Кредит на всё'},
+  {id:'luxury_11',ru:'Реклама роскоши'},
+  {id:'feed_12',ru:'Бесконечная лента'},
+  {id:'festival_13',ru:'Фестиваль'},
+  {id:'repair_14',ru:'Косметический ремонт'},
+  {id:'approvals_15',ru:'Семь согласований'},
+  {id:'bot_16',ru:'Бот поддержки'},
+  {id:'school_17',ru:'Школа грамот'},
+  {id:'diplomas_18',ru:'Быстрые дипломы'},
+  {id:'promotion_19',ru:'Повышение за отчёт'},
+  {id:'system_20',ru:'Единая система'},
+  {id:'library_21',ru:'Закрытая библиотека (новая)'}
+];
+const P=124, B=104, R=20, SX=2.05, SY=1.025, SZ=1.9, TILE_W=620, TILE_H=540, ANCHOR_X=310, ANCHOR_Y=205;
+const C = {asphalt:'#323842',paving:'#b5a08e',edge:'#8d8278',line:'#d4c4b0',zebra:'#e1d7c8',detail:'#9a8d7e'};
+const defaultCells = [
+  ['approvals_15', 'bot_16', 'school_17', 'diplomas_18', 'promotion_19', 'system_20'],
+  ['library_21', 'alcohol_08', 'fastfood_09', 'credit_10', 'luxury_11', 'feed_12'],
+  ['festival_13', 'repair_14', 'empty', 'mall', 'park', 'construction'],
+  ['market', 'diner', 'library', 'bot_16', 'school_17', 'system_20'],
+  ['park', 'mall', 'library_21', 'credit_10', 'festival_13', 'empty']
+];
+let state = {rows:5,cols:6,seed:'SNIK-042',preset:'mixed',density:100,cells:structuredClone(defaultCells),net:null,rollB:0,rollR:0};
+let mode='build', selectedType='mall', selected={r:-1,c:-1}, hover=null;
+const sprite = { objects:{} }, defaults = {objects:{}};
+const custom = {objects:{}};
+let loading=0;
+const stage=$('stage'), canvas=$('map'),ctx=canvas.getContext('2d',{alpha:false});
+let width=0,height=0,dpr=1,scale=1,panX=0,panY=0,fitScale=1;
+let dragging=false, dragPointer=null, moved=false, spaceDown=false, pointerInside=false;
+const toggles={roads:true,objects:true,coords:false};
+let history=[],redoStack=[],toastTimer=0;
+
+function defaultNetwork(rows,cols){
+  // Every plot has a street on all four sides. Road art is never baked into plot PNGs.
+  return {h:Array.from({length:rows+1},()=>Array(cols).fill(true)),
+    v:Array.from({length:rows},()=>Array(cols+1).fill(true))};
+}
+state.net=defaultNetwork(state.rows,state.cols);
+function hash(text){let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function rngOf(key){let a=hash(key);return ()=>{a+=0x6D2B79F5;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
+function weightedType(rand,preset){
+  const weights={
+    mixed:[12,9,10,9,10,9,8,7,7,5,4,4,3,3,5,4,5,4,4,4,5],
+    downtown:[4,12,4,7,10,10,4,9,10,8,7,5,4,6,7,5,5,4,7,6,2],
+    green:[14,8,22,5,4,6,12,4,4,2,3,4,7,5,2,3,5,2,3,3,7],
+    abandoned:[22,3,11,18,4,4,13,5,4,3,4,2,2,5,2,4,3,4,3,5,11]
+  }[preset]||[12,9,10,9,10,9,8,7,7,5,4,4,3,3,5,4,5,4,4,4,5];
+  let value=rand()*weights.reduce((x,y)=>x+y,0);
+  for(let i=0;i<weights.length;i++){value-=weights[i];if(value<0)return TYPES[i].id;}
+  return 'empty';
+}
+function makeBlocks(){
+  const rand=rngOf(`${state.seed}/blocks/${state.rollB}`);
+  state.cells=Array.from({length:state.rows},()=>Array.from({length:state.cols},()=>weightedType(rand,state.preset)));
+}
+function makeRoads(){state.net=defaultNetwork(state.rows,state.cols);}
+function normalizeCells(){const valid=new Set(TYPES.map(x=>x.id));state.cells=state.cells.map(row=>row.map(t=>valid.has(t)?t:'empty'));}
+
+function snapshot(){return JSON.stringify({state,custom});}
+function pushUndo(){history.push(snapshot());if(history.length>60)history.shift();redoStack.length=0;refreshUndoButtons();}
+function restore(data){
+  const p=JSON.parse(data);state=p.state;state.net=defaultNetwork(state.rows,state.cols);for(const kind of ['objects']){
+    custom[kind]=p.custom?.[kind]||{};
+    for(const t of TYPES) setSprite(kind,t.id,custom[kind][t.id]||defaults[kind][t.id]);
+  }
+  normalizeCells();syncSettings();resetHover();render();refreshUndoButtons();
+}
+function refreshUndoButtons(){$('undo').disabled=!history.length;$('redo').disabled=!redoStack.length;}
+function undo(){if(!history.length)return;redoStack.push(snapshot());restore(history.pop());}
+function redo(){if(!redoStack.length)return;history.push(snapshot());restore(redoStack.pop());}
+function labelFor(id){return TYPES.find(t=>t.id===id)?.ru||id;}
+function syncSettings(){
+  $('cols').value=state.cols;$('rows').value=state.rows;$('seed').value=state.seed;$('preset').value=state.preset;
+  $('gridLabel').textContent=`${state.cols} × ${state.rows}`;
+  $('plotCount').textContent=state.cols*state.rows;
+}
+function toast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2900);}
+function syncFromForm(){
+  state.cols=Math.max(2,Math.min(16,Math.floor(+$('cols').value||6)));
+  state.rows=Math.max(2,Math.min(16,Math.floor(+$('rows').value||5)));
+  state.seed=$('seed').value.trim()||'SNIK-042';state.preset=$('preset').value;state.density=100;
+  syncSettings();
+}
+function createNew(keepSeed=false){pushUndo();syncFromForm();state.rollB=0;state.rollR=0;makeBlocks();makeRoads();selected={r:-1,c:-1};resetHover();fitView();render();toast(`Новая карта: ${state.cols} × ${state.rows} / ${state.seed}`);}
+function randSeed(){const arr=new Uint32Array(1);if(crypto?.getRandomValues)crypto.getRandomValues(arr);else arr[0]=Date.now();$('seed').value='CITY-'+arr[0].toString(36).toUpperCase();createNew();}
+function resetHover(){hover=null;updateStatus();}
+function updateStatus(){
+  let s=mode==='road'?'Улицы рисуются автоматически вокруг каждого участка.':mode==='pan'?'Перетаскивайте карту. Колесо мыши меняет масштаб.':'Выберите тип и щёлкните по участку • Колесо мыши — масштаб • Space + drag — перемещение';
+  if(hover?.kind==='cell')s=`Участок ${hover.c+1}, ${hover.r+1} · ${labelFor(state.cells[hover.r][hover.c])} → ${labelFor(selectedType)}`;
+  if(hover?.kind==='road')s=`${hover.dir==='h'?'Горизонтальная':'Вертикальная'} улица (${hover.c+1}, ${hover.r+1}) · ${state.net[hover.dir][hover.r][hover.c]?'дорога':'пешеходный проход'} · нажмите, чтобы изменить`;
+  $('status').textContent=s;
+}
+function dims(){const W=state.cols*P+R,H=state.rows*P+R;return {W,H,originX:H*SX+76,originY:167,vw:(W+H)*SX+152,vh:(W+H)*SY+290};}
+function xy(wx,wy,wz=0){const d=dims();return {x:d.originX+(wx-wy)*SX,y:d.originY+(wx+wy)*SY-wz*SZ};}
+function worldFromVirtual(x,y){const d=dims();const vx=(x-d.originX)/SX,vy=(y-d.originY)/SY;return {x:(vx+vy)/2,y:(vy-vx)/2};}
+function vToScreen(x,y){return {x:panX+x*scale,y:panY+y*scale};}
+function screenToV(x,y){return {x:(x-panX)/scale,y:(y-panY)/scale};}
+function poly(context,pts,fill,stroke=null,lw=1){context.beginPath();pts.forEach(([x,y,z],i)=>{const p=xy(x,y,z||0);if(!i)context.moveTo(p.x,p.y);else context.lineTo(p.x,p.y);});context.closePath();if(fill){context.fillStyle=fill;context.fill();}if(stroke){context.lineWidth=lw;context.strokeStyle=stroke;context.stroke();}}
+function rect(context,x0,y0,x1,y1,c,z=0,stroke=null,lw=1){poly(context,[[x0,y0,z],[x1,y0,z],[x1,y1,z],[x0,y1,z]],c,stroke,lw);}
+function line(context,pts,c,w=1){context.beginPath();pts.forEach(([x,y,z],i)=>{const p=xy(x,y,z||0);if(!i)context.moveTo(p.x,p.y);else context.lineTo(p.x,p.y);});context.lineWidth=w;context.lineJoin='round';context.strokeStyle=c;context.stroke();}
+function dot(context,x,y,z,r,color){const p=xy(x,y,z);context.beginPath();context.ellipse(p.x,p.y,r,r,0,0,Math.PI*2);context.fillStyle=color;context.fill();}
+function drawRoads(context){
+  const {rows,cols,net}=state,{W,H}=dims();
+  // Continuous street slab: every rectangle is aligned on a shared world-coordinate grid.
+  poly(context,[[0,H,-4],[W,H,-4],[W,H,0],[0,H,0]],'#202226');
+  poly(context,[[W,0,-4],[W,H,-4],[W,H,0],[W,0,0]],'#282b30');
+  rect(context,0,0,W,H,C.paving,0,'#262c2e');
+  for(let r=0;r<=rows;r++)for(let c=0;c<cols;c++)if(net.h[r][c])rect(context,c*P,r*P,(c+1)*P+R,r*P+R,C.asphalt);
+  for(let r=0;r<rows;r++)for(let c=0;c<=cols;c++)if(net.v[r][c])rect(context,c*P,r*P,c*P+R,(r+1)*P+R,C.asphalt);
+  for(let r=0;r<=rows;r++)for(let c=0;c<=cols;c++){
+    const k=Number(c>0&&net.h[r][c-1])+Number(c<cols&&net.h[r][c])+Number(r>0&&net.v[r-1][c])+Number(r<rows&&net.v[r][c]);
+    if(k)rect(context,c*P,r*P,c*P+R,r*P+R,C.asphalt);
+    else rect(context,c*P+2,r*P+2,c*P+R-2,r*P+R-2,'#838070');
+  }
+  for(let r=0;r<=rows;r++)for(let c=0;c<cols;c++){
+    const y=r*P,cy=y+R/2,x0=c*P+R,x1=(c+1)*P;
+    if(!net.h[r][c]){for(let k=0;k<3;k++){const x=x0+10+k*30;line(context,[[x,y+2,.1],[x,y+R-2,.1]],'#86877c',1);}continue;}
+    for(const yy of [y+2,y+R-2])line(context,[[x0,yy,.1],[x1,yy,.1]],C.edge,1);
+    for(let k=0;k<4;k++){const t=x0+7+k*22;line(context,[[t,cy,.1],[Math.min(t+10,x1-5),cy,.1]],C.line,2);}
+  }
+  for(let r=0;r<rows;r++)for(let c=0;c<=cols;c++){
+    const x=c*P,cx=x+R/2,y0=r*P+R,y1=(r+1)*P;
+    if(!net.v[r][c]){for(let k=0;k<3;k++){const y=y0+10+k*30;line(context,[[x+2,y,.1],[x+R-2,y,.1]],'#86877c',1);}continue;}
+    for(const xx of [x+2,x+R-2])line(context,[[xx,y0,.1],[xx,y1,.1]],C.edge,1);
+    for(let k=0;k<4;k++){const t=y0+7+k*22;line(context,[[cx,t,.1],[cx,Math.min(t+10,y1-5),.1]],C.line,2);}
+  }
+  for(let r=1;r<rows;r++)for(let c=1;c<cols;c++){
+    const x=c*P+R/2,y=r*P+R/2;
+    for(const [dx,dy,enabled] of [[-1,0,net.h[r][c-1]],[1,0,net.h[r][c]],[0,-1,net.v[r-1][c]],[0,1,net.v[r][c]]]){
+      if(!enabled)continue;
+      for(let k=0;k<4;k++){
+        const t=-7+k*4.3;
+        if(dx)rect(context,x+dx*(R/2+6)-2,y+t,x+dx*(R/2+6)+2,y+t+2.1,C.zebra,.1);
+        else rect(context,x+t,y+dy*(R/2+6)-2,x+t+2.1,y+dy*(R/2+6)+2,C.zebra,.1);
+      }
+    }
+    dot(context,x,y,.15,3,'#555a5a');
+  }
+}
+function spritePos(r,c){const p=xy(c*P+R,r*P+R);return{x:p.x-ANCHOR_X,y:p.y-ANCHOR_Y};}
+function drawSprites(context){
+  if(toggles.objects){
+    const positions=[];for(let r=0;r<state.rows;r++)for(let c=0;c<state.cols;c++)positions.push({r,c});
+    positions.sort((a,b)=>(a.r+a.c)-(b.r+b.c)||a.r-b.r);
+    for(const {r,c} of positions){const kind=state.cells[r][c],im=sprite.objects[kind],{x,y}=spritePos(r,c);
+      if(im?.complete&&im.naturalWidth)context.drawImage(im,x,y,TILE_W,TILE_H);
+    }
+  }
+  if(toggles.coords){
+    context.font='bold 13px sans-serif';context.textAlign='center';context.textBaseline='middle';
+    for(let r=0;r<state.rows;r++)for(let c=0;c<state.cols;c++){
+      const p=xy(c*P+R+B/2,r*P+R+B/2,4);context.fillStyle='#172025ee';context.fillRect(p.x-19,p.y-10,38,20);
+      context.fillStyle='#f6e2b5';context.fillText(`${c+1},${r+1}`,p.x,p.y);
+    }
+  }
+}
+function drawHighlights(context){
+  if(selected.r>=0&&selected.r<state.rows&&selected.c>=0&&selected.c<state.cols){
+    const x=selected.c*P+R,y=selected.r*P+R;
+    rect(context,x,y,x+B,y+B,'#b5c07a19',2.8,'#cfdba0',2);
+  }
+  if(!hover)return;
+  if(hover.kind==='cell'){
+    const x=hover.c*P+R,y=hover.r*P+R;
+    rect(context,x,y,x+B,y+B,'#dfc17a22',3,'#f3c785',2);
+  }else if(hover.kind==='road'){
+    const {r,c,dir}=hover;
+    if(dir==='h')rect(context,c*P+R,r*P,(c+1)*P,r*P+R,'#f1c07e5c',.6,'#f5d29b',2);
+    else rect(context,c*P,r*P+R,c*P+R,(r+1)*P,'#f1c07e5c',.6,'#f5d29b',2);
+  }
+}
+function draw(context,includeHighlight=true){
+  if(toggles.roads)drawRoads(context);
+  drawSprites(context);
+  if(includeHighlight)drawHighlights(context);
+}
+function drawStageBackground(){
+  ctx.save();const grad=ctx.createLinearGradient(0,0,width,height);grad.addColorStop(0,'#29333d');grad.addColorStop(1,'#172027');ctx.fillStyle=grad;ctx.fillRect(0,0,width,height);
+  ctx.strokeStyle='#ffffff08';ctx.lineWidth=1;const spacing=36;
+  ctx.beginPath();for(let x=0;x<width;x+=spacing){ctx.moveTo(x+.5,0);ctx.lineTo(x+.5,height);}for(let y=0;y<height;y+=spacing){ctx.moveTo(0,y+.5);ctx.lineTo(width,y+.5);}ctx.stroke();ctx.restore();
+}
+function render(){
+  if(!width||!height)return;
+  ctx.setTransform(dpr,0,0,dpr,0,0);drawStageBackground();
+  ctx.translate(panX,panY);ctx.scale(scale,scale);
+  draw(ctx);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  $('zoomLabel').textContent=`${Math.round(scale*100)}% · ${state.cols}×${state.rows}`;
+}
+function resize(){
+  const bb=stage.getBoundingClientRect();
+  const oldWidth=width,oldHeight=height,oldDpr=dpr;
+  const nextWidth=Math.max(1,bb.width),nextHeight=Math.max(1,bb.height);
+  const nextDpr=Math.min(2,window.devicePixelRatio||1);
+  if(oldWidth===nextWidth&&oldHeight===nextHeight&&oldDpr===nextDpr)return;
+  width=nextWidth;height=nextHeight;dpr=nextDpr;
+  canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);
+  canvas.style.width=width+'px';canvas.style.height=height+'px';
+  if(!oldWidth||!oldHeight){fitView();return;}
+  // Preserve the user-selected zoom and keep the same world point centered.
+  // ResizeObserver can run after hover/status-text changes; never call fitView here.
+  panX+=(width-oldWidth)/2;
+  panY+=(height-oldHeight)/2;
+  render();
+}
+function fitView(){
+  const {vw,vh}=dims();fitScale=Math.min((width-42)/vw,(height-42)/vh);scale=Math.max(.025,Math.min(3,fitScale));
+  panX=(width-vw*scale)/2;panY=(height-vh*scale)/2;render();
+}
+function zoomAt(factor,localX=width/2,localY=height/2){
+  const last=scale;scale=Math.max(.055,Math.min(3.7,scale*factor));
+  panX=localX-(localX-panX)*scale/last;panY=localY-(localY-panY)*scale/last;render();
+}
+function projectPointFromEvent(e){const b=canvas.getBoundingClientRect();return{x:e.clientX-b.left,y:e.clientY-b.top};}
+function pickRoad(w){
+  if(w.x<0||w.y<0||w.x>state.cols*P+R||w.y>state.rows*P+R)return null;
+  const c=Math.floor(w.x/P),r=Math.floor(w.y/P),fx=w.x-c*P,fy=w.y-r*P;
+  if(fy>=0&&fy<R&&fx>R&&c<state.cols&&r<=state.rows)return{kind:'road',dir:'h',r,c};
+  if(fx>=0&&fx<R&&fy>R&&r<state.rows&&c<=state.cols)return{kind:'road',dir:'v',r,c};
+  // At junction interiors, choose nearest radiating segment by position.
+  if(fx<=R&&fy<=R){
+    const options=[];
+    if(c>0&&r<=state.rows)options.push({kind:'road',dir:'h',r,c:c-1});
+    if(c<state.cols&&r<=state.rows)options.push({kind:'road',dir:'h',r,c});
+    if(r>0&&c<=state.cols)options.push({kind:'road',dir:'v',r:r-1,c});
+    if(r<state.rows&&c<=state.cols)options.push({kind:'road',dir:'v',r,c});
+    if(options.length)return options[(fx+fy<R)?0:options.length-1];
+  }
+  return null;
+}
+function alphaHit(im,relativeX,relativeY){
+  if(!im?.complete||!im.naturalWidth)return false;
+  const x=Math.floor(relativeX),y=Math.floor(relativeY);
+  if(x<0||y<0||x>=TILE_W||y>=TILE_H)return false;
+  const map=im._alpha;if(!map)return false;
+  return map[y*TILE_W+x]>45;
+}
+function pickAt(p){
+  const v=screenToV(p.x,p.y), w=worldFromVirtual(v.x,v.y+2.4*SZ);
+  if(mode==='road')return pickRoad(w);
+  if(mode==='pan')return null;
+  // Hit test sprite silhouette first, so rooftops are clickable too.
+  if(toggles.objects){
+    const positions=[];for(let r=0;r<state.rows;r++)for(let c=0;c<state.cols;c++)positions.push({r,c});
+    positions.sort((a,b)=>(b.r+b.c)-(a.r+a.c)||b.r-a.r);
+    for(const {r,c} of positions){const im=sprite.objects[state.cells[r][c]],pos=spritePos(r,c);
+      if(alphaHit(im,v.x-pos.x,v.y-pos.y))return{kind:'cell',r,c};
+    }
+  }
+  const c=Math.floor((w.x-R)/P),r=Math.floor((w.y-R)/P);
+  if(c>=0&&c<state.cols&&r>=0&&r<state.rows&&w.x>=c*P+R&&w.x<=c*P+R+B&&w.y>=r*P+R&&w.y<=r*P+R+B)return{kind:'cell',r,c};
+  return null;
+}
+function samePick(a,b){if(!a||!b)return a===b;return a.kind===b.kind&&a.r===b.r&&a.c===b.c&&a.dir===b.dir;}
+function doPick(item){if(!item)return;
+  if(item.kind==='cell'&&mode==='build'){
+    selected={r:item.r,c:item.c};if(state.cells[item.r][item.c]!==selectedType){pushUndo();state.cells[item.r][item.c]=selectedType;}
+    render();updateStatus();
+  }else if(item.kind==='road'&&mode==='road'){
+    return;
+  }
+}
+function setMode(next){if(next==='road')next='build';mode=next;document.querySelectorAll('.mode').forEach(x=>x.classList.toggle('active',x.dataset.mode===next));
+  $('modeHint').textContent=next==='road'?'Щёлкните по полосе улицы, чтобы сделать её пешеходной — или вернуть асфальт.':next==='pan'?'Тяните карту мышью или пальцем, колёсико меняет масштаб.':'Нажмите на участок, чтобы заменить тип здания. Пробел + перетаскивание — перемещение.';
+  canvas.classList.toggle('pan',next==='pan');resetHover();render();
+}
+function selectType(id){selectedType=id;$('chosenType').value=id;document.querySelectorAll('.tile-btn').forEach(b=>b.classList.toggle('active',b.dataset.kind===id));}
+function buildPalette(){
+  const cont=$('tiles');cont.replaceChildren();const sel=$('chosenType');sel.replaceChildren();
+  for(let i=0;i<TYPES.length;i++){
+    const t=TYPES[i];const opt=document.createElement('option');opt.value=t.id;opt.textContent=`${String(i).padStart(2,'0')} · ${t.ru}`;sel.append(opt);
+    const b=document.createElement('button');b.type='button';b.className='tile-btn';b.dataset.kind=t.id;b.title=t.ru;
+    const im=document.createElement('img');im.src=window.SNIK_SPRITES?.objects?.[t.id]||`assets/objects/${String(i).padStart(2,'0')}_${t.id}.png`;im.alt=t.ru;
+    const lab=document.createElement('span');lab.textContent=String(i).padStart(2,'0')+' · '+t.ru;lab.className='tile-caption';b.setAttribute('aria-label',t.ru);b.append(im,lab);b.addEventListener('click',()=>{selectType(t.id);if(mode!=='build')setMode('build');closePanel();});cont.append(b);
+  }
+  selectType(selectedType);
+}
+function setSprite(layer,id,src){
+  const im=new Image();im.decoding='async';im.onload=()=>{
+    if(im.naturalWidth!==TILE_W||im.naturalHeight!==TILE_H){console.warn(`Sprite ${id} is not ${TILE_W}×${TILE_H}:`,im.naturalWidth,im.naturalHeight);return;}
+    const off=document.createElement('canvas');off.width=TILE_W;off.height=TILE_H;const g=off.getContext('2d',{willReadFrequently:true});g.drawImage(im,0,0);
+    sprite[layer][id]=im;
+    let rgba;
+    try{rgba=g.getImageData(0,0,TILE_W,TILE_H).data;}
+    catch(error){
+      if(error.name!=='SecurityError')throw error;
+      $('canvasAccessNotice').hidden=false;
+      $('exportPNG').disabled=true;
+      $('exportPNG').title='Для экспорта PNG откройте редактор через HTTP';
+      render();return;
+    }
+    const alpha=new Uint8Array(TILE_W*TILE_H);for(let i=0,j=3;i<alpha.length;i++,j+=4)alpha[i]=rgba[j];
+    im._alpha=alpha;
+    if(layer==='objects'){
+      // The full transparent sprite has a large isometric canvas. Crop only its
+      // visible contents for the catalog, without changing the actual sprite.
+      let x0=TILE_W,y0=TILE_H,x1=0,y1=0;
+      for(let y=0;y<TILE_H;y++)for(let x=0;x<TILE_W;x++)if(alpha[y*TILE_W+x]>55){
+        if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;
+      }
+      const thumbnail=document.createElement('canvas');thumbnail.width=116;thumbnail.height=90;
+      const tg=thumbnail.getContext('2d');
+      if(x1>=x0&&y1>=y0){
+        const bw=x1-x0+1,bh=y1-y0+1,f=Math.min(106/bw,80/bh);
+        tg.drawImage(im,x0,y0,bw,bh,(116-bw*f)/2,(90-bh*f)/2,bw*f,bh*f);
+      }
+      const ix=TYPES.findIndex(t=>t.id===id),b=$('tiles').children[ix];
+      if(b)b.querySelector('img').src=thumbnail.toDataURL('image/png');
+    }
+    render();
+  };
+  im.onerror=()=>{console.error('Cannot load sprite:',layer,id);toast(`Не удалось загрузить PNG: ${id}`);};
+  im.src=src;
+}
+function loadAssets(){
+  for(let i=0;i<TYPES.length;i++)for(const layer of ['objects']){
+    const id=TYPES[i].id,src=window.SNIK_SPRITES?.[layer]?.[id]||`assets/${layer}/${String(i).padStart(2,'0')}_${id}.png`;
+    defaults[layer][id]=src;setSprite(layer,id,src);
+  }
+}
+function uploadSprite(layer,file){if(!file)return;
+  const reader=new FileReader();reader.onload=()=>{
+    const im=new Image();im.onload=()=>{
+      if(im.naturalWidth!==TILE_W||im.naturalHeight!==TILE_H){toast(`Размер ${im.naturalWidth}×${im.naturalHeight}; нужен 620×540`);return;}
+      pushUndo();custom[layer][selectedType]=reader.result;setSprite(layer,selectedType,reader.result);
+      toast(`Спрайт «${labelFor(selectedType)}» заменён`);
+    };im.onerror=()=>toast('Некорректный файл изображения');im.src=reader.result;
+  };reader.readAsDataURL(file);
+}
+function exportProject(){return {
+  format:'snik-city-map',version:'1.0.0',projection:{sx:SX,sy:SY,sz:SZ},tile:{size:[620,540],anchor:[310,205],block:B,street:R,pitch:P},
+  rows:state.rows,cols:state.cols,seed:state.seed,preset:state.preset,density:state.density,
+  cells:state.cells,streets:state.net,rollB:state.rollB,rollR:state.rollR,
+  customSprites:custom
+};}
+function downloadBlob(name,blob){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);}
+function saveJSON(){downloadBlob(`snik-city-${state.cols}x${state.rows}.json`,new Blob([JSON.stringify(exportProject(),null,2)],{type:'application/json'}));toast('JSON-проект экспортирован');}
+function importProject(file){if(!file)return;const reader=new FileReader();reader.onload=()=>{
+  try{
+    const parsed=JSON.parse(reader.result);
+    if(parsed.format!=='snik-city-map')throw Error('Неизвестный формат проекта');
+    const rows=+parsed.rows,cols=+parsed.cols;
+    if(!Number.isInteger(rows)||!Number.isInteger(cols)||rows<2||cols<2||rows>16||cols>16)throw Error('Допустимый размер: от 2 до 16 участков');
+    if(!Array.isArray(parsed.cells)||parsed.cells.length!==rows||!parsed.cells.every(row=>Array.isArray(row)&&row.length===cols&&row.every(t=>TYPES.some(x=>x.id===t))))throw Error('Неверная сетка участков');
+    const net=parsed.streets;if(!net||net.h.length!==rows+1||!net.h.every(row=>Array.isArray(row)&&row.length===cols&&row.every(v=>typeof v==='boolean'))||net.v.length!==rows||!net.v.every(row=>Array.isArray(row)&&row.length===cols+1&&row.every(v=>typeof v==='boolean')))throw Error('Неверная дорожная сеть');
+    pushUndo();state={rows,cols,seed:String(parsed.seed||'import'),preset:String(parsed.preset||'mixed'),density:100,cells:parsed.cells,net:defaultNetwork(rows,cols),rollB:+parsed.rollB||0,rollR:+parsed.rollR||0};
+    for(const layer of ['objects']){
+      custom[layer]={};for(const t of TYPES){const src=parsed.customSprites?.[layer]?.[t.id];if(typeof src==='string'&&src.startsWith('data:image/')&&src.length<15_000_000)custom[layer][t.id]=src;
+        setSprite(layer,t.id,custom[layer][t.id]||defaults[layer][t.id]);
+      }
+    }
+    syncSettings();selected={r:-1,c:-1};resetHover();fitView();toast(`Загружен проект ${cols} × ${rows}`);
+  }catch(e){toast(`Ошибка JSON: ${e.message}`);console.error(e);}
+};reader.readAsText(file);}
+function exportPNG(){
+  const d=dims(),limit=8000;const multiplier=Math.min(2,limit/Math.max(d.vw,d.vh));
+  const out=document.createElement('canvas');out.width=Math.round(d.vw*multiplier);out.height=Math.round(d.vh*multiplier);
+  const g=out.getContext('2d');g.scale(multiplier,multiplier);g.fillStyle='#263038';g.fillRect(0,0,d.vw,d.vh);
+  draw(g,false);
+  out.toBlob(blob=>{if(!blob){toast('Не удалось экспортировать изображение');return;}
+    downloadBlob(`snik-city-${state.cols}x${state.rows}-${state.seed.replace(/[^\w-]+/g,'_')}.png`,blob);toast(`PNG ${out.width}×${out.height} экспортирован`);
+  },'image/png');
+}
+function openPanel(){
+  $('appShell').classList.add('panel-open');
+  $('panelToggle').setAttribute('aria-expanded','true');
+  $('panelClose').focus();
+}
+function closePanel(){
+  $('appShell').classList.remove('panel-open');
+  $('panelToggle').setAttribute('aria-expanded','false');
+}
+function togglePanel(){if($('appShell').classList.contains('panel-open'))closePanel();else openPanel();}
+function bind(){
+  $('panelToggle').addEventListener('click',togglePanel);
+  $('panelClose').addEventListener('click',closePanel);
+  $('panelBackdrop').addEventListener('click',closePanel);
+  window.addEventListener('keydown',e=>{if(e.key==='Escape' && $('appShell').classList.contains('panel-open'))closePanel();});
+  $('generate').addEventListener('click',()=>{createNew();closePanel();});$('randomize').addEventListener('click',()=>{randSeed();closePanel();});
+  $('rerollBlocks').addEventListener('click',()=>{pushUndo();state.rollB++;makeBlocks();render();toast('Здания перемешаны; улицы не изменены');});
+  document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+  $('chosenType').addEventListener('change',e=>{selectType(e.target.value);closePanel();});
+  for(const [id,field] of [['showRoads','roads'],['showObjects','objects'],['showCoords','coords']])$(id).addEventListener('change',e=>{toggles[field]=e.target.checked;render();});
+  for(const [id,layer] of [['objectUpload','objects']])$(id).addEventListener('change',e=>{uploadSprite(layer,e.target.files?.[0]);e.target.value='';});
+  $('resetAsset').addEventListener('click',()=>{pushUndo();for(const layer of ['objects']){delete custom[layer][selectedType];setSprite(layer,selectedType,defaults[layer][selectedType]);}toast(`Исходные спрайты «${labelFor(selectedType)}» восстановлены`);});
+  $('fit').addEventListener('click',fitView);$('zoomFit').addEventListener('click',fitView);
+  $('zoomPlus').addEventListener('click',()=>zoomAt(1.25));$('zoomMinus').addEventListener('click',()=>zoomAt(1/1.25));
+  $('undo').addEventListener('click',undo);$('redo').addEventListener('click',redo);
+  $('exportPNG').addEventListener('click',exportPNG);$('exportJSON').addEventListener('click',saveJSON);
+  $('importJSON').addEventListener('change',e=>{importProject(e.target.files?.[0]);e.target.value='';});
+  canvas.addEventListener('wheel',e=>{e.preventDefault();const p=projectPointFromEvent(e);zoomAt(Math.exp(-e.deltaY*.0013),p.x,p.y);},{passive:false});
+  canvas.addEventListener('contextmenu',e=>e.preventDefault());
+  canvas.addEventListener('pointerdown',e=>{if(e.button!==0&&e.button!==1&&e.button!==2)return;
+    canvas.setPointerCapture(e.pointerId);const p=projectPointFromEvent(e);dragPointer={x:p.x,y:p.y,px:panX,py:panY,button:e.button,panning:mode==='pan'||spaceDown||e.button!==0};dragging=true;moved=false;
+    if(dragPointer.panning)canvas.classList.add('dragging');
+  });
+  canvas.addEventListener('pointermove',e=>{const p=projectPointFromEvent(e);
+    if(dragging&&dragPointer){const dx=p.x-dragPointer.x,dy=p.y-dragPointer.y;
+      if(Math.abs(dx)+Math.abs(dy)>4)moved=true;
+      if(dragPointer.panning){panX=dragPointer.px+dx;panY=dragPointer.py+dy;render();return;}
+    }
+    const pick=pickAt(p);if(!samePick(hover,pick)){hover=pick;updateStatus();render();}
+  });
+  canvas.addEventListener('pointerup',e=>{
+    if(!dragging)return;
+    const wasPan=dragPointer?.panning;canvas.classList.remove('dragging');dragPointer=null;dragging=false;
+    if(!wasPan&&!moved&&e.button===0){const p=projectPointFromEvent(e);doPick(pickAt(p));}
+  });
+  canvas.addEventListener('pointercancel',()=>{dragging=false;dragPointer=null;canvas.classList.remove('dragging');});
+  canvas.addEventListener('pointerleave',()=>{if(!dragging){hover=null;updateStatus();render();}});
+  window.addEventListener('keydown',e=>{
+    if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement?.tagName))return;
+    if(e.code==='Space'){spaceDown=true;e.preventDefault();canvas.classList.add('pan');}
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();if(e.shiftKey)redo();else undo();}
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo();}
+    if(e.key.toLowerCase()==='f')fitView();
+  });
+  window.addEventListener('keyup',e=>{if(e.code==='Space'){spaceDown=false;if(mode!=='pan')canvas.classList.remove('pan');}});
+  if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(stage);else window.addEventListener('resize',resize);
+  refreshUndoButtons();
+}
+function start(){buildPalette();syncSettings();bind();loadAssets();resize();render();}
+start();
+})();
+</script></body></html>

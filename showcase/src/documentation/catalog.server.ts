@@ -9,6 +9,47 @@ interface SectionDefinition {
   readonly includes: (file: string) => boolean;
 }
 
+const gameDesignSections: readonly SectionDefinition[] = [
+  {
+    title: 'Start here',
+    description: 'The project vision and a map of the game design.',
+    includes: (file) =>
+      [
+        'README.md',
+        'game/README.md',
+        'game/vision.md',
+        'game/overview.md',
+      ].includes(file),
+  },
+  {
+    title: 'Systems',
+    description:
+      'Responsibilities, rules, proposals, and open questions for each system.',
+    includes: (file) => file.startsWith('game/systems/'),
+  },
+  {
+    title: 'Milestones',
+    description: 'The prototype scope and development milestones.',
+    includes: (file) => file.startsWith('game/milestones/'),
+  },
+  {
+    title: 'Content',
+    description:
+      'Concrete authored content and explicitly labeled candidate collections.',
+    includes: (file) => file.startsWith('game/content/'),
+  },
+  {
+    title: 'Technical design',
+    description: 'The software model and implementation constraints.',
+    includes: (file) => file.startsWith('tech/'),
+  },
+  {
+    title: 'UI references',
+    description: 'Presentation notes and interactive experiments.',
+    includes: (file) => file.startsWith('mockups/'),
+  },
+];
+
 const sectionDefinitions: Record<ProjectId, readonly SectionDefinition[]> = {
   gemfire: [
     {
@@ -33,10 +74,10 @@ const sectionDefinitions: Record<ProjectId, readonly SectionDefinition[]> = {
       includes: (file) => file === 'ROADMAP.md',
     },
   ],
-  'total-space': [
+  'sink-city': [
     {
-      title: 'Start here',
-      description: 'The project vision and a map of the game design.',
+      title: 'С чего начать',
+      description: 'Видение и обзор систем.',
       includes: (file) =>
         [
           'README.md',
@@ -46,31 +87,32 @@ const sectionDefinitions: Record<ProjectId, readonly SectionDefinition[]> = {
         ].includes(file),
     },
     {
-      title: 'Systems',
-      description: 'Rules for the strategic and combat systems.',
+      title: 'Системы',
+      description: 'Строительство, прогрессия, город, власть, сюжет и цели.',
       includes: (file) => file.startsWith('game/systems/'),
     },
     {
-      title: 'Milestones',
-      description: 'The prototype scope and development milestones.',
+      title: 'Этапы разработки',
+      description: 'Границы прототипа и этапы развития игры.',
       includes: (file) => file.startsWith('game/milestones/'),
     },
     {
-      title: 'Content',
-      description: 'Ship and building rosters, with their artwork.',
+      title: 'Контент',
+      description: 'Городские идеи и каталог участков.',
       includes: (file) => file.startsWith('game/content/'),
     },
     {
-      title: 'Technical design',
-      description: 'The software model and implementation constraints.',
+      title: 'Технический дизайн',
+      description: 'Программная модель и ограничения реализации.',
       includes: (file) => file.startsWith('tech/'),
     },
     {
-      title: 'UI references',
-      description: 'Campaign and battle interaction notes.',
+      title: 'Интерфейсы и прототипы',
+      description: 'Редактор карты Map Lab.',
       includes: (file) => file.startsWith('mockups/'),
     },
   ],
+  'total-space': gameDesignSections,
 };
 
 const startingOrder = [
@@ -92,25 +134,23 @@ function createCatalog(project: ProjectId) {
         }) satisfies DocumentSummary,
     )
     .sort((a, b) => {
-      if (project === 'total-space') {
-        const aStart = startingOrder.indexOf(a.file);
-        const bStart = startingOrder.indexOf(b.file);
-        if (aStart !== -1 || bStart !== -1)
-          return (
-            (aStart === -1 ? Infinity : aStart) -
-            (bStart === -1 ? Infinity : bStart)
-          );
-      }
+      const aStart = startingOrder.indexOf(a.file);
+      const bStart = startingOrder.indexOf(b.file);
+      if (aStart !== -1 || bStart !== -1)
+        return (
+          (aStart === -1 ? Infinity : aStart) -
+          (bStart === -1 ? Infinity : bStart)
+        );
       return a.file.localeCompare(b.file, 'en', { numeric: true });
     });
 
-  const sections: DocumentSection[] = sectionDefinitions[project].map(
-    (definition) => ({
+  const sections: DocumentSection[] = sectionDefinitions[project]
+    .map((definition) => ({
       title: definition.title,
       description: definition.description,
       documents: documents.filter((page) => definition.includes(page.file)),
-    }),
-  );
+    }))
+    .filter((section) => section.documents.length > 0);
   const grouped = new Set(
     sections.flatMap((section) => section.documents.map((page) => page.file)),
   );

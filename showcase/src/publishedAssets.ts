@@ -20,6 +20,15 @@ type PublishedAsset = AssetLocation &
 export const publishedAssets: readonly PublishedAsset[] = [
   {
     type: 'directory',
+    project: 'sink-city',
+    documentPath: 'game/content/buildings/images/',
+    sourcePath: '../sink-city/docs/game/content/buildings/images/',
+    publishedPath: 'sink-city/game/content/buildings/images/',
+    extension: '.webp',
+    contentType: 'image/webp',
+  },
+  {
+    type: 'directory',
     project: 'total-space',
     documentPath: 'game/content/ships/images/',
     sourcePath: '../total-space/docs/game/content/ships/images/',

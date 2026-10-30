@@ -8,8 +8,14 @@
   background: var(--color-fd-card);
 }
 
+.card[data-has-image='false'] {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+}
+
 .preview {
   position: relative;
+  overflow: hidden;
   background: radial-gradient(circle, #26364e, #101824);
 
   img {
