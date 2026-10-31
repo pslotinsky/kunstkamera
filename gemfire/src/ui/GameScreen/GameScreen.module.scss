@@ -1,4 +1,4 @@
-@use '@/ui/kit';
+@use "@/ui/kit";
 
 .root {
   --hud-width: 22.75rem;
@@ -13,16 +13,8 @@
 .root::before {
   position: absolute;
   inset: 0;
-  content: '';
+  content: "";
   background: var(--surface-900);
-}
-
-.root:has([data-dimmed]) .mapArea::before {
-  filter: var(--map-dim);
-}
-
-.root:has([data-dimmed]) .turnStatus {
-  filter: var(--map-dim) drop-shadow(0 0.4rem 0.6rem rgba(0, 0, 0, 0.45));
 }
 
 .mapArea {
@@ -50,8 +42,8 @@
   opacity: 0.55;
   pointer-events: none;
   transition: filter 300ms ease;
-  content: '';
-  background: url('@/assets/ui/compass.webp') center / contain no-repeat;
+  content: "";
+  background: url("@/assets/ui/compass.webp") center / contain no-repeat;
 }
 
 .turnStatus {
@@ -62,9 +54,17 @@
   padding: 0.95rem 2.8rem 1.1rem;
   text-align: center;
   pointer-events: none;
-  background: url('@/assets/ui/plaque.webp') center / 100% 100% no-repeat;
+  background: url("@/assets/ui/plaque.webp") center / 100% 100% no-repeat;
   filter: drop-shadow(0 0.4rem 0.6rem rgba(0, 0, 0, 0.45));
   transition: filter 300ms ease;
+}
+
+.root:has([data-dimmed]) .mapArea::before {
+  filter: var(--map-dim);
+}
+
+.root:has([data-dimmed]) .turnStatus {
+  filter: var(--map-dim) drop-shadow(0 0.4rem 0.6rem rgba(0, 0, 0, 0.45));
 }
 
 .date {
@@ -85,4 +85,3 @@
   font-size: 1.1rem;
   font-weight: 600;
 }
-

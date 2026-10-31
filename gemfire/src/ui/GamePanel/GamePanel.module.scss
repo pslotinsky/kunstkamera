@@ -1,4 +1,4 @@
-@use '@/ui/kit';
+@use "@/ui/kit";
 
 .root {
   @include kit.panel;
@@ -23,4 +23,3 @@
   inset: -3px;
   z-index: 3;
 }
-
