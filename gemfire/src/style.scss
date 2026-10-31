@@ -1,8 +1,9 @@
+// biome-ignore-all lint/correctness/noUnknownUnit: Biome 2.6.3 misreads hex colors in SCSS custom properties.
 :root {
   color-scheme: dark;
 
-  --font-display: 'EB Garamond', Georgia, serif;
-  --font-body: 'EB Garamond', Georgia, serif;
+  --font-display: "EB Garamond", Georgia, serif;
+  --font-body: "EB Garamond", Georgia, serif;
 
   --surface-900: #050b1a;
   --surface-800: #071024;

@@ -26,7 +26,6 @@
     inset 0 0 0 3px var(--trim-dim);
 }
 
-
 @mixin display-type {
   font-family: var(--font-display);
   color: var(--ink);
@@ -44,13 +43,13 @@
 
 @mixin ornate-corners($size: 56px) {
   pointer-events: none;
-  content: '';
+  content: "";
   background:
-    url('@/assets/ui/corner-top-left.webp') top left / $size auto no-repeat,
-    url('@/assets/ui/corner-top-right.webp') top right / $size auto no-repeat,
-    url('@/assets/ui/corner-bottom-left.webp') bottom left / $size auto
+    url("@/assets/ui/corner-top-left.webp") top left / $size auto no-repeat,
+    url("@/assets/ui/corner-top-right.webp") top right / $size auto no-repeat,
+    url("@/assets/ui/corner-bottom-left.webp") bottom left / $size auto
       no-repeat,
-    url('@/assets/ui/corner-bottom-right.webp') bottom right / $size auto
+    url("@/assets/ui/corner-bottom-right.webp") bottom right / $size auto
       no-repeat;
 }
 
@@ -60,8 +59,8 @@
   left: 0;
   aspect-ratio: 765 / 39;
   pointer-events: none;
-  content: '';
-  background: url('@/assets/ui/rule.webp') center / 100% auto no-repeat;
+  content: "";
+  background: url("@/assets/ui/rule.webp") center / 100% auto no-repeat;
   translate: 0 -50%;
 }
 
