@@ -67,7 +67,9 @@ export class AttackCommand extends ProvinceCommand {
   ): boolean {
     return (
       this.selectableTargets.includes(target.number) &&
-      attacker.hasTroops &&
+      attacker.canFight() &&
+      (!attacker.unit ||
+        this.context.world.getFifthUnits(source).includes(attacker.unit)) &&
       attacker.supplyDays > 0 &&
       source.resources.troops >= attacker.troops &&
       source.resources.food >= attacker.food &&

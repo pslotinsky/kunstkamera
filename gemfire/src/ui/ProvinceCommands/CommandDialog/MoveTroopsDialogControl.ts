@@ -1,5 +1,5 @@
 import type { MoveTroopsCommand } from '@/core/commands/province/MoveTroopsCommand';
-import type { HiredUnit } from '@/core/domain/HiredUnit';
+import type { FifthUnit } from '@/core/domain/FifthUnit';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
 import { isDefined } from '@/lib/value/isDefined';
@@ -110,11 +110,11 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
     return this.committed() > 0 || isDefined(this.carriedUnit());
   }
 
-  private carriableUnits(): readonly HiredUnit[] {
+  private carriableUnits(): readonly FifthUnit[] {
     return this.target ? this.stationedUnits() : [];
   }
 
-  private carryOptions(units: readonly HiredUnit[]): DropdownOption[] {
+  private carryOptions(units: readonly FifthUnit[]): DropdownOption[] {
     return [
       { value: '', label: 'None' },
       ...units.map((unit) => ({
@@ -126,11 +126,11 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
     ];
   }
 
-  private stationedUnits(): readonly HiredUnit[] {
-    return this.world.turnQueue.current?.hiredUnits ?? [];
+  private stationedUnits(): readonly FifthUnit[] {
+    return this.world.turnQueue.current?.stationedUnits ?? [];
   }
 
-  private carriedUnit(): HiredUnit | undefined {
+  private carriedUnit(): FifthUnit | undefined {
     return this.stationedUnits().find(
       (unit) => unit.name === this.controls.carry.value,
     );

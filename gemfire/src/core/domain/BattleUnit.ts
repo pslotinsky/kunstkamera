@@ -197,6 +197,7 @@ export class BattleUnit {
 
     target.takeLosses(losses);
     this.takeLosses(backlash);
+    this.takeLosses(Math.floor(this.strength * this.unit.attackFatigue));
 
     return new Clash({ striker: this, target, approach, losses, backlash });
   }

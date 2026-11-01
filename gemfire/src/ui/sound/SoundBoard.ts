@@ -295,6 +295,33 @@ export class SoundBoard {
     }
   }
 
+  public playBanshee(): void {
+    this.tone({
+      type: 'sine',
+      frequency: 740,
+      glideTo: 330,
+      duration: 2.2,
+      peak: 0.12,
+      attack: 0.4,
+    });
+    this.tone({
+      type: 'triangle',
+      frequency: 760,
+      glideTo: 350,
+      duration: 2,
+      peak: 0.045,
+      attack: 0.5,
+      delay: 0.12,
+    });
+    this.noise({
+      filter: 'bandpass',
+      frequency: 1300,
+      duration: 1.8,
+      peak: 0.035,
+      attack: 0.4,
+    });
+  }
+
   public playGlitter(): void {
     if (this.hasSample('glitter')) {
       this.playSample('glitter');

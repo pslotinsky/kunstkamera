@@ -179,11 +179,11 @@ How the campaign ends.
 
 Good and bad events, seasonal disasters, and Pastha.
 
-- [ ] hit random good and bad events
-- [ ] suffer seasonal disasters by region (snow, fire, flood, quake, plague)
-- [ ] trigger special events like Pastha
-- [ ] hear the banshee when a ruler dies
-- [ ] suffer a hired unit's rampage (loyalty, cultivation, and protection drop)
+- [x] hit random good and bad events
+- [x] suffer seasonal disasters by region (snow, fire, flood, quake, plague)
+- [x] trigger special events like Pastha
+- [x] hear the banshee when a ruler dies
+- [x] suffer a hired unit's rampage (loyalty, cultivation, and protection drop)
 
 ## 16. New game & advisors
 

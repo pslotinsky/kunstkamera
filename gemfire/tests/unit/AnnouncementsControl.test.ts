@@ -1,13 +1,16 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { BAD_EVENTS, GOOD_EVENTS, RAMPAGE } from '@/config/province-events';
 import { Artifact } from '@/core/domain/Artifact';
 import { HiredUnit } from '@/core/domain/HiredUnit';
+import { Incident } from '@/core/domain/Incident';
 import type { Province } from '@/core/domain/Province';
 import { Resources } from '@/core/domain/Resources';
 import { Succession } from '@/core/domain/Succession';
 import { AllianceOfferedEvent } from '@/core/events/AllianceOfferedEvent';
 import { ArtifactFoundEvent } from '@/core/events/ArtifactFoundEvent';
+import { IncidentReportedEvent } from '@/core/events/IncidentReportedEvent';
 import { MissionReportedEvent } from '@/core/events/MissionReportedEvent';
 import { SuccessionReportedEvent } from '@/core/events/SuccessionReportedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
@@ -95,6 +98,43 @@ function setup() {
 }
 
 describe('AnnouncementsControl', () => {
+  it('names the blessed lord without showing numerical changes', () => {
+    const screen = setup();
+    const definition = GOOD_EVENTS.find((event) => event.image === 'unicorn')!;
+    const incident = new Incident({
+      definition,
+      province: screen.myProvince,
+      date: screen.world.date,
+      recipient: screen.ruler.name,
+      changes: [{ stat: 'war', before: 50, after: 52 }],
+    });
+    screen.events.publish(new IncidentReportedEvent(incident));
+
+    expect(screen.text()).toBe('A unicorn empowered Erin.');
+    expect(document.querySelector('[data-detail]')?.textContent).toBe('');
+  });
+
+  it.each([GOOD_EVENTS[0]!, BAD_EVENTS[0]!, RAMPAGE])(
+    'keeps enemy $kind incidents silent while announcing the same incident at home',
+    (definition) => {
+      const screen = setup();
+      const announce = (province: Province) => {
+        const incident = new Incident({
+          definition,
+          province,
+          date: screen.world.date,
+          changes: [],
+        });
+        screen.events.publish(new IncidentReportedEvent(incident));
+      };
+      announce(screen.theirProvince);
+      expect(screen.shown()).toBe(false);
+      announce(screen.myProvince);
+      expect(screen.shown()).toBe(true);
+      expect(screen.text()).toContain(definition.description);
+    },
+  );
+
   afterEach(() => document.body.replaceChildren());
 
   it('announces only what happens in your own provinces', () => {

@@ -9,6 +9,7 @@ import { ArtifactFoundEvent } from '@/core/events/ArtifactFoundEvent';
 import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
 import { CaptiveJudgedEvent } from '@/core/events/CaptiveJudgedEvent';
 import { GeneralDiedEvent } from '@/core/events/GeneralDiedEvent';
+import { IncidentReportedEvent } from '@/core/events/IncidentReportedEvent';
 import { MissionReportedEvent } from '@/core/events/MissionReportedEvent';
 import { SearchReportedEvent } from '@/core/events/SearchReportedEvent';
 import { SuccessionReportedEvent } from '@/core/events/SuccessionReportedEvent';
@@ -33,6 +34,7 @@ import { ChoiceConfirmedEvent } from './ChoiceConfirmedEvent';
 import { ChoiceDeclinedEvent } from './ChoiceDeclinedEvent';
 
 type Announced =
+  | IncidentReportedEvent
   | UnitDesertedEvent
   | ArtifactFoundEvent
   | MissionReportedEvent
@@ -65,6 +67,7 @@ export class AnnouncementsControl extends Control<
   }
 
   protected override onMount(): void {
+    this.onWorldEvent(IncidentReportedEvent, (event) => this.announce(event));
     this.onWorldEvent(UnitDesertedEvent, (event) => this.announce(event));
     this.onWorldEvent(ArtifactFoundEvent, (event) => this.announce(event));
     this.onWorldEvent(MissionReportedEvent, (event) => this.announce(event));
@@ -103,6 +106,13 @@ export class AnnouncementsControl extends Control<
       event instanceof AllianceOfferedEvent
     ) {
       return true;
+    }
+
+    if (event instanceof IncidentReportedEvent) {
+      return (
+        (event.incident.family?.isEqual(player) ?? false) ||
+        event.incident.definition.kind === 'disaster'
+      );
     }
 
     if (event instanceof GeneralDiedEvent) {
@@ -209,7 +219,9 @@ export class AnnouncementsControl extends Control<
   }
 
   private show(announced: Announced, pending: number): void {
-    if (announced instanceof ArtifactFoundEvent) {
+    if (announced instanceof IncidentReportedEvent) {
+      this.view.showIncident(announced.incident, pending);
+    } else if (announced instanceof ArtifactFoundEvent) {
       this.offerRecipients(announced);
       this.view.showFind(announced, pending);
     } else if (announced instanceof MissionReportedEvent) {

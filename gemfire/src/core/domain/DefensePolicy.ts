@@ -19,7 +19,11 @@ export class DefensePolicy {
   public getAnswers(province: Province): readonly DefenderAnswer[] {
     const answers: DefenderAnswer[] = [];
 
-    if (province.resources.troops > 0) {
+    const unitCanFight = this.world
+      .getFifthUnits(province)
+      .some((unit) => unit.standsAlone);
+
+    if (province.resources.troops > 0 || unitCanFight) {
       answers.push('fight');
     }
 

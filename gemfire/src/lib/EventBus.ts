@@ -6,12 +6,21 @@ export class EventBus {
   private readonly subscribers = new Map<EventClass<unknown>, Handler[]>();
   private readonly observers: ((event: object) => void)[] = [];
   private readonly pending: object[] = [];
+  private readonly deferred: (() => void)[] = [];
 
   private isDispatching = false;
   private batchDepth = 0;
 
   public publish(event: object): void {
     this.pending.push(event);
+
+    if (!this.isDispatching && this.batchDepth === 0) {
+      this.dispatchPending();
+    }
+  }
+
+  public afterDispatch(action: () => void): void {
+    this.deferred.push(action);
 
     if (!this.isDispatching && this.batchDepth === 0) {
       this.dispatchPending();
@@ -76,15 +85,19 @@ export class EventBus {
     this.isDispatching = true;
 
     try {
-      let event = this.pending.shift();
+      while (this.pending.length || this.deferred.length) {
+        const event = this.pending.shift();
 
-      while (event) {
-        for (const observer of this.observers) {
-          observer(event);
+        if (event) {
+          for (const observer of this.observers) {
+            observer(event);
+          }
+          this.dispatch(event);
+        } else {
+          const action = this.deferred.shift();
+
+          action?.();
         }
-
-        this.dispatch(event);
-        event = this.pending.shift();
       }
     } finally {
       this.isDispatching = false;

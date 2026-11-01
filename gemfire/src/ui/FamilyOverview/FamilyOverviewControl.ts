@@ -107,7 +107,7 @@ export class FamilyOverviewControl extends CommandDialogControl<
       ? this.world
           .getFamilyProvinces(this.viewed)
           .flatMap((province) =>
-            province.hiredUnits.map((unit) => ({ unit, province })),
+            province.stationedUnits.map((unit) => ({ unit, province })),
           )
       : [];
   }
