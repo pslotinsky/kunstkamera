@@ -235,11 +235,17 @@ export class Invasion {
   private buryUnits(report: InvasionReport): void {
     const outcome = report.outcome!;
 
-    if (outcome.hasLostUnit(BattleSide.attacker)) {
+    if (
+      this.attacker.unit?.isSpentAfterBattle ||
+      outcome.hasLostUnit(BattleSide.attacker)
+    ) {
       this.dismiss(this.attacker.unit, this.source);
     }
 
-    if (outcome.hasLostUnit(BattleSide.defender)) {
+    if (
+      report.defender.unit?.isSpentAfterBattle ||
+      outcome.hasLostUnit(BattleSide.defender)
+    ) {
       this.dismiss(report.defender.unit, this.target);
     }
   }
@@ -279,7 +285,7 @@ export class Invasion {
   }
 
   private dismiss(unit: FifthUnit | undefined, province: Province): void {
-    const stationed = province.hiredUnits.find((hired) => hired === unit);
+    const stationed = province.stationedUnits.find((hired) => hired === unit);
 
     if (stationed) {
       province.removeUnit(stationed);
@@ -310,6 +316,9 @@ export class Invasion {
   private capture(): readonly Province[] {
     const owner = this.source.family!;
 
+    this.target.stationedUnits = this.target.stationedUnits.filter(
+      (unit) => !unit.isSpentAfterBattle,
+    );
     this.target.claim(owner);
 
     const vacated = this.seat(this.attacker.commander, owner);
@@ -341,7 +350,7 @@ export class Invasion {
   }
 
   private relocateUnit(): void {
-    const marched = this.source.hiredUnits.find(
+    const marched = this.source.stationedUnits.find(
       (unit) => unit === this.attacker.unit,
     );
 

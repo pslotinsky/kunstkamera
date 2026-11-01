@@ -7,6 +7,7 @@ import { BattleSide } from '@/core/domain/BattleSide';
 import { Gem } from '@/core/domain/Gem';
 import { HiredUnit } from '@/core/domain/HiredUnit';
 import type { InvasionReport } from '@/core/domain/InvasionReport';
+import { Pastha } from '@/core/domain/Pastha';
 import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
 import { BattleStartedEvent } from '@/core/events/BattleStartedEvent';
 
@@ -156,6 +157,19 @@ function setup(params: SetupParams = {}) {
 }
 
 describe('AttackCommand', () => {
+  it('can attack with Pastha alone, but cannot summon a visit that has already departed', () => {
+    const { source, attack, started } = setup();
+    const pastha = new Pastha();
+    source.addUnit(pastha);
+    source.removeUnit(pastha);
+    attack({ troops: 0, unit: pastha });
+    expect(started()).toBeUndefined();
+    source.addUnit(pastha);
+    attack({ troops: 0, unit: pastha });
+    expect(started()?.battle.attacker.unit).toBe(pastha);
+    expect(started()?.battle.getUnits(BattleSide.attacker)).toHaveLength(1);
+  });
+
   it('offers adjacent provinces held by another house only', () => {
     const { command } = setup();
 

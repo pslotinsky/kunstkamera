@@ -505,6 +505,7 @@ describe('Campaign completion through game actions', () => {
     const order: string[] = [];
     const command = new AttackCommand(context);
 
+    context.rival.gems[0]!.rest(world.date, 3);
     events.subscribe(BattleReportedEvent, () => {
       order.push('battle');
       expect(world.campaign.outcome?.isVictory).toBe(true);

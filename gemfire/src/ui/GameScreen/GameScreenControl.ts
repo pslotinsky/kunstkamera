@@ -8,6 +8,8 @@ import { WarReportedEvent } from '@/core/events/WarReportedEvent';
 import { Control } from '@/lib/Control';
 import type { EventClass } from '@/lib/EventBus';
 import { AnnouncementsControl } from '@/ui/Announcements/AnnouncementsControl';
+import { IncidentClosedEvent } from '@/ui/Announcements/IncidentClosedEvent';
+import { IncidentShownEvent } from '@/ui/Announcements/IncidentShownEvent';
 import { BattleReportControl } from '@/ui/BattleReport/BattleReportControl';
 import { CampaignEndingControl } from '@/ui/CampaignEnding/CampaignEndingControl';
 import { CaptiveDialogControl } from '@/ui/CaptiveDialog/CaptiveDialogControl';
@@ -75,6 +77,12 @@ export class GameScreenControl extends Control<
   }
 
   protected override onMount(): void {
+    const announcements = this.controls.announcements.view;
+
+    announcements.subscribe(IncidentShownEvent, (event) =>
+      this.showIncidentProvince(event.province),
+    );
+    announcements.subscribe(IncidentClosedEvent, () => this.restoreProvince());
     this.controls.worldMap.onProvinceSelected((province) => {
       this.selectProvince(province);
     });
@@ -197,6 +205,25 @@ export class GameScreenControl extends Control<
     }
 
     this.renderTargeting(province.number);
+  }
+
+  private showIncidentProvince(province: Province): void {
+    this.controls.gamePanel.hideCommands();
+    this.showProvinceInfo(province);
+    this.controls.worldMap.clearHighlighting();
+    this.controls.worldMap.showSelected(province.number);
+  }
+
+  private restoreProvince(): void {
+    if (this.selected !== undefined) {
+      const province = this.context.world.map.getProvince(this.selected);
+
+      this.showProvince(province);
+    } else {
+      this.displayed = undefined;
+      this.controls.gamePanel.showHint();
+      this.controls.worldMap.clearHighlighting();
+    }
   }
 
   private showProvinceInfo(province: Province): void {

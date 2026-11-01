@@ -30,6 +30,10 @@ export abstract class Unit {
 
   public abstract get consumesFood(): boolean;
 
+  public get attackFatigue(): number {
+    return 0;
+  }
+
   public get hasLivery(): boolean {
     return true;
   }

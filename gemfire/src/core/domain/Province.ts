@@ -3,8 +3,9 @@ import { isDefined } from '@/lib/value/isDefined';
 import { Characteristics } from './Characteristics';
 import { Development, type DevelopmentGains } from './Development';
 import type { Family } from './Family';
+import type { FifthUnit } from './FifthUnit';
 import type { General } from './General';
-import type { HiredUnit } from './HiredUnit';
+import { HiredUnit } from './HiredUnit';
 import { type ResourceGains, Resources } from './Resources';
 
 export type Landscape = 'snow' | 'woods' | 'river' | 'mountain';
@@ -22,7 +23,7 @@ export interface ProvinceParams {
 }
 
 const MAX_GOODWILL = 15;
-const ACTIONS_PER_TURN = 3;
+const ACTIONS_PER_CYCLE = 3;
 const REMOTE_PENALTY = 0.5;
 
 export type ProvinceStatus =
@@ -42,7 +43,7 @@ export class Province {
   public goodwill = 0;
   public actionCount = 0;
   public governor?: General | undefined;
-  public hiredUnits: readonly HiredUnit[] = [];
+  public stationedUnits: readonly FifthUnit[] = [];
   public readonly hirePool: readonly string[];
 
   private house: Family | undefined;
@@ -65,11 +66,15 @@ export class Province {
   }
 
   public claim(family: Family): void {
+    if (this.house !== family) {
+      this.resetActionCycle();
+    }
     this.house = family;
     this.entrusted = false;
   }
 
   public unclaim(): void {
+    this.resetActionCycle();
     this.house = undefined;
     this.entrusted = false;
   }
@@ -98,12 +103,20 @@ export class Province {
     this.entrusted = false;
   }
 
-  public addUnit(unit: HiredUnit): void {
-    this.hiredUnits = [...this.hiredUnits, unit];
+  public get hiredUnits(): readonly HiredUnit[] {
+    return this.stationedUnits.filter(
+      (unit): unit is HiredUnit => unit instanceof HiredUnit,
+    );
   }
 
-  public removeUnit(unit: HiredUnit): void {
-    this.hiredUnits = this.hiredUnits.filter((stationed) => stationed !== unit);
+  public addUnit(unit: FifthUnit): void {
+    this.stationedUnits = [...this.stationedUnits, unit];
+  }
+
+  public removeUnit(unit: FifthUnit): void {
+    this.stationedUnits = this.stationedUnits.filter(
+      (stationed) => stationed !== unit,
+    );
   }
 
   public hasUnit(name: string): boolean {
@@ -166,7 +179,16 @@ export class Province {
       Math.max(this.goodwill + goodwill, -MAX_GOODWILL),
     );
 
-    this.actionCount = (this.actionCount + 1) % ACTIONS_PER_TURN;
+    this.actionCount = Math.min(this.actionCount + 1, ACTIONS_PER_CYCLE);
+  }
+
+  public get isEventDue(): boolean {
+    return this.actionCount === ACTIONS_PER_CYCLE;
+  }
+
+  public resetActionCycle(): void {
+    this.actionCount = 0;
+    this.goodwill = 0;
   }
 
   public isEqual(other?: Province | number): boolean {

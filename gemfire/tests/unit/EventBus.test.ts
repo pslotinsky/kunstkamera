@@ -5,6 +5,24 @@ import { EventBus } from '@/lib/EventBus';
 class PingEvent {}
 
 describe('EventBus', () => {
+  it('runs deferred work after subscribers and their queued reactions have finished', () => {
+    const events = new EventBus();
+    const first = new PingEvent();
+    const reaction = new PingEvent();
+    const order: string[] = [];
+
+    events.subscribe(PingEvent, (event) => {
+      if (event === first) {
+        events.publish(reaction);
+        events.afterDispatch(() => order.push('next phase'));
+      } else {
+        order.push('hold acquired');
+      }
+    });
+    events.publish(first);
+    expect(order).toEqual(['hold acquired', 'next phase']);
+  });
+
   it('delays subscribers and observers until the outer batch finishes', () => {
     const events = new EventBus();
     const first = new PingEvent();

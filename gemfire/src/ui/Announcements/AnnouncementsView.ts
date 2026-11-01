@@ -2,6 +2,7 @@ import { html, type TemplateResult } from 'lit-html';
 
 import { Coronation } from '@/core/domain/Coronation';
 import type { Disbanding } from '@/core/domain/Disbanding';
+import type { Incident } from '@/core/domain/Incident';
 import type { SabotageDamage } from '@/core/domain/Infiltration';
 import type { World } from '@/core/domain/World';
 import type { AllianceOfferedEvent } from '@/core/events/AllianceOfferedEvent';
@@ -26,11 +27,14 @@ import { View } from '@/lib/View';
 import { getFamilyCrestUrl } from '@/ui/art/getFamilyCrestUrl';
 import { getFifthUnitPortraitUrl } from '@/ui/art/getFifthUnitPortraitUrl';
 import { getGeneralPortraitUrl } from '@/ui/art/getGeneralPortraitUrl';
+import { getPublicAssetUrl } from '@/ui/art/getPublicAssetUrl';
 import type { DropdownControl } from '@/ui/Dropdown/DropdownControl';
 
 import { AnnouncementDismissedEvent } from './AnnouncementDismissedEvent';
 import { ChoiceConfirmedEvent } from './ChoiceConfirmedEvent';
 import { ChoiceDeclinedEvent } from './ChoiceDeclinedEvent';
+import { IncidentClosedEvent } from './IncidentClosedEvent';
+import { IncidentShownEvent } from './IncidentShownEvent';
 
 import styles from './Announcements.module.scss';
 
@@ -61,6 +65,9 @@ const VERDICTS: Record<Verdict, string> = {
 };
 
 interface Announcement {
+  readonly title?: string;
+  readonly location?: string;
+  readonly illustrated?: boolean;
   readonly text: string;
   readonly icon?: string | undefined;
   readonly detail?: string | undefined;
@@ -86,6 +93,8 @@ export class AnnouncementsView extends View<
   public get template(): TemplateResult {
     return html`
       <div class="${styles.root} ${styles.hidden}" data-overlay>
+        <h2 class=${styles.title} data-title hidden></h2>
+        <p class=${styles.location} data-location hidden></p>
         <figure class=${styles.scroll}>
           <img class=${styles.icon} data-icon alt="" />
           <div>
@@ -124,6 +133,31 @@ export class AnnouncementsView extends View<
         </footer>
       </div>
     `;
+  }
+
+  public showIncident(incident: Incident, pending: number): void {
+    const detail = incident.definition.grantsPastha
+      ? 'Available for one battle. No upkeep.'
+      : '';
+    const text = incident.monster
+      ? `The ${incident.monster} went on a rampage, ravaging the land.`
+      : incident.definition.description.replace(
+          '{lord}',
+          incident.recipient ?? 'the lord',
+        );
+
+    this.tell(
+      {
+        title: `${incident.province.name} — ${incident.definition.name}`,
+        location: `${incident.family?.name ?? 'Neutral'} · ${incident.date}`,
+        text,
+        detail,
+        icon: getPublicAssetUrl(`events/${incident.definition.image}.webp`),
+        illustrated: true,
+      },
+      pending,
+    );
+    this.publish(new IncidentShownEvent(incident.province));
   }
 
   public showDesertion(event: UnitDesertedEvent, pending: number): void {
@@ -233,6 +267,14 @@ export class AnnouncementsView extends View<
 
   public hide(): void {
     this.element.classList.add(styles.hidden!);
+    this.closeIncident();
+  }
+
+  private closeIncident(): void {
+    if (this.element.classList.contains(styles.illustrated!)) {
+      this.element.classList.remove(styles.illustrated!);
+      this.publish(new IncidentClosedEvent());
+    }
   }
 
   private describeDeparture(
@@ -384,10 +426,27 @@ export class AnnouncementsView extends View<
   }
 
   private showAnnouncement(announcement: Announcement, pending: number): void {
+    if (!announcement.illustrated) {
+      this.closeIncident();
+    }
+    this.element.classList.toggle(
+      styles.illustrated!,
+      announcement.illustrated ?? false,
+    );
+    const title = this.element.querySelector<HTMLElement>('[data-title]')!;
+    const location =
+      this.element.querySelector<HTMLElement>('[data-location]')!;
+
+    title.textContent = announcement.title ?? '';
+    location.textContent = announcement.location ?? '';
+    title.hidden = !announcement.title;
+    location.hidden = !announcement.location;
     this.text.textContent = announcement.text;
     this.detail.textContent = announcement.detail ?? '';
+    this.detail.hidden = !announcement.detail;
     this.showIcon(announcement.icon);
-    this.pending.textContent = pending > 0 ? `${pending} more to come` : '';
+    this.pending.textContent =
+      !announcement.illustrated && pending > 0 ? `${pending} more to come` : '';
     this.element.classList.remove(styles.hidden!);
   }
 

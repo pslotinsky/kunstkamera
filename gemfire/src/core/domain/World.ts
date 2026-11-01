@@ -238,7 +238,7 @@ export class World {
   public getFifthUnits(province: Province): readonly FifthUnit[] {
     const guardians = province.family?.getReadyGuardians(this.date) ?? [];
 
-    return [...province.hiredUnits, ...guardians].sort(
+    return [...province.stationedUnits, ...guardians].sort(
       (left, right) => right.strength - left.strength,
     );
   }

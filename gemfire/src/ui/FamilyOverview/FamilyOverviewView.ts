@@ -4,7 +4,7 @@ import type { Family } from '@/core/domain/Family';
 import type { FifthUnit } from '@/core/domain/FifthUnit';
 import type { Gem } from '@/core/domain/Gem';
 import type { General, GeneralRank } from '@/core/domain/General';
-import type { HiredUnit } from '@/core/domain/HiredUnit';
+import { HiredUnit } from '@/core/domain/HiredUnit';
 import type { Province, ProvinceStatus } from '@/core/domain/Province';
 import { getFifthUnitPortraitUrl } from '@/ui/art/getFifthUnitPortraitUrl';
 import { getGeneralPortraitUrl } from '@/ui/art/getGeneralPortraitUrl';
@@ -25,7 +25,7 @@ export interface GeneralRow {
 }
 
 export interface FifthUnitRow {
-  readonly unit: HiredUnit;
+  readonly unit: FifthUnit;
   readonly province: Province;
 }
 
@@ -152,13 +152,18 @@ export class FamilyOverviewView extends CommandDialogView {
       this.body.innerHTML = this.renderTable(
         ['', 'Strength', 'Province'],
         rows.map((row) => [
-          this.renderUnitCard(row.unit, row.unit.category),
+          this.renderUnitCard(
+            row.unit,
+            row.unit instanceof HiredUnit
+              ? row.unit.category
+              : row.unit.description,
+          ),
           String(row.unit.strength),
           String(row.province),
         ]),
       );
     } else {
-      this.body.innerHTML = `<p class=${styles.empty}>No Fifth Units hired.</p>`;
+      this.body.innerHTML = `<p class=${styles.empty}>No Fifth Units stationed.</p>`;
     }
   }
 

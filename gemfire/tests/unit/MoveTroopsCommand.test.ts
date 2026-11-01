@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { MoveTroopsCommand } from '@/core/commands/province/MoveTroopsCommand';
 import { HiredUnit } from '@/core/domain/HiredUnit';
+import { Pastha } from '@/core/domain/Pastha';
 
 import {
   advanceTo,
@@ -61,6 +62,22 @@ function setup() {
 }
 
 describe('MoveTroopsCommand', () => {
+  it('moves one Pastha visit without spending it or carrying another visit along', () => {
+    const { source, neutral, command } = setup();
+    const carried = new Pastha();
+    const reserve = new Pastha();
+    source.addUnit(carried);
+    source.addUnit(reserve);
+    command.moveTo(neutral, {});
+    command.carry(carried);
+    command.execute();
+
+    expect(source.stationedUnits).toEqual([reserve]);
+    expect(neutral.stationedUnits).toEqual([carried]);
+    expect(neutral.belongsTo(source.family!)).toBe(true);
+    expect(source.hiredUnits).toEqual([]);
+  });
+
   it('reinforces an adjacent province you own without changing its ownership', () => {
     const { family, source, owned, command } = setup();
 

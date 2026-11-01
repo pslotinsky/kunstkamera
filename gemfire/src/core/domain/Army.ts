@@ -67,6 +67,10 @@ export class Army {
     );
   }
 
+  public canFight(): boolean {
+    return this.hasTroops || (this.unit?.standsAlone ?? false);
+  }
+
   public get hasTroops(): boolean {
     return this.troops > 0;
   }

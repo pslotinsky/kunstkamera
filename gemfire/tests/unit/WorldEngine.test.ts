@@ -4,6 +4,7 @@ import { RecruitCommand } from '@/core/commands/province/RecruitCommand';
 import { TradeCommand } from '@/core/commands/province/TradeCommand';
 import { CalendarDate } from '@/core/domain/CalendarDate';
 import { MonthStartedEvent } from '@/core/events/MonthStartedEvent';
+import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { TurnHeldEvent } from '@/core/events/TurnHeldEvent';
 import { TurnReleasedEvent } from '@/core/events/TurnReleasedEvent';
@@ -144,14 +145,21 @@ describe('WorldEngine', () => {
   });
 
   it('collects tax and harvest on every owned province when September arrives', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
     const fixture = createFixture(new CalendarDate(1186, 8));
     const playerProvince = fixture.world.map.getProvince(1);
     const rivalProvince = fixture.world.map.getProvince(3);
     const neutralProvince = fixture.world.map.getProvince(4);
     let rivalHarvest = 0;
 
-    fixture.events.subscribe(MonthStartedEvent, () => {
-      rivalHarvest = rivalProvince.resources.food;
+    fixture.events.subscribe(ProvinceUpdatedEvent, (event) => {
+      if (
+        event.province === rivalProvince &&
+        rivalHarvest === 0 &&
+        fixture.world.date.month === 9
+      ) {
+        rivalHarvest = rivalProvince.resources.food;
+      }
     });
     drainMonth(fixture);
 

@@ -63,7 +63,7 @@ export class WarPolicy {
     const supply = Army.measureDailyFood(troops, unit) * BATTLE_DAY_LIMIT;
     const food = Math.min(province.resources.food, supply);
 
-    return commander && troops > 0
+    return commander && (troops > 0 || unit?.standsAlone)
       ? new Army({ commander, troops, food, unit })
       : undefined;
   }

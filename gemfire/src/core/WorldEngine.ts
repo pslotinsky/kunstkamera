@@ -2,6 +2,7 @@ import { ComputerPlayer } from '@/core/ai/ComputerPlayer';
 import { CommandExecutor } from '@/core/CommandExecutor';
 import { ConcludeBattleCommand } from '@/core/commands/ConcludeBattleCommand';
 import { LifecycleCommand } from '@/core/commands/LifecycleCommand';
+import { ResolveEventsCommand } from '@/core/commands/ResolveEventsCommand';
 import { TaxAndHarvestCommand } from '@/core/commands/TaxAndHarvestCommand';
 import { UpkeepCommand } from '@/core/commands/UpkeepCommand';
 import type { BattleOutcome } from '@/core/domain/BattleOutcome';
@@ -25,6 +26,7 @@ export class WorldEngine {
   private readonly lifecycle: LifecycleCommand;
   private readonly taxAndHarvest: TaxAndHarvestCommand;
   private readonly upkeep: UpkeepCommand;
+  private readonly provinceEvents: ResolveEventsCommand;
   private readonly holders = new Set<object>();
 
   private fought: Invasion | undefined;
@@ -32,8 +34,11 @@ export class WorldEngine {
   private phase:
     | 'start-month'
     | 'lifecycle'
+    | 'events'
     | 'tax'
     | 'waiting-turn'
+    | 'reporting-turn'
+    | 'ready-turn'
     | 'taking-turn'
     | 'upkeep'
     | 'next-turn'
@@ -48,12 +53,10 @@ export class WorldEngine {
     this.lifecycle = new LifecycleCommand({ world, events });
     this.taxAndHarvest = new TaxAndHarvestCommand({ world, events });
     this.upkeep = new UpkeepCommand({ world, events });
+    this.provinceEvents = new ResolveEventsCommand({ world, events });
   }
 
   public start(): void {
-    this.events.subscribe(TurnStartedEvent, (event) => {
-      this.handleTurnStart(event.province);
-    });
     this.events.subscribe(TurnEndedEvent, (event) =>
       this.handleTurnEnd(event.turnNumber),
     );
@@ -80,7 +83,7 @@ export class WorldEngine {
     });
     this.events.subscribe(TurnReleasedEvent, (event) => {
       this.holders.delete(event.holder);
-      queueMicrotask(() => this.resume());
+      queueMicrotask(() => this.advance());
     });
     this.events.subscribe(BattleEndedEvent, (event) => {
       this.settleBattle(event.outcome, event.refuge);
@@ -89,7 +92,7 @@ export class WorldEngine {
   }
 
   private advance(): void {
-    if (!this.world.campaign.canProgress) {
+    if (!this.world.campaign.canProgress || this.holders.size > 0) {
       return;
     }
 
@@ -100,11 +103,20 @@ export class WorldEngine {
       case 'lifecycle':
         this.processLifecycle();
         break;
+      case 'events':
+        this.resolveEvents();
+        break;
       case 'tax':
         this.collectTaxAndHarvest();
         break;
       case 'waiting-turn':
         this.startTurn();
+        break;
+      case 'reporting-turn':
+        this.reportTurnEvents();
+        break;
+      case 'ready-turn':
+        this.takeTurn();
         break;
       case 'upkeep':
         this.chargeUpkeep();
@@ -136,18 +148,6 @@ export class WorldEngine {
     }
   }
 
-  private handleTurnStart(province: Province): void {
-    if (!this.world.isPlayerRun(province)) {
-      const suspended = this.computer.play(province);
-
-      if (!suspended) {
-        this.events.publish(
-          new TurnEndedEvent(this.world.turnQueue.turnNumber),
-        );
-      }
-    }
-  }
-
   private handleTurnEnd(turnNumber: number): void {
     if (this.phase === 'taking-turn' && turnNumber === this.started) {
       this.started = undefined;
@@ -166,10 +166,16 @@ export class WorldEngine {
     this.executor.execute(this.lifecycle);
 
     if (this.lifecycle.isComplete) {
-      this.phase = 'tax';
+      this.phase = 'events';
     }
 
-    this.advance();
+    this.events.afterDispatch(() => this.advance());
+  }
+
+  private resolveEvents(): void {
+    this.phase = 'tax';
+    this.executor.execute(this.provinceEvents);
+    this.events.afterDispatch(() => this.advance());
   }
 
   private collectTaxAndHarvest(): void {
@@ -182,10 +188,36 @@ export class WorldEngine {
   private startTurn(): void {
     const { current, turnNumber } = this.world.turnQueue;
 
-    if (current && this.holders.size === 0) {
+    if (current) {
       this.started = turnNumber;
-      this.phase = 'taking-turn';
+      this.phase = 'reporting-turn';
       this.events.publish(new TurnStartedEvent(turnNumber, current));
+      this.events.afterDispatch(() => this.advance());
+    }
+  }
+
+  private reportTurnEvents(): void {
+    const { current } = this.world.turnQueue;
+
+    this.phase = 'ready-turn';
+    if (current) {
+      this.provinceEvents.report(current);
+    }
+    this.events.afterDispatch(() => this.advance());
+  }
+
+  private takeTurn(): void {
+    const province = this.world.turnQueue.current;
+
+    this.phase = 'taking-turn';
+    if (province && !this.world.isPlayerRun(province)) {
+      const suspended = this.computer.play(province);
+
+      if (!suspended) {
+        this.events.publish(
+          new TurnEndedEvent(this.world.turnQueue.turnNumber),
+        );
+      }
     }
   }
 
@@ -204,12 +236,6 @@ export class WorldEngine {
     } else {
       this.phase = 'waiting-turn';
       this.events.publish(new TurnScheduledEvent());
-    }
-  }
-
-  private resume(): void {
-    if (this.holders.size === 0) {
-      this.advance();
     }
   }
 }

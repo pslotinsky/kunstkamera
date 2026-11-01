@@ -109,7 +109,7 @@ export class AttackDialogControl extends CommandDialogControl<
       isDefined(this.target) &&
       isDefined(province) &&
       isDefined(army) &&
-      army.hasTroops &&
+      army.canFight() &&
       army.supplyDays > 0 &&
       province.resources.gold >= army.deploymentCost
     );

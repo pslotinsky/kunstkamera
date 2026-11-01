@@ -17,6 +17,14 @@ export class FifthUnit extends Unit {
     this.strength = params.strength;
   }
 
+  public override get attackFatigue(): number {
+    return 0.1;
+  }
+
+  public get isSpentAfterBattle(): boolean {
+    return false;
+  }
+
   public override get consumesFood(): boolean {
     return false;
   }

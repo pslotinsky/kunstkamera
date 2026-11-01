@@ -1,5 +1,5 @@
 import type { Family } from '@/core/domain/Family';
-import type { HiredUnit } from '@/core/domain/HiredUnit';
+import type { FifthUnit } from '@/core/domain/FifthUnit';
 import type { Province } from '@/core/domain/Province';
 import type { ResourceGains } from '@/core/domain/Resources';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
@@ -11,7 +11,7 @@ export class MoveTroopsCommand extends ProvinceCommand {
   private gold = 0;
   private food = 0;
   private troops = 0;
-  private carried: HiredUnit | undefined;
+  private carried: FifthUnit | undefined;
 
   public constructor(context: WorldCommandContext) {
     super('Move Troops', context);
@@ -24,7 +24,7 @@ export class MoveTroopsCommand extends ProvinceCommand {
     this.troops = cargo.troops ?? 0;
   }
 
-  public carry(unit: HiredUnit | undefined): void {
+  public carry(unit: FifthUnit | undefined): void {
     this.carried = unit;
   }
 
@@ -108,7 +108,7 @@ export class MoveTroopsCommand extends ProvinceCommand {
 
   private isCarrying(source: Province): boolean {
     return (
-      this.carried !== undefined && source.hiredUnits.includes(this.carried)
+      this.carried !== undefined && source.stationedUnits.includes(this.carried)
     );
   }
 }

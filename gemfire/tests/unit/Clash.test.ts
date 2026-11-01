@@ -6,6 +6,7 @@ import { BattleUnit } from '@/core/domain/BattleUnit';
 import type { Clash } from '@/core/domain/Clash';
 import { Facing } from '@/core/domain/Facing';
 import { FifthUnit } from '@/core/domain/FifthUnit';
+import { Pastha } from '@/core/domain/Pastha';
 import { StandardUnit } from '@/core/domain/StandardUnit';
 import type { RangePattern, Unit } from '@/core/domain/Unit';
 
@@ -85,6 +86,22 @@ function duel(setup: Duel): Clash {
 }
 
 describe('Clash', () => {
+  it('takes attack fatigue from Pastha even when the target cannot retaliate', () => {
+    const striker = place(new Pastha(), 0, 0, 160, 50, Facing.east);
+    const target = place(
+      StandardUnit.ofName('Horsemen')!,
+      4,
+      4,
+      100,
+      50,
+      Facing.west,
+    );
+    striker.strikeAt(target);
+
+    expect(striker.strength).toBe(144);
+    expect(target.strength).toBeLessThan(100);
+  });
+
   it('reads the face a blow lands on from the way the target looks', () => {
     expect(duel({ from: [2, 3] }).approach).toBe('front');
     expect(duel({ from: [4, 3] }).approach).toBe('rear');

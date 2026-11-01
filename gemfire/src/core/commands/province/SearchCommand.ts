@@ -35,7 +35,7 @@ export class SearchCommand extends ProvinceCommand {
 
     if (province && target && this.canExecute() && this.isForeign(target)) {
       province.addResources({ gold: -SEARCH_COST });
-      this.publish(new SearchReportedEvent(target, target.hiredUnits));
+      this.publish(new SearchReportedEvent(target, target.stationedUnits));
       this.reportFind(province, target);
       this.complete(province);
     }

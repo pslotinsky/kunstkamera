@@ -549,6 +549,28 @@ The following event-system details remain unresolved:
 
 ---
 
+## Remake Balance
+
+These are initial remake tuning choices, not recovered original values. Event identities and affected stats follow the catalogue above. Exact original probabilities and magnitudes remain unknown.
+
+| Effect | Base amount |
+| --- | ---: |
+| Resource gift or theft | 20 |
+| Ordinary province-stat gain or loss | 10 |
+| Unicorn's Domestic and Military bonuses | 2 each |
+| Gwraig's Charm bonus | 2 |
+| Disaster or rampage | 20 each from Loyalty, Cultivation, and Protection |
+
+A neutral cycle has a 10% good-event chance and a 10% bad-event chance. Each point of positive goodwill gives a 20% good-event chance, up to 60%; each negative point gives the same chance of a bad event. The opposite event remains possible at 5%. Unused probability produces no encounter.
+
+Character rewards require +2 goodwill; Pastha requires +3. Eligible ordinary good encounters have weight 4, and each character reward and Pastha has weight 1. Eligible bad encounters are equally likely. Rewards that cannot affect their recipient are excluded before selection.
+
+Protection multiplies bad-encounter chance and all harmful incident amounts by `1 − Protection / 400`. Round losses down. A prevented encounter becomes no event. Each scheduled disaster has a separate 10% chance per eligible owned province, and monster rampage has a 2% monthly chance per province with stationed monsters. Protection reduces their damage, not their chance.
+
+Events apply only their listed effects; no additional Fame change is inferred from an encounter. The [general Fame rules](./05-characters.md#sources-of-fame) suggest event-related changes, but do not identify which encounters cause them. That interaction remains unconfirmed.
+
+---
+
 ## Summary
 
 Gemfire’s event system has two main layers:

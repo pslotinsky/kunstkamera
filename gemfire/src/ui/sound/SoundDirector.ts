@@ -106,7 +106,7 @@ export class SoundDirector {
 
   private tollForSuccession(event: SuccessionReportedEvent): void {
     if (event.cause === 'death') {
-      this.sounds.playBell();
+      this.sounds.playBanshee();
     }
   }
 }

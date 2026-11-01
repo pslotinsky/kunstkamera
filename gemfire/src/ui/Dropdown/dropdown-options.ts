@@ -13,7 +13,9 @@ export function toUnitOptions(units: readonly FifthUnit[]): DropdownOption[] {
       value: unit.name,
       label: unit.name,
       icon: getFifthUnitPortraitUrl(unit),
-      note: String(unit.strength),
+      note: unit.isSpentAfterBattle
+        ? `${unit.strength} · one battle`
+        : String(unit.strength),
     })),
   ];
 }

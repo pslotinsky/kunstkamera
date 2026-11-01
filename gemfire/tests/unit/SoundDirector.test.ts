@@ -112,22 +112,27 @@ describe('SoundDirector', () => {
     expect(bell).not.toHaveBeenCalled();
   });
 
-  it('tolls the bell for a succession born of a death', () => {
+  it('wails once instead of tolling for a ruler death', () => {
     const { events, sounds } = setup();
+    const banshee = vi.spyOn(sounds, 'playBanshee');
     const bell = vi.spyOn(sounds, 'playBell');
 
     events.publish(reportSuccession('death'));
 
-    expect(bell).toHaveBeenCalledOnce();
+    expect(banshee).toHaveBeenCalledOnce();
+    expect(bell).not.toHaveBeenCalled();
   });
 
   it('keeps silent over a succession born of a banishment', () => {
     const { events, sounds } = setup();
     const bell = vi.spyOn(sounds, 'playBell');
 
+    const banshee = vi.spyOn(sounds, 'playBanshee');
+
     events.publish(reportSuccession('banishment'));
 
     expect(bell).not.toHaveBeenCalled();
+    expect(banshee).not.toHaveBeenCalled();
   });
 
   it('glitters when an artifact is found', () => {

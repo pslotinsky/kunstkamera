@@ -7,6 +7,7 @@ import { Gem } from '@/core/domain/Gem';
 import { HiredUnit } from '@/core/domain/HiredUnit';
 import { Invasion } from '@/core/domain/Invasion';
 import { InvasionReport } from '@/core/domain/InvasionReport';
+import { Pastha } from '@/core/domain/Pastha';
 
 import {
   makeArmy,
@@ -62,6 +63,86 @@ function setup(params: SetupParams = {}) {
 }
 
 describe('Invasion', () => {
+  it('lets an untrooped province defend with its stationed Pastha', () => {
+    const { source, target, world } = setup({ defenders: 0 });
+    const pastha = new Pastha();
+    target.addUnit(pastha);
+    const invasion = new Invasion({
+      world,
+      source,
+      target,
+      attacker: makeArmy(),
+    });
+    const started = invasion.begin();
+
+    expect(started).toBeInstanceOf(Battle);
+    if (!(started instanceof Battle)) {
+      throw new Error('Pastha was not allowed to defend');
+    }
+    expect(started.getUnits(BattleSide.defender)).toHaveLength(1);
+    expect(started.defender.unit).toBe(pastha);
+  });
+
+  it.each([BattleSide.attacker, BattleSide.defender])(
+    'spends only the participating Pastha visits after a fought battle won by %s',
+    (winner) => {
+      const { source, target, world } = setup();
+      const attacking = new Pastha();
+      const reserve = new Pastha();
+      const defending = new Pastha();
+      source.addUnit(attacking);
+      source.addUnit(reserve);
+      target.addUnit(defending);
+      const defensiveReserve = new Pastha();
+      target.addUnit(defensiveReserve);
+      const attacker = makeArmy({
+        commander: source.governor!,
+        unit: attacking,
+      });
+      const invasion = new Invasion({ world, source, target, attacker });
+      invasion.muster();
+      invasion.answer({ answer: 'fight', unit: defending });
+      invasion.conclude(makeOutcome({ winner }));
+
+      expect(source.stationedUnits).toEqual([reserve]);
+      expect(target.stationedUnits).toEqual(
+        winner.isAttacker ? [] : [defensiveReserve],
+      );
+    },
+  );
+
+  it('keeps an attacking Pastha after a concession', () => {
+    const { source, target, world } = setup({ defenders: 0, defenderFood: 0 });
+    const attacking = new Pastha();
+    source.addUnit(attacking);
+    const attacker = makeArmy({ commander: source.governor!, unit: attacking });
+    const invasion = new Invasion({ world, source, target, attacker });
+    invasion.muster();
+    invasion.answer({ answer: 'surrender' });
+
+    expect(source.stationedUnits).toEqual([]);
+    expect(target.stationedUnits).toEqual([attacking]);
+  });
+
+  it('spends Pastha even when its side retreats without losing the unit', () => {
+    const { source, target, world } = setup();
+    const pastha = new Pastha();
+    source.addUnit(pastha);
+    const attacker = makeArmy({ commander: source.governor!, unit: pastha });
+    const invasion = new Invasion({ world, source, target, attacker });
+    invasion.muster();
+    invasion.answer({ answer: 'fight' });
+    invasion.conclude(
+      makeOutcome({
+        winner: BattleSide.defender,
+        reason: 'retreat',
+        lostUnits: [],
+      }),
+    );
+
+    expect(source.stationedUnits).toEqual([]);
+  });
+
   it('charges the deployment cost and musters the defender on begin', () => {
     const { invasion, source, attacker } = setup();
     const goldBefore = source.resources.gold;

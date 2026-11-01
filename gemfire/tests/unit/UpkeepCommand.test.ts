@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { UpkeepCommand } from '@/core/commands/UpkeepCommand';
 import { CalendarDate } from '@/core/domain/CalendarDate';
 import { HiredUnit } from '@/core/domain/HiredUnit';
+import { Pastha } from '@/core/domain/Pastha';
 import { UnitDesertedEvent } from '@/core/events/UnitDesertedEvent';
 
 import { makeFamily, makeProvince, makeWorld } from './factories';
@@ -43,6 +44,16 @@ function rollAt(roll: number): void {
 }
 
 describe('UpkeepCommand', () => {
+  it('keeps Pastha without pay or desertion even when hired units cannot be maintained', () => {
+    const { province, command } = createFixture({ gold: 0, units: ['Orks'] });
+    const pastha = new Pastha();
+    province.addUnit(pastha);
+    command.execute();
+
+    expect(province.resources.gold).toBe(0);
+    expect(province.stationedUnits).toEqual([pastha]);
+  });
+
   afterEach(() => vi.restoreAllMocks());
 
   it('charges every stationed unit its cost on a quarter month', () => {
