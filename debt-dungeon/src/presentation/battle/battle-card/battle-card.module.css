@@ -1,0 +1,203 @@
+.battleCard {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 9.3rem minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  column-gap: 0.75rem;
+  align-items: start;
+  min-width: 0;
+  min-height: 0;
+  padding: 0.6rem;
+  border: 1px solid #c7bd9f;
+  border-radius: 0.3rem;
+  background: #f8f4e8;
+  color: #171923;
+  text-align: left;
+
+  &:not([inert]):not(.battleCard_defeated) {
+    cursor: pointer;
+  }
+}
+
+.battleCard__portrait {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: stretch;
+  min-width: 0;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 0.2rem;
+  background: #d8cbb0;
+}
+
+.battleCard__squadImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.battleCard__info {
+  display: flex;
+  grid-column: 2;
+  grid-row: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  align-self: stretch;
+  min-width: 0;
+  min-height: 0;
+}
+
+.battleCard__heading {
+  position: relative;
+  min-height: 1.7rem;
+  padding-right: 3rem;
+}
+
+.battleCard__squadType {
+  display: block;
+  font-family: Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.battleCard__unitIcon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  object-fit: contain;
+}
+
+.battleCard__healthValue {
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+.battleCard__healthTrack {
+  height: 0.7rem;
+  overflow: hidden;
+  border: 1px solid #aaa;
+  border-radius: 0.2rem;
+  background: #ddd;
+}
+
+.battleCard__health {
+  height: 100%;
+  transition: width 220ms ease-out;
+}
+
+.battleCard__composition {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.15rem 0.5rem;
+  font-size: 0.85rem;
+  line-height: 1.2;
+}
+
+.battleCard__squadTroops,
+.battleCard__commanderHealth {
+  color: inherit;
+}
+
+.battleCard_attacker {
+  .battleCard__health {
+    background: #56915f;
+  }
+}
+
+.battleCard_defender {
+  grid-template-columns: minmax(0, 1fr) 9.3rem;
+  text-align: right;
+
+  .battleCard__portrait {
+    grid-column: 2;
+  }
+
+  .battleCard__squadImage {
+    transform: scaleX(-1);
+  }
+
+  .battleCard__info {
+    grid-column: 1;
+  }
+
+  .battleCard__heading {
+    padding-right: 0;
+    padding-left: 3rem;
+  }
+
+  .battleCard__unitIcon {
+    right: auto;
+    left: 0;
+  }
+
+  .battleCard__health {
+    background: #c94e40;
+  }
+
+  .battleCard__composition {
+    flex-direction: row-reverse;
+  }
+}
+
+.battleCard_current {
+  border-color: #f28c00;
+  background: #fff2d8;
+  box-shadow: inset 0 0 0 2px #f28c00;
+}
+
+.battleCard_selected {
+  border-color: #18bfd1;
+  background: #dcf8f8;
+  box-shadow: inset 0 0 0 2px #18bfd1;
+}
+
+.battleCard_defeated {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.battleCard_hit {
+  animation: battleCard-hit 220ms ease-out;
+}
+
+.battleCard_death {
+  animation: battleCard-death 400ms ease-in;
+}
+
+@keyframes battleCard-death {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0.45;
+  }
+}
+
+@keyframes battleCard-hit {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+
+  50% {
+    filter: brightness(1.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .battleCard_hit,
+  .battleCard_death {
+    animation: none;
+  }
+
+  .battleCard__health {
+    transition: none;
+  }
+}

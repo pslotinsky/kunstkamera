@@ -1,0 +1,25 @@
+.battleSide {
+  display: grid;
+  grid-template-rows: minmax(0, 56.5fr) minmax(0, 43.5fr);
+  height: 100%;
+}
+
+.battleSide__scene {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.battleSide__panel {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  box-sizing: border-box;
+  background: #f4f1e7;
+}
+
+.battleSide__panel_attacker {
+  padding: 0.8rem 1.6rem 0.8rem 0.8rem;
+}
+
+.battleSide__panel_defender {
+  padding: 0.8rem 0.8rem 0.8rem 1.6rem;
+}

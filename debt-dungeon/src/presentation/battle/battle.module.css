@@ -1,0 +1,33 @@
+.battle {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  zoom: var(--battle-screen-scale, 1);
+}
+
+.battle__timeline {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+.battle__sides {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr);
+  height: 100%;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 43.5%;
+    z-index: -1;
+    background:
+      linear-gradient(180deg, #10141a30 0%, #10141a05 45%, #10141a50 100%),
+      url("/scene/cave.webp") center top / cover no-repeat;
+  }
+}
