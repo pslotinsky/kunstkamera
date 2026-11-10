@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Debt Dungeon — Map prototype</title>
+    <style>
+      :root { color-scheme: dark; font-family: system-ui, sans-serif; color: #dcded5; background: #141b1b; font-synthesis: none; }
+      * { box-sizing: border-box; }
+      body { margin: 0; }
+      button, input, select { font: inherit; }
+      button, select, input[type="text"] { color: #e3e5dd; background: #202c2b; border: 1px solid #3a4945; border-radius: 5px; padding: 8px 10px; }
+      button { cursor: pointer; }
+      button:hover { background: #31403a; border-color: #9d9a6b; }
+      button:disabled { cursor: default; opacity: .4; }
+      :focus-visible { outline: 2px solid #e5c777; outline-offset: 3px; }
+      .app { height: 100dvh; display: grid; grid-template-columns: 260px minmax(0, 1fr); }
+      aside { overflow: auto; padding: 24px 20px; background: #17201f; border-right: 1px solid #34413b; }
+      .eyebrow { color: #c2ad72; font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; margin: 0 0 7px; }
+      h1 { font: 30px/1.15 Georgia, serif; color: #f0e6ca; margin: 0; }
+      .intro { color: #9daaa0; font-size: 12px; line-height: 1.6; margin: 10px 0 22px; }
+      h2 { margin: 0 0 13px; color: #b8c3b7; font-size: 10px; letter-spacing: .13em; text-transform: uppercase; }
+      section { border-top: 1px solid #304039; padding-top: 17px; margin-top: 19px; }
+      label { display: block; color: #b9c4b9; font-size: 12px; margin-bottom: 13px; }
+      label > span { display: flex; justify-content: space-between; margin-bottom: 7px; }
+      input[type="range"] { width: 100%; accent-color: #c6b171; }
+      input[type="text"], select { width: 100%; min-width: 0; }
+      .seed-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; }
+      .generate { width: 100%; background: #c6b171; color: #17201f; font-weight: 700; border-color: #c6b171; }
+      .generate:hover { background: #dfcb8e; }
+      .toggle { display: flex; gap: 9px; align-items: center; margin-bottom: 11px; }
+      .toggle input { accent-color: #c6b171; width: 15px; height: 15px; margin: 0; }
+      .workspace { min-width: 0; min-height: 0; position: relative; background: #111819; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+      .map-header { padding: 17px 24px; display: flex; gap: 12px; justify-content: space-between; align-items: center; border-bottom: 1px solid #303d36; background: #17201fe8; }
+      .map-header strong { color: #e3dac1; font: 18px Georgia, serif; }
+      .map-header small { display: block; color: #8d9d90; font-size: 11px; margin-top: 5px; }
+      .badge { color: #d4bd7a; border: 1px solid #625b3c; padding: 5px 8px; font-size: 10px; letter-spacing: .08em; white-space: nowrap; }
+      .viewport { position: relative; min-height: 0; overflow: hidden; }
+      canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+      canvas:active { cursor: grabbing; }
+      .map-tools { position: absolute; top: 15px; left: 16px; display: flex; gap: 5px; }
+      .map-tools button { background: #17201feb; min-width: 36px; box-shadow: 0 2px 12px #0004; }
+      .map-hint { position: absolute; bottom: 13px; left: 16px; color: #c3cbbd; background: #111b18d9; border: 1px solid #3c4a3c; border-radius: 4px; padding: 7px 10px; font-size: 11px; pointer-events: none; }
+      .status { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 7px; padding: 10px 18px; font-size: 11px; color: #a6b49f; border-top: 1px solid #303d36; }
+      .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; font-size: 11px; color: #a6b49f; }
+      .legend span { display: flex; align-items: center; gap: 7px; }
+      .swatch { width: 12px; height: 12px; border: 1px solid #ffffff20; border-radius: 2px; }
+      .details-title { font: 21px Georgia, serif; color: #e7dab5; margin-bottom: 9px; }
+      .facts { display: grid; grid-template-columns: 1fr auto; gap: 8px; font-size: 11px; margin: 0 0 14px; }
+      dt { color: #8d9f90; } dd { margin: 0; color: #d6dece; text-align: right; }
+      .note { color: #91a191; font-size: 11px; line-height: 1.6; }
+      #travel { width: 100%; }
+      details { font-size: 11px; color: #8d9f90; line-height: 1.6; margin-top: 20px; }
+      summary { cursor: pointer; color: #b4bda9; }
+      a { color: #d3bd7c; }
+      @media (max-width: 700px) {
+        .app { height: auto; min-height: 100dvh; grid-template-columns: 1fr; }
+        aside { order: 2; padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 22px; border-right: 0; }
+        .branding, details { grid-column: 1 / -1; }
+        .branding .intro { margin-bottom: 0; }
+        .workspace { height: 66dvh; min-height: 380px; }
+        .map-header { padding: 12px 15px; }
+        .map-hint { max-width: calc(100% - 32px); line-height: 1.5; }
+        section { margin-top: 14px; }
+      }
+      @media (max-width: 390px) { aside { grid-template-columns: 1fr; } .badge { display: none; } }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <aside aria-label="Map settings">
+        <div class="branding">
+          <p class="eyebrow">Debt Dungeon · Prototype</p>
+          <h1>The underworld</h1>
+          <p class="intro">Explore a generated dungeon floor: connected caverns, narrow passages, and rival labyrinths.</p>
+        </div>
+        <section aria-labelledby="generation-title">
+          <h2 id="generation-title">Generate a floor</h2>
+          <form id="generator">
+            <label for="seed"><span>World seed</span><span class="seed-row"><input id="seed" type="text" value="hollow-crown" maxlength="64" /><button id="random-seed" type="button" aria-label="Choose a new random seed">↻</button></span></label>
+            <label for="size"><span>Floor size</span><select id="size"><option value="36,24">Small · 36 × 24</option><option value="48,32" selected>Medium · 48 × 32</option><option value="60,40">Large · 60 × 40</option></select></label>
+            <label for="openness"><span>Cavern openness <output id="openness-value">55%</output></span><input id="openness" type="range" min="30" max="80" value="55" step="5" /></label>
+            <label for="domains"><span>Labyrinths <output id="domains-value">5</output></span><input id="domains" type="range" min="3" max="8" value="5" /></label>
+            <button class="generate" type="submit">Generate map</button>
+          </form>
+        </section>
+        <section aria-labelledby="layers-title">
+          <h2 id="layers-title">Map layers</h2>
+          <label class="toggle"><input id="grid" type="checkbox" checked /> Hex grid</label>
+          <label class="toggle"><input id="influence" type="checkbox" checked /> Labyrinth territories</label>
+          <label class="toggle"><input id="fog" type="checkbox" /> Fog of war</label>
+          <div class="legend" id="legend"></div>
+        </section>
+        <section aria-labelledby="location-title">
+          <h2 id="location-title">Selected location</h2>
+          <div class="details-title" id="tile-name">Your labyrinth</div>
+          <dl class="facts" id="tile-facts"></dl>
+          <button type="button" id="travel" disabled>Move expedition here</button>
+          <p class="note" id="route-note" aria-live="polite">Select an open hex to preview a route.</p>
+        </section>
+        <section aria-labelledby="expedition-title">
+          <h2 id="expedition-title">Expedition</h2>
+          <dl class="facts" id="expedition-facts"></dl>
+          <button id="return-home" type="button">Plan route home</button>
+        </section>
+        <details>
+          <summary>About this experiment</summary>
+          <p>Can a hex map produce distinct regions connected by useful chokepoints? Generate a floor, inspect its passages, then move an expedition through it.</p>
+          <p>Movement costs, territory sizes, and sight range are prototype assumptions. Territory is an ownership preview; terrain transformation is not simulated. All state resets when you generate a new map.</p>
+          <p>Hex coordinates, conversion, distance, and pathfinding follow <a href="https://www.redblobgames.com/grids/hexagons/" target="_blank" rel="noreferrer">Red Blob Games’ Hexagonal Grids</a>. This page runs offline.</p>
+        </details>
+      </aside>
+      <div class="workspace">
+        <header class="map-header"><div><strong>The Hollow Marches</strong><small id="map-subtitle">A dungeon floor, waiting to be explored</small></div><span class="badge">MAP EXPERIMENT</span></header>
+        <div class="viewport" id="viewport">
+          <canvas id="map" tabindex="0" aria-label="Generated hex map. Drag to pan, scroll to zoom. Click a tile to inspect and preview a route. Arrow keys select neighboring tiles; Enter moves the expedition."></canvas>
+          <nav class="map-tools" aria-label="Map view"><button type="button" id="zoom-in" aria-label="Zoom in">+</button><button type="button" id="zoom-out" aria-label="Zoom out">−</button><button type="button" id="fit">Fit map</button></nav>
+          <div class="map-hint">Drag to pan · Scroll to zoom · Click a hex to plan a route</div>
+        </div>
+        <footer class="status"><span id="map-stats"></span><span id="map-position">Axial hex grid · Pointy top</span></footer>
+      </div>
+    </main>
+    <script>
+      // Standalone generation and pathfinding. The renderer below owns all DOM work.
+      const HexMap = (() => {
+        const directions = [[1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]];
+        const terrains = {
+          stone: { name: 'Cavern floor', color: '#79795a', cost: 1 },
+          moss: { name: 'Mosslands', color: '#60754b', cost: 1 },
+          forest: { name: 'Fungal grove', color: '#45604b', cost: 2 },
+          swamp: { name: 'Marsh', color: '#566b59', cost: 3 },
+          water: { name: 'Shallows', color: '#3d6469', cost: 3 },
+          rock: { name: 'Deep rock', color: '#252f30', cost: Infinity },
+        };
+        const names = ['Your labyrinth', 'Mossroot Hold', 'The Ashen Court', 'Stillwater Den', 'Iron Hollow', 'The Pale Archive', 'Embervault', 'Thornwatch'];
+        const colors = ['#ddc37e', '#90bd79', '#e38e74', '#7fbec6', '#c59dd0', '#b2b7d9', '#dfab68', '#a7c393'];
+        const key = (q, r) => `${q},${r}`;
+        const distance = (a, b) => (Math.abs(a.q - b.q) + Math.abs(a.r - b.r) + Math.abs(a.q + a.r - b.q - b.r)) / 2;
+        const pixel = (hex) => ({ x: Math.sqrt(3) * (hex.q + hex.r / 2), y: 1.5 * hex.r });
+        function round(q, r) {
+          let x = Math.round(q), y = Math.round(r);
+          const s = -q - r, z = Math.round(s);
+          const dx = Math.abs(x - q), dy = Math.abs(y - r), dz = Math.abs(z - s);
+          if (dx > dy && dx > dz) { x = -y - z; }
+          else if (dy > dz) { y = -x - z; }
+          return { q: x, r: y };
+        }
+        function fromPixel(x, y) { return round(Math.sqrt(3) / 3 * x - y / 3, 2 / 3 * y); }
+        function hash(text) {
+          let value = 2166136261;
+          for (const char of text) { value = Math.imul(value ^ char.charCodeAt(0), 16777619); }
+          value = Math.imul(value ^ value >>> 16, 0x85ebca6b);
+          value = Math.imul(value ^ value >>> 13, 0xc2b2ae35);
+          return (value ^ value >>> 16) >>> 0;
+        }
+        function random(seed) {
+          let state = seed;
+          return () => {
+            state += 0x6d2b79f5;
+            let value = Math.imul(state ^ state >>> 15, 1 | state);
+            value ^= value + Math.imul(value ^ value >>> 7, 61 | value);
+            return ((value ^ value >>> 14) >>> 0) / 4294967296;
+          };
+        }
+        function noise(x, y, seed) {
+          const sample = (a, b) => hash(`${seed}:${a}:${b}`) / 4294967295;
+          const ix = Math.floor(x), iy = Math.floor(y);
+          const smooth = (t) => t * t * (3 - 2 * t);
+          const tx = smooth(x - ix), ty = smooth(y - iy);
+          const a = sample(ix, iy) * (1 - tx) + sample(ix + 1, iy) * tx;
+          const b = sample(ix, iy + 1) * (1 - tx) + sample(ix + 1, iy + 1) * tx;
+          return a * (1 - ty) + b * ty;
+        }
+        function neighbors(world, tile) {
+          return directions.map(([q, r]) => world.tiles.get(key(tile.q + q, tile.r + r))).filter(Boolean);
+        }
+        function route(world, start, goal, allowed) {
+          const costs = new Map([[start.id, 0]]), previous = new Map();
+          const frontier = [{ tile: start, priority: 0 }];
+          const visited = new Set();
+          let reached = false;
+          while (frontier.length && !reached) {
+            frontier.sort((a, b) => b.priority - a.priority);
+            const current = frontier.pop().tile;
+            if (!visited.has(current.id)) {
+              visited.add(current.id);
+              reached = current.id === goal.id;
+              if (!reached) {
+                for (const next of neighbors(world, current).filter((tile) => tile.terrain !== 'rock' && (!allowed || allowed.has(tile.id)))) {
+                  const cost = costs.get(current.id) + terrains[next.terrain].cost;
+                  if (cost < (costs.get(next.id) ?? Infinity)) {
+                    costs.set(next.id, cost);
+                    previous.set(next.id, current);
+                    frontier.push({ tile: next, priority: cost + distance(next, goal) });
+                  }
+                }
+              }
+            }
+          }
+          const path = [];
+          let current = reached ? goal : undefined;
+          while (current) { path.unshift(current); current = previous.get(current.id); }
+          return { path, cost: costs.get(goal.id) ?? Infinity };
+        }
+        function generate({ seed, columns, rows, openness, domainCount }) {
+          const rng = random(hash(seed));
+          const tiles = new Map();
+          for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < columns; col++) {
+              const q = col - Math.floor(row / 2), r = row;
+              tiles.set(key(q, r), { id: key(q, r), q, r, col, row, terrain: 'rock', variation: rng(), owner: -1, site: null });
+            }
+          }
+          const world = { seed, columns, rows, tiles, domains: [] };
+          const rooms = [];
+          const roomColumns = 4, roomRows = 3;
+          for (let y = 0; y < roomRows; y++) {
+            for (let x = 0; x < roomColumns; x++) {
+              const col = Math.round((x + .35 + rng() * .3) * columns / roomColumns);
+              const row = Math.round((y + .35 + rng() * .3) * rows / roomRows);
+              rooms.push(tiles.get(key(col - Math.floor(row / 2), row)));
+            }
+          }
+          const radius = Math.min(columns / 4, rows / 3) * (.12 + openness / 220);
+          for (const tile of tiles.values()) {
+            const roomDistance = Math.min(...rooms.map((room) => distance(tile, room)));
+            const edgeNoise = noise(tile.col * .32, tile.row * .32, `${seed}walls`);
+            if (tile.col > 0 && tile.row > 0 && tile.col < columns - 1 && tile.row < rows - 1 && roomDistance < radius + edgeNoise * 2.5) { tile.terrain = 'stone'; }
+          }
+          // Connect every room to the growing network, carving narrow passages.
+          const connected = [rooms[0]];
+          for (const room of rooms.slice(1)) {
+            const target = connected.toSorted((a, b) => distance(a, room) - distance(b, room))[0];
+            const steps = distance(room, target);
+            for (let i = 0; i <= steps; i++) {
+              const t = steps ? i / steps : 0;
+              const hex = round(room.q * (1 - t) + target.q * t, room.r * (1 - t) + target.r * t);
+              const tile = tiles.get(key(hex.q, hex.r));
+              if (tile) { tile.terrain = 'stone'; }
+            }
+            connected.push(room);
+          }
+          // Keep the floor connected, including small islands created by noisy walls.
+          const accessible = new Set([rooms[0].id]), queue = [rooms[0]];
+          for (let i = 0; i < queue.length; i++) {
+            for (const next of neighbors(world, queue[i])) {
+              if (next.terrain !== 'rock' && !accessible.has(next.id)) { accessible.add(next.id); queue.push(next); }
+            }
+          }
+          for (const tile of tiles.values()) {
+            if (!accessible.has(tile.id)) { tile.terrain = 'rock'; }
+            if (tile.terrain !== 'rock') {
+              const wet = noise(tile.col * .16, tile.row * .16, `${seed}wet`);
+              const growth = noise(tile.col * .21, tile.row * .21, `${seed}growth`);
+              tile.terrain = wet > .73 ? 'water' : wet > .6 ? 'swamp' : growth > .6 ? 'forest' : growth > .4 ? 'moss' : 'stone';
+            }
+          }
+          const candidates = [...tiles.values()].filter((tile) => tile.terrain !== 'rock');
+          const first = rooms[4];
+          for (let i = 0; i < domainCount; i++) {
+            const center = i === 0 ? first : rooms.toSorted((a, b) => {
+              const score = (tile) => Math.min(...world.domains.map((domain) => distance(tile, domain.center))) + tile.variation * 2;
+              return score(b) - score(a);
+            })[0];
+            center.terrain = 'stone';
+            center.site = { type: 'labyrinth', name: names[i] };
+            world.domains.push({ center, name: names[i], color: colors[i] });
+          }
+          const sites = [
+            { type: 'crystal', name: 'Crystal seam' }, { type: 'ruin', name: 'Forgotten shrine' },
+            { type: 'camp', name: 'Wandering creatures' }, { type: 'stairs', name: 'Passage to the next floor' },
+          ];
+          const placed = world.domains.map((domain) => domain.center);
+          for (const tile of candidates.toSorted((a, b) => a.variation - b.variation)) {
+            if (placed.length < domainCount + Math.round(columns / 3) && !tile.site && placed.every((other) => distance(tile, other) >= 4)) {
+              tile.site = sites[(placed.length - domainCount) % sites.length];
+              placed.push(tile);
+            }
+          }
+          for (const tile of candidates) {
+            const nearest = world.domains.map((domain, index) => ({ index, distance: distance(tile, domain.center) })).sort((a, b) => a.distance - b.distance)[0];
+            tile.owner = nearest.distance <= 4 ? nearest.index : -1;
+          }
+          return world;
+        }
+        return { directions, terrains, key, distance, pixel, fromPixel, neighbors, route, generate };
+      })();
+    </script>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const canvas = $('map'), ctx = canvas.getContext('2d');
+      const view = { x: 0, y: 0, scale: 16, width: 0, height: 0 };
+      let world, selected, expedition, hovered, path = [], pathCost = 0, spent = 0, known = new Set();
+      let pointer = null;
+      const settings = () => {
+        const [columns, rows] = $('size').value.split(',').map(Number);
+        return { seed: $('seed').value.trim() || 'hollow-crown', columns, rows, openness: Number($('openness').value), domainCount: Number($('domains').value) };
+      };
+      function discover(tile) {
+        for (const candidate of world.tiles.values()) { if (HexMap.distance(tile, candidate) <= 5) { known.add(candidate.id); } }
+      }
+      function generate() {
+        const options = settings();
+        $('seed').value = options.seed;
+        world = HexMap.generate(options);
+        expedition = world.domains[0].center; selected = expedition; hovered = null;
+        known = new Set(); path = []; spent = 0; discover(expedition);
+        $('map-subtitle').textContent = `Seed ${world.seed} · ${world.columns} × ${world.rows} hexes · ${world.domains.length} labyrinths`;
+        fit(); inspect(selected);
+      }
+      function fit() {
+        if (!world) { return; }
+        const centers = [...world.tiles.values()].map(HexMap.pixel);
+        const minX = Math.min(...centers.map((p) => p.x)) - 1.2, maxX = Math.max(...centers.map((p) => p.x)) + 1.2;
+        const minY = -1.2, maxY = Math.max(...centers.map((p) => p.y)) + 1.2;
+        view.scale = Math.min((view.width - 40) / (maxX - minX), (view.height - 40) / (maxY - minY));
+        view.x = (view.width - (maxX + minX) * view.scale) / 2;
+        view.y = (view.height - (maxY + minY) * view.scale) / 2;
+        draw();
+      }
+      function hex(tile, inset = 0) {
+        const center = HexMap.pixel(tile), size = 1 - inset;
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const angle = Math.PI / 180 * (60 * i - 30);
+          const x = center.x + Math.cos(angle) * size, y = center.y + Math.sin(angle) * size;
+          if (i === 0) { ctx.moveTo(x, y);  }else { ctx.lineTo(x, y); }
+        }
+        ctx.closePath();
+      }
+      function marker(tile) {
+        const p = HexMap.pixel(tile), type = tile.site.type;
+        ctx.save(); ctx.translate(p.x, p.y);
+        ctx.lineWidth = .09; ctx.strokeStyle = '#ead7a4'; ctx.fillStyle = '#172522';
+        if (type === 'labyrinth') {
+          ctx.fillStyle = tile.owner >= 0 ? world.domains[tile.owner].color : '#ddc37e';
+          ctx.fillRect(-.42, -.12, .84, .52);
+          for (const x of [-.45, 0, .45]) { ctx.fillRect(x - .12, -.42, .24, .55); }
+          ctx.fillStyle = '#233028'; ctx.fillRect(-.12, .08, .24, .32);
+        } else if (type === 'crystal') {
+          ctx.fillStyle = '#b6d6d0';
+          for (const [x, height] of [[-.25, .25], [0, .55], [.25, .35]]) {
+            ctx.beginPath();ctx.moveTo(x-.14,.3);ctx.lineTo(x-.12,-height);ctx.lineTo(x,-height-.18);ctx.lineTo(x+.12,-height);ctx.lineTo(x+.14,.3);ctx.closePath();ctx.fill();ctx.stroke();
+          }
+        } else if (type === 'ruin') {
+          ctx.strokeRect(-.32,-.3,.64,.65); ctx.beginPath();ctx.moveTo(-.45,-.3);ctx.lineTo(0,-.6);ctx.lineTo(.45,-.3);ctx.stroke();
+        } else if (type === 'camp') {
+          ctx.beginPath();ctx.moveTo(-.4,.3);ctx.lineTo(0,-.45);ctx.lineTo(.4,.3);ctx.closePath();ctx.fill();ctx.stroke();
+        } else {
+          for (let i=0;i<4;i++) {ctx.beginPath();ctx.moveTo(-.4+i*.15,.3-i*.18);ctx.lineTo(.4,.3-i*.18);ctx.stroke();}
+        }
+        ctx.restore();
+      }
+      function decoration(tile) {
+        const { x, y } = HexMap.pixel(tile);
+        ctx.save(); ctx.translate(x, y); ctx.lineWidth = .055;
+        if (tile.terrain === 'rock' && tile.variation > .35) {
+          ctx.strokeStyle = '#47514a'; ctx.fillStyle = '#333d37';
+          ctx.beginPath();ctx.moveTo(-.42,.25);ctx.lineTo(-.08,-.42);ctx.lineTo(.3,.25);ctx.closePath();ctx.fill();ctx.stroke();
+          ctx.beginPath();ctx.moveTo(-.08,-.42);ctx.lineTo(.01,.05);ctx.lineTo(.3,.25);ctx.stroke();
+        } else if (tile.terrain === 'forest') {
+          ctx.strokeStyle = '#273f32';ctx.fillStyle = '#899075';
+          for (const x of [-.3,.2]) {ctx.beginPath();ctx.moveTo(x,.35);ctx.lineTo(x,-.2);ctx.stroke();ctx.beginPath();ctx.ellipse(x,-.18,.25,.12,0,Math.PI,0);ctx.fill();}
+        } else if (tile.terrain === 'water' || tile.terrain === 'swamp') {
+          ctx.strokeStyle = tile.terrain === 'water' ? '#82a7a4' : '#a2ac83';
+          for (let i=0;i<2;i++) {ctx.beginPath();ctx.moveTo(-.3+i*.15,-.1+i*.3);ctx.lineTo(.25+i*.15,-.1+i*.3);ctx.stroke();}
+        } else if (tile.terrain === 'moss' && tile.variation > .5) {
+          ctx.strokeStyle = '#91a16c';ctx.beginPath();ctx.moveTo(-.2,.2);ctx.lineTo(-.1,-.1);ctx.moveTo(.1,.2);ctx.lineTo(.22,-.1);ctx.stroke();
+        }
+        ctx.restore();
+      }
+      function draw() {
+        if (!world || !view.width) { return; }
+        const ratio = window.devicePixelRatio || 1;
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        ctx.fillStyle = '#111819';ctx.fillRect(0,0,view.width,view.height);
+        ctx.translate(view.x, view.y);ctx.scale(view.scale,view.scale);
+        const fog = $('fog').checked, influence = $('influence').checked, grid = $('grid').checked;
+        for (const tile of world.tiles.values()) {
+          const hidden = fog && !known.has(tile.id);
+          hex(tile);ctx.fillStyle = hidden ? '#1a2324' : HexMap.terrains[tile.terrain].color;ctx.fill();
+          if (!hidden) {
+            hex(tile);ctx.fillStyle = `rgba(0,0,0,${tile.variation*.1})`;ctx.fill();
+            decoration(tile);
+            if (influence && tile.owner >= 0) { hex(tile);ctx.fillStyle = `${world.domains[tile.owner].color}25`;ctx.fill(); }
+          }
+          if (grid) {hex(tile);ctx.strokeStyle = '#0c191c35';ctx.lineWidth=.035;ctx.stroke();}
+        }
+        if (influence) {
+          for (const tile of world.tiles.values()) {
+            if (tile.owner >= 0 && (!fog || known.has(tile.id))) {
+              const p=HexMap.pixel(tile);ctx.strokeStyle=`${world.domains[tile.owner].color}c0`;ctx.lineWidth=.075;
+              HexMap.directions.forEach(([q,r],i)=>{
+                const neighbor=world.tiles.get(HexMap.key(tile.q+q,tile.r+r));
+                if (neighbor?.owner !== tile.owner) {
+                  const angle=(60*-i)*Math.PI/180;
+                  ctx.beginPath();ctx.moveTo(p.x+Math.cos(angle-Math.PI/6),p.y+Math.sin(angle-Math.PI/6));ctx.lineTo(p.x+Math.cos(angle+Math.PI/6),p.y+Math.sin(angle+Math.PI/6));ctx.stroke();
+                }
+              });
+            }
+          }
+        }
+        for (const tile of world.tiles.values()) { if (tile.site && (!fog || known.has(tile.id))) { marker(tile); } }
+        if (path.length > 1) {
+          ctx.beginPath();path.forEach((tile,i)=>{const p=HexMap.pixel(tile);if(i===0) { ctx.moveTo(p.x,p.y); }else { ctx.lineTo(p.x,p.y); }});
+          ctx.strokeStyle='#f1dca5';ctx.lineWidth=.13;ctx.setLineDash([.12,.23]);ctx.stroke();ctx.setLineDash([]);
+        }
+        for (const [tile,color] of [[hovered,'#fff1bc80'],[selected,'#f5d58e']]) {
+          if(tile && (!fog || known.has(tile.id))) {hex(tile,.08);ctx.strokeStyle=color;ctx.lineWidth=.09;ctx.stroke();}
+        }
+        const army=HexMap.pixel(expedition);
+        ctx.beginPath();ctx.arc(army.x,army.y,.63,0,Math.PI*2);ctx.strokeStyle='#fff0b5';ctx.lineWidth=.09;ctx.stroke();
+        ctx.fillStyle='#eee2bc';ctx.beginPath();ctx.arc(army.x,army.y,.19,0,Math.PI*2);ctx.fill();
+        for (const domain of world.domains) {
+          if (!fog || known.has(domain.center.id)) {
+            const p=HexMap.pixel(domain.center);ctx.font='.52px Georgia';ctx.textAlign='center';ctx.textBaseline='middle';
+            ctx.lineWidth=.15;ctx.strokeStyle='#16231d';ctx.fillStyle='#eee7cf';ctx.strokeText(domain.name,p.x,p.y+1.15);ctx.fillText(domain.name,p.x,p.y+1.15);
+          }
+        }
+      }
+      function inspect(tile) {
+        selected = tile;
+        const hidden = $('fog').checked && !known.has(tile.id);
+        const terrain=HexMap.terrains[tile.terrain];
+        const result=hidden ? { path:[],cost:Infinity } : HexMap.route(world,expedition,tile,$('fog').checked?known:undefined);
+        path=result.path;pathCost=result.cost;
+        $('tile-name').textContent=hidden ? 'Unexplored' : tile.site?.name ?? terrain.name;
+        const owner=hidden ? 'Unknown' : tile.owner>=0 ? world.domains[tile.owner].name : 'Unclaimed';
+        const facts=[['Coordinates',`${tile.q}, ${tile.r}`],['Terrain',hidden?'Unknown':terrain.name],['Domain',owner],['Travel cost',hidden?'Unknown':Number.isFinite(terrain.cost)?`${terrain.cost} per hex`:'Impassable']];
+        $('tile-facts').replaceChildren(...facts.flatMap(([label,value])=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;return[dt,dd];}));
+        $('travel').disabled=path.length<2;
+        $('route-note').textContent=hidden?'Explore nearby to reveal this location.':tile.id===expedition.id?'Your expedition is here.':path.length?`${path.length-1} hexes · ${pathCost} movement points`:tile.terrain==='rock'?'Solid rock blocks movement.':'No route through explored ground. Reveal a connected passage first.';
+        updateState();draw();
+      }
+      function updateState() {
+        const open=[...world.tiles.values()].filter((tile)=>tile.terrain!=='rock').length;
+        const visible=[...world.tiles.values()].filter((tile)=>known.has(tile.id)&&tile.terrain!=='rock').length;
+        $('map-stats').textContent=`${world.tiles.size.toLocaleString()} hexes · ${open.toLocaleString()} open · ${world.domains.length} labyrinths`;
+        const facts=[['Position',`${expedition.q}, ${expedition.r}`],['Distance travelled',`${spent} movement points`],['Explored ground',`${Math.round(visible/open*100)}%`]];
+        $('expedition-facts').replaceChildren(...facts.flatMap(([label,value])=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;return[dt,dd];}));
+      }
+      function travel() {
+        if(path.length>1) {for(const tile of path) { discover(tile); }expedition=selected;spent+=pathCost;inspect(expedition);}
+      }
+      function zoom(factor,x=view.width/2,y=view.height/2) {
+        const next=Math.max(3,Math.min(75,view.scale*factor));
+        view.x=x-(x-view.x)*next/view.scale;view.y=y-(y-view.y)*next/view.scale;view.scale=next;draw();
+      }
+      function pick(event) {
+        const bounds=canvas.getBoundingClientRect();
+        const hex=HexMap.fromPixel((event.clientX-bounds.left-view.x)/view.scale,(event.clientY-bounds.top-view.y)/view.scale);
+        return world.tiles.get(HexMap.key(hex.q,hex.r));
+      }
+      canvas.addEventListener('pointerdown',(event)=>{if(event.button===0){pointer={id:event.pointerId,x:event.clientX,y:event.clientY,originX:event.clientX,originY:event.clientY,dragged:false};canvas.setPointerCapture(event.pointerId);}});
+      canvas.addEventListener('pointermove',(event)=>{
+        if(pointer&&pointer.id===event.pointerId){const dx=event.clientX-pointer.x,dy=event.clientY-pointer.y;pointer.dragged ||= Math.hypot(event.clientX-pointer.originX,event.clientY-pointer.originY)>4;if(pointer.dragged){view.x+=dx;view.y+=dy;}pointer.x=event.clientX;pointer.y=event.clientY;draw();}
+        else {hovered=pick(event);$('map-position').textContent=hovered?`Hex ${hovered.q}, ${hovered.r}`:'Axial hex grid · Pointy top';draw();}
+      });
+      canvas.addEventListener('pointerup',(event)=>{if(pointer?.id===event.pointerId){if(!pointer.dragged){const tile=pick(event);if(tile) { inspect(tile); }}pointer=null;}});
+      canvas.addEventListener('pointercancel',()=>{pointer=null;});
+      canvas.addEventListener('pointerleave',()=>{hovered=null;draw();});
+      canvas.addEventListener('wheel',(event)=>{event.preventDefault();const bounds=canvas.getBoundingClientRect();zoom(Math.exp(-event.deltaY*.0015),event.clientX-bounds.left,event.clientY-bounds.top);},{passive:false});
+      canvas.addEventListener('keydown',(event)=>{
+        const direction={ArrowRight:0,ArrowUp:2,ArrowLeft:3,ArrowDown:5}[event.key];
+        if(direction!==undefined){event.preventDefault();const[dq,dr]=HexMap.directions[direction];const tile=world.tiles.get(HexMap.key(selected.q+dq,selected.r+dr));if(tile) { inspect(tile); }}
+        if(event.key==='Enter'){event.preventDefault();travel();}
+        if(event.key==='+'||event.key==='=') { zoom(1.25); }
+        if(event.key==='-') { zoom(.8); }
+      });
+      $('generator').addEventListener('submit',(event)=>{event.preventDefault();generate();});
+      $('random-seed').addEventListener('click',()=>{$('seed').value=`hollow-${Math.random().toString(36).slice(2,8)}`;generate();});
+      for(const id of ['openness','domains']) { $(id).addEventListener('input',()=>{$(`${id}-value`).textContent=$(id).value+(id==='openness'?'%':'');}); }
+      for(const id of ['grid','influence','fog']) { $(id).addEventListener('change',()=>inspect(selected)); }
+      $('zoom-in').addEventListener('click',()=>zoom(1.25));$('zoom-out').addEventListener('click',()=>zoom(.8));$('fit').addEventListener('click',fit);
+      $('travel').addEventListener('click',travel);
+      $('return-home').addEventListener('click',()=>inspect(world.domains[0].center));
+      $('legend').replaceChildren(...Object.values(HexMap.terrains).map((terrain)=>{const item=document.createElement('span'),swatch=document.createElement('i');swatch.className='swatch';swatch.style.background=terrain.color;item.append(swatch,document.createTextNode(terrain.name));return item;}));
+      new ResizeObserver(()=>{const rect=$('viewport').getBoundingClientRect(),ratio=window.devicePixelRatio||1;view.width=rect.width;view.height=rect.height;canvas.width=Math.round(rect.width*ratio);canvas.height=Math.round(rect.height*ratio);fit();}).observe($('viewport'));
+      generate();
+    </script>
+  </body>
+</html>

@@ -14,6 +14,14 @@ interface PrototypeConfig {
 export const prototypes: readonly PrototypeConfig[] = [
   {
     project: 'debt-dungeon',
+    slug: 'map',
+    name: 'Map',
+    source: { type: 'html', file: '../debt-dungeon/docs/mockups/map.html' },
+    documentPath: 'mockups/map.html',
+    publishedPath: 'debt-dungeon/interactive/map/',
+  },
+  {
+    project: 'debt-dungeon',
     slug: 'battle',
     name: 'Battle',
     source: { type: 'build', directory: '../debt-dungeon/dist/' },

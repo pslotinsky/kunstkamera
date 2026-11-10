@@ -47,7 +47,7 @@ export const debtDungeonDocs = defineDocs({
   dir: '../debt-dungeon/docs',
   docs: {
     async: true,
-    files: ['game/**/*.md'],
+    files: ['game/**/*.md', 'mockups/**/*.md'],
     schema: ({ source, path }) =>
       pageSchema.extend({
         title: z.string().default(source.match(/^#\s+(.+)$/m)?.[1] || path),
