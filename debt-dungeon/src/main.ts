@@ -1,6 +1,6 @@
 import { App } from './application/app';
 
-import './style.module.css';
+import './style.css';
 
 const root = document.querySelector<HTMLDivElement>('#app')!;
 const app = new App();

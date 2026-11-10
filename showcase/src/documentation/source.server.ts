@@ -1,9 +1,14 @@
 import { loader } from 'fumadocs-core/source';
-import { docs, sinkCityDocs, totalSpaceDocs } from '../../.source/server';
+import {
+  debtDungeonDocs,
+  docs,
+  sinkCityDocs,
+  totalSpaceDocs,
+} from '../../.source/server';
 import { mapProjects } from '../projects';
 import { collectionNames } from './config';
 
-const collections = { docs, sinkCityDocs, totalSpaceDocs };
+const collections = { debtDungeonDocs, docs, sinkCityDocs, totalSpaceDocs };
 
 export const sources = mapProjects((project) =>
   loader({

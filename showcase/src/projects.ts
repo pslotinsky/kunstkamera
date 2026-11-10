@@ -2,6 +2,7 @@ export const projectNames = {
   gemfire: 'Gemfire',
   'total-space': 'Total Space',
   'sink-city': 'Sink City',
+  'debt-dungeon': 'Debt Dungeon',
 } as const;
 
 export type ProjectId = keyof typeof projectNames;

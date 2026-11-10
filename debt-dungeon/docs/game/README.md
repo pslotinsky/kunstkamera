@@ -4,7 +4,7 @@ This documentation describes the **current target vision** for the game, rather 
 
 1. [Vision](vision.md) — the experience we want to create.
 2. [Systems overview](overview.md) — a map of game systems and their responsibilities.
-3. [Systems](systems/) — concepts for individual parts of the game.
+3. [Systems](overview.md) — concepts for individual parts of the game.
 4. [Game content](content/README.md) — preliminary labyrinth and creature archetypes.
 5. [References](references.md) — main inspirations and confirmed areas of influence.
 

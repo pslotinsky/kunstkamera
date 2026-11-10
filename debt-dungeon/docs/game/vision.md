@@ -27,7 +27,7 @@ The protagonist's initial goal is to repay his debts. Gradually, the labyrinth b
 
 ## Military Model
 
-Positional turn-based battles inspired by Disciples, with a commander-led squad as the combat unit. Each squad contains troops of one type; its commander may be an ordinary character or a unique hero. Details belong to the [troops system](systems/troops.md).
+Positional turn-based battles inspired by Disciples, with a commander-led squad as the combat unit. Each squad contains troops of one type; its commander may be an ordinary character or a unique hero. Details belong to the [troops system](system/troops.md).
 
 ## Main References
 

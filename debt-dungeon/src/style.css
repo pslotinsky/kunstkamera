@@ -1,4 +1,4 @@
-:global(:root) {
+:root {
   font-family: system-ui, sans-serif;
   color: #222;
   background: #222;
@@ -7,15 +7,15 @@
   -webkit-font-smoothing: antialiased;
 }
 
-:global(html),
-:global(body) {
+html,
+body {
   width: 100%;
   height: 100%;
   margin: 0;
   min-width: 320px;
 }
 
-:global(#app) {
+#app {
   display: grid;
   place-items: center;
   width: 100%;

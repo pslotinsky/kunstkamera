@@ -2,6 +2,7 @@ import { isProjectId, type ProjectId } from '../projects.ts';
 
 export const collectionNames = {
   gemfire: 'docs',
+  'debt-dungeon': 'debtDungeonDocs',
   'total-space': 'totalSpaceDocs',
   'sink-city': 'sinkCityDocs',
 } as const satisfies Record<ProjectId, string>;

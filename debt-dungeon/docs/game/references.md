@@ -13,4 +13,4 @@ The game's main references are **Age of Wonders, Disciples, Total War, and Thea*
 | Total War      | One of the main references; the specific systems to draw from have not yet been defined.                                                                                               |
 | Thea           | One of the main references; the specific systems to draw from have not yet been defined.                                                                                               |
 
-References provide direction, but do not imply adopting every mechanic from these games. Debt Dungeon's own rules are described in [troops](systems/troops.md) and [territory](systems/territory.md).
+References provide direction, but do not imply adopting every mechanic from these games. Debt Dungeon's own rules are described in [troops](system/troops.md) and [territory](system/territory.md).

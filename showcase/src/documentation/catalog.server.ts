@@ -25,7 +25,13 @@ const gameDesignSections: readonly SectionDefinition[] = [
     title: 'Systems',
     description:
       'Responsibilities, rules, proposals, and open questions for each system.',
-    includes: (file) => file.startsWith('game/systems/'),
+    includes: (file) =>
+      file.startsWith('game/systems/') || file.startsWith('game/system/'),
+  },
+  {
+    title: 'References',
+    description: 'Inspirations and their intended influence on the game.',
+    includes: (file) => file === 'game/references.md',
   },
   {
     title: 'Milestones',
@@ -89,7 +95,8 @@ const sectionDefinitions: Record<ProjectId, readonly SectionDefinition[]> = {
     {
       title: 'Системы',
       description: 'Строительство, прогрессия, город, власть, сюжет и цели.',
-      includes: (file) => file.startsWith('game/systems/'),
+      includes: (file) =>
+        file.startsWith('game/systems/') || file.startsWith('game/system/'),
     },
     {
       title: 'Этапы разработки',
@@ -113,6 +120,7 @@ const sectionDefinitions: Record<ProjectId, readonly SectionDefinition[]> = {
     },
   ],
   'total-space': gameDesignSections,
+  'debt-dungeon': gameDesignSections,
 };
 
 const startingOrder = [

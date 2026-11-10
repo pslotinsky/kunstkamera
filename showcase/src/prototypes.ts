@@ -4,17 +4,27 @@ interface PrototypeConfig {
   readonly project: ProjectId;
   readonly slug: string;
   readonly name: string;
-  readonly sourceFile: string;
+  readonly source:
+    | { readonly type: 'html'; readonly file: string }
+    | { readonly type: 'build'; readonly directory: string };
   readonly documentPath: string;
   readonly publishedPath: string;
 }
 
 export const prototypes: readonly PrototypeConfig[] = [
   {
+    project: 'debt-dungeon',
+    slug: 'battle',
+    name: 'Battle',
+    source: { type: 'build', directory: '../debt-dungeon/dist/' },
+    documentPath: 'mockups/battle/index.html',
+    publishedPath: 'debt-dungeon/interactive/battle/',
+  },
+  {
     project: 'sink-city',
     slug: 'map-lab',
     name: 'Map Lab',
-    sourceFile: '../sink-city/docs/mockups/map-lab.html',
+    source: { type: 'html', file: '../sink-city/docs/mockups/map-lab.html' },
     documentPath: 'mockups/map-lab.html',
     publishedPath: 'sink-city/interactive/map-lab/',
   },
@@ -22,7 +32,10 @@ export const prototypes: readonly PrototypeConfig[] = [
     project: 'total-space',
     slug: 'campaign',
     name: 'Campaign',
-    sourceFile: '../total-space/docs/mockups/campaign/prototype.html',
+    source: {
+      type: 'html',
+      file: '../total-space/docs/mockups/campaign/prototype.html',
+    },
     documentPath: 'mockups/campaign/prototype.html',
     publishedPath: 'total-space/interactive/campaign/',
   },
@@ -30,7 +43,10 @@ export const prototypes: readonly PrototypeConfig[] = [
     project: 'total-space',
     slug: 'battle',
     name: 'Battle',
-    sourceFile: '../total-space/docs/mockups/battle/prototype.html',
+    source: {
+      type: 'html',
+      file: '../total-space/docs/mockups/battle/prototype.html',
+    },
     documentPath: 'mockups/battle/prototype.html',
     publishedPath: 'total-space/interactive/battle/',
   },
