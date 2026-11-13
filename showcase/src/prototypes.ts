@@ -13,6 +13,17 @@ interface PrototypeConfig {
 
 export const prototypes: readonly PrototypeConfig[] = [
   {
+    project: 'kingdom-hr',
+    slug: 'recruitment',
+    name: 'Recruitment',
+    source: {
+      type: 'build',
+      directory: '../kingdom-hr/docs/mockups/recruitment/dist/',
+    },
+    documentPath: 'mockups/recruitment/dist/index.html',
+    publishedPath: 'kingdom-hr/interactive/recruitment/',
+  },
+  {
     project: 'debt-dungeon',
     slug: 'map',
     name: 'Map',
