@@ -12,6 +12,15 @@ export default defineConfig({
     reactRouter(),
     servePublishedArtifacts(),
   ],
-  server: { fs: { allow: ['.', '../gemfire/docs', '../total-space/docs'] } },
+  server: {
+    fs: {
+      allow: [
+        '.',
+        '../gemfire/docs',
+        '../total-space/docs',
+        '../debt-dungeon/docs',
+      ],
+    },
+  },
   build: { target: 'es2022' },
 });

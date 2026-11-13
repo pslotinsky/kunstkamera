@@ -5,7 +5,11 @@ import { publishedAssets } from '../src/publishedAssets.ts';
 
 export async function prototypeHtml(prototype: (typeof prototypes)[number]) {
   const showcase = new URL('../', import.meta.url);
-  let html = await readFile(new URL(prototype.sourceFile, showcase), 'utf8');
+  const sourceFile =
+    prototype.source.type === 'build'
+      ? `${prototype.source.directory}index.html`
+      : prototype.source.file;
+  let html = await readFile(new URL(sourceFile, showcase), 'utf8');
   for (const asset of publishedAssets) {
     if (asset.project !== prototype.project) continue;
     const sourcePath = posix.relative(

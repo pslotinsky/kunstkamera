@@ -1,3 +1,4 @@
+import debtDungeonGoblin from '../../../../debt-dungeon/public/unit/goblin_01.webp';
 import gemfireFachan from '../../../../gemfire/public/unit/fachan.webp';
 import sinkCityAlcomarket from '../../../../sink-city/docs/game/content/buildings/images/objects/alcohol-08.webp';
 import fleetCarrier from '../../../../total-space/docs/game/content/ships/images/14-fleet-carrier.webp';
@@ -13,6 +14,14 @@ export const projectPresentations = {
     imageAlt: 'Sink City alcomarket by a bus stop',
     imageFit: 'contain',
     imageScale: 1.65,
+  },
+  'debt-dungeon': {
+    label: 'Dungeon strategy concept',
+    description:
+      'Restore a magical labyrinth and balance its inhabitants’ needs against debts in the ordinary world. Explore the design and an early battle mockup.',
+    image: debtDungeonGoblin,
+    imageAlt: 'Debt Dungeon goblin archer',
+    imageFit: 'contain',
   },
   gemfire: {
     label: 'Turn-based strategy',

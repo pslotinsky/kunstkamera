@@ -24,7 +24,13 @@ if (basename)
 
 for (const prototype of prototypes) {
   const directory = new URL(prototype.publishedPath, output);
-  await mkdir(directory, { recursive: true });
+  if (prototype.source.type === 'build') {
+    await cp(new URL(prototype.source.directory, showcase), directory, {
+      recursive: true,
+    });
+  } else {
+    await mkdir(directory, { recursive: true });
+  }
   await writeFile(
     new URL('index.html', directory),
     await prototypeHtml(prototype),

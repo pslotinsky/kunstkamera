@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+import { extname } from 'node:path';
 import type { Plugin } from 'vite';
 import { prototypeHtml } from '../build/prototypeHtml.ts';
 import { prototypes } from '../src/prototypes.ts';
@@ -12,9 +13,39 @@ function artifact(
   const prototype = prototypes.find((item) => item.publishedPath === path);
   if (prototype) {
     return {
-      file: new URL(prototype.sourceFile, showcase),
+      file: new URL(
+        prototype.source.type === 'build'
+          ? `${prototype.source.directory}index.html`
+          : prototype.source.file,
+        showcase,
+      ),
       contentType: 'text/html; charset=utf-8',
     };
+  }
+
+  const build = prototypes.find(
+    (item) =>
+      item.source.type === 'build' && path.startsWith(item.publishedPath),
+  );
+  if (build?.source.type === 'build') {
+    const relative = decodeURIComponent(path.slice(build.publishedPath.length));
+    const valid =
+      !relative.includes('\\') &&
+      relative
+        .split('/')
+        .every((part) => part !== '' && part !== '.' && part !== '..');
+    const contentTypes: Record<string, string> = {
+      '.js': 'text/javascript; charset=utf-8',
+      '.css': 'text/css; charset=utf-8',
+      '.webp': 'image/webp',
+    };
+    const contentType = contentTypes[extname(relative)];
+    if (valid && contentType) {
+      return {
+        file: new URL(build.source.directory + relative, showcase),
+        contentType,
+      };
+    }
   }
 
   const asset = getPublishedAsset(path);
@@ -38,10 +69,9 @@ export function servePublishedArtifacts(): Plugin {
         const relative = pathname.startsWith(base)
           ? pathname.slice(base.length)
           : pathname.replace(/^\//, '');
-        const match = artifact(relative);
-        if (!match) return next();
-
         try {
+          const match = artifact(relative);
+          if (!match) return next();
           const prototype = prototypes.find(
             (item) => item.publishedPath === relative,
           );
