@@ -1,11 +1,20 @@
 import debtDungeonGoblin from '../../../../debt-dungeon/public/unit/goblin_01.webp';
 import gemfireFachan from '../../../../gemfire/public/unit/fachan.webp';
+import kingdomHrPaper from '../../../../kingdom-hr/docs/mockups/recruitment/dist/assets/paper-with-hand.webp';
 import sinkCityAlcomarket from '../../../../sink-city/docs/game/content/buildings/images/objects/alcohol-08.webp';
 import fleetCarrier from '../../../../total-space/docs/game/content/ships/images/14-fleet-carrier.webp';
 import type { ProjectId } from '../../projects';
 import type { ProjectCardProps } from './ProjectCard';
 
 export const projectPresentations = {
+  'kingdom-hr': {
+    label: 'Kingdom management concept',
+    description:
+      'Run a kingdom through the people you hire. Explore the design and review candidates in the recruitment prototype.',
+    image: kingdomHrPaper,
+    imageAlt: 'A hand holding a candidate’s résumé in Kingdom HR',
+    imageFit: 'contain',
+  },
   'sink-city': {
     label: 'City-building strategy',
     description:

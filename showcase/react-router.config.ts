@@ -3,6 +3,7 @@ import type { Config } from '@react-router/dev/config';
 import {
   debtDungeonDocs,
   docs,
+  kingdomHrDocs,
   sinkCityDocs,
   totalSpaceDocs,
 } from './source.config.ts';
@@ -13,7 +14,13 @@ import { mapProjects } from './src/projects.ts';
 import { getPrototypeUrl, prototypes } from './src/prototypes.ts';
 
 const basename = process.env.SHOWCASE_BASE || '/kunstkamera/';
-const collections = { debtDungeonDocs, docs, sinkCityDocs, totalSpaceDocs };
+const collections = {
+  debtDungeonDocs,
+  docs,
+  kingdomHrDocs,
+  sinkCityDocs,
+  totalSpaceDocs,
+};
 
 export default {
   appDirectory: 'src',

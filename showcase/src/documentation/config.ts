@@ -5,6 +5,7 @@ export const collectionNames = {
   'debt-dungeon': 'debtDungeonDocs',
   'total-space': 'totalSpaceDocs',
   'sink-city': 'sinkCityDocs',
+  'kingdom-hr': 'kingdomHrDocs',
 } as const satisfies Record<ProjectId, string>;
 
 export function getDocumentationProject(

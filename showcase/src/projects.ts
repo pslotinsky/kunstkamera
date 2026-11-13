@@ -3,6 +3,7 @@ export const projectNames = {
   'total-space': 'Total Space',
   'sink-city': 'Sink City',
   'debt-dungeon': 'Debt Dungeon',
+  'kingdom-hr': 'Kingdom HR',
 } as const;
 
 export type ProjectId = keyof typeof projectNames;

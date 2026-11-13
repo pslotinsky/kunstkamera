@@ -121,6 +121,16 @@ const sectionDefinitions: Record<ProjectId, readonly SectionDefinition[]> = {
   ],
   'total-space': gameDesignSections,
   'debt-dungeon': gameDesignSections,
+  'kingdom-hr': [
+    ...gameDesignSections,
+    {
+      title: 'Gameplay & ideas',
+      description:
+        'The daily recruitment loop and ideas for managing a kingdom’s staff.',
+      includes: (file) =>
+        file === 'game/gameplay.md' || file === 'game/ideas.md',
+    },
+  ],
 };
 
 const startingOrder = [

@@ -8,6 +8,7 @@ on:
       - gemfire/**
       - debt-dungeon/**
       - total-space/**
+      - kingdom-hr/**
       - .github/workflows/ci.yml
       - .github/workflows/gemfire-ci.yml
   pull_request:
@@ -17,6 +18,7 @@ on:
       - gemfire/**
       - debt-dungeon/**
       - total-space/**
+      - kingdom-hr/**
       - .github/workflows/ci.yml
       - .github/workflows/gemfire-ci.yml
   workflow_dispatch:
