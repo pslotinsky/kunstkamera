@@ -5,22 +5,22 @@ on:
     branches: [main]
     paths:
       - showcase/**
-      - gemfire/**
+      - gemstorm/**
       - debt-dungeon/**
       - total-space/**
       - kingdom-hr/**
       - .github/workflows/ci.yml
-      - .github/workflows/gemfire-ci.yml
+      - .github/workflows/gemstorm-ci.yml
   pull_request:
     branches: [main]
     paths:
       - showcase/**
-      - gemfire/**
+      - gemstorm/**
       - debt-dungeon/**
       - total-space/**
       - kingdom-hr/**
       - .github/workflows/ci.yml
-      - .github/workflows/gemfire-ci.yml
+      - .github/workflows/gemstorm-ci.yml
   workflow_dispatch:
 
 permissions:
@@ -31,20 +31,20 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  gemfire:
-    name: Gemfire
-    uses: ./.github/workflows/gemfire-ci.yml
+  gemstorm:
+    name: Gemstorm
+    uses: ./.github/workflows/gemstorm-ci.yml
 
   showcase:
     name: Showcase
-    needs: gemfire
+    needs: gemstorm
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
-          node-version-file: gemfire/.nvmrc
+          node-version-file: gemstorm/.nvmrc
           cache: npm
           cache-dependency-path: |
             showcase/package-lock.json
@@ -64,8 +64,8 @@ jobs:
       - name: Download game build
         uses: actions/download-artifact@v8
         with:
-          name: gemfire-game
-          path: showcase/dist/public/gemfire/game
+          name: gemstorm-game
+          path: showcase/dist/public/gemstorm/game
       - uses: actions/upload-pages-artifact@v5
         with:
           path: showcase/dist/public
@@ -73,7 +73,7 @@ jobs:
   deploy:
     name: Deploy GitHub Pages
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    needs: [gemfire, showcase]
+    needs: [gemstorm, showcase]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

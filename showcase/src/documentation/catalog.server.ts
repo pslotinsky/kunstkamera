@@ -57,26 +57,31 @@ const gameDesignSections: readonly SectionDefinition[] = [
 ];
 
 const sectionDefinitions: Record<ProjectId, readonly SectionDefinition[]> = {
-  gemfire: [
+  gemstorm: [
     {
-      title: 'Specification',
+      title: 'Start here',
+      description: 'Gemstorm’s setting, identity, and source acknowledgments.',
+      includes: (file) => file === 'README.md' || file.startsWith('identity/'),
+    },
+    {
+      title: 'Historical research',
       description: 'Game rules, systems, scenarios, and reference data.',
       includes: (file) => file.startsWith('spec/'),
     },
     {
       title: 'Design',
-      description: 'Detailed behavior for each feature of the remake.',
+      description: 'Detailed behavior for each feature of the game.',
       includes: (file) => file.startsWith('design/'),
     },
     {
       title: 'Guides & references',
       description:
-        'External manuals and other sources used during reconstruction.',
+        'External manuals and sources acknowledged as historical influences.',
       includes: (file) => file.startsWith('guides/'),
     },
     {
       title: 'Roadmap',
-      description: 'Completed features and planned work for the remake.',
+      description: 'Completed features and planned work for the game.',
       includes: (file) => file === 'ROADMAP.md',
     },
   ],

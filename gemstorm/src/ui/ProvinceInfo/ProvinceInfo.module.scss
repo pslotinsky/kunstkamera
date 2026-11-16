@@ -1,0 +1,127 @@
+@use "@/ui/kit";
+
+.root h2 {
+  margin: 0;
+  font-size: 1.55rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.header {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  padding: 0.25rem 0.25rem 0;
+}
+
+.header h2,
+.header p {
+  margin: 0;
+}
+
+.header h2 + h2 {
+  color: var(--ink-cool);
+  font-weight: 500;
+}
+
+.crest {
+  flex: 0 0 auto;
+  width: 80px;
+  padding: 0 2px;
+  aspect-ratio: 48 / 62;
+  object-fit: contain;
+}
+
+.divider {
+  @include kit.divider;
+}
+
+.governor {
+  position: relative;
+  margin-bottom: var(--rule-space);
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0 0.25rem var(--rule-space);
+}
+
+.governor::after {
+  @include kit.ornament-rule;
+
+  top: 100%;
+}
+
+.portrait {
+  flex: 0 0 auto;
+  width: 80px;
+  aspect-ratio: 1;
+  object-fit: contain;
+  padding: 2px;
+  border: 1px solid var(--trim);
+  border-radius: 3px;
+}
+
+.hint {
+  margin: 0;
+  opacity: 0.6;
+}
+
+.stats {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0;
+}
+
+.column {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.column h3 {
+  margin: 0 0 0.15rem;
+  color: var(--heading);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.column p {
+  margin: 0;
+}
+
+@keyframes statUpdate {
+  from {
+    background: rgba(255, 200, 80, 0.3);
+  }
+
+  to {
+    background: var(--surface-900);
+  }
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 8px 12px;
+  font-size: 1.35rem;
+  font-variant-numeric: tabular-nums;
+
+  @include kit.well;
+  color: #f4f8ff;
+}
+
+.changed {
+  animation: statUpdate 0.6s ease;
+}
+
+.statIcon {
+  width: 34px;
+  height: 34px;
+  image-rendering: pixelated;
+}

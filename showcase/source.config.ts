@@ -5,10 +5,17 @@ import { z } from 'zod';
 import { remarkLiteralHtml } from './vite/remarkLiteralHtml.ts';
 
 export const docs = defineDocs({
-  dir: '../gemfire/docs',
+  dir: '../gemstorm/docs',
   docs: {
     async: true,
-    files: ['ROADMAP.md', 'design/[0-9]*.md', 'spec/*.md', 'guides/README.md'],
+    files: [
+      'README.md',
+      'ROADMAP.md',
+      'design/[0-9]*.md',
+      'identity/*.md',
+      'spec/*.md',
+      'guides/README.md',
+    ],
     schema: ({ source, path }) =>
       pageSchema.extend({
         title: z.string().default(source.match(/^#\s+(.+)$/m)?.[1] || path),

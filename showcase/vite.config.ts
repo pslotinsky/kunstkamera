@@ -16,7 +16,7 @@ export default defineConfig({
     fs: {
       allow: [
         '.',
-        '../gemfire/docs',
+        '../gemstorm/docs',
         '../total-space/docs',
         '../debt-dungeon/docs',
       ],
