@@ -39,11 +39,20 @@ export class TitleScreenView extends View<
     `;
   }
 
+  public show(): void {
+    this.element.classList.remove(styles.hidden!);
+    this.focusNewGame();
+  }
+
   public hide(): void {
     this.element.classList.add(styles.hidden!);
   }
 
   protected override onMount(): void {
+    this.focusNewGame();
+  }
+
+  private focusNewGame(): void {
     this.element
       .querySelector<HTMLButtonElement>('[data-new-game]')!
       .focus({ preventScroll: true });

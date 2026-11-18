@@ -75,11 +75,13 @@ describe('TitleScreenControl', () => {
     expect(isScenePaused()).toBe(false);
   });
 
-  it('pauses the scene when the title closes', () => {
+  it('pauses the scene while hidden and resumes it when shown again', () => {
     mount();
 
-    title!.close();
-
+    title!.hide();
     expect(isScenePaused()).toBe(true);
+
+    title!.show();
+    expect(isScenePaused()).toBe(false);
   });
 });

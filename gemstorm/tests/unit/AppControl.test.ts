@@ -1,11 +1,9 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { CampaignStartedEvent } from '@/core/events/CampaignStartedEvent';
+import { SCENARIOS } from '@/config/scenarios';
 import { AppControl } from '@/ui/App/AppControl';
 import { SoundBoard } from '@/ui/sound/SoundBoard';
-
-import { makeFamily, makeProvince, makeWorld } from './factories';
 
 let shell: AppControl | undefined;
 const visibility = Object.getOwnPropertyDescriptor(
@@ -13,25 +11,20 @@ const visibility = Object.getOwnPropertyDescriptor(
   'checkVisibility',
 );
 
-function mount() {
-  const player = makeFamily({ name: 'Alderwyn' });
-  const home = makeProvince({ number: 1, name: 'Ulster', family: player });
-  const { world, events } = makeWorld([home], player);
+function mount(): void {
   const container = document.createElement('div');
   document.body.append(container);
-  shell = new AppControl({
-    world,
-    events,
-    commands: [],
-    sounds: new SoundBoard(),
-  });
+  shell = new AppControl({ sounds: new SoundBoard() });
   shell.mount(container);
-
-  return { events };
 }
 
-function newGameButton(): HTMLButtonElement {
-  return document.querySelector<HTMLButtonElement>('[data-new-game]')!;
+function button(
+  label: string,
+  within: ParentNode = document,
+): HTMLButtonElement {
+  const buttons = [...within.querySelectorAll('button')];
+
+  return buttons.find((candidate) => candidate.textContent?.trim() === label)!;
 }
 
 function title(): HTMLElement {
@@ -40,11 +33,18 @@ function title(): HTMLElement {
   )!;
 }
 
-function campaign(): HTMLElement {
-  return document.querySelector<HTMLElement>('[data-campaign]')!;
+function scenarioSelect(): HTMLElement {
+  return document.querySelector<HTMLElement>(
+    '[aria-labelledby="scenario-heading"]',
+  )!;
+}
+
+function stage(): HTMLElement {
+  return document.querySelector<HTMLElement>('[data-stage]')!;
 }
 
 beforeEach(() => {
+  vi.useFakeTimers();
   Object.defineProperty(HTMLElement.prototype, 'checkVisibility', {
     configurable: true,
     value(this: HTMLElement): boolean {
@@ -67,6 +67,7 @@ afterEach(() => {
   shell = undefined;
   document.body.replaceChildren();
   vi.unstubAllGlobals();
+  vi.useRealTimers();
   if (visibility) {
     Object.defineProperty(HTMLElement.prototype, 'checkVisibility', visibility);
   } else {
@@ -75,22 +76,44 @@ afterEach(() => {
 });
 
 describe('AppControl', () => {
-  it('keeps the campaign inert behind the title until a new game begins', () => {
+  it('opens on the title, with no campaign yet', () => {
     mount();
 
-    expect(campaign().hasAttribute('inert')).toBe(true);
-    expect(document.activeElement).toBe(newGameButton());
+    expect(title().checkVisibility()).toBe(true);
+    expect(scenarioSelect().checkVisibility()).toBe(false);
+    expect(document.activeElement).toBe(button('New Game'));
+    expect(stage().childElementCount).toBe(0);
   });
 
-  it('hides the title and starts the campaign on New Game', () => {
-    const { events } = mount();
-    const started = vi.fn();
-    events.subscribe(CampaignStartedEvent, started);
+  it('moves from the title to the scenario choice on New Game', () => {
+    mount();
 
-    newGameButton().click();
+    button('New Game').click();
 
-    expect(started).toHaveBeenCalledOnce();
     expect(title().checkVisibility()).toBe(false);
-    expect(campaign().hasAttribute('inert')).toBe(false);
+    expect(scenarioSelect().checkVisibility()).toBe(true);
+  });
+
+  it('returns to the title on Back', () => {
+    mount();
+    button('New Game').click();
+
+    button('Back', scenarioSelect()).click();
+
+    expect(scenarioSelect().checkVisibility()).toBe(false);
+    expect(title().checkVisibility()).toBe(true);
+  });
+
+  it('starts a campaign in the chosen scenario on Next', () => {
+    const chosen = SCENARIOS[1]!;
+    mount();
+    button('New Game').click();
+
+    document.querySelector<HTMLButtonElement>('[data-scenario="2"]')!.click();
+    button('Next', scenarioSelect()).click();
+
+    expect(scenarioSelect().checkVisibility()).toBe(false);
+    expect(stage().childElementCount).toBeGreaterThan(0);
+    expect(stage().textContent).toContain(`Month 1, ${chosen.year}`);
   });
 });

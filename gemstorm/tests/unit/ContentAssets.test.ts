@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { HIRED_UNITS } from '@/config/fifth-units';
 import { GEMS } from '@/config/gems';
 import { BAD_EVENTS, DISASTERS, GOOD_EVENTS } from '@/config/province-events';
-import { SCENARIO_1 } from '@/config/scenario-1';
+import { SCENARIOS } from '@/config/scenarios';
 
 const assets = import.meta.glob('../../public/**/*.webp');
 
@@ -13,13 +13,16 @@ function hasAsset(path: string): boolean {
 
 describe('game content assets', () => {
   it('has portraits and crests for every starting general and house', () => {
-    for (const general of SCENARIO_1.generals) {
+    const generals = SCENARIOS.flatMap((scenario) => scenario.generals);
+    const families = SCENARIOS.flatMap((scenario) => scenario.families);
+
+    for (const general of generals) {
       expect(
         hasAsset(`portraits/${general.name.toLowerCase()}.webp`),
         general.name,
       ).toBe(true);
     }
-    for (const family of SCENARIO_1.families) {
+    for (const family of families) {
       expect(
         hasAsset(`crests/${family.name.toLowerCase()}.webp`),
         family.name,

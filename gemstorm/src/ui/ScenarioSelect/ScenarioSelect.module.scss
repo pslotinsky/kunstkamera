@@ -1,0 +1,118 @@
+@use "@/ui/kit";
+
+.root {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  color: var(--ink);
+  background: var(--surface-900);
+}
+
+.hidden {
+  display: none;
+}
+
+.frame {
+  @include kit.double-trim;
+
+  position: absolute;
+  inset: 1rem;
+  z-index: 1;
+  pointer-events: none;
+
+  &::after {
+    @include kit.ornate-corners(56px);
+
+    position: absolute;
+    inset: -3px;
+  }
+}
+
+.choices {
+  position: absolute;
+  top: 4rem;
+  bottom: 4rem;
+  left: 4rem;
+  display: flex;
+  flex-direction: column;
+  width: 34rem;
+}
+
+.heading {
+  @include kit.display-type;
+
+  margin: 0 0 2rem;
+  color: var(--gold-text);
+  font-size: 3.25rem;
+  font-weight: 600;
+}
+
+.list {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scenario {
+  @include kit.card;
+
+  display: grid;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 1rem 1.25rem;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--trim-dim);
+  }
+}
+
+.selected {
+  @include kit.selected;
+}
+
+.name {
+  @include kit.display-type;
+
+  color: var(--gold-text);
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.year {
+  color: var(--ink-soft);
+  font-size: 1.1rem;
+  font-variant: small-caps;
+}
+
+.description {
+  color: var(--ink-soft);
+  font-size: 1.15rem;
+  line-height: 1.4;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.action {
+  @include kit.framed-button;
+
+  min-width: 10rem;
+  min-height: 4.25rem;
+}
+
+.map {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  bottom: 2rem;
+  left: 42rem;
+}

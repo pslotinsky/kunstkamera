@@ -18,7 +18,12 @@ export class TitleScreenControl extends Control<
     });
   }
 
-  public close(): void {
+  public show(): void {
+    this.view.show();
+    this.controls.scene.setPaused(false);
+  }
+
+  public hide(): void {
     this.controls.scene.setPaused(true);
     this.view.hide();
   }

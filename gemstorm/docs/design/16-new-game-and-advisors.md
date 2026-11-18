@@ -154,15 +154,8 @@ Complete scenarios 2–4 using the local ROM records for ownership, resources, a
 
 ## Overview
 
-- **App shell** owns the game frame and its scaling. It holds the title above the campaign screens, which stay inert until the campaign starts.
-- **Title screen** contains the animated scene, the main menu, and the Options dialog. New Game hides the title and publishes `CampaignStartedEvent`, which starts the engine.
-- **Options** is a standalone dialog that edits the sound board's channels, so the campaign can reuse it.
-- **Sound channels**: master, with music and SFX beneath it. Each channel keeps its own volume and on/off state.
-- **Sound director** owns all music cues and click sounds on every screen: title music from launch, map music once the campaign starts.
-
-## Current state
-
-Implemented: the title screen, Options, and title music. New Game starts the default campaign (The Fractured Oath, Alderwyn) from a world created at boot. Scenario, family, and advisor selection, advice, and New Game after an ending remain planned.
+- **Session**: lasts from launch to exit. It holds the title, the setup screens, Options, and the menu music.
+- **Campaign**: one playthrough. It is built from the setup choices when the player confirms them, and discarded when it ends, so a new game never inherits anything from the last one.
 
 ## Domain model
 

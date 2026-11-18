@@ -4,6 +4,9 @@ export const SCENARIO_1: Scenario = {
   number: 1,
   name: 'The Fractured Oath',
   year: 201,
+  description:
+    'The rebellion begins. Avar and Darian challenge the royal house of Varrengard.',
+  playableFamilies: ['Alderwyn', 'Stormmere', 'Emberholt', 'Thornvale'],
   generals: [
     {
       name: 'Caeric',

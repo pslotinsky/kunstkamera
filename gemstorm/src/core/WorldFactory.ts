@@ -21,18 +21,29 @@ const MONTHS_PER_YEAR = 12;
 const DEATH_SPREAD_MONTHS = 3;
 
 // TODO: replaced by the family chosen at new-game setup (feature 16)
-const playerFamily = 'Alderwyn';
+const DEFAULT_PLAYER_FAMILY = 'Alderwyn';
+
+export interface CampaignStart {
+  readonly scenario: Scenario;
+  readonly family?: string;
+}
+
+interface Population {
+  readonly generals: Collection<string, General>;
+  readonly provinces: Collection<number, Province>;
+  readonly families: Collection<string, Family>;
+}
 
 export class WorldFactory {
-  public create(): World {
-    const scenario = this.defaultScenario();
+  public create(start?: CampaignStart): World {
+    const scenario = start?.scenario ?? this.defaultScenario();
+    const playerFamily = start?.family ?? DEFAULT_PLAYER_FAMILY;
 
-    const generals = this.createGenerals(scenario);
-    const provinces = this.createProvinces(scenario);
-    const families = this.createFamilies(scenario, generals, provinces);
+    if (!scenario.playableFamilies.includes(playerFamily)) {
+      throw new Error(`${playerFamily} is not playable in ${scenario.name}`);
+    }
 
-    this.settleProvinces(scenario, families, generals, provinces);
-
+    const { generals, provinces, families } = this.populate(scenario);
     const player = families.getOrFail(playerFamily);
 
     return new World({
@@ -42,6 +53,22 @@ export class WorldFactory {
       generals,
       player,
     });
+  }
+
+  public createMap(scenario: Scenario): WorldMap {
+    const { provinces } = this.populate(scenario);
+
+    return new WorldMap(provinces);
+  }
+
+  private populate(scenario: Scenario): Population {
+    const generals = this.createGenerals(scenario);
+    const provinces = this.createProvinces(scenario);
+    const families = this.createFamilies(scenario, generals, provinces);
+
+    this.settleProvinces(scenario, families, generals, provinces);
+
+    return { generals, provinces, families };
   }
 
   private defaultScenario(): Scenario {

@@ -1,0 +1,8 @@
+@use "@/ui/WorldMap/map-art";
+
+.root {
+  @include map-art.map-art;
+
+  width: 100%;
+  height: 100%;
+}

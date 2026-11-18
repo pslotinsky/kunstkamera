@@ -17,18 +17,14 @@ export class AppView extends View<AppContext, AppViews> {
 
     return html`
       <div class=${styles.root}>
-        <div class=${styles.campaign} data-campaign inert>
-          ${views.gameScreen.template} ${views.battleScreen.template}
-        </div>
-        ${views.title.template}
+        <div class=${styles.stage} data-stage></div>
+        ${views.title.template} ${views.scenarioSelect.template}
       </div>
     `;
   }
 
-  public enterCampaign(): void {
-    this.element
-      .querySelector<HTMLElement>('[data-campaign]')!
-      .removeAttribute('inert');
+  public get stage(): HTMLElement {
+    return this.element.querySelector<HTMLElement>('[data-stage]')!;
   }
 
   protected override onMount(): void {

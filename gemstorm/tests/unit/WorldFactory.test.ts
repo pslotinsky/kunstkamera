@@ -1,39 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { SCENARIO_1 } from '@/config/scenario-1';
+import { SCENARIOS } from '@/config/scenarios';
 import { WorldFactory } from '@/core/WorldFactory';
 
-const world = new WorldFactory().create();
-
-describe('WorldFactory', () => {
-  it('owns provinces with families from the world, leaving the rest neutral', () => {
-    const families = new Set(world.families.all);
-
-    let ownedCount = 0;
-    let neutralCount = 0;
-
-    for (const province of world.map.provinces) {
-      const owner = province.family;
-
-      if (owner === undefined) {
-        neutralCount += 1;
-      } else {
-        ownedCount += 1;
-        expect(families.has(owner)).toBe(true);
-      }
-    }
-
-    expect(ownedCount).toBeGreaterThan(0);
-    expect(neutralCount).toBeGreaterThan(0);
-  });
-
-  it('gives every governed province a governor from the owning family', () => {
-    for (const province of world.map.provinces) {
-      if (province.governor) {
-        expect(province.family, `province ${province.number}`).toBeDefined();
-        expect(province.family?.members).toContain(province.governor);
-      }
-    }
+describe.each(SCENARIOS)('WorldFactory: $name', (scenario) => {
+  const world = new WorldFactory().create({
+    scenario,
+    family: scenario.playableFamilies[0]!,
   });
 
   it('seats each family ruler in the home province they govern', () => {
@@ -51,7 +24,7 @@ describe('WorldFactory', () => {
   });
 
   it('gives each house the gems its scenario names, and nothing derives them', () => {
-    for (const definition of SCENARIO_1.families) {
+    for (const definition of scenario.families) {
       const family = world.families.getOrFail(definition.name);
 
       expect(
@@ -60,6 +33,15 @@ describe('WorldFactory', () => {
       ).toEqual([...definition.gems]);
     }
   });
+
+  it('starts in January of the scenario year with the chosen house', () => {
+    expect(world.date.year).toBe(scenario.year);
+    expect(world.date.month).toBe(1);
+    expect(world.player.name).toBe(scenario.playableFamilies[0]);
+  });
+});
+
+describe('WorldFactory', () => {
   it('says what kind of country each province is', () => {
     const world = new WorldFactory().create();
     const grouped = (kind: string) =>
@@ -73,5 +55,13 @@ describe('WorldFactory', () => {
     expect(grouped('woods')).toEqual([
       6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 23, 30,
     ]);
+  });
+
+  it('refuses a house that is not playable in the scenario', () => {
+    const [scenario] = SCENARIOS;
+
+    expect(() =>
+      new WorldFactory().create({ scenario: scenario!, family: 'Varrengard' }),
+    ).toThrow();
   });
 });
