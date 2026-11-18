@@ -1,0 +1,41 @@
+@use "@/ui/Setup/setup-screen";
+
+.root {
+  @include setup-screen.screen;
+}
+
+.hidden {
+  display: none;
+}
+
+.frame {
+  @include setup-screen.frame;
+}
+
+.choices {
+  @include setup-screen.choices;
+}
+
+.header {
+  @include setup-screen.header;
+}
+
+.heading {
+  @include setup-screen.heading;
+}
+
+.subtitle {
+  @include setup-screen.subtitle;
+}
+
+.actions {
+  @include setup-screen.actions;
+}
+
+.action {
+  @include setup-screen.action;
+}
+
+.map {
+  @include setup-screen.map-pane;
+}

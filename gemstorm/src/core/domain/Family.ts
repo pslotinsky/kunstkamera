@@ -83,6 +83,10 @@ export class Family {
     this.gems = [];
   }
 
+  public get vassals(): readonly General[] {
+    return this.members.filter((member) => !this.isRuler(member));
+  }
+
   public get guardians(): readonly FifthUnit[] {
     return this.gems.map((gem) => gem.guardian);
   }

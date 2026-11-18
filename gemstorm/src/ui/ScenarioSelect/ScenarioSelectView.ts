@@ -2,9 +2,9 @@ import { html, type TemplateResult } from 'lit-html';
 
 import type { Scenario } from '@/config/scenarios';
 import { View } from '@/lib/View';
+import { BackChosenEvent } from '@/ui/Setup/events/BackChosenEvent';
+import { NextChosenEvent } from '@/ui/Setup/events/NextChosenEvent';
 
-import { BackChosenEvent } from './events/BackChosenEvent';
-import { NextChosenEvent } from './events/NextChosenEvent';
 import { ScenarioSelectedEvent } from './events/ScenarioSelectedEvent';
 import type { ScenarioSelectContext, ScenarioSelectViews } from './types';
 
@@ -24,9 +24,11 @@ export class ScenarioSelectView extends View<
         aria-labelledby="scenario-heading">
         <div class=${styles.frame} aria-hidden="true"></div>
         <div class=${styles.choices}>
-          <h2 id="scenario-heading" class=${styles.heading}>
-            Choose a scenario
-          </h2>
+          <header class=${styles.header}>
+            <h2 id="scenario-heading" class=${styles.heading}>
+              Choose Scenario
+            </h2>
+          </header>
           <ol class=${styles.list}>
             ${this.context.scenarios.map((scenario) =>
               this.renderScenario(scenario),

@@ -1,0 +1,14 @@
+@use "@/ui/WorldMap/map-art";
+
+.root {
+  @include map-art.map-art;
+
+  width: 100%;
+  height: 100%;
+}
+
+.root :global(.province.highlighted) {
+  fill: rgba(216, 181, 106, 0.3);
+  stroke: rgba(248, 217, 142, 0.9);
+  stroke-width: 1;
+}

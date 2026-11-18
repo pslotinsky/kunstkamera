@@ -1,0 +1,76 @@
+@use "@/ui/kit";
+@use "@/ui/Setup/setup-screen";
+
+$divider-space: setup-screen.$space * 2.5;
+
+.root {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: setup-screen.$space;
+  margin-top: $divider-space * 2 - setup-screen.$space;
+
+  &::before {
+    @include kit.ornament-rule;
+
+    top: -$divider-space;
+  }
+}
+
+.portrait {
+  flex-shrink: 0;
+  width: 11rem;
+  height: 11rem;
+  object-fit: cover;
+  border: 1px solid var(--trim);
+  border-radius: 4px;
+}
+
+.facts {
+  display: flex;
+  flex-direction: column;
+  gap: setup-screen.$space-small;
+}
+
+.name {
+  @include kit.display-type;
+
+  color: var(--gold-text);
+  font-size: 2.25rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.age {
+  color: var(--ink-soft);
+  font-size: 1.35rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-rows: auto auto;
+  grid-auto-flow: column;
+  gap: 0 setup-screen.$space;
+  justify-content: start;
+  margin: 0;
+}
+
+.statName {
+  color: var(--ink-soft);
+  font-size: 1.15rem;
+  font-variant: small-caps;
+}
+
+.statValue {
+  margin: 0;
+  color: var(--ink);
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.vassals {
+  color: var(--ink-soft);
+  font-size: 1.35rem;
+}

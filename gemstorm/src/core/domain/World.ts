@@ -248,7 +248,7 @@ export class World {
   }
 
   public getFamilyProvinces(family: Family): readonly Province[] {
-    return this.map.provinces.filter((province) => province.belongsTo(family));
+    return this.map.getFamilyProvinces(family);
   }
 
   public getVassals(family: Family): readonly General[] {

@@ -18,7 +18,9 @@ export class AppView extends View<AppContext, AppViews> {
     return html`
       <div class=${styles.root}>
         <div class=${styles.stage} data-stage></div>
-        ${views.title.template} ${views.scenarioSelect.template}
+        ${views.title.template}
+        ${views.scenarioSelect.template}
+        ${views.familySelect.template}
       </div>
     `;
   }

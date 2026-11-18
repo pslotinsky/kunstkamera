@@ -1,4 +1,5 @@
 import type { ChildrenViews } from '@/lib/Control';
+import type { FamilySelectControl } from '@/ui/FamilySelect/FamilySelectControl';
 import type { ScenarioSelectControl } from '@/ui/ScenarioSelect/ScenarioSelectControl';
 import type { SoundBoard } from '@/ui/sound/SoundBoard';
 import type { TitleScreenControl } from '@/ui/TitleScreen/TitleScreenControl';
@@ -10,6 +11,7 @@ export interface AppContext {
 export type AppControls = {
   readonly title: TitleScreenControl;
   readonly scenarioSelect: ScenarioSelectControl;
+  readonly familySelect: FamilySelectControl;
 };
 
 export type AppViews = ChildrenViews<AppControls>;

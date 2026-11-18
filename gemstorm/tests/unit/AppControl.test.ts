@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SCENARIOS } from '@/config/scenarios';
 import { AppControl } from '@/ui/App/AppControl';
+import { CampaignControl } from '@/ui/Campaign/CampaignControl';
 import { SoundBoard } from '@/ui/sound/SoundBoard';
 
 let shell: AppControl | undefined;
@@ -39,6 +40,12 @@ function scenarioSelect(): HTMLElement {
   )!;
 }
 
+function familySelect(): HTMLElement {
+  return document.querySelector<HTMLElement>(
+    '[aria-labelledby="family-heading"]',
+  )!;
+}
+
 function stage(): HTMLElement {
   return document.querySelector<HTMLElement>('[data-stage]')!;
 }
@@ -67,6 +74,7 @@ afterEach(() => {
   shell = undefined;
   document.body.replaceChildren();
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
   vi.useRealTimers();
   if (visibility) {
     Object.defineProperty(HTMLElement.prototype, 'checkVisibility', visibility);
@@ -104,16 +112,40 @@ describe('AppControl', () => {
     expect(title().checkVisibility()).toBe(true);
   });
 
-  it('starts a campaign in the chosen scenario on Next', () => {
-    const chosen = SCENARIOS[1]!;
+  it('moves from the scenario to the house choice on Next, and back', () => {
     mount();
     button('New Game').click();
 
-    document.querySelector<HTMLButtonElement>('[data-scenario="2"]')!.click();
     button('Next', scenarioSelect()).click();
 
     expect(scenarioSelect().checkVisibility()).toBe(false);
-    expect(stage().childElementCount).toBeGreaterThan(0);
-    expect(stage().textContent).toContain(`Month 1, ${chosen.year}`);
+    expect(familySelect().checkVisibility()).toBe(true);
+
+    button('Back', familySelect()).click();
+
+    expect(familySelect().checkVisibility()).toBe(false);
+    expect(scenarioSelect().checkVisibility()).toBe(true);
+  });
+
+  it('starts a campaign in the chosen scenario as the chosen house', () => {
+    const scenario = SCENARIOS[1]!;
+    const family = scenario.playableFamilies[2]!;
+    const create = vi.spyOn(CampaignControl, 'create');
+    mount();
+    button('New Game').click();
+    document.querySelector<HTMLButtonElement>('[data-scenario="2"]')!.click();
+    button('Next', scenarioSelect()).click();
+
+    document
+      .querySelector<HTMLButtonElement>(`[data-key="${family}"]`)!
+      .click();
+    button('Next', familySelect()).click();
+
+    expect(create).toHaveBeenCalledWith(
+      { scenario, family },
+      expect.anything(),
+    );
+    expect(familySelect().checkVisibility()).toBe(false);
+    expect(stage().textContent).toContain(`Month 1, ${scenario.year}`);
   });
 });

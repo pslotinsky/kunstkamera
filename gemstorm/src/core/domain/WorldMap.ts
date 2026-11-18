@@ -1,5 +1,6 @@
 import type { Collection } from '@/lib/Collection';
 
+import type { Family } from './Family';
 import type { Province } from './Province';
 
 export class WorldMap {
@@ -11,6 +12,18 @@ export class WorldMap {
 
   public get provinces(): readonly Province[] {
     return this.provincesCollection.all;
+  }
+
+  public getFamilyProvinces(family: Family): readonly Province[] {
+    return this.provinces.filter((province) => province.belongsTo(family));
+  }
+
+  public getOwners(): readonly Family[] {
+    const owners = this.provinces.flatMap((province) =>
+      province.family ? [province.family] : [],
+    );
+
+    return [...new Set(owners)];
   }
 
   public getProvince(number: number): Province {

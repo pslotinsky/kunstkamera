@@ -1,9 +1,10 @@
 import { SCENARIOS } from '@/config/scenarios';
 import { Control } from '@/lib/Control';
 import { CampaignControl } from '@/ui/Campaign/CampaignControl';
-import { BackChosenEvent } from '@/ui/ScenarioSelect/events/BackChosenEvent';
-import { NextChosenEvent } from '@/ui/ScenarioSelect/events/NextChosenEvent';
+import { FamilySelectControl } from '@/ui/FamilySelect/FamilySelectControl';
 import { ScenarioSelectControl } from '@/ui/ScenarioSelect/ScenarioSelectControl';
+import { BackChosenEvent } from '@/ui/Setup/events/BackChosenEvent';
+import { NextChosenEvent } from '@/ui/Setup/events/NextChosenEvent';
 import { NewGameChosenEvent } from '@/ui/TitleScreen/events/NewGameChosenEvent';
 import { TitleScreenControl } from '@/ui/TitleScreen/TitleScreenControl';
 
@@ -17,15 +18,18 @@ export class AppControl extends Control<AppView, AppControls> {
     super(AppView, context, {
       title: new TitleScreenControl({ sounds: context.sounds }),
       scenarioSelect: new ScenarioSelectControl({ scenarios: SCENARIOS }),
+      familySelect: new FamilySelectControl(),
     });
   }
 
   protected override onMount(): void {
-    const { title, scenarioSelect } = this.controls;
+    const { title, scenarioSelect, familySelect } = this.controls;
 
     title.view.subscribe(NewGameChosenEvent, () => this.chooseScenario());
     scenarioSelect.view.subscribe(BackChosenEvent, () => this.returnToTitle());
-    scenarioSelect.view.subscribe(NextChosenEvent, () => this.startCampaign());
+    scenarioSelect.view.subscribe(NextChosenEvent, () => this.chooseFamily());
+    familySelect.view.subscribe(BackChosenEvent, () => this.chooseScenario());
+    familySelect.view.subscribe(NextChosenEvent, () => this.startCampaign());
   }
 
   protected override onUnmount(): void {
@@ -34,6 +38,7 @@ export class AppControl extends Control<AppView, AppControls> {
 
   private chooseScenario(): void {
     this.controls.title.hide();
+    this.controls.familySelect.hide();
     this.controls.scenarioSelect.show();
   }
 
@@ -42,14 +47,21 @@ export class AppControl extends Control<AppView, AppControls> {
     this.controls.title.show();
   }
 
+  private chooseFamily(): void {
+    const { scenarioSelect, familySelect } = this.controls;
+
+    scenarioSelect.hide();
+    familySelect.show(scenarioSelect.scenario);
+  }
+
   private startCampaign(): void {
-    const { scenarioSelect } = this.controls;
+    const { scenarioSelect, familySelect } = this.controls;
     const campaign = CampaignControl.create(
-      { scenario: scenarioSelect.scenario },
+      { scenario: scenarioSelect.scenario, family: familySelect.family.name },
       this.context.sounds,
     );
 
-    scenarioSelect.hide();
+    familySelect.hide();
     campaign.mount(this.view.stage);
     this.campaign = campaign;
   }

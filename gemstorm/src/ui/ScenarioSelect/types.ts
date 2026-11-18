@@ -1,7 +1,6 @@
 import type { Scenario } from '@/config/scenarios';
 import type { ChildrenViews } from '@/lib/Control';
-
-import type { MapPreviewControl } from './MapPreview/MapPreviewControl';
+import type { MapPreviewControl } from '@/ui/MapPreview/MapPreviewControl';
 
 export interface ScenarioSelectContext {
   readonly scenarios: readonly Scenario[];

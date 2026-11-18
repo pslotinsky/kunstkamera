@@ -192,7 +192,7 @@ Starting a campaign: title screen, scenario and family choice, and an advisor to
 - [x] start a new game from the title screen
 - [x] hear the title theme on the menus
 - [x] pick one of the four scenarios
-- [ ] choose the family you play
+- [x] choose the family you play
 - [ ] pick one of four advisors at setup
 - [ ] get advice on your next move during play
 

@@ -25,7 +25,7 @@ const DEFAULT_PLAYER_FAMILY = 'Alderwyn';
 
 export interface CampaignStart {
   readonly scenario: Scenario;
-  readonly family?: string;
+  readonly family: string;
 }
 
 interface Population {
@@ -47,12 +47,16 @@ export class WorldFactory {
     const player = families.getOrFail(playerFamily);
 
     return new World({
-      date: new CalendarDate(scenario.year, START_MONTH),
+      date: this.getStartDate(scenario),
       map: new WorldMap(provinces),
       families,
       generals,
       player,
     });
+  }
+
+  public getStartDate(scenario: Scenario): CalendarDate {
+    return new CalendarDate(scenario.year, START_MONTH);
   }
 
   public createMap(scenario: Scenario): WorldMap {

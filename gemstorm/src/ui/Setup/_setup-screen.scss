@@ -1,0 +1,115 @@
+@use "@/ui/kit";
+
+$frame-inset: 1rem;
+$gutter: 3rem;
+$inset: $frame-inset + $gutter;
+$choices-width: 28rem;
+$space: 1rem;
+$space-small: 0.5rem;
+
+@mixin screen {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  color: var(--ink);
+  background: var(--surface-900);
+}
+
+@mixin frame {
+  @include kit.double-trim;
+
+  position: absolute;
+  inset: $frame-inset;
+  z-index: 1;
+  pointer-events: none;
+
+  &::after {
+    @include kit.ornate-corners(56px);
+
+    position: absolute;
+    inset: -3px;
+  }
+}
+
+@mixin choices {
+  position: absolute;
+  top: $inset;
+  bottom: $inset;
+  left: $inset;
+  display: flex;
+  flex-direction: column;
+  gap: $space;
+  width: $choices-width;
+}
+
+@mixin header {
+  display: flex;
+  flex-direction: column;
+  gap: $space-small;
+  margin-bottom: $space;
+}
+
+@mixin heading {
+  @include kit.display-type;
+
+  margin: 0;
+  color: var(--gold-text);
+  font-size: 3.25rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+@mixin subtitle {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 1.25rem;
+}
+
+@mixin card {
+  @include kit.card;
+
+  padding: $space;
+}
+
+@mixin list {
+  display: grid;
+  gap: $space;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@mixin choice {
+  @include card;
+
+  width: 100%;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--trim-dim);
+  }
+}
+
+@mixin actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+@mixin action {
+  @include kit.framed-button;
+
+  min-width: 10rem;
+  min-height: 4.25rem;
+}
+
+@mixin map-pane {
+  position: absolute;
+  top: $frame-inset + $space;
+  right: $frame-inset + $space;
+  bottom: $frame-inset + $space;
+  left: $inset + $choices-width + $gutter;
+}

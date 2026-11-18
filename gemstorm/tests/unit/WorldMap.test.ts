@@ -5,6 +5,17 @@ import { WorldFactory } from '@/core/WorldFactory';
 const { map } = new WorldFactory().create();
 
 describe('WorldMap', () => {
+  it('lists each owning house once, leaving neutral provinces out', () => {
+    const owners = map.getOwners();
+    const owned = map.provinces.filter((province) => province.family);
+
+    expect(new Set(owners).size).toBe(owners.length);
+    expect(owners).toEqual(
+      expect.arrayContaining(owned.map((province) => province.family)),
+    );
+    expect(owners).not.toContain(undefined);
+  });
+
   it('getProvince returns the province and throws on an unknown number', () => {
     expect(map.getProvince(10).name).toBe('Alderpass');
     expect(() => map.getProvince(31)).toThrow();

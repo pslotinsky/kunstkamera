@@ -1,11 +1,8 @@
 @use "@/ui/kit";
+@use "@/ui/Setup/setup-screen";
 
 .root {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  color: var(--ink);
-  background: var(--surface-900);
+  @include setup-screen.screen;
 }
 
 .hidden {
@@ -13,63 +10,30 @@
 }
 
 .frame {
-  @include kit.double-trim;
-
-  position: absolute;
-  inset: 1rem;
-  z-index: 1;
-  pointer-events: none;
-
-  &::after {
-    @include kit.ornate-corners(56px);
-
-    position: absolute;
-    inset: -3px;
-  }
+  @include setup-screen.frame;
 }
 
 .choices {
-  position: absolute;
-  top: 4rem;
-  bottom: 4rem;
-  left: 4rem;
-  display: flex;
-  flex-direction: column;
-  width: 34rem;
+  @include setup-screen.choices;
+}
+
+.header {
+  @include setup-screen.header;
 }
 
 .heading {
-  @include kit.display-type;
-
-  margin: 0 0 2rem;
-  color: var(--gold-text);
-  font-size: 3.25rem;
-  font-weight: 600;
+  @include setup-screen.heading;
 }
 
 .list {
-  display: grid;
-  gap: 1rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  @include setup-screen.list;
 }
 
 .scenario {
-  @include kit.card;
+  @include setup-screen.choice;
 
   display: grid;
-  gap: 0.35rem;
-  width: 100%;
-  padding: 1rem 1.25rem;
-  color: var(--ink);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-
-  &:hover {
-    border-color: var(--trim-dim);
-  }
+  gap: setup-screen.$space-small;
 }
 
 .selected {
@@ -97,22 +61,13 @@
 }
 
 .actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: auto;
+  @include setup-screen.actions;
 }
 
 .action {
-  @include kit.framed-button;
-
-  min-width: 10rem;
-  min-height: 4.25rem;
+  @include setup-screen.action;
 }
 
 .map {
-  position: absolute;
-  top: 2rem;
-  right: 2rem;
-  bottom: 2rem;
-  left: 42rem;
+  @include setup-screen.map-pane;
 }

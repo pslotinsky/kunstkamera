@@ -1,9 +1,9 @@
 import type { Scenario } from '@/config/scenarios';
 import { WorldFactory } from '@/core/WorldFactory';
 import { Control } from '@/lib/Control';
+import { MapPreviewControl } from '@/ui/MapPreview/MapPreviewControl';
 
 import { ScenarioSelectedEvent } from './events/ScenarioSelectedEvent';
-import { MapPreviewControl } from './MapPreview/MapPreviewControl';
 import { ScenarioSelectView } from './ScenarioSelectView';
 import type { ScenarioSelectContext, ScenarioSelectControls } from './types';
 
@@ -20,10 +20,8 @@ export class ScenarioSelectControl extends Control<
       throw new Error('No scenario to select');
     }
 
-    const map = new WorldFactory().createMap(first);
-
     super(ScenarioSelectView, context, {
-      mapPreview: new MapPreviewControl({ map }),
+      mapPreview: new MapPreviewControl(),
     });
     this.selected = first;
   }
@@ -44,7 +42,7 @@ export class ScenarioSelectControl extends Control<
     this.subscribe(ScenarioSelectedEvent, (event) =>
       this.select(event.scenario),
     );
-    this.view.showSelected(this.selected);
+    this.select(this.selected);
   }
 
   private select(scenario: Scenario): void {

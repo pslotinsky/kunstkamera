@@ -96,26 +96,35 @@ The player loses their last province, acknowledges the ending, and inspects the 
 ## UI
 
 ```text
-┌─ Gemstorm ────────────────────────────────┐
-│                GEMSTORM                   │
-│                                          │
-│              [ New Game ]                │
-│              [ Options  ]                │
-└──────────────────────────────────────────┘
+┌─ Gemstorm ─────────────────────────────────┐
+│                                            │
+│                 GEMSTORM                   │
+│                                            │
+│               [ New Game ]                 │
+│               [ Options  ]                 │
+│                                            │
+└────────────────────────────────────────────┘
 
-┌─ New game · Family ───────────────────────┐
-│  The Fractured Oath                             │
-│                                           │
-│  [ Alderwyn ]   <Political map preview>    │
-│  [ Stormmere ]      Selected lands highlighted │
-│  [ Emberholt ]                               │
-│  [ Thornvale ]                            │
-│                                           │
-│  Ruler: <name>    Provinces: <count>      │
-│  Members: <count> Gems: <names>           │
-│                                           │
-│  [ Back ]                      [ Next ]   │
-└───────────────────────────────────────────┘
+┌─ New game · Family ──────────────────────────────┐
+│  Choose Family                                   │
+│  The Fractured Oath · Year 201                   │
+│                                                  │
+│  ┏━━━━━━━━━━┓ ┌──────────┐   <map preview with   │
+│  ┃ [crest]  ┃ │ [crest]  │    starting crests;   │
+│  ┃ Alderwyn ┃ │Stormmere │    chosen house's     │
+│  ┗━━━━━━━━━━┛ └──────────┘    lands lit>         │
+│  ┌──────────┐ ┌──────────┐                       │
+│  │ [crest]  │ │ [crest]  │                       │
+│  │Emberholt │ │Thornvale │                       │
+│  └──────────┘ └──────────┘                       │
+│                                                  │
+│  [portrait]  Avar                                │
+│              Age 19                              │
+│              INT 82  WAR 87  CHA 76              │
+│              4 vassals                           │
+│                                                  │
+│  [ Back ]                         [ Next ]       │
+└──────────────────────────────────────────────────┘
 
 ┌─ <Advisor name> ─────────────────────────┐
 │  <Portrait>                              │
@@ -128,7 +137,7 @@ The player loses their last province, acknowledges the ending, and inspects the 
 
 The Scenario screen shows all four names, starting dates, and short introductions. Next opens the Family screen illustrated above. The Advisor screen offers four portraits with names and sample sayings, followed by the scenario/family summary and Begin campaign.
 
-Reuse the existing visual language and map geometry. The setup map shows starting ownership without orders or turn markers. Highlight the selected family's provinces and display its ruler, province count, members, and Gems. Selection works by keyboard and pointer, with visible focus, accessible labels, and focus restored to Advice when its dialog closes. Escape follows Back in setup and closes optional advice.
+Reuse the existing visual language and map geometry. The setup map shows starting ownership without orders or turn markers. Highlight the selected family's provinces on the map and display its ruler: portrait, name, age, INT, WAR, CHA, and number of vassals. Selection works by keyboard and pointer, with visible focus, accessible labels, and focus restored to Advice when its dialog closes. Escape follows Back in setup and closes optional advice.
 
 ### Title screen
 

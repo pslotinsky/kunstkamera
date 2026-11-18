@@ -37,6 +37,14 @@ export class ProvinceMarkers {
     }
   }
 
+  public place(province: Province): void {
+    if (this.markers.has(province.number)) {
+      this.actualize(province);
+    } else {
+      this.add(province);
+    }
+  }
+
   public actualize(province: Province): void {
     const marker = this.markers.get(province.number);
     const anchor = MARKER_ANCHORS[province.number];
