@@ -23,10 +23,21 @@
   @include kit.selected;
 }
 
-.image {
-  width: 6.5rem;
-  height: auto;
+$picture-size: 8rem;
+
+.emblem {
+  width: $picture-size;
+  height: $picture-size;
+  object-fit: contain;
   filter: drop-shadow(0 0.4rem 0.6rem rgba(0, 0, 0, 0.6));
+}
+
+.portrait {
+  width: $picture-size;
+  height: $picture-size;
+  object-fit: cover;
+  border: 1px solid var(--trim);
+  border-radius: 4px;
 }
 
 .label {

@@ -126,6 +126,27 @@ The player loses their last province, acknowledges the ending, and inspects the 
 │  [ Back ]                         [ Next ]       │
 └──────────────────────────────────────────────────┘
 
+┌─ New game · Advisor ─────────────────────────────┐
+│  Choose Advisor                                  │
+│  The Fractured Oath · Year 201 · Alderwyn        │
+│                                                  │
+│  ┏━━━━━━━━━━┓ ┌──────────┐   <map preview with   │
+│  ┃[portrait]┃ │[portrait]│    chosen family's    │
+│  ┃ Orraven  ┃ │ Brannoc  │    lands lit>         │
+│  ┗━━━━━━━━━━┛ └──────────┘                       │
+│  ┌──────────┐ ┌──────────┐                       │
+│  │[portrait]│ │[portrait]│                       │
+│  │  Vesha   │ │ Quillon  │                       │
+│  └──────────┘ └──────────┘                       │
+│                                                  │
+│  [portrait]  Orraven                             │
+│              the Chronicler                      │
+│              “A wise ruler prepares for          │
+│               tomorrow.”                         │
+│                                                  │
+│  [ Back ]                        [ Begin ]       │
+└──────────────────────────────────────────────────┘
+
 ┌─ <Advisor name> ─────────────────────────┐
 │  <Portrait>                              │
 │  Give food to <active province>.         │
@@ -135,7 +156,7 @@ The player loses their last province, acknowledges the ending, and inspects the 
 └──────────────────────────────────────────┘
 ```
 
-The Scenario screen shows all four names, starting dates, and short introductions. Next opens the Family screen illustrated above. The Advisor screen offers four portraits with names and sample sayings, followed by the scenario/family summary and Begin campaign.
+The Scenario screen shows all four names, starting dates, and short introductions. Next opens the Family screen illustrated above. The Advisor screen offers four portraits with names. The selected advisor's portrait, title, and a sample saying appear below them; the map highlights the chosen family's provinces as the scenario/family summary. Begin starts the campaign.
 
 Reuse the existing visual language and map geometry. The setup map shows starting ownership without orders or turn markers. Highlight the selected family's provinces on the map and display its ruler: portrait, name, age, INT, WAR, CHA, and number of vassals. Selection works by keyboard and pointer, with visible focus, accessible labels, and focus restored to Advice when its dialog closes. Escape follows Back in setup and closes optional advice.
 

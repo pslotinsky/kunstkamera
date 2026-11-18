@@ -1,29 +1,12 @@
 @use "@/ui/kit";
 @use "@/ui/Setup/setup-screen";
 
-$divider-space: setup-screen.$space * 2.5;
-
 .root {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: setup-screen.$space;
-  margin-top: $divider-space * 2 - setup-screen.$space;
-
-  &::before {
-    @include kit.ornament-rule;
-
-    top: -$divider-space;
-  }
+  @include setup-screen.preview;
 }
 
 .portrait {
-  flex-shrink: 0;
-  width: 11rem;
-  height: 11rem;
-  object-fit: cover;
-  border: 1px solid var(--trim);
-  border-radius: 4px;
+  @include setup-screen.preview-portrait;
 }
 
 .facts {
@@ -33,12 +16,7 @@ $divider-space: setup-screen.$space * 2.5;
 }
 
 .name {
-  @include kit.display-type;
-
-  color: var(--gold-text);
-  font-size: 2.25rem;
-  font-weight: 600;
-  line-height: 1.1;
+  @include setup-screen.preview-name;
 }
 
 .age {

@@ -64,4 +64,16 @@ describe('WorldFactory', () => {
       new WorldFactory().create({ scenario: scenario!, family: 'Varrengard' }),
     ).toThrow();
   });
+
+  it('keeps the chosen advisor with the campaign', () => {
+    const [scenario] = SCENARIOS;
+    const [, advisor] = new WorldFactory().createAdvisors();
+    const world = new WorldFactory().create({
+      scenario: scenario!,
+      family: scenario!.playableFamilies[0]!,
+      advisor: advisor!,
+    });
+
+    expect(world.campaign.advisor?.isEqual(advisor!)).toBe(true);
+  });
 });

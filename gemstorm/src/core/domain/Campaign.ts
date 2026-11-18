@@ -1,3 +1,4 @@
+import type { Advisor } from './Advisor';
 import { CampaignOutcome, type DefeatReason } from './CampaignOutcome';
 import type { Coronation } from './Coronation';
 import type { Family } from './Family';
@@ -6,13 +7,16 @@ import type { World } from './World';
 const AURETH_PROVINCES = 30;
 
 export class Campaign {
+  public readonly advisor: Advisor | undefined;
+
   private readonly world: World;
   private concluded: CampaignOutcome | undefined;
   private fallen: CampaignOutcome | undefined;
   private succession: Coronation | undefined;
 
-  public constructor(world: World) {
+  public constructor(world: World, advisor?: Advisor) {
     this.world = world;
+    this.advisor = advisor;
   }
 
   public get outcome(): CampaignOutcome | undefined {

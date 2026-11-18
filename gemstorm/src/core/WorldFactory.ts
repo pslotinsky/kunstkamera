@@ -1,9 +1,11 @@
+import { ADVISORS } from '@/config/advisors';
 import { PROVINCES } from '@/config/provinces';
 import {
   type FamilyDefinition,
   SCENARIOS,
   type Scenario,
 } from '@/config/scenarios';
+import { Advisor } from '@/core/domain/Advisor';
 import { CalendarDate } from '@/core/domain/CalendarDate';
 import { Characteristics } from '@/core/domain/Characteristics';
 import { Development } from '@/core/domain/Development';
@@ -26,6 +28,7 @@ const DEFAULT_PLAYER_FAMILY = 'Alderwyn';
 export interface CampaignStart {
   readonly scenario: Scenario;
   readonly family: string;
+  readonly advisor?: Advisor;
 }
 
 interface Population {
@@ -52,7 +55,12 @@ export class WorldFactory {
       families,
       generals,
       player,
+      advisor: start?.advisor,
     });
+  }
+
+  public createAdvisors(): readonly Advisor[] {
+    return ADVISORS.map((params) => new Advisor(params));
   }
 
   public getStartDate(scenario: Scenario): CalendarDate {

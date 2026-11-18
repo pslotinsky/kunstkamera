@@ -31,7 +31,11 @@ export class FamilySelectControl extends Control<
       FamilySelectView,
       {},
       {
-        houses: new TileGridControl({ name: 'houses', size: PLAYABLE_HOUSES }),
+        houses: new TileGridControl({
+          name: 'houses',
+          size: PLAYABLE_HOUSES,
+          picture: 'emblem',
+        }),
         ruler: new RulerPreviewControl(),
         mapPreview: new MapPreviewControl(),
       },

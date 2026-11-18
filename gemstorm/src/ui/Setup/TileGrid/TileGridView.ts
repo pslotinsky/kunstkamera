@@ -12,10 +12,18 @@ export interface Tile {
   readonly label: string;
 }
 
+export type TilePicture = 'emblem' | 'portrait';
+
 export interface TileGridContext {
   readonly name: string;
   readonly size: number;
+  readonly picture: TilePicture;
 }
+
+const PICTURE_CLASSES: Readonly<Record<TilePicture, string>> = {
+  emblem: styles.emblem!,
+  portrait: styles.portrait!,
+};
 
 export class TileGridView extends View<TileGridContext> {
   protected readonly rootClass = styles.root!;
@@ -58,7 +66,7 @@ export class TileGridView extends View<TileGridContext> {
       <li>
         <button class=${styles.tile} data-tile aria-pressed="false"
           @click=${(event: Event) => this.selectTile(event)}>
-          <img class=${styles.image} data-image alt="" />
+          <img class=${PICTURE_CLASSES[this.context.picture]} data-image alt="" />
           <span class=${styles.label} data-label></span>
         </button>
       </li>

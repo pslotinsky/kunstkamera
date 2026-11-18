@@ -1,6 +1,7 @@
 import { BREAKAWAY_NAMES } from '@/config/families';
 import type { Collection } from '@/lib/Collection';
 
+import type { Advisor } from './Advisor';
 import type { CalendarDate } from './CalendarDate';
 import { Campaign } from './Campaign';
 import type { Captive } from './Captive';
@@ -18,6 +19,7 @@ export interface WorldParams {
   readonly families: Collection<string, Family>;
   readonly generals: Collection<string, General>;
   readonly player: Family;
+  readonly advisor?: Advisor | undefined;
 }
 
 export class World {
@@ -40,7 +42,7 @@ export class World {
     this.generals = params.generals;
     this.player = params.player;
     this.turnQueue = new TurnQueue(this.map.provinces);
-    this.campaign = new Campaign(this);
+    this.campaign = new Campaign(this, params.advisor);
   }
 
   public hold(captive: Captive): void {

@@ -46,6 +46,12 @@ function familySelect(): HTMLElement {
   )!;
 }
 
+function advisorSelect(): HTMLElement {
+  return document.querySelector<HTMLElement>(
+    '[aria-labelledby="advisor-heading"]',
+  )!;
+}
+
 function stage(): HTMLElement {
   return document.querySelector<HTMLElement>('[data-stage]')!;
 }
@@ -127,7 +133,24 @@ describe('AppControl', () => {
     expect(scenarioSelect().checkVisibility()).toBe(true);
   });
 
-  it('starts a campaign in the chosen scenario as the chosen house', () => {
+  it('moves from the house to the advisor choice on Next, and back', () => {
+    mount();
+    button('New Game').click();
+    button('Next', scenarioSelect()).click();
+
+    button('Next', familySelect()).click();
+
+    expect(familySelect().checkVisibility()).toBe(false);
+    expect(advisorSelect().checkVisibility()).toBe(true);
+    expect(stage().childElementCount).toBe(0);
+
+    button('Back', advisorSelect()).click();
+
+    expect(advisorSelect().checkVisibility()).toBe(false);
+    expect(familySelect().checkVisibility()).toBe(true);
+  });
+
+  it('begins a campaign with the chosen scenario, house, and advisor', () => {
     const scenario = SCENARIOS[1]!;
     const family = scenario.playableFamilies[2]!;
     const create = vi.spyOn(CampaignControl, 'create');
@@ -135,17 +158,25 @@ describe('AppControl', () => {
     button('New Game').click();
     document.querySelector<HTMLButtonElement>('[data-scenario="2"]')!.click();
     button('Next', scenarioSelect()).click();
-
-    document
+    familySelect()
       .querySelector<HTMLButtonElement>(`[data-key="${family}"]`)!
       .click();
     button('Next', familySelect()).click();
 
+    advisorSelect()
+      .querySelector<HTMLButtonElement>('[data-key="Vesha"]')!
+      .click();
+    button('Begin', advisorSelect()).click();
+
     expect(create).toHaveBeenCalledWith(
-      { scenario, family },
+      {
+        scenario,
+        family,
+        advisor: expect.objectContaining({ name: 'Vesha' }),
+      },
       expect.anything(),
     );
-    expect(familySelect().checkVisibility()).toBe(false);
+    expect(advisorSelect().checkVisibility()).toBe(false);
     expect(stage().textContent).toContain(`Month 1, ${scenario.year}`);
   });
 });

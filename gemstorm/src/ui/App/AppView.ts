@@ -21,6 +21,7 @@ export class AppView extends View<AppContext, AppViews> {
         ${views.title.template}
         ${views.scenarioSelect.template}
         ${views.familySelect.template}
+        ${views.advisorSelect.template}
       </div>
     `;
   }

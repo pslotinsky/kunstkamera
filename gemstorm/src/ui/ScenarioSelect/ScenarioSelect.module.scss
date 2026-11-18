@@ -1,30 +1,6 @@
 @use "@/ui/kit";
 @use "@/ui/Setup/setup-screen";
 
-.root {
-  @include setup-screen.screen;
-}
-
-.hidden {
-  display: none;
-}
-
-.frame {
-  @include setup-screen.frame;
-}
-
-.choices {
-  @include setup-screen.choices;
-}
-
-.header {
-  @include setup-screen.header;
-}
-
-.heading {
-  @include setup-screen.heading;
-}
-
 .list {
   @include setup-screen.list;
 }
@@ -58,16 +34,4 @@
   color: var(--ink-soft);
   font-size: 1.15rem;
   line-height: 1.4;
-}
-
-.actions {
-  @include setup-screen.actions;
-}
-
-.action {
-  @include setup-screen.action;
-}
-
-.map {
-  @include setup-screen.map-pane;
 }

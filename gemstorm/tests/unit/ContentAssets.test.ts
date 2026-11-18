@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { ADVISORS } from '@/config/advisors';
 import { HIRED_UNITS } from '@/config/fifth-units';
 import { GEMS } from '@/config/gems';
 import { BAD_EVENTS, DISASTERS, GOOD_EVENTS } from '@/config/province-events';
@@ -26,6 +27,15 @@ describe('game content assets', () => {
       expect(
         hasAsset(`crests/${family.name.toLowerCase()}.webp`),
         family.name,
+      ).toBe(true);
+    }
+  });
+
+  it('has a portrait for every advisor', () => {
+    for (const advisor of ADVISORS) {
+      expect(
+        hasAsset(`advisors/${advisor.name.toLowerCase()}.webp`),
+        advisor.name,
       ).toBe(true);
     }
   });

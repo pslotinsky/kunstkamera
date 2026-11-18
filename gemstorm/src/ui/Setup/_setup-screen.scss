@@ -6,6 +6,7 @@ $inset: $frame-inset + $gutter;
 $choices-width: 28rem;
 $space: 1rem;
 $space-small: 0.5rem;
+$divider-space: $space * 2.5;
 
 @mixin screen {
   position: absolute;
@@ -112,4 +113,36 @@ $space-small: 0.5rem;
   right: $frame-inset + $space;
   bottom: $frame-inset + $space;
   left: $inset + $choices-width + $gutter;
+}
+
+@mixin preview {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: $space;
+  margin-top: $divider-space * 2 - $space;
+
+  &::before {
+    @include kit.ornament-rule;
+
+    top: -$divider-space;
+  }
+}
+
+@mixin preview-portrait {
+  flex-shrink: 0;
+  width: 11rem;
+  height: 11rem;
+  object-fit: cover;
+  border: 1px solid var(--trim);
+  border-radius: 4px;
+}
+
+@mixin preview-name {
+  @include kit.display-type;
+
+  color: var(--gold-text);
+  font-size: 2.25rem;
+  font-weight: 600;
+  line-height: 1.1;
 }

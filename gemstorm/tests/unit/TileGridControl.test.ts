@@ -14,7 +14,11 @@ let grid: TileGridControl | undefined;
 function mount(): TileGridControl {
   const container = document.createElement('div');
   document.body.append(container);
-  grid = new TileGridControl({ name: 'houses', size: TILES.length });
+  grid = new TileGridControl({
+    name: 'houses',
+    size: TILES.length,
+    picture: 'emblem',
+  });
   grid.mount(container);
   grid.showTiles(TILES);
 
