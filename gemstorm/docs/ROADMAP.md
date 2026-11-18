@@ -189,8 +189,8 @@ Good and bad events, seasonal disasters, and Nerith.
 
 Starting a campaign: title screen, scenario and family choice, and an advisor to consult.
 
-- [ ] start a new game from the title screen
-- [ ] hear the title theme on the menus
+- [x] start a new game from the title screen
+- [x] hear the title theme on the menus
 - [ ] pick one of the four scenarios
 - [ ] choose the family you play
 - [ ] pick one of four advisors at setup

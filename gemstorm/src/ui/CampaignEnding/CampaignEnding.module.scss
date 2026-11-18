@@ -40,19 +40,7 @@
 
 .action,
 .reopen {
-  padding: 0.65rem 1.1rem;
-  color: var(--ink);
-  font: inherit;
-  background: var(--button);
-  border: 1px solid var(--trim);
-  border-radius: 3px;
-  cursor: pointer;
-  pointer-events: auto;
-
-  &:hover,
-  &:focus-visible {
-    @include kit.selected;
-  }
+  @include kit.button;
 }
 
 .reopen {

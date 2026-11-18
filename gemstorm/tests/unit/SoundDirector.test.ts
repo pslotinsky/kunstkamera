@@ -7,6 +7,7 @@ import { AllianceOfferedEvent } from '@/core/events/AllianceOfferedEvent';
 import { ArtifactFoundEvent } from '@/core/events/ArtifactFoundEvent';
 import { BattleEndedEvent } from '@/core/events/BattleEndedEvent';
 import { BattleStartedEvent } from '@/core/events/BattleStartedEvent';
+import { CampaignStartedEvent } from '@/core/events/CampaignStartedEvent';
 import { DefenseRequestedEvent } from '@/core/events/DefenseRequestedEvent';
 import { GeneralDiedEvent } from '@/core/events/GeneralDiedEvent';
 import {
@@ -62,9 +63,21 @@ afterEach(() => {
   }
 
   document.body.innerHTML = '';
+  vi.restoreAllMocks();
 });
 
 describe('SoundDirector', () => {
+  it('plays the title music until the campaign starts, then the map music', () => {
+    const music = vi.spyOn(SoundBoard.prototype, 'playMusic');
+    const { events } = setup();
+
+    expect(music).toHaveBeenLastCalledWith('title');
+
+    events.publish(new CampaignStartedEvent());
+
+    expect(music).toHaveBeenLastCalledWith('map');
+  });
+
   it('sounds the horn and the battle music when a battle opens', () => {
     const { events, sounds } = setup();
     const horn = vi.spyOn(sounds, 'playHorn');

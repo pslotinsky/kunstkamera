@@ -7,6 +7,5 @@ The game is heavily influenced by Koei's **Gemfire**. The feature designs descri
 - [Roadmap](ROADMAP.md)
 - [New game and advisors](design/16-new-game-and-advisors.md)
 - [Creature name review](identity/creature-names.md)
-- [Asset provenance](identity/assets.md)
 - [External sources](guides/README.md)
 - [Historical research archive](spec/README.md)

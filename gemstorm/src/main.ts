@@ -1,5 +1,7 @@
 import './style.scss';
+
 import { createCommandGroups } from '@/core/commands/province/catalog';
+import { CampaignStartedEvent } from '@/core/events/CampaignStartedEvent';
 import { WorldEngine } from '@/core/WorldEngine';
 import { WorldFactory } from '@/core/WorldFactory';
 import { EventBus } from '@/lib/EventBus';
@@ -30,4 +32,4 @@ const director = new SoundDirector({ world, events, sounds });
 shell.mount(app);
 director.listen();
 
-engine.start();
+events.subscribe(CampaignStartedEvent, () => engine.start());

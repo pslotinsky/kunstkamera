@@ -10,7 +10,6 @@ Gemstorm is heavily influenced by **Koei's Gemfire**. The original game and exte
 - [Design documents](docs/design/16-new-game-and-advisors.md)
 - [Current vocabulary](GLOSSARY.md)
 - [Historical name crosswalk](docs/identity/name-crosswalk.md)
-- [Asset provenance and remaining work](docs/identity/assets.md)
 - [External references](docs/guides/README.md)
 
 Run `npm ci`, then `npm run dev`. Validate changes with `npm run check:ci`, `npm test`, and `npm run build`.

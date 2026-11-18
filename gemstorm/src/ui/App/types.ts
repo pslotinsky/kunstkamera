@@ -5,6 +5,7 @@ import type { EventBus } from '@/lib/EventBus';
 import type { BattleScreenControl } from '@/ui/BattleScreen/BattleScreenControl';
 import type { GameScreenControl } from '@/ui/GameScreen/GameScreenControl';
 import type { SoundBoard } from '@/ui/sound/SoundBoard';
+import type { TitleScreenControl } from '@/ui/TitleScreen/TitleScreenControl';
 
 export interface AppContext {
   readonly world: World;
@@ -16,6 +17,7 @@ export interface AppContext {
 export type AppControls = {
   readonly gameScreen: GameScreenControl;
   readonly battleScreen: BattleScreenControl;
+  readonly title: TitleScreenControl;
 };
 
 export type AppViews = ChildrenViews<AppControls>;

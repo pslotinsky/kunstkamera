@@ -102,3 +102,58 @@
     top: 50%;
   }
 }
+
+@mixin button {
+  padding: 0.65rem 1.1rem;
+  color: var(--ink);
+  font: inherit;
+  background: var(--button);
+  border: 1px solid var(--trim);
+  border-radius: 3px;
+  cursor: pointer;
+  pointer-events: auto;
+
+  &:hover,
+  &:focus-visible {
+    @include selected;
+  }
+}
+
+@mixin framed-button {
+  padding: 0 1.25rem;
+  font: inherit;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--gold-text);
+  background: var(--surface-700);
+  border-radius: 8px;
+  cursor: pointer;
+  @include double-trim;
+
+  border-width: 2px;
+
+  &:hover:not(:disabled) {
+    background-color: var(--surface-600);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+@mixin checkbox {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  accent-color: var(--trim);
+
+  &:disabled {
+    opacity: 0.4;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--gold-text);
+    outline-offset: 4px;
+  }
+}

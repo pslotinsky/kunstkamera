@@ -124,30 +124,12 @@
 }
 
 .skipTurn {
+  @include kit.framed-button;
+
   flex-shrink: 0;
   width: 100%;
   min-height: 4.25rem;
   margin-top: auto;
-  padding: 0 1.25rem;
-  font: inherit;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--gold-text);
-  background: var(--surface-700);
-  border-radius: 8px;
-  cursor: pointer;
-  @include kit.double-trim;
-
-  border-width: 2px;
-}
-
-.skipTurn:hover:not(:disabled) {
-  background-color: var(--surface-600);
-}
-
-.skipTurn:disabled {
-  opacity: 0.5;
-  cursor: default;
 }
 
 .hidden {

@@ -41,7 +41,7 @@
 body {
   margin: 0;
   font-family: var(--font-body);
-  background: var(--ocean-bottom);
+  background: var(--surface-900);
   color: var(--ink);
 }
 
@@ -56,5 +56,5 @@ h3 {
   display: flex;
   height: 100dvh;
   overflow: hidden;
-  background: #000;
+  background: var(--surface-900);
 }

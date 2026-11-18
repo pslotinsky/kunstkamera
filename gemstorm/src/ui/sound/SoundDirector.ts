@@ -4,6 +4,7 @@ import { AllianceOfferedEvent } from '@/core/events/AllianceOfferedEvent';
 import { ArtifactFoundEvent } from '@/core/events/ArtifactFoundEvent';
 import { BattleEndedEvent } from '@/core/events/BattleEndedEvent';
 import { BattleStartedEvent } from '@/core/events/BattleStartedEvent';
+import { CampaignStartedEvent } from '@/core/events/CampaignStartedEvent';
 import { DefenseRequestedEvent } from '@/core/events/DefenseRequestedEvent';
 import { GeneralDiedEvent } from '@/core/events/GeneralDiedEvent';
 import { SuccessionReportedEvent } from '@/core/events/SuccessionReportedEvent';
@@ -31,6 +32,9 @@ export class SoundDirector {
     const { events } = this.context;
     const { signal } = this.lifetime;
 
+    document.addEventListener('keydown', () => this.sounds.unlock(), {
+      signal,
+    });
     document.addEventListener('pointerdown', () => this.sounds.unlock(), {
       signal,
     });
@@ -38,8 +42,13 @@ export class SoundDirector {
       signal,
     });
 
-    this.sounds.playMusic('map');
+    this.sounds.playMusic('title');
 
+    events.subscribe(
+      CampaignStartedEvent,
+      () => this.sounds.playMusic('map'),
+      signal,
+    );
     events.subscribe(BattleStartedEvent, () => this.openBattle(), signal);
     events.subscribe(
       BattleEndedEvent,

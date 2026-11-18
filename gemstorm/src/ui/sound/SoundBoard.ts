@@ -3,8 +3,10 @@ import type { ZZFX } from 'zzfx';
 import type { RangePattern } from '@/core/domain/Unit';
 import { getPublicAssetUrl } from '@/ui/art/getPublicAssetUrl';
 
+import { SoundChannel } from './SoundChannel';
+
 const MASTER_LEVEL = 0.4;
-const EFFECTS_LEVEL = 0.35;
+const SFX_LEVEL = 0.35;
 const DEFAULT_ATTACK = 0.005;
 const SILENCE = 0.001;
 
@@ -21,13 +23,14 @@ const MUSIC_LEVEL = 0.25;
 const MUSIC_FADE = 0.6;
 
 const MUSIC_TRACKS = {
+  title: getPublicAssetUrl('music/title.mp3'),
   map: getPublicAssetUrl('music/strategic-map.mp3'),
   battle: getPublicAssetUrl('music/battle.mp3'),
 } as const;
 
 export type MusicTrack = keyof typeof MUSIC_TRACKS;
 
-interface MusicChannel {
+interface MusicPlayer {
   readonly element: HTMLAudioElement;
   readonly gain: GainNode;
   track?: MusicTrack;
@@ -144,7 +147,7 @@ const ZZFX_ALARM: readonly ZzfxNote[] = [
 interface Output {
   readonly context: AudioContext;
   readonly master: GainNode;
-  readonly effects: GainNode;
+  readonly sfx: GainNode;
 }
 
 interface EnvelopeParams {
@@ -166,14 +169,18 @@ interface NoiseParams extends EnvelopeParams {
 }
 
 export class SoundBoard {
+  public readonly master = new SoundChannel(MASTER_LEVEL);
+  public readonly music = new SoundChannel(MUSIC_LEVEL, this.master);
+  public readonly sfx = new SoundChannel(SFX_LEVEL, this.master);
+
   private context?: AudioContext;
-  private master?: GainNode;
-  private effects?: GainNode;
+  private masterNode?: GainNode;
+  private sfxNode?: GainNode;
   private noiseBuffer?: AudioBuffer;
   private zzfx?: typeof ZZFX;
   private samples?: Map<string, AudioBuffer[]>;
   private track?: MusicTrack;
-  private music?: MusicChannel;
+  private musicPlayer?: MusicPlayer;
   private switching?: ReturnType<typeof setTimeout> | undefined;
 
   public unlock(): void {
@@ -560,9 +567,11 @@ export class SoundBoard {
 
   private loadZzfx(): void {
     if (!this.zzfx) {
-      void import('zzfx').then((module) => {
-        this.zzfx = module.ZZFX;
-      });
+      void import('zzfx')
+        .then((module) => {
+          this.zzfx = module.ZZFX;
+        })
+        .catch(() => undefined);
     }
   }
 
@@ -581,22 +590,21 @@ export class SoundBoard {
     }
   }
 
-  private ensureMusic(output: Output): MusicChannel {
-    if (!this.music) {
+  private ensureMusic(output: Output): MusicPlayer {
+    if (!this.musicPlayer) {
       const element = new Audio();
-      const gain = new GainNode(output.context, { gain: MUSIC_LEVEL });
+      const gain = this.music.connect(output.context, output.master);
       const source = output.context.createMediaElementSource(element);
 
       element.loop = true;
       source.connect(gain);
-      gain.connect(output.master);
-      this.music = { element, gain };
+      this.musicPlayer = { element, gain };
     }
 
-    return this.music;
+    return this.musicPlayer;
   }
 
-  private fadeTo(output: Output, music: MusicChannel, url: string): void {
+  private fadeTo(output: Output, music: MusicPlayer, url: string): void {
     if (this.switching !== undefined) {
       clearTimeout(this.switching);
       this.switching = undefined;
@@ -617,14 +625,17 @@ export class SoundBoard {
     }
   }
 
-  private swapTrack(output: Output, music: MusicChannel, url: string): void {
+  private swapTrack(output: Output, music: MusicPlayer, url: string): void {
     const start = output.context.currentTime;
 
     music.element.src = url;
     void music.element.play().catch(() => undefined);
     music.gain.gain.cancelScheduledValues(start);
     music.gain.gain.setValueAtTime(0, start);
-    music.gain.gain.linearRampToValueAtTime(MUSIC_LEVEL, start + MUSIC_FADE);
+    music.gain.gain.linearRampToValueAtTime(
+      this.music.level,
+      start + MUSIC_FADE,
+    );
   }
 
   private loadSamples(): void {
@@ -689,7 +700,7 @@ export class SoundBoard {
       });
 
       source.connect(level);
-      level.connect(output.effects);
+      level.connect(output.sfx);
       source.start(output.context.currentTime + (options.delay ?? 0));
     }
   }
@@ -721,7 +732,7 @@ export class SoundBoard {
 
       const source = new AudioBufferSourceNode(output.context, { buffer });
 
-      source.connect(output.effects);
+      source.connect(output.sfx);
       source.start(output.context.currentTime + delay);
     }
   }
@@ -744,7 +755,7 @@ export class SoundBoard {
       }
 
       oscillator.connect(envelope);
-      envelope.connect(output.effects);
+      envelope.connect(output.sfx);
       oscillator.start(start);
       oscillator.stop(end);
     }
@@ -767,7 +778,7 @@ export class SoundBoard {
 
       source.connect(filter);
       filter.connect(envelope);
-      envelope.connect(output.effects);
+      envelope.connect(output.sfx);
       source.start(start);
       source.stop(end);
     }
@@ -810,25 +821,23 @@ export class SoundBoard {
 
   private findOutput(): Output | undefined {
     const context = this.ensureContext();
-    const master = this.master;
-    const effects = this.effects;
+    const master = this.masterNode;
+    const sfx = this.sfxNode;
 
-    return context && master && effects && context.state === 'running'
-      ? { context, master, effects }
+    return context && master && sfx && context.state === 'running'
+      ? { context, master, sfx }
       : undefined;
   }
 
   private ensureContext(): AudioContext | undefined {
     if (!this.context && typeof AudioContext !== 'undefined') {
       const context = new AudioContext();
-      const master = new GainNode(context, { gain: MASTER_LEVEL });
-      const effects = new GainNode(context, { gain: EFFECTS_LEVEL });
+      const master = this.master.connect(context, context.destination);
+      const sfx = this.sfx.connect(context, master);
 
-      master.connect(context.destination);
-      effects.connect(master);
       this.context = context;
-      this.master = master;
-      this.effects = effects;
+      this.masterNode = master;
+      this.sfxNode = sfx;
     }
 
     return this.context;

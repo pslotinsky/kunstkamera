@@ -22,9 +22,15 @@ After a campaign ends, return to the title to begin another. Mid-campaign quitti
 
 ## Functionality
 
+### Title and options
+
+- Open on the title screen with New Game and Options.
+- Options offers an All sounds switch and separate Music and SFX controls, each with an on/off switch and a 0–100% volume slider. Switching a channel off keeps its volume. All sounds disables the channel controls while retaining their choices.
+- The SFX slider previews a click when released. The chosen settings carry into the campaign.
+
 ### Starting a campaign
 
-- Open on the title screen with New Game. Do not create or advance a world until setup is confirmed.
+- Do not advance time until setup is confirmed. The campaign begins from the confirmed scenario and family.
 - Follow Scenario → Family → Advisor → Begin campaign. Allow Back at each step; returning from Scenario goes to the title.
 - Offer all four scenarios using their canonical names and dates from scenario configuration. Show a short account of their starting situation.
 - Preview each scenario's political map. Its ownership, rulers, resources, rosters, and Gems must match the campaign's starting situation.
@@ -94,6 +100,7 @@ The player loses their last province, acknowledges the ending, and inspects the 
 │                GEMSTORM                   │
 │                                          │
 │              [ New Game ]                │
+│              [ Options  ]                │
 └──────────────────────────────────────────┘
 
 ┌─ New game · Family ───────────────────────┐
@@ -123,6 +130,10 @@ The Scenario screen shows all four names, starting dates, and short introduction
 
 Reuse the existing visual language and map geometry. The setup map shows starting ownership without orders or turn markers. Highlight the selected family's provinces and display its ruler, province count, members, and Gems. Selection works by keyboard and pointer, with visible focus, accessible labels, and focus restored to Advice when its dialog closes. Escape follows Back in setup and closes optional advice.
 
+### Title screen
+
+The title shows an animated landscape behind the menu, with a gentle parallax that follows the mouse. All motion stops when the system's reduced-motion preference is set.
+
 ### Menu music
 
 Play _The Crown of the Fallen Kingdom_ (`public/music/title.mp3`) across setup steps without restarting it. Browser autoplay may leave the initial title silent; the first pointer or keyboard activation starts the current screen's music when playback is permitted. Beginning the campaign switches to map music. Returning from a completed campaign switches to title music. Unavailable audio never blocks setup.
@@ -140,6 +151,18 @@ Original messages cover hiring, supplies, development, defence, and rival invasi
 ### Scenario data
 
 Complete scenarios 2–4 using the local ROM records for ownership, resources, and hire pools, and the character roster for attributes, following the [source hierarchy](../spec/README.md#source-notes). Scenario 3 uses the documented Gweyn ruler correction, without giving Erven Tordin lineage. Character attributes follow the roster, including Pender’s Scenario-2 WAR of 92 and Gweyn’s Scenario-3 WAR of 58; ROM hire-pool names are normalized to the unit catalogue.
+
+## Overview
+
+- **App shell** owns the game frame and its scaling. It holds the title above the campaign screens, which stay inert until the campaign starts.
+- **Title screen** contains the animated scene, the main menu, and the Options dialog. New Game hides the title and publishes `CampaignStartedEvent`, which starts the engine.
+- **Options** is a standalone dialog that edits the sound board's channels, so the campaign can reuse it.
+- **Sound channels**: master, with music and SFX beneath it. Each channel keeps its own volume and on/off state.
+- **Sound director** owns all music cues and click sounds on every screen: title music from launch, map music once the campaign starts.
+
+## Current state
+
+Implemented: the title screen, Options, and title music. New Game starts the default campaign (The Fractured Oath, Alderwyn) from a world created at boot. Scenario, family, and advisor selection, advice, and New Game after an ending remain planned.
 
 ## Domain model
 
