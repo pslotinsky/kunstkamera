@@ -3,7 +3,7 @@ import type { Advisor } from '@/core/domain/Advisor';
 import { WorldFactory } from '@/core/WorldFactory';
 import { Control } from '@/lib/Control';
 import { getAdvisorPortraitUrl } from '@/ui/art/getAdvisorPortraitUrl';
-import { MapPreviewControl } from '@/ui/MapPreview/MapPreviewControl';
+import { ScenarioMapControl } from '@/ui/Setup/ScenarioMap/ScenarioMapControl';
 import { TileSelectedEvent } from '@/ui/Setup/TileGrid/events/TileSelectedEvent';
 import { TileGridControl } from '@/ui/Setup/TileGrid/TileGridControl';
 import type { Tile } from '@/ui/Setup/TileGrid/TileGridView';
@@ -32,7 +32,7 @@ export class AdvisorSelectControl extends Control<
           picture: 'portrait',
         }),
         preview: new AdvisorPreviewControl(),
-        mapPreview: new MapPreviewControl(),
+        map: new ScenarioMapControl(),
       },
     );
     this.advisors = advisors;
@@ -48,9 +48,8 @@ export class AdvisorSelectControl extends Control<
     const family = map.getOwners().find((owner) => owner.name === familyName);
     const provinces = family ? map.getFamilyProvinces(family) : [];
 
-    this.view.showSummary(scenario, familyName);
-    this.controls.mapPreview.showMap(map);
-    this.controls.mapPreview.highlight(provinces);
+    this.controls.map.show(scenario, map, familyName);
+    this.controls.map.highlight(provinces);
     this.view.show();
   }
 

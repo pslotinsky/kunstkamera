@@ -1,9 +1,12 @@
 import type { Scenario } from '@/config/scenarios';
 import { WorldFactory } from '@/core/WorldFactory';
 import { Control } from '@/lib/Control';
-import { MapPreviewControl } from '@/ui/MapPreview/MapPreviewControl';
+import { ScenarioMapControl } from '@/ui/Setup/ScenarioMap/ScenarioMapControl';
+import { TileSelectedEvent } from '@/ui/Setup/TileGrid/events/TileSelectedEvent';
+import { TileGridControl } from '@/ui/Setup/TileGrid/TileGridControl';
+import type { Tile } from '@/ui/Setup/TileGrid/TileGridView';
 
-import { ScenarioSelectedEvent } from './events/ScenarioSelectedEvent';
+import { ScenarioPreviewControl } from './ScenarioPreview/ScenarioPreviewControl';
 import { ScenarioSelectView } from './ScenarioSelectView';
 import type { ScenarioSelectContext, ScenarioSelectControls } from './types';
 
@@ -21,7 +24,13 @@ export class ScenarioSelectControl extends Control<
     }
 
     super(ScenarioSelectView, context, {
-      mapPreview: new MapPreviewControl(),
+      scenarios: new TileGridControl({
+        name: 'scenarios',
+        size: context.scenarios.length,
+        picture: 'none',
+      }),
+      preview: new ScenarioPreviewControl(),
+      map: new ScenarioMapControl(),
     });
     this.selected = first;
   }
@@ -39,17 +48,36 @@ export class ScenarioSelectControl extends Control<
   }
 
   protected override onMount(): void {
-    this.subscribe(ScenarioSelectedEvent, (event) =>
-      this.select(event.scenario),
+    const { scenarios } = this.controls;
+
+    scenarios.view.subscribe(TileSelectedEvent, (event) =>
+      this.select(event.key),
     );
-    this.select(this.selected);
+    scenarios.showTiles(
+      this.context.scenarios.map((scenario) => this.toTile(scenario)),
+    );
+    this.select(this.toTile(this.selected).key);
   }
 
-  private select(scenario: Scenario): void {
-    const map = new WorldFactory().createMap(scenario);
+  private select(key: string): void {
+    const scenario = this.context.scenarios.find(
+      (candidate) => this.toTile(candidate).key === key,
+    );
 
-    this.selected = scenario;
-    this.view.showSelected(scenario);
-    this.controls.mapPreview.showMap(map);
+    if (scenario) {
+      const map = new WorldFactory().createMap(scenario);
+
+      this.selected = scenario;
+      this.controls.scenarios.select(key);
+      this.controls.preview.showScenario(scenario);
+      this.controls.map.show(scenario, map);
+    }
+  }
+
+  private toTile(scenario: Scenario): Tile {
+    return {
+      key: String(scenario.number),
+      label: scenario.name,
+    };
   }
 }

@@ -5,7 +5,7 @@ export const SCENARIO_3: Scenario = {
   name: 'The Western Schism',
   year: 211,
   description:
-    'Ten years of war have strengthened the great houses. Duskerran fights from the west.',
+    'Ten years of war have swallowed Greyfen and Thornvale. Power gathers around Alderwyn, Stormmere and Varrengard, while young Valecross fights to survive.',
   playableFamilies: ['Stormmere', 'Alderwyn', 'Duskerran', 'Valecross'],
   generals: [
     {

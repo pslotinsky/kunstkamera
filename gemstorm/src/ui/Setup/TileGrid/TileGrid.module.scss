@@ -10,6 +10,9 @@
   list-style: none;
 }
 
+$picture-size: 8rem;
+$tile-height: 12.5rem;
+
 .tile {
   @include setup-screen.choice;
 
@@ -17,13 +20,12 @@
   flex-direction: column;
   align-items: center;
   gap: setup-screen.$space-small;
+  height: $tile-height;
 }
 
 .selected {
   @include kit.selected;
 }
-
-$picture-size: 8rem;
 
 .emblem {
   width: $picture-size;
@@ -46,4 +48,7 @@ $picture-size: 8rem;
   color: var(--gold-text);
   font-size: 1.6rem;
   font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  margin-block: auto;
 }

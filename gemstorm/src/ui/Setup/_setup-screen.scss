@@ -60,24 +60,10 @@ $divider-space: $space * 2.5;
   line-height: 1.1;
 }
 
-@mixin subtitle {
-  margin: 0;
-  color: var(--ink-soft);
-  font-size: 1.25rem;
-}
-
 @mixin card {
   @include kit.card;
 
   padding: $space;
-}
-
-@mixin list {
-  display: grid;
-  gap: $space;
-  margin: 0;
-  padding: 0;
-  list-style: none;
 }
 
 @mixin choice {

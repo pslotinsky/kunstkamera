@@ -9,6 +9,7 @@ import type { CaptiveDialogControl } from '@/ui/CaptiveDialog/CaptiveDialogContr
 import type { CommandDialogsControl } from '@/ui/CommandDialogs/CommandDialogsControl';
 import type { DefenseDialogControl } from '@/ui/DefenseDialog/DefenseDialogControl';
 import type { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
+import type { PlaqueControl } from '@/ui/Plaque/PlaqueControl';
 import type { SearchReportControl } from '@/ui/SearchReport/SearchReportControl';
 import type { SoundBoard } from '@/ui/sound/SoundBoard';
 import type { WorldMapControl } from '@/ui/WorldMap/WorldMapControl';
@@ -30,6 +31,7 @@ export type GameScreenControls = {
   readonly announcements: AnnouncementsControl;
   readonly defenseDialog: DefenseDialogControl;
   readonly campaignEnding: CampaignEndingControl;
+  readonly turnStatus: PlaqueControl;
 };
 
 export type GameScreenViews = ChildrenViews<GameScreenControls>;

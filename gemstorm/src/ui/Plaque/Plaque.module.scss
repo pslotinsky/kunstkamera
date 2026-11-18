@@ -1,0 +1,32 @@
+@use "@/ui/kit";
+
+.root {
+  padding: 0.95rem 2.8rem 1.1rem;
+  text-align: center;
+  pointer-events: none;
+  background: url("@/assets/ui/plaque.webp") center / 100% 100% no-repeat;
+  filter: drop-shadow(0 0.4rem 0.6rem rgba(0, 0, 0, 0.45));
+}
+
+.title {
+  @include kit.display-type;
+
+  margin: 0;
+  color: var(--parchment-ink);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.caption {
+  margin: 0;
+  color: var(--parchment-ink-soft);
+  font-size: 1.1rem;
+  font-weight: 600;
+
+  &:empty {
+    display: none;
+  }
+}

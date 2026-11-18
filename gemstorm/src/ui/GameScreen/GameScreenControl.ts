@@ -16,6 +16,7 @@ import { CaptiveDialogControl } from '@/ui/CaptiveDialog/CaptiveDialogControl';
 import { CommandDialogsControl } from '@/ui/CommandDialogs/CommandDialogsControl';
 import { DefenseDialogControl } from '@/ui/DefenseDialog/DefenseDialogControl';
 import { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
+import { PlaqueControl } from '@/ui/Plaque/PlaqueControl';
 import { TargetingEndedEvent } from '@/ui/ProvinceCommands/TargetingEndedEvent';
 import { TargetingStartedEvent } from '@/ui/ProvinceCommands/TargetingStartedEvent';
 import { SearchReportControl } from '@/ui/SearchReport/SearchReportControl';
@@ -72,6 +73,7 @@ export class GameScreenControl extends Control<
         events: context.events,
       }),
       campaignEnding: new CampaignEndingControl(context),
+      turnStatus: new PlaqueControl({ name: 'turn' }),
     });
     this.turnHold = new TurnHold(context.events);
   }
@@ -88,7 +90,7 @@ export class GameScreenControl extends Control<
     });
     this.onWorldEvent(MonthStartedEvent, (event) => {
       if (!this.context.world.campaign.isEnded) {
-        this.view.showDate(event.date);
+        this.controls.turnStatus.showTitle(String(event.date));
       }
     });
     this.onWorldEvent(TurnStartedEvent, (event) => this.handleTurnStart(event));
@@ -116,9 +118,12 @@ export class GameScreenControl extends Control<
       this.finishCampaign(event.outcome),
     );
 
-    const current = this.context.world.turnQueue.current;
+    const { current, turnNumber } = this.context.world.turnQueue;
+
+    this.controls.turnStatus.showTitle(String(this.context.world.date));
 
     if (current) {
+      this.showTurn(current, turnNumber);
       this.showProvince(current);
     }
 
@@ -129,12 +134,21 @@ export class GameScreenControl extends Control<
     }
   }
 
+  private showTurn(province: Province, turnNumber: number): void {
+    this.controls.turnStatus.showCaption(
+      `Turn ${turnNumber}: ${province.name}`,
+    );
+  }
+
   private finishCampaign(outcome: CampaignOutcome): void {
     this.selectable = undefined;
     this.inspectsTarget = false;
     this.controls.gamePanel.hideCommands();
     this.showFinalMap();
-    this.view.showEnding(outcome);
+    this.controls.turnStatus.showTitle(String(outcome.date));
+    this.controls.turnStatus.showCaption(
+      `${outcome.isVictory ? 'Victory' : 'Defeat'} — ${outcome.house}`,
+    );
   }
 
   private showFinalMap(): void {
@@ -163,7 +177,7 @@ export class GameScreenControl extends Control<
     const { world } = this.context;
 
     if (province.hasOwner()) {
-      this.view.showTurn(province, turnNumber);
+      this.showTurn(province, turnNumber);
       this.showProvince(province);
     } else {
       this.controls.gamePanel.hideCommands();

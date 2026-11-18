@@ -5,7 +5,7 @@ export const SCENARIO_1: Scenario = {
   name: 'The Fractured Oath',
   year: 201,
   description:
-    'The rebellion begins. Avar and Darian challenge the royal house of Varrengard.',
+    'The Gemstorm has flung the seven Gems across Aureth, and every house has seized what fell on its land. Avar of Alderwyn and Darian of Stormmere rise against Varrengard.',
   playableFamilies: ['Alderwyn', 'Stormmere', 'Emberholt', 'Thornvale'],
   generals: [
     {

@@ -5,7 +5,7 @@ export const SCENARIO_4: Scenario = {
   name: 'Gemstorm',
   year: 216,
   description:
-    'The war nears its conclusion. Powerful houses face challengers without Gems.',
+    'The war nears its end. Rhovan has betrayed Avar for Varrengard, Tavren of Sunhallow claims its bloodline, and Kestrel founds Blackharbor without a Gem.',
   playableFamilies: ['Stormmere', 'Alderwyn', 'Sunhallow', 'Blackharbor'],
   generals: [
     {

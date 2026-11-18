@@ -1,15 +1,11 @@
 import { html, type TemplateResult } from 'lit-html';
 
-import type { Scenario } from '@/config/scenarios';
 import { View } from '@/lib/View';
 import { BackChosenEvent } from '@/ui/Setup/events/BackChosenEvent';
 import { NextChosenEvent } from '@/ui/Setup/events/NextChosenEvent';
 import layout from '@/ui/Setup/SetupScreen.module.scss';
 
-import { ScenarioSelectedEvent } from './events/ScenarioSelectedEvent';
 import type { ScenarioSelectContext, ScenarioSelectViews } from './types';
-
-import styles from './ScenarioSelect.module.scss';
 
 export class ScenarioSelectView extends View<
   ScenarioSelectContext,
@@ -34,11 +30,8 @@ export class ScenarioSelectView extends View<
               Choose Scenario
             </h2>
           </header>
-          <ol class=${styles.list}>
-            ${this.context.scenarios.map((scenario) =>
-              this.renderScenario(scenario),
-            )}
-          </ol>
+          ${views.scenarios.template}
+          ${views.preview.template}
           <div class=${layout.actions}>
             <button class=${layout.action}
               @click=${() => this.publish(new BackChosenEvent())}>
@@ -50,7 +43,7 @@ export class ScenarioSelectView extends View<
             </button>
           </div>
         </div>
-        <div class=${layout.map}>${views.mapPreview.template}</div>
+        <div class=${layout.map}>${views.map.template}</div>
       </section>
     `;
   }
@@ -61,34 +54,5 @@ export class ScenarioSelectView extends View<
 
   public hide(): void {
     this.element.classList.add(layout.hidden!);
-  }
-
-  public showSelected(selected: Scenario): void {
-    for (const button of this.scenarioButtons) {
-      const isSelected = button.dataset.scenario === String(selected.number);
-
-      button.classList.toggle(styles.selected!, isSelected);
-      button.setAttribute('aria-pressed', String(isSelected));
-    }
-  }
-
-  private renderScenario(scenario: Scenario): TemplateResult {
-    return html`
-      <li>
-        <button class=${styles.scenario} data-scenario=${scenario.number}
-          aria-pressed="false"
-          @click=${() => this.publish(new ScenarioSelectedEvent(scenario))}>
-          <span class=${styles.name}>${scenario.name}</span>
-          <span class=${styles.year}>Year ${scenario.year}</span>
-          <span class=${styles.description}>${scenario.description}</span>
-        </button>
-      </li>
-    `;
-  }
-
-  private get scenarioButtons(): readonly HTMLButtonElement[] {
-    return [
-      ...this.element.querySelectorAll<HTMLButtonElement>('[data-scenario]'),
-    ];
   }
 }

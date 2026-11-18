@@ -5,7 +5,7 @@ import type { WorldMap } from '@/core/domain/WorldMap';
 import { WorldFactory } from '@/core/WorldFactory';
 import { Control } from '@/lib/Control';
 import { getFamilyCrestUrl } from '@/ui/art/getFamilyCrestUrl';
-import { MapPreviewControl } from '@/ui/MapPreview/MapPreviewControl';
+import { ScenarioMapControl } from '@/ui/Setup/ScenarioMap/ScenarioMapControl';
 import { TileSelectedEvent } from '@/ui/Setup/TileGrid/events/TileSelectedEvent';
 import { TileGridControl } from '@/ui/Setup/TileGrid/TileGridControl';
 import type { Tile } from '@/ui/Setup/TileGrid/TileGridView';
@@ -37,7 +37,7 @@ export class FamilySelectControl extends Control<
           picture: 'emblem',
         }),
         ruler: new RulerPreviewControl(),
-        mapPreview: new MapPreviewControl(),
+        map: new ScenarioMapControl(),
       },
     );
   }
@@ -79,11 +79,10 @@ export class FamilySelectControl extends Control<
     this.families = scenario.playableFamilies.flatMap((name) =>
       owners.filter((owner) => owner.name === name),
     );
-    this.view.showScenario(scenario);
     this.controls.houses.showTiles(
       this.families.map((family) => this.toTile(family)),
     );
-    this.controls.mapPreview.showMap(map);
+    this.controls.map.show(scenario, map);
     this.select(scenario.playableFamilies[0]!);
   }
 
@@ -99,7 +98,7 @@ export class FamilySelectControl extends Control<
       this.selected = family;
       this.controls.houses.select(family.name);
       this.controls.ruler.showRuler(family, rulerAge);
-      this.controls.mapPreview.highlight(provinces);
+      this.controls.map.highlight(provinces);
     }
   }
 

@@ -64,9 +64,8 @@ describe('AdvisorSelectControl', () => {
       ...document.querySelectorAll<SVGElement>('.province.highlighted'),
     ].map((region) => Number(region.dataset.province));
 
-    expect(text('[data-summary]')).toBe(
-      `${SCENARIO.name} · Year ${SCENARIO.year} · ${family}`,
-    );
+    expect(text('[data-map-title]')).toBe(SCENARIO.name);
+    expect(text('[data-map-caption]')).toBe(family);
     expect(highlighted.sort((left, right) => left - right)).toEqual(owned);
   });
 });

@@ -105,47 +105,67 @@ The player loses their last province, acknowledges the ending, and inspects the 
 │                                            │
 └────────────────────────────────────────────┘
 
-┌─ New game · Family ──────────────────────────────┐
-│  Choose Family                                   │
-│  The Fractured Oath · Year 201                   │
-│                                                  │
-│  ┏━━━━━━━━━━┓ ┌──────────┐   <map preview with   │
-│  ┃ [crest]  ┃ │ [crest]  │    starting crests;   │
-│  ┃ Alderwyn ┃ │Stormmere │    chosen house's     │
-│  ┗━━━━━━━━━━┛ └──────────┘    lands lit>         │
-│  ┌──────────┐ ┌──────────┐                       │
-│  │ [crest]  │ │ [crest]  │                       │
-│  │Emberholt │ │Thornvale │                       │
-│  └──────────┘ └──────────┘                       │
-│                                                  │
-│  [portrait]  Avar                                │
-│              Age 19                              │
-│              INT 82  WAR 87  CHA 76              │
-│              4 vassals                           │
-│                                                  │
-│  [ Back ]                         [ Next ]       │
-└──────────────────────────────────────────────────┘
+┌─ New game · Scenario ────────────────────────────────────────────────┐
+│  Choose Scenario             ┌──────────────┐                        │
+│                              │ MONTH 1, 201 │   <map with            │
+│                              └──────────────┘    starting crests>    │
+│  ┏━━━━━━━━━━┓ ┌──────────┐                                           │
+│  ┃   The    ┃ │Embers of │                                           │
+│  ┃Fractured ┃ │Rebellion │                                           │
+│  ┗━━━━━━━━━━┛ └──────────┘                                           │
+│  ┌──────────┐ ┌──────────┐                                           │
+│  │ Western  │ │          │                                           │
+│  │  Schism  │ │ Gemstorm │                                           │
+│  └──────────┘ └──────────┘                                           │
+│  ◆──────────◇──────────◆                                             │
+│  The Gemstorm has flung the seven Gems                               │
+│  across Aureth…                                                      │
+│                                                                      │
+│  [ Back ]        [ Next ]                                            │
+│                                           THE FRACTURED OATH         │
+└──────────────────────────────────────────────────────────────────────┘
 
-┌─ New game · Advisor ─────────────────────────────┐
-│  Choose Advisor                                  │
-│  The Fractured Oath · Year 201 · Alderwyn        │
-│                                                  │
-│  ┏━━━━━━━━━━┓ ┌──────────┐   <map preview with   │
-│  ┃[portrait]┃ │[portrait]│    chosen family's    │
-│  ┃ Orraven  ┃ │ Brannoc  │    lands lit>         │
-│  ┗━━━━━━━━━━┛ └──────────┘                       │
-│  ┌──────────┐ ┌──────────┐                       │
-│  │[portrait]│ │[portrait]│                       │
-│  │  Vesha   │ │ Quillon  │                       │
-│  └──────────┘ └──────────┘                       │
-│                                                  │
-│  [portrait]  Orraven                             │
-│              the Chronicler                      │
-│              “A wise ruler prepares for          │
-│               tomorrow.”                         │
-│                                                  │
-│  [ Back ]                        [ Begin ]       │
-└──────────────────────────────────────────────────┘
+┌─ New game · Family ──────────────────────────────────────────────────┐
+│  Choose Family               ┌──────────────┐                        │
+│                              │ MONTH 1, 201 │   <map with            │
+│                              └──────────────┘    starting crests>    │
+│  ┏━━━━━━━━━━┓ ┌──────────┐                                           │
+│  ┃ [crest]  ┃ │ [crest]  │                                           │
+│  ┃ Alderwyn ┃ │Stormmere │                                           │
+│  ┗━━━━━━━━━━┛ └──────────┘                                           │
+│  ┌──────────┐ ┌──────────┐                                           │
+│  │ [crest]  │ │ [crest]  │                                           │
+│  │Emberholt │ │Thornvale │                                           │
+│  └──────────┘ └──────────┘                                           │
+│  ◆──────────◇──────────◆                                             │
+│  [portrait]  Avar · Age 19                                           │
+│              INT 82  WAR 87  CHA 76                                  │
+│              4 vassals                                               │
+│                                                                      │
+│  [ Back ]        [ Next ]                                            │
+│                                           THE FRACTURED OATH         │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌─ New game · Advisor ─────────────────────────────────────────────────┐
+│  Choose Advisor              ┌──────────────┐                        │
+│                              │ MONTH 1, 201 │   <map with            │
+│                              └──────────────┘    starting crests>    │
+│  ┏━━━━━━━━━━┓ ┌──────────┐                                           │
+│  ┃[portrait]┃ │[portrait]│                                           │
+│  ┃ Orraven  ┃ │ Brannoc  │                                           │
+│  ┗━━━━━━━━━━┛ └──────────┘                                           │
+│  ┌──────────┐ ┌──────────┐                                           │
+│  │[portrait]│ │[portrait]│                                           │
+│  │  Vesha   │ │ Quillon  │                                           │
+│  └──────────┘ └──────────┘                                           │
+│  ◆──────────◇──────────◆                                             │
+│  [portrait]  Orraven, the Chronicler                                 │
+│              “A wise ruler prepares                                  │
+│               for tomorrow.”                                         │
+│                                                                      │
+│  [ Back ]        [ Begin ]                                           │
+│                                           THE FRACTURED OATH         │
+└──────────────────────────────────────────────────────────────────────┘
 
 ┌─ <Advisor name> ─────────────────────────┐
 │  <Portrait>                              │
@@ -156,7 +176,7 @@ The player loses their last province, acknowledges the ending, and inspects the 
 └──────────────────────────────────────────┘
 ```
 
-The Scenario screen shows all four names, starting dates, and short introductions. Next opens the Family screen illustrated above. The Advisor screen offers four portraits with names. The selected advisor's portrait, title, and a sample saying appear below them; the map highlights the chosen family's provinces as the scenario/family summary. Begin starts the campaign.
+All three setup screens share one layout: four selectable tiles, a preview of the selection under a divider, and the map with the start date on a plaque at its top-left corner and the scenario name written on the sea at its bottom-right. The Scenario screen's tiles show each scenario's name, and its start year appears on the map's date plaque; its preview shows a short introduction to the starting situation. The Advisor screen offers four portraits with names. The selected advisor's portrait, title, and a sample saying appear below them; the map highlights the chosen family's provinces, and the family's name appears under the scenario name. Begin starts the campaign.
 
 Reuse the existing visual language and map geometry. The setup map shows starting ownership without orders or turn markers. Highlight the selected family's provinces on the map and display its ruler: portrait, name, age, INT, WAR, CHA, and number of vassals. Selection works by keyboard and pointer, with visible focus, accessible labels, and focus restored to Advice when its dialog closes. Escape follows Back in setup and closes optional advice.
 

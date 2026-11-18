@@ -1,6 +1,5 @@
 import { html, type TemplateResult } from 'lit-html';
 
-import type { Scenario } from '@/config/scenarios';
 import { View } from '@/lib/View';
 import { BackChosenEvent } from '@/ui/Setup/events/BackChosenEvent';
 import { NextChosenEvent } from '@/ui/Setup/events/NextChosenEvent';
@@ -28,7 +27,6 @@ export class FamilySelectView extends View<
         <div class=${layout.choices}>
           <header class=${layout.header}>
             <h2 id="family-heading" class=${layout.heading}>Choose Family</h2>
-            <p class=${layout.subtitle} data-scenario-name></p>
           </header>
           ${views.houses.template}
           ${views.ruler.template}
@@ -43,7 +41,7 @@ export class FamilySelectView extends View<
             </button>
           </div>
         </div>
-        <div class=${layout.map}>${views.mapPreview.template}</div>
+        <div class=${layout.map}>${views.map.template}</div>
       </section>
     `;
   }
@@ -54,10 +52,5 @@ export class FamilySelectView extends View<
 
   public hide(): void {
     this.element.classList.add(layout.hidden!);
-  }
-
-  public showScenario(scenario: Scenario): void {
-    this.element.querySelector('[data-scenario-name]')!.textContent =
-      `${scenario.name} · Year ${scenario.year}`;
   }
 }

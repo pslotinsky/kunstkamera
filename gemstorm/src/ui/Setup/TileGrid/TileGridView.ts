@@ -1,4 +1,4 @@
-import { html, type TemplateResult } from 'lit-html';
+import { html, nothing, type TemplateResult } from 'lit-html';
 
 import { View } from '@/lib/View';
 
@@ -8,11 +8,11 @@ import styles from './TileGrid.module.scss';
 
 export interface Tile {
   readonly key: string;
-  readonly image: string;
   readonly label: string;
+  readonly image?: string;
 }
 
-export type TilePicture = 'emblem' | 'portrait';
+export type TilePicture = 'emblem' | 'portrait' | 'none';
 
 export interface TileGridContext {
   readonly name: string;
@@ -20,9 +20,10 @@ export interface TileGridContext {
   readonly picture: TilePicture;
 }
 
-const PICTURE_CLASSES: Readonly<Record<TilePicture, string>> = {
-  emblem: styles.emblem!,
-  portrait: styles.portrait!,
+const PICTURE_CLASSES: Readonly<Record<TilePicture, string | undefined>> = {
+  emblem: styles.emblem,
+  portrait: styles.portrait,
+  none: undefined,
 };
 
 export class TileGridView extends View<TileGridContext> {
@@ -45,9 +46,8 @@ export class TileGridView extends View<TileGridContext> {
 
       if (tile) {
         button.dataset.key = tile.key;
-        button.querySelector<HTMLImageElement>('[data-image]')!.src =
-          tile.image;
         button.querySelector('[data-label]')!.textContent = tile.label;
+        this.showImage(button, tile.image);
       }
     }
   }
@@ -66,11 +66,30 @@ export class TileGridView extends View<TileGridContext> {
       <li>
         <button class=${styles.tile} data-tile aria-pressed="false"
           @click=${(event: Event) => this.selectTile(event)}>
-          <img class=${PICTURE_CLASSES[this.context.picture]} data-image alt="" />
+          ${this.renderPicture()}
           <span class=${styles.label} data-label></span>
         </button>
       </li>
     `;
+  }
+
+  private renderPicture(): TemplateResult | typeof nothing {
+    const pictureClass = PICTURE_CLASSES[this.context.picture];
+
+    return pictureClass
+      ? html`<img class=${pictureClass} data-image alt="" />`
+      : nothing;
+  }
+
+  private showImage(
+    button: HTMLButtonElement,
+    image: string | undefined,
+  ): void {
+    const picture = button.querySelector<HTMLImageElement>('[data-image]');
+
+    if (picture && image) {
+      picture.src = image;
+    }
   }
 
   private selectTile(event: Event): void {

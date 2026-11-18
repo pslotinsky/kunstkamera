@@ -156,7 +156,11 @@ describe('AppControl', () => {
     const create = vi.spyOn(CampaignControl, 'create');
     mount();
     button('New Game').click();
-    document.querySelector<HTMLButtonElement>('[data-scenario="2"]')!.click();
+    document
+      .querySelector<HTMLButtonElement>(
+        '[data-tile-grid="scenarios"] [data-key="2"]',
+      )!
+      .click();
     button('Next', scenarioSelect()).click();
     familySelect()
       .querySelector<HTMLButtonElement>(`[data-key="${family}"]`)!

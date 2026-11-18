@@ -1,5 +1,5 @@
 import type { ChildrenViews } from '@/lib/Control';
-import type { MapPreviewControl } from '@/ui/MapPreview/MapPreviewControl';
+import type { ScenarioMapControl } from '@/ui/Setup/ScenarioMap/ScenarioMapControl';
 import type { TileGridControl } from '@/ui/Setup/TileGrid/TileGridControl';
 
 import type { AdvisorPreviewControl } from './AdvisorPreview/AdvisorPreviewControl';
@@ -7,7 +7,7 @@ import type { AdvisorPreviewControl } from './AdvisorPreview/AdvisorPreviewContr
 export type AdvisorSelectControls = {
   readonly advisors: TileGridControl;
   readonly preview: AdvisorPreviewControl;
-  readonly mapPreview: MapPreviewControl;
+  readonly map: ScenarioMapControl;
 };
 
 export type AdvisorSelectViews = ChildrenViews<AdvisorSelectControls>;

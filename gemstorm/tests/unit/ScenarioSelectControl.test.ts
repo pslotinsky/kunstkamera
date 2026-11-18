@@ -17,8 +17,12 @@ function mount(): ScenarioSelectControl {
 
 function scenarioButton(number: number): HTMLButtonElement {
   return document.querySelector<HTMLButtonElement>(
-    `[data-scenario="${number}"]`,
+    `[data-tile-grid="scenarios"] [data-key="${number}"]`,
   )!;
+}
+
+function text(selector: string): string {
+  return document.querySelector(selector)?.textContent?.trim() ?? '';
 }
 
 function crestOf(provinceNumber: number): string | undefined {
@@ -46,12 +50,26 @@ afterEach(() => {
 });
 
 describe('ScenarioSelectControl', () => {
-  it('starts with the first scenario selected', () => {
+  it('offers each scenario as a tile, the first one chosen', () => {
     const mounted = mount();
+    const [first] = SCENARIOS;
 
-    expect(mounted.scenario).toBe(SCENARIOS[0]);
-    expect(scenarioButton(1).getAttribute('aria-pressed')).toBe('true');
-    expect(scenarioButton(2).getAttribute('aria-pressed')).toBe('false');
+    expect(mounted.scenario).toBe(first);
+    expect(scenarioButton(1).textContent).toContain(first!.name);
+    expect(text('[data-description]')).toBe(first!.description);
+  });
+
+  it('labels the map with the start date and scenario name of the click', () => {
+    const second = SCENARIOS[1]!;
+    mount();
+
+    scenarioButton(2).click();
+
+    expect(text('[data-plaque="date"] [data-title]')).toBe(
+      `Month 1, ${second.year}`,
+    );
+    expect(text('[data-map-title]')).toBe(second.name);
+    expect(text('[data-description]')).toBe(second.description);
   });
 
   it('shows the starting crests of the scenario that is clicked', () => {
@@ -63,7 +81,6 @@ describe('ScenarioSelectControl', () => {
     scenarioButton(2).click();
 
     expect(mounted.scenario).toBe(SCENARIOS[1]);
-    expect(scenarioButton(2).getAttribute('aria-pressed')).toBe('true');
     expect(crestOf(changed.number)).toContain(
       `crests/${changed.family!.toLowerCase()}.webp`,
     );

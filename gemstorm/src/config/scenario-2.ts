@@ -5,7 +5,7 @@ export const SCENARIO_2: Scenario = {
   name: 'Embers of Rebellion',
   year: 206,
   description:
-    'Five years into the rebellion, old houses fall and Aldren establishes Duskerran.',
+    'Five years on, Redwake has destroyed Emberholt, and Aldren has broken with Varrengard to found House Duskerran. Alderwyn and Stormmere fight on.',
   playableFamilies: ['Stormmere', 'Alderwyn', 'Redwake', 'Greyfen'],
   generals: [
     {

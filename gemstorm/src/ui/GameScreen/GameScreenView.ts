@@ -1,8 +1,5 @@
 import { html, type TemplateResult } from 'lit-html';
 
-import type { CalendarDate } from '@/core/domain/CalendarDate';
-import type { CampaignOutcome } from '@/core/domain/CampaignOutcome';
-import type { Province } from '@/core/domain/Province';
 import { View } from '@/lib/View';
 
 import { OverlayToggledEvent } from './OverlayToggledEvent';
@@ -16,18 +13,13 @@ export class GameScreenView extends View<GameScreenContext, GameScreenViews> {
   private isOverlayOpen = false;
 
   public get template(): TemplateResult {
-    const { views, context } = this;
-    const { current, turnNumber } = context.world.turnQueue;
-    const status = current ? this.renderTurn(current, turnNumber) : '';
+    const { views } = this;
 
     return html`
       <div class=${styles.root}>
         ${views.gamePanel.template}
         <div class=${styles.mapArea}>
-          <div class=${styles.turnStatus}>
-            <p class=${styles.date}>${String(context.world.date)}</p>
-            <p class=${styles.status}>${status}</p>
-          </div>
+          <div class=${styles.turnStatus}>${views.turnStatus.template}</div>
           ${views.worldMap.template}
           ${views.commandDialogs.template}
           ${views.searchReport.template}
@@ -43,22 +35,6 @@ export class GameScreenView extends View<GameScreenContext, GameScreenViews> {
 
   protected override onMount(): void {
     this.watchOverlays();
-  }
-
-  public showEnding(outcome: CampaignOutcome): void {
-    this.showDate(outcome.date);
-    this.setText(
-      styles.status!,
-      `${outcome.isVictory ? 'Victory' : 'Defeat'} — ${outcome.house}`,
-    );
-  }
-
-  public showDate(date: CalendarDate): void {
-    this.setText(styles.date!, String(date));
-  }
-
-  public showTurn(province: Province, turnNumber: number): void {
-    this.setText(styles.status!, this.renderTurn(province, turnNumber));
   }
 
   private watchOverlays(): void {
@@ -97,17 +73,5 @@ export class GameScreenView extends View<GameScreenContext, GameScreenViews> {
 
   private get mapArea(): HTMLElement {
     return this.element.querySelector<HTMLElement>(`.${styles.mapArea}`)!;
-  }
-
-  private renderTurn(province: Province, turnNumber: number): string {
-    return `Turn ${turnNumber}: ${province.name}`;
-  }
-
-  private setText(className: string, text: string): void {
-    const element = this.element.querySelector(`.${className}`);
-
-    if (element) {
-      element.textContent = text;
-    }
   }
 }

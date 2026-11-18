@@ -1,6 +1,5 @@
 import { html, type TemplateResult } from 'lit-html';
 
-import type { Scenario } from '@/config/scenarios';
 import { View } from '@/lib/View';
 import { BackChosenEvent } from '@/ui/Setup/events/BackChosenEvent';
 import { BeginChosenEvent } from '@/ui/Setup/events/BeginChosenEvent';
@@ -28,7 +27,6 @@ export class AdvisorSelectView extends View<
         <div class=${layout.choices}>
           <header class=${layout.header}>
             <h2 id="advisor-heading" class=${layout.heading}>Choose Advisor</h2>
-            <p class=${layout.subtitle} data-summary></p>
           </header>
           ${views.advisors.template}
           ${views.preview.template}
@@ -43,7 +41,7 @@ export class AdvisorSelectView extends View<
             </button>
           </div>
         </div>
-        <div class=${layout.map}>${views.mapPreview.template}</div>
+        <div class=${layout.map}>${views.map.template}</div>
       </section>
     `;
   }
@@ -54,10 +52,5 @@ export class AdvisorSelectView extends View<
 
   public hide(): void {
     this.element.classList.add(layout.hidden!);
-  }
-
-  public showSummary(scenario: Scenario, familyName: string): void {
-    this.element.querySelector('[data-summary]')!.textContent =
-      `${scenario.name} · Year ${scenario.year} · ${familyName}`;
   }
 }

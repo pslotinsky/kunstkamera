@@ -17,7 +17,7 @@ Gems enter the game here as what the spec says they are: house-level assets, see
 | Search    | Sending a spy into a province another house holds: costs the turn and 5 Gold, reports the Fifth Units stationed there, may find an artifact. |
 | Artifact  | One of eight items that permanently raise one characteristic of one general (§5.10). Modelled as `Artifact`.                  |
 | Grant     | Naming the general who takes a newly found artifact: their characteristic rises for good and the artifact is spent. Done at the find, never later. |
-| Gem       | One of the six wizard stones Princess Selyra loosed from the crown, or Gemstorm itself with the ashwing's ruby still in it. Owned by a house, never by a province or a person (§7.2). Modelled as `Gem`. |
+| Gem       | One of the seven stones the Gemstorm flung across Aureth, each bound to its Guardian. Owned by a house, never by a province or a person (§7.2). Modelled as `Gem`. |
 | Guardian  | The Fifth Unit a Gem lets its house summon, named for its Gem (Voltryn, Asterion, the Ashwing…). A `FifthUnit` like a hired monster, held by the Gem rather than being it; it fights in feature 8. |
 
 ## Functionality
