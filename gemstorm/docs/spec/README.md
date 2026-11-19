@@ -8,6 +8,11 @@ A reverse-engineering specification for **Koei's Gemfire** — a complete-enough
 
 Chapters (01–13) explain how each system works; appendices (A–E) hold the large shared data tables.
 
+Unless a rule says otherwise, division rounds down, caps are maxima, and subtraction stops at zero.
+
+Detailed rules take precedence over older summaries where those summaries have not yet been reconciled.
+
+
 ---
 
 ## Documents
@@ -35,7 +40,7 @@ Chapters (01–13) explain how each system works; appendices (A–E) hold the la
 | [appendix-a-world-data.md](./appendix-a-world-data.md) | Province list and numbers, adjacency, geography, strategic and disaster regions, active families, and house-level notes. |
 | [appendix-b-character-and-scenario-data.md](./appendix-b-character-and-scenario-data.md) | Generals, rulers, vassals, the character stat format, scenario province ownership, starting Gems and rosters, and scenario data gaps. |
 | [appendix-c-military-data.md](./appendix-c-military-data.md) | Standard units, Gem Guardians, Hired Fifth Units, Pastha; Strength / Move / Range / Cost tables, movement traits, and range patterns. |
-| [appendix-d-rules-data.md](./appendix-d-rules-data.md) | Command categories and tables, monthly action rules, goodwill values, the unknown-formula register, and the data-confidence legend. |
+| [appendix-d-rules-data.md](./appendix-d-rules-data.md) | Command categories and tables, monthly action rules, goodwill values, and the data-confidence legend. |
 | [appendix-e-lore-and-narrative-data.md](./appendix-e-lore-and-narrative-data.md) | Story premise, the Gemfire ↔ Royal Blood name mapping, mythic framing, key characters (Eselred, Robyn), the Gem scattering, the scenario narrative timeline, and known narrative limits. |
 
 ---

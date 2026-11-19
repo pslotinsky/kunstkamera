@@ -511,20 +511,119 @@ flowchart TD
 
 ---
 
-## Open Questions
+---
 
-The following military-system details remain unresolved:
+## Detailed rules: War Costs and Free Movement
 
-1. Exact battle damage formula.
-2. Exact WAR contribution to attack, defense, and casualties.
-3. Exact terrain modifiers, if any.
-4. Exact rounding for deployment cost.
-5. Exact rounding for Food needed per day.
-6. Exact Strength loss rules for non-Gem Fifth Units.
-7. Exact destruction threshold for Hired Fifth Units.
-8. Exact capture probability for defeated commanders.
-9. Exact post-battle handling in rare edge cases.
-10. Version differences in unit data and supply rules.
+### Attack
+
+```text
+Gold cost   = troops ÷ 8 + 10
+Food / day  = unit Strength ÷ 10 + troops ÷ 10 + 1
+Days        = 3, 5, 8, or 10
+Food taken  = Food / day × Days
+```
+
+- "Unit Strength" is the Strength of the accompanying hired Fifth Unit. A Gem Guardian adds nothing to food.
+- Requires an adjacent, non-allied enemy province, at least 1 soldier, 10 Gold, and 1 Food.
+- A Gem Guardian cannot be taken while its rest counter is above 0.
+- The defender commits all its soldiers and food.
+- Attack counts as a −1 command for policy events.
+- The computer always takes 5 days.
+
+### Move Troops
+
+Free; ends the turn.
+
+- Target must be adjacent and either owned or empty.
+- May carry soldiers, one Fifth Unit (not a Gem Guardian), Gold, and Food, within the target's caps.
+- Moving into an empty province claims it and raises the ruler's Fame by 3 (cap 100).
+
+### Transport
+
+Free; ends the turn.
+
+- Sends or receives Gold and Food between any two owned provinces. **Adjacency is not required.**
+- Needs at least two owned provinces.
+
+---
+
+---
+
+## Detailed rules: Fifth Units After Battle
+
+The unit taken into battle leaves its province slot. Afterwards it is put back only if it is an ordinary hireable unit with Strength above 0.
+
+**A Pastha taken into battle is never put back, so it fights once.** (Likely — no other restore path was found.)
+
+| Outcome       | Attacker's unit                                   | Defender's unit                                                                 |
+| ------------- | ------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Defender held | Returns to the origin province.                   | Stays in the province.                                                          |
+| Attacker won  | Moves into the conquered province, still hired.   | Retreats with its owner if there is a province to retreat to; otherwise it joins the conquered province's hire pool. |
+
+When a province is conquered, every other unit left in it joins that province's hire pool; a Pastha left there is removed.
+
+When a province becomes unowned: Gold and Food halve, Soldiers and Loyalty drop to 0, hired units return to the hire pool, and a Pastha is removed.
+
+If a side's Fifth Unit is destroyed in battle, that family's ruler loses 1 Fame and that side's commander loses 2–3 WAR (`maximum Strength ÷ 50`). ---
+
+---
+
+## Detailed rules: Generals After an Attack
+
+### Who marches
+
+The **whole leadership of the attacking province goes with the army**: its lord, or its ruler together with every court vassal. No one is left behind and no commander is chosen.
+
+The origin province is without a general while the battle is fought. Nothing can exploit this, because the battle and its aftermath resolve before any other province acts.
+
+### Outcomes
+
+| Outcome | Attacker's generals | Defender's generals |
+| --- | --- | --- |
+| Attacker wins | Move into the conquered province and lead it. | Flee to a retreat province, unless the commander is captured. |
+| Defender holds | Return to the origin province, unless the commander is captured. | Stay. |
+| Defender fled before battle | As "attacker wins". | Go to the chosen province; the capture roll still applies. |
+| Defender surrendered | As "attacker wins". | The commander is always captured. |
+
+Capture chances are in [Tactical Battle](./09-tactical-battle-system.md#detailed-rules-tactical-battle); a prisoner's fate is in [Prisoners](./05-characters.md#detailed-rules-prisoners).
+
+### Consequences of winning
+
+- **The attacking leadership does not go home.** The origin province stays owned but is left without a general, under direct rule at half the ruler's stats.
+- **A ruler who attacks and wins moves his home** to the conquered province, court included.
+- The conquered province's Entrust setting is cleared. **The origin's is kept**: an entrusted province whose lord marched away and won stays entrusted, now under direct rule, and the computer keeps running it.
+
+A family that attacks with every lord it has ends up with its generals at the front and its rear provinces under direct rule, until Change Lord sends someone back.
+
+### Retreating inside a battle
+
+A side that chooses Retreat during the battle picks its destination: an own or unowned neighbour of the battlefield, or the ruler's home. An attacker who retreats this way need not return to the province he came from.
+
+### Where a fleeing defender lands
+
+The retreat province is a random own or unowned neighbour of the battlefield; failing that, the ruler's home; failing that, there is nowhere to go and capture is certain.
+
+| The retreat province… | Result |
+| --- | --- |
+| is unowned | It is claimed. The family's ruler gains 3 Fame. The fleeing leadership leads it. |
+| is own, with no general | The fleeing leadership leads it. |
+| is own, with a lord, and the one fleeing is the **ruler** | The ruler and his court take over. The lord joins the court as a vassal. Entrust is cleared. |
+| is own, with a lord, and the one fleeing is a **lord** | The fleeing lord joins his ruler's court as a vassal, wherever the ruler is. |
+
+### When the commander is captured
+
+- **The court is not captured with a ruler.** Only the commander is the prisoner; the vassals' future follows from his fate.
+- A captured lord who is ransomed or released rejoins his ruler's court **as a vassal**, even though he was a lord. The province he led keeps its owner and has no general.
+- A captured ruler is never ransomed. He goes straight to Recruit, Release, or Banish.
+
+**A released ruler** takes over a random province of his family other than the battlefield — not necessarily the one he left. Its lord, if any, joins his court. If the family has no other province he claims an unowned neighbour of the battlefield; if there is none the family is destroyed.
+
+**A banished ruler** is succeeded by his heir, who becomes ruler where he stands, and the court gathers to him. With no heir the family splits.
+
+An attacking ruler's family always still owns the province he set out from, so releasing him can never destroy the family. A defending ruler who loses his last province has no such safety.
+
+---
 
 ---
 

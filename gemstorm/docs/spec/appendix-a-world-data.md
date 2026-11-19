@@ -464,18 +464,48 @@ flowchart TD
 
 ---
 
-## Open Data Questions
+## A.8 Map Coordinates
 
-The following data remains to be fully verified:
+Each province has a position on the strategic map, represented on a coarse grid. x runs west to east, y north to south.
 
-1. (Resolved) Province-by-province disaster ranges are documented in the events chapter (§11.6).
-2. Whether disaster regions differ between game versions.
-3. Full internal region classification, if any exists.
-4. Exact world-data differences between Gemfire and Royal Blood.
-5. Full confirmation of province names across all localized versions.
-6. Whether any province has hidden strategic properties beyond adjacency, disaster risk, and available Hired Fifth Units.
+| # | Province | x | y |
+| --: | --- | --: | --: |
+| 1 | Dunmoor | 5 | 1 |
+| 2 | Carveti | 5 | 3 |
+| 3 | Cobrige | 8 | 2 |
+| 4 | Banshea | 11 | 1 |
+| 5 | Petaria | 11 | 3 |
+| 6 | Hyland | 8 | 5 |
+| 7 | Norwood | 5 | 5 |
+| 8 | Lisle | 1 | 3 |
+| 9 | Erewood | 3 | 7 |
+| 10 | Rodale | 7 | 7 |
+| 11 | Hermet | 10 | 7 |
+| 12 | Ostlan | 12 | 7 |
+| 13 | Powice | 1 | 11 |
+| 14 | Cardyf | 3 | 12 |
+| 15 | Eljing | 5 | 9 |
+| 16 | Centra | 7 | 10 |
+| 17 | Culver | 9 | 10 |
+| 18 | Lindum | 12 | 9 |
+| 19 | Caster | 12 | 11 |
+| 20 | Anglia | 12 | 13 |
+| 21 | Oldlyn | 12 | 15 |
+| 22 | Londre | 9 | 12 |
+| 23 | Attley | 6 | 12 |
+| 24 | Linden | 6 | 14 |
+| 25 | Ashlan | 3 | 17 |
+| 26 | Penzan | 1 | 17 |
+| 27 | Belgam | 5 | 17 |
+| 28 | Celsea | 8 | 15 |
+| 29 | Cambry | 8 | 17 |
+| 30 | Farlan | 11 | 17 |
+
+A twelfth family name, **Holly**, is available but unused in the starting scenarios.
 
 ---
+
+The full internal region classification, localized names, version differences, and any hidden province properties beyond adjacency, disasters, and hire pools remain unverified.
 
 ## Summary
 

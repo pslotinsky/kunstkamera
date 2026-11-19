@@ -174,7 +174,7 @@ Despite the command name, this category includes both monsters and elite human u
 | Gargoyles | Monster     |      120 |            40 |  3\* | Short / Close | Flying.                  |
 | Gunners   | Elite Human |      150 |            40 |    3 | Long          | Ranged unit.             |
 | Lancers   | Elite Human |      180 |            50 |    3 | Short / Close | Strong melee unit.       |
-| Orks      | Monster     |      100 |            20 |    2 | Short / Close | Cheap monster unit.      |
+| Orks      | Monster     |      100 |            20 |    3 | Short / Close | Cheap monster unit.      |
 | Skeletons | Monster     |      100 |            20 |    2 | Short / Close | Cheap monster unit.      |
 | Shooters  | Elite Human |      150 |            35 |    3 | Long          | Ranged unit.             |
 | Spearmen  | Elite Human |      150 |            20 |    3 | Long          | Cheap ranged elite unit. |
@@ -544,20 +544,56 @@ flowchart TD
 
 ---
 
-## Open Data Questions
+## C.11 Unit Values
 
-The following data remains to be fully verified:
+The following table gives the unit values.
 
-1. (Resolved) Range tile diagrams for all four ranges are in §C.6.
-2. (Resolved) Largest range diagram is in §C.6.
-3. Exact destruction threshold for Hired Fifth Units.
-4. Exact Strength loss rules for all non-Gem Fifth Units.
-5. Whether any Fifth Units have hidden combat modifiers beyond Strength, Move, and Range.
-6. Whether Fifth Unit data differs between SNES, Genesis, NES, PC, and Royal Blood versions.
-7. (Resolved) "Outer" is not a distinct range; Skulryk is Circular.
-8. Whether Pastha’s combat behaviour differs from Gem Guardians beyond one-use availability.
+Attack and Defence are not shown to the player. They feed the damage formulas in [Tactical Battle](./09-tactical-battle-system.md#detailed-rules-tactical-battle). "Fame needed" is the ruler Fame below which a hired unit may rampage or desert; it does not prevent hiring.
+
+**Standard units**
+
+| Unit | Share of soldiers | Attack | Defence | Move | Range | Builds fences |
+| --- | --- | --: | --: | --: | --- | --- |
+| Horsemen | Remainder (about 25%) | 21 | 20 | 3 | Short | No |
+| Knights | 25% | 20 | 19 | 2 | Short | Yes |
+| Archers | 25% | 18 | 18 | 2 | Long | No |
+| Knights | 25% | 20 | 19 | 2 | Short | Yes |
+
+**Fifth Units**
+
+| # | Unit | Strength | Attack | Defence | Move | Range | Cost | Fame needed | Class |
+| --: | --- | --: | --: | --: | --: | --- | --: | --: | --- |
+| 0 | Ogre | 100 | 26 | 27 | 2 | Short | 50 | 21 | Monster |
+| 1 | Orks | 100 | 20 | 20 | 3 | Short | 20 | 9 | Monster |
+| 2 | Olog-hais | 110 | 21 | 18 | 2 | Short | 30 | 12 | Monster |
+| 3 | Gargoyles | 120 | 23 | 25 | 3 | Short | 40 | 18 | Monster |
+| 4 | Lizards | 110 | 27 | 28 | 3 | Short | 60 | 27 | Monster |
+| 5 | Skeletons | 100 | 18 | 19 | 2 | Short | 20 | 9 | Monster |
+| 6 | Bugbear | 100 | 20 | 24 | 3 | Short | 30 | 3 | Monster |
+| 7 | Fachan | 100 | 26 | 23 | 3 | Largest | 40 | 21 | Monster |
+| 8 | Wyvern | 150 | 29 | 30 | 3 | Short | 60 | 42 | Monster |
+| 9 | Gunners | 150 | 27 | 21 | 3 | Long | 40 | 30 | Mercenary |
+| 10 | Shooters | 150 | 24 | 22 | 3 | Long | 35 | 15 | Mercenary |
+| 11 | Spearmen | 150 | 22 | 21 | 3 | Long | 20 | 12 | Mercenary |
+| 12 | Pikemen | 150 | 25 | 26 | 3 | Short | 40 | 21 | Mercenary |
+| 13 | Lancers | 180 | 27 | 26 | 3 | Short | 50 | 45 | Mercenary |
+| 14 | Warriors | 180 | 28 | 27 | 3 | Short | 60 | 51 | Mercenary |
+| 15 | Pluvius | 160 | 29 | 29 | 2 | Circular | — | — | Gem Guardian |
+| 16 | Zendor | 150 | 28 | 28 | 3 | Circular | — | — | Gem Guardian |
+| 17 | Skulryk | 110 | 22 | 22 | 3 | Circular | — | — | Gem Guardian |
+| 18 | Empyron | 140 | 25 | 25 | 2 | Short | — | — | Gem Guardian |
+| 19 | Scylla | 130 | 24 | 24 | 2 | Short | — | — | Gem Guardian |
+| 20 | Chylla | 120 | 22 | 23 | 3 | Short | — | — | Gem Guardian |
+| 21 | Pastha | 160 | 30 | 29 | 2 | Short | — | — | Special |
+| 22 | Dragon | 160 | 30 | 30 | 2 | Largest | — | — | Special |
+
+- Gargoyles and Wyvern fly. This is decided by unit, not by a value in the table.
+- The unit names are **Orks**, **Olog-hais**, and **Wyvern**.
+- Monsters are restocked in the hire pool; mercenaries are a fixed pool of 12 per scenario.
 
 ---
+
+Any additional hidden combat modifiers and version-specific differences in Fifth Unit data remain unverified.
 
 ## Summary
 

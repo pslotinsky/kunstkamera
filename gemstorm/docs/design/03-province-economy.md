@@ -81,7 +81,7 @@ The table is our invention — a provisional model that makes prices breathe wit
 
 **Unaffordable orders disable.** `WorldCommand` gets `canExecute()` (default true); Cultivation and Protection override it with `gold >= 10`, and the menu disables any command whose `canExecute` is false — re-evaluated on `ProvinceUpdated`. The `execute` guard stays as the domain backstop.
 
-**Refreshing the UI.** Orders now mutate visible state outside the turn cycle (Trade ends no turn). Commands publish `ProvinceUpdated(province)` after mutating; `GameScreenControl` refreshes the info panel when the updated province is the selected one. `TaxAndHarvestCommand` adopts the same event, fixing September's silent stat change.
+**Refreshing the UI.** Orders now mutate visible state outside the turn cycle (Trade ends no turn). Commands publish `ProvinceUpdated(province)` after mutating; `StrategyScreenControl` refreshes the info panel when the updated province is the selected one. `TaxAndHarvestCommand` adopts the same event, fixing September's silent stat change.
 
 ## Domain model
 

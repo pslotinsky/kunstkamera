@@ -228,11 +228,3 @@ Gemfire is not a conventional large-scale wargame. Most decisions happen on the 
 
 ---
 
-## Open Questions
-
-The following high-level questions remain partially unresolved:
-
-1. Exact internal province activation order.
-2. Exact timing of some end-of-month checks.
-3. Exact defeat handling in edge cases involving ruler capture, banishment, surrender, or family absorption.
-4. Exact version differences between SNES, Genesis, NES, PC, and Royal Blood.

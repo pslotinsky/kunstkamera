@@ -690,18 +690,217 @@ Simple but persistent AI
 
 ---
 
-## Open Questions
+---
 
-The following AI details remain unresolved:
+## Detailed rules: Computer Play
 
-1. Exact Entrust AI command priority order.
-2. Full list of diplomatic commands actively used by AI.
-3. Exact strategic attack decision formula.
-4. Exact auto-combat resolution formula.
-5. Whether any version-specific AI bonuses exist.
-6. Exact tactical retreat conditions.
-7. Exact AI handling of Gem cooldown and Hired Fifth Unit upkeep.
-8. Whether AI evaluates long-term economy or only local province state.
+### Entrust
+
+An entrusted province runs **the same routine as a computer-owned province**: same priorities, same thresholds. Only two things are withheld from it: the free resource transfer and the fake raid (both below). It can attack, recruit, propose or break alliances, and attempt defections on the player's behalf. Its battles are also fought by the computer.
+
+Entrust is cleared whenever the province changes owner.
+
+### No hidden bonuses
+
+No difficulty or scenario value is read by any strategic, diplomatic, or tactical decision routine, and the upkeep, harvest, and event code treats all owners alike. The computer's advantages are procedural:
+
+1. Each month, before its command, a computer or entrusted province gets a **free market trade** if it is short of exactly one of Gold or Food (it sells half its Food or spends half its Gold).
+2. If short of both, a **computer-owned** province receives a quarter of the Gold and Food of the family's richest province, from anywhere on the map, for free.
+3. A **free lord assignment**: if the ruler shares a province with another general and the family has a province with no general, that general is sent to one of them.
+4. It reads enemy soldier counts directly.
+
+"Short" means Gold below `soldiers ÷ 8 + 20`, or Food below `soldiers ÷ 10 + 30`.
+
+### Monthly command choice
+
+The province's lord sets a temperament by comparing INT with WAR:
+
+| Temperament          | Diplomacy first | Develop first | Military first |
+| -------------------- | --------------- | ------------- | -------------- |
+| INT ≥ WAR            | 30%             | 30%           | 40%            |
+| WAR > INT            | 20%             | 20%           | 60%            |
+
+Each plan is a chain; the first step that can act is the month's command. If none can, the province does nothing.
+
+```text
+Military first:  Offence → Build-up → Diplomacy
+Develop first:   Develop → Build-up → Offence
+Diplomacy first: Diplomacy → (1 in 9: fake raid) → Develop → Offence
+```
+
+### Offence
+
+**Attack** is tried first:
+
+```text
+no soldiers, or any neighbour is unowned → no attack
+class by lord WAR (halved if no general):  ≤55, ≤75, ≤99, 100+
+required advantage over EVERY non-allied enemy neighbour:  1.6×, 1.4×, 1.2×, 1.0×
+target = the neighbour with the fewest soldiers
+send   = max(target soldiers × (1.4, 1.2, 1.0, 0.9), half of own soldiers)
+food   = 5 days;  Fifth Unit = the available unit with the highest Strength
+```
+
+The attack is cancelled if the province cannot afford the Gold or Food, or if every enemy neighbour is an ally.
+
+The computer never empties a province: an attack always leaves soldiers behind, Expand sends a third, and Reinforce at most half.
+
+**Expand**, if an unowned neighbour exists: move a third of Gold, Food, and soldiers into a random one.
+
+### Develop
+
+The lowest of Cultivation, Loyalty, and Protection is raised, ties going in that order. Loyalty is raised with the smallest Give Food (20). Only that one command is tried: if the province cannot afford it, Develop fails and the plan moves on, without trying the other two.
+
+### Build-up
+
+```text
+equal chance:
+    Reinforce — interior provinces only: send half the soldiers to the own neighbour
+                that borders an enemy and has the fewest soldiers
+    Recruit   — soldiers = Gold ÷ 8, costing a quarter of the province's Gold (needs at least 8 Gold)
+if that failed: Hire — only with no hired unit; the first offered unit it can
+                afford and whose requirement the ruler's Fame meets
+```
+
+The computer never dismisses a unit and has no upkeep reasoning.
+
+### Diplomacy
+
+Runs only from the province the family ruler is in.
+
+```text
+"strongest neighbour" = among families bordering this province (at least two
+                        different ones required), the one with the most provinces
+
+Ally:   if unallied and owning 10 or fewer provinces → propose to the strongest neighbour
+Break:  if allied → break when owning more than 10 provinces and 6+ more than the ally,
+        or when the ally is no longer the strongest neighbour
+Defect: (ruler CHA ÷ 2)% chance to try a random general of another family
+```
+
+Notes on the above:
+
+- "Bordering" is measured from the ruler's province only, not from the family's whole border. This looks like a slip in the original.
+- Lankshire counts toward the two families required but is never chosen.
+- An allied family with fewer than two neighbouring families has no "strongest neighbour", so it always breaks. A family can therefore ally one month and break the next.
+- Ally and Break use the month's command even when the proposal is refused. Defect does not count as a command for policy events.
+
+The computer **never** uses Surrender, Recruit negotiation, Search, or real Plunder and Sabotage. It never moves its ruler by choice, but a ruler's province can attack, and then the ruler and his court march with the army.
+
+**Fake raid:** the only Plunder/Sabotage the computer performs is cosmetic. If a human neighbour's lord has higher INT + WAR than the raider's, the player sees "we caught plunderers/saboteurs". Otherwise nothing happens. Nothing is ever stolen or damaged.
+
+### Defender's choice before battle
+
+A **human** defender is asked to Fight, Retreat, or Surrender:
+
+- Fight needs Food and either soldiers or a usable Fifth Unit.
+- Retreat needs somewhere to go. If the destination is the ruler's home and it is not adjacent, soldiers and supplies are abandoned.
+- Surrender is refused while the province still has both soldiers and Food.
+
+A **computer** defender decides as follows.
+
+
+```text
+cannot retreat anywhere:
+    fight if it has food and (soldiers or a usable Fifth Unit), otherwise surrender
+can retreat:
+    retreat chance = 100%  if it has no food, or food < soldiers ÷ 40
+                   = 80%   if attacker soldiers ÷ 5 ≥ defender soldiers  (50% with a hired Fifth Unit)
+                   = 0%    otherwise
+```
+
+A defender with food but no soldiers falls in the 80% case; the other 20% of the time it "fights" with nothing and loses.
+
+"Can retreat" means a neighbour is own or unowned, **or** the province is not led by the family ruler. In the second case the retreat goes to the ruler's home province wherever it is on the map.
+
+Retreat goes to the own neighbour with the most soldiers, then an unowned neighbour, then home.
+
+**Defender's Fifth Unit:**
+
+```text
+a hired Pastha is always used
+otherwise none, if (attacker soldiers + attacker unit Strength) × 10 < defender soldiers
+otherwise the available unit with the highest Strength — hired units first, then Guardians off rest
+```
+
+### Tactical play
+
+The same routine drives the player's Auto mode. Each turn a side picks a stance:
+
+1. Outnumbered 10 to 1 before day 4 → **retreat** (computer only), if it can.
+2. Defender outnumbered 2 to 1 → **hold**.
+3. Enemy food will run out before the battle ends and own food will not → **hold** and starve them out.
+4. Otherwise → **assault**.
+
+A unit always **moves first, then acts**. It never attacks and then moves.
+
+**Hold:**
+
+- A unit standing on the own base only builds a fence (if it is a Knights unit and a plain empty tile is adjacent) or passes. It never attacks.
+- The others walk toward the base, roughly nearest first. If the base is occupied by anyone, they go to a tile from which they can hit that occupant.
+- A unit already in position, or with no path, steps toward the nearest enemy instead.
+- If a fence blocked its move, the unit tries to break it and does not attack that turn. Otherwise it attacks if an enemy is in range.
+
+**Assault:**
+
+- One **keeper** — the unit nearest the own base — returns to the base and fences it. If the base is already occupied, the occupant fences. The keeper never attacks.
+- The rest advance on the enemy base, roughly nearest first. If the base is occupied, they go to a tile from which they can hit the occupant.
+- If the enemy base cannot be reached, Archers go for the nearest enemy unit; other units close in as far as they can. (This fallback is gated by a value the original leaves uninitialised, so it often does not fire.)
+- After moving, a unit attacks if an enemy is in range; only if none is, it breaks an adjacent fence.
+- For the defender, the last unit in the order holds its position unless it is the Fifth Unit. It still attacks.
+
+**Pathfinding:** shortest path over a cost map. A tile costs 1; a fence 2; a tile holding an enemy costs more the stronger the enemy; a tile holding a friend costs 1 more, or 6 more if that friend is next to an enemy. Between equally good steps the choice is 50/50.
+
+**Targets:** adjacent-range units attack the **weakest** enemy in range. Ranged and special units attack the **strongest**. Ties go to the first found. There is no randomness in target choice.
+
+**Randomness** enters only through path ties, fence attempts, and the choice of retreat province.
+
+The unit ordering is produced by a faulty sort in the original, so "nearest first" is only approximate.
+
+The tactical computer never surrenders.
+
+---
+
+---
+
+## Detailed rules: Advisor Hints
+
+The hint is chosen independently of the computer's own decision routine.
+
+**1. Shortage, always checked first:**
+
+```text
+Gold needed = Cultivation ÷ 5 (if a general is present) + the hire cost of each hired unit
+Food needed = soldiers ÷ 10
+
+short of both → "poor in gold and food"
+short of Gold → "find a means to earn gold"
+short of Food → "your people will starve"
+```
+
+These are the next quarterly upkeep figures ([Upkeep, Rampage, Desertion, and Disasters](./11-events.md#detailed-rules-upkeep-rampage-desertion-and-disasters)).
+
+**2. Otherwise, three topics are checked in an order set by the season:**
+
+| Months   | Order                  | Fallback line                       |
+| -------- | ---------------------- | ----------------------------------- |
+| Jan–Apr  | War, Army, Domestic    | "The people rejoice in your success" |
+| May–Aug  | Domestic, War, Army    | "Consider all options…"             |
+| Sep–Dec  | Army, Domestic, War    | "Foolish is the ruler who lacks patience" |
+
+| Topic    | Condition                                                             | Advice                         |
+| -------- | --------------------------------------------------------------------- | ------------------------------ |
+| War      | An enemy neighbour has less than two thirds of this province's soldiers | Attack the weakest such province |
+| War      | No enemy neighbour, and an unowned neighbour exists                    | That province has no ruler     |
+| Army     | Under 300 soldiers and an enemy neighbour has more                     | Enlarge the army               |
+| Army     | No hired Fifth Unit                                                    | Hire monsters / hire mercenaries |
+| Domestic | Loyalty below 75                                                       | Be generous to the people      |
+| Domestic | Cultivation below 75                                                   | Cultivate                      |
+| Domestic | Protection below 75                                                    | Prepare for disasters          |
+
+When several lines of one topic qualify, one is picked at random. Each of the four advisors has its own wording for the same 14 lines.
+
+---
 
 ---
 

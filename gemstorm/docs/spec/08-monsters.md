@@ -384,7 +384,7 @@ The player guide is explicit that a low-Fame family cannot hold mercenaries at a
 
 Player testing puts the threshold at roughly 20 Fame for the Strength-150 mercenaries (Spearmen, Pikemen) and roughly 50 Fame for the Strength-180 mercenaries (Lancers, Warriors), with the two ranged Strength-150 units (Gunners, Shooters) untested.
 
-These numbers are observed, not verified against the ROM; the correlation with Strength rather than cost is the most defensible reading of the tested points.
+These numbers are estimates; the correlation with Strength rather than cost is the most defensible reading of the tested points.
 
 Monsters have no Fame requirement but can turn on their owner: Orks are "most likely to go on a rampage (damaging your state)" and Olog-Hai are "quite likely to terrorize your state by rampaging".
 
@@ -489,16 +489,82 @@ flowchart TD
 
 ---
 
-## Open Questions
+---
 
-The following Hired Fifth Unit details remain unresolved:
+## Detailed rules: Recruit, Hire, and the Hire Pool
 
-1. Exact logic for changes in province-level Hired Fifth Unit availability.
-2. Exact Fame thresholds per mercenary, and whether the check is a hard cutoff or a probability that softens as Fame rises.
-3. Exact Strength threshold at which a Hired Fifth Unit is destroyed.
-4. Per-monster rampage chance, and whether Fame or length of possession feeds into it.
-5. Whether Dismiss refunds any resources in any version.
-6. Version differences in Hired Fifth Unit names, stats, and availability.
+### Recruit
+
+```text
+Gold −= 2 × n
+Soldiers = min(999, Soldiers + n)
+```
+
+No Loyalty cost. Recruit counts as a −1 command for policy events.
+
+### Hire and Dismiss
+
+- A unit can be hired when a slot in the province holds it as "available for hire".
+- Cost is the unit's hire cost (Appendix C §C.4). The same amount is charged again every quarter as upkeep.
+- At most three hired units per province.
+- Dismiss returns the unit to "available for hire" in that province. There is no refund.
+- Hiring or dismissing ends the turn.
+
+### Control requirement
+
+Each hireable unit has a control requirement, compared against the family ruler's Fame.
+
+| Unit      | Requirement | Unit      | Requirement |
+| --------- | ----------- | --------- | ----------- |
+| Bugbear   | 3           | Shooters  | 15          |
+| Orks      | 9           | Gargoyles | 18          |
+| Skeletons | 9           | Ogre      | 21          |
+| Olog-hais | 12          | Fachan    | 21          |
+| Spearmen  | 12          | Pikemen   | 21          |
+| Lizards   | 27          | Gunners   | 30          |
+| Wyvern    | 42          | Lancers   | 45          |
+| Warriors  | 51          |           |             |
+
+The player can hire below the requirement; the requirement governs rampage and desertion. The computer only hires units it meets the requirement for.
+
+### Hire pool restock
+
+At the start of February and August, every province that has no unit available for hire gains one in its first free slot, at full Strength.
+
+Each province offers one of two monsters, chosen with equal chance:
+
+| Provinces                  | Offers               |
+| -------------------------- | -------------------- |
+| 1, 5                       | Orks or Bugbear      |
+| 2, 3, 4, 6                 | Orks or Fachan       |
+| 7, 8, 9                    | Ogre or Lizards      |
+| 10, 17, 23                 | Ogre or Skeletons    |
+| 11, 12, 18, 19             | Olog-hais or Skeletons |
+| 13, 14, 16                 | Ogre or Bugbear      |
+| 15                         | Ogre or Wyvern       |
+| 20, 21, 27                 | Orks or Skeletons    |
+| 22, 30                     | Gargoyles or Skeletons |
+| 24, 26                     | Orks or Wyvern       |
+| 25                         | Gargoyles or Lizards |
+| 28                         | Gargoyles or Wyvern  |
+| 29                         | Orks or Gargoyles    |
+
+Province numbers are the 1–30 numbers of Appendix A.
+
+Human mercenaries (Gunners … Warriors) are never restocked. They exist only as a fixed starting pool of 12.
+
+A province with a mercenary waiting for hire counts as having a unit available, so it receives no new monster until that mercenary is hired or moves on.
+
+### Hire pool migration
+
+At the start of March and September, each unhired **mercenary-class** unit may move to a neighbouring province that has a free slot:
+
+- pick a neighbour at random among those with room;
+- move with 60% chance.
+
+Monsters never migrate. At most one unit of each kind moves per pass.
+
+---
 
 ---
 

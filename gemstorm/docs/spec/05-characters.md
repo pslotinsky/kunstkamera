@@ -526,16 +526,228 @@ A small house with excellent characters can be more dangerous than its map posit
 
 ---
 
-## Open Questions
+---
 
-The following character-system details remain unresolved:
+## Detailed rules: January: Decay, Ageing, Death
 
-1. Exact Recruit formula.
-2. Exact Defection formula.
-3. Exact capture probability after battle.
-4. Internal scale and initialization of hidden General Loyalty.
-5. Exact influence of CHA on systems other than Give Food.
-6. Exact Fame gain and loss formulas.
-7. Exact annual character growth formula.
-8. Exact effects of Banish.
-9. The per-year magnitude of stat growth and decline (the age thresholds — growth to ~60, decline after, death ~75 — are player-tested).
+### Yearly decay
+
+Every province, owned or not:
+
+```text
+Loyalty     −= Loyalty ÷ 20 + (100 − Loyalty) ÷ 35
+Cultivation −= Cultivation ÷ 20 + 1
+Protection  −= Protection ÷ 20 + 1
+```
+
+### Yearly stat change
+
+Applied to all three stats of each active character (cap 200):
+
+| Character         | Change                      |
+| ----------------- | --------------------------- |
+| Age 65 or older   | −5 each                     |
+| Ruler             | 80% chance of +2 each       |
+| Lord              | 50% chance of +1 each       |
+| Vassal            | 15% chance of +1 each       |
+
+### Death from old age
+
+Each character older than 74 dies with a percentage chance equal to their age. This is checked once a year.
+
+---
+
+---
+
+## Detailed rules: Search
+
+Costs 5 Gold and ends the turn. The target is any province owned by another family; adjacency is not required.
+
+```text
+score = (INT + WAR + CHA) ÷ 20        (ruler's total ÷ 40 if no general is present)
+
+success requires all of:
+    at least one treasure still undiscovered
+    chance(50)
+    chance(score)
+```
+
+A lord with all three stats at 100 finds a treasure 7.5% of the time.
+
+On failure the search instead reports one random hired Fifth Unit in the target province, or that none is employed there.
+
+There are eight treasures in the whole game, each found once. The finder chooses which general of the family receives it:
+
+| Treasure effect | Count      |
+| --------------- | ---------- |
+| INT +25, +30, +40 | one each |
+| WAR +25, +30, +40 | one each |
+| CHA +30, +40      | one each |
+
+---
+
+---
+
+## Detailed rules: Fame
+
+Fame is a 0–100 value held by the family ruler. It is shown on the character screen only for rulers.
+
+**What Fame is used for:**
+
+- the control requirement of hired Fifth Units ([Recruit, Hire, and the Hire Pool](./08-monsters.md#detailed-rules-recruit-hire-and-the-hire-pool), [Upkeep, Rampage, Desertion, and Disasters](./11-events.md#detailed-rules-upkeep-rampage-desertion-and-disasters));
+- recruiting prisoners.
+
+Fame is **not** an input to Ally, Defection, Surrender, Sabotage, or Plunder.
+
+**Every change to Fame:**
+
+| Cause                                                         | Change                         |
+| ------------------------------------------------------------- | ------------------------------ |
+| Battle won as attacker                                        | winner +3, loser −3            |
+| Battle won as defender                                        | winner +1, loser −1            |
+| Own Fifth Unit destroyed in battle                            | −1                             |
+| Claiming an unowned province (Move Troops, or a retreat into one) | +3                         |
+| A lord defects with his province                              | gainer +3, loser −3            |
+| A family surrenders, or its captured ruler is recruited       | +3 per province gained         |
+| Successful Plunder                                            | −0 to −2                       |
+| Gwraig event                                                  | +0 to +4                       |
+| Heir succeeds, CHA at least the old ruler's                   | inherits in full               |
+| Heir succeeds, CHA lower                                      | inherits half                  |
+| Lord founds a new family when a house splits                  | starts at 3                    |
+
+Breaking an alliance, a failed negotiation, Sabotage, Release, and Banish do not change Fame.
+
+---
+
+---
+
+## Detailed rules: General Loyalty
+
+**There is no changing loyalty value.** A general's hidden loyalty is three fixed facts:
+
+| Fact                 | Effect                                                                 |
+| -------------------- | ---------------------------------------------------------------------- |
+| Defection class 0–3  | Chance to accept a defection offer: 3%, 15%, 30%, 50%.                 |
+| Recruit class 0–3    | Fame the captor's ruler needs to recruit him after capture: 51, 31, 16, 0. |
+| House membership     | A member of the ruling house never defects, and can be an heir.        |
+
+No command changes the two classes. House membership ends when the general becomes ruler, is recruited after capture, or his family is absorbed or destroyed.
+
+The two classes are set independently for each general.
+
+---
+
+---
+
+## Detailed rules: Prisoners
+
+For the capture chance see [Tactical Battle](./09-tactical-battle-system.md#detailed-rules-tactical-battle).
+
+### Ransom
+
+Offered first, unless the prisoner is the losing family's ruler. The captor asks for Gold or Food. A computer family pays from its ruler's home province:
+
+| It holds at least | It pays       |
+| ----------------- | ------------- |
+| 1.5 × the demand  | Always        |
+| 1.2 × the demand  | 75%           |
+| the demand        | 5%            |
+| less              | Never         |
+
+A human captor chooses whether to demand Gold or Food; a computer captor picks either with equal chance. A human asked to pay cannot agree to more than the home province holds.
+
+The ransom moves from the losing ruler's home province into the province that was fought over.
+
+A ransomed prisoner returns to his ruler's court.
+
+### Fate
+
+The choices are **Recruit, Release, Banish**. There is no execution.
+
+**Recruit** needs the captor's ruler to have enough Fame:
+
+```text
+a ruler whose family is human, or who has an heir → cannot be recruited
+otherwise → Fame ≥ 51, 31, 16, or 0 by the prisoner's recruit class
+```
+
+- An ordinary general joins the captor's court.
+- A ruler's whole family is taken over: generals, provinces, and Gems. The captor's ruler gains 3 Fame per province.
+
+**Release:**
+
+- An ordinary general returns to his ruler's court.
+- A ruler moves to a random remaining province of his family. If he has none he claims an unowned province next to the battlefield. If there is none, the family is destroyed and its Gems go to the victor.
+
+**Banish:** the prisoner leaves the game for good. For a ruler, succession follows as for death, and if there is no heir the Gems go to the victor.
+
+None of the three changes Fame directly.
+
+A computer captor recruits when it can. Otherwise it releases if its ruler's CHA is above 100, and else banishes with chance `(100 − CHA) ÷ 3` percent.
+
+---
+
+---
+
+## Detailed rules: Succession
+
+**Heir:** a member of the ruler's house.
+
+- A human family chooses among them.
+- A computer family takes the one with the highest INT + WAR + CHA.
+
+The heir's province becomes the family's home province. He inherits the old ruler's Fame in full if his CHA is at least the old ruler's, otherwise half.
+
+**No heir:**
+
+- A human family is out of the game.
+- The family is split. Each province with a lord becomes a new family under that lord, starting with 3 Fame. Each province without one becomes unowned.
+- A new family takes a free family slot at random, and its name comes from that slot, so the same lord may found a differently named house from one game to the next.
+- Each court vassal offers himself to the surviving rulers in turn, smallest court first. A computer ruler always accepts. If no one takes him he leaves the game.
+- Each Gem goes to a random surviving family.
+
+---
+
+---
+
+## Detailed rules: Wandering Generals
+
+A general without a family offers himself to the surviving rulers, one at a time.
+
+### When it happens
+
+| Situation | Who wanders |
+| --------- | ----------- |
+| A ruler dies of old age with no heir | His court vassals |
+| A captured ruler is banished and the family cannot continue | His court vassals |
+| A captured ruler is released but his family has no province and nowhere to go | The former ruler himself, and his court vassals |
+
+Lords are not affected: each lord of a split family founds a new family in his province.
+
+### The offer
+
+```text
+the general's Fame is set to 0
+rulers are asked in order of court size, smallest first; Lankshire is never asked
+    a computer ruler always accepts
+    a human ruler chooses Accept or Reject; Reject passes the offer on
+the first to accept takes him as a court vassal, in that ruler's home province
+if no one accepts, he leaves the game for good
+```
+
+- After a battle the victor is among those asked.
+- A general can only be lost this way if every eligible ruler is human and refuses, or none remains.
+- There is no limit on court size or on the number of generals a family may hold.
+- The general speaks a line that reflects his defection class, from most reluctant to most eager. It is a hint to his loyalty, and the only one the game gives.
+- He keeps his house membership mark, though it no longer matches any family.
+
+### No one ever joins the game
+
+A scenario's cast is fixed at the start. Generals absent from a scenario never arrive later, and no one comes of age.
+
+The only exits are old age, the Banshee event, banishment, and an offer no one accepts.
+
+---
+
+---
+

@@ -436,15 +436,60 @@ flowchart TD
 
 ---
 
-## Open Questions
+---
 
-The following Gem-system details remain unresolved:
+## Detailed rules: Gems
 
-1. (Resolved) Range tile diagrams are in Appendix C §C.6.
-2. Exact edge cases for Gem transfer when a family dissolves without a clear banisher.
-3. Whether any ruler stat, Fame value, or hidden condition affects Gem acquisition or retention.
-4. Version differences in Gem names, Guardian stats, and range labels.
-5. Exact handling of Gem availability in rare post-battle edge cases.
+### Holding and using
+
+- Gems belong to the **family**, not to a province or a general.
+- Each Gem gives one Gem Guardian, usable from any province of the family, always at full Strength, with no cost or upkeep. It cannot be dismissed.
+- The seventh Gem gives the Dragon. It follows every Gem rule: same rest, same transfer, no special condition to gain or keep it.
+
+### Rest
+
+```text
+when a battle is joined: rest = 3 for the Gem unit of each side
+start of every month:    rest −= 1   (stops at 0)
+```
+
+While rest is above 0 the Guardian cannot be chosen for attack or defence. It is usable again in the third month after the battle.
+
+Rest is set when the battle starts, whether or not the Guardian's special attack is used.
+
+### Transfer
+
+All of a family's Gems pass to another family in these cases:
+
+| Case                                                                 | Gems go to                          |
+| -------------------------------------------------------------------- | ----------------------------------- |
+| Ruler captured and the family taken over                             | The victor                          |
+| Ruler released, but the family has no province and nowhere to flee   | The victor                          |
+| Ruler banished with no heir                                          | The victor                          |
+| Family joins another through diplomacy                               | The receiving family                |
+| Ruler dies of old age with no successor                              | Each Gem to a random surviving family |
+
+A ruler banished **with** an heir keeps the family's Gems.
+
+No stat, Fame value, or other hidden condition affects Gem acquisition or retention.
+
+---
+
+---
+
+## Detailed rules: The Dragon
+
+- The Dragon is the unit granted by the seventh Gem. Each Gem is named by its Guardian.
+- **Lankshire holds the Dragon at the start of every scenario.** No other family ever starts with it.
+- It changes hands only as every Gem does. There is no scripted event, no requirement to hold the other six, and no other way to obtain it.
+- Because Lankshire cannot surrender, the Dragon is won by capturing or outliving its ruler.
+- If a ruler dies of old age with no heir, each of his Gems goes to a **random** surviving family. The Dragon can reach anyone this way, including a newly founded family.
+- It rests for three months after a battle, like the six Guardians.
+- In battle it is the strongest unit in the game: Attack 30, Defence 30, Strength 160, Move 2, and the widest range (all tiles within 2). Otherwise it follows the special-unit rules of [Tactical Battle](./09-tactical-battle-system.md#detailed-rules-tactical-battle). (Likely — no Dragon-specific battle code exists.)
+
+**Gems have no effect on victory.** The game ends only by unification. Gem count matters to exactly one rule: a computer family's answer to an alliance proposal.
+
+---
 
 ---
 
