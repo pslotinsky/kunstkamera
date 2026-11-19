@@ -22,6 +22,7 @@ export class GameScreenView extends View<GameScreenContext, GameScreenViews> {
           <div class=${styles.turnStatus}>${views.turnStatus.template}</div>
           ${views.worldMap.template}
           ${views.commandDialogs.template}
+          ${views.advice.template}
           ${views.searchReport.template}
           ${views.battleReport.template}
           ${views.captiveDialog.template}

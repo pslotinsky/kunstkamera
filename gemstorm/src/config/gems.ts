@@ -5,7 +5,7 @@ export const GEMS: readonly GemParams[] = [
     gemstone: 'Ruby',
     guardian: {
       name: 'Ashwing',
-      description: 'The ember-winged guardian of the high beacon',
+      description: 'Breathes fire from the sky',
       strength: 160,
       move: 2,
       range: 'largest',

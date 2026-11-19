@@ -7,8 +7,10 @@ import { CampaignEndedEvent } from '@/core/events/CampaignEndedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { Control } from '@/lib/Control';
 import type { EventBus } from '@/lib/EventBus';
+import type { AdviceControl } from '@/ui/Advice/AdviceControl';
 import type { CommandDialogsControl } from '@/ui/CommandDialogs/CommandDialogsControl';
 
+import { AdviceChosenEvent } from './AdviceChosenEvent';
 import type { AnyCommandDialogControl } from './CommandDialog/CommandDialogControl';
 import { CommandSelectedEvent } from './CommandSelectedEvent';
 import { ProvinceCommandsView } from './ProvinceCommandsView';
@@ -26,6 +28,7 @@ interface PendingDialog {
 export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
   private readonly executor: CommandExecutor;
   private readonly dialogs: CommandDialogsControl;
+  private readonly advice: AdviceControl;
 
   private pending: PendingDialog | null = null;
 
@@ -34,14 +37,17 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
     commands: readonly CommandGroup[],
     events: EventBus,
     dialogs: CommandDialogsControl,
+    advice: AdviceControl,
   ) {
     super(ProvinceCommandsView, { world, commands, events });
     this.executor = new CommandExecutor({ world, events });
     this.dialogs = dialogs;
+    this.advice = advice;
   }
 
   public show(): void {
     this.view.show();
+    this.view.enableAdvice(this.advice.isAvailable);
   }
 
   public hide(): void {
@@ -60,6 +66,7 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
       CampaignEndedEvent,
       () => {
         this.closeDialog();
+        this.advice.close();
         this.view.disableActions();
         this.hide();
       },
@@ -69,6 +76,8 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
       this.selectCommand(event.command),
     );
     this.subscribe(StepChosenEvent, (event) => this.chooseStep(event.value));
+    this.subscribe(AdviceChosenEvent, () => this.consultAdvisor());
+    this.advice.onDismiss(() => this.view.focusAdvice());
 
     for (const dialog of this.dialogs.all) {
       dialog.onConfirm(() => this.completeCommand());
@@ -85,9 +94,18 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
     this.view.showStep(this.pending?.dialog.step);
   }
 
+  private consultAdvisor(): void {
+    this.closeDialog();
+
+    if (this.advice.isAvailable) {
+      this.advice.consult();
+    }
+  }
+
   private selectCommand(command: WorldCommand): void {
     const alreadyOpen = this.pending?.command === command;
 
+    this.advice.close();
     this.closeDialog();
 
     if (!alreadyOpen && !this.context.world.campaign.isEnded) {

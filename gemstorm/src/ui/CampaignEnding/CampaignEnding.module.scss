@@ -38,6 +38,44 @@
   line-height: 1.6;
 }
 
+.farewell {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin: 0 0 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--trim);
+  text-align: left;
+}
+
+.farewellPortrait {
+  flex-shrink: 0;
+  width: 6rem;
+  height: 6rem;
+  object-fit: cover;
+  border: 1px solid var(--trim);
+  border-radius: 4px;
+}
+
+.farewellCaption {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.farewellLine {
+  margin: 0;
+  color: var(--ink);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.farewellName {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
 .action,
 .reopen {
   @include kit.button;

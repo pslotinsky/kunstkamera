@@ -20,4 +20,4 @@ A named being bound to a house's Gem, deployable as an army's Fifth Unit.
 A tide wyrm that voluntarily joins a province for one battle, separately from hired Fifth Units and Gem Guardians.
 
 **Gemstorm**:
-The storm of unnatural power that flung the seven Gems across Aureth. Each house holds the stones that fell on its land, which sets the houses against one another.
+The storm of unnatural power that tore the seven Gems from Varrengard and flung them across Aureth. Each house holds the stones that fell on its land, which sets the houses against one another.

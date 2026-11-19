@@ -4,6 +4,7 @@ import type { CampaignOutcome } from '@/core/domain/CampaignOutcome';
 import type { World } from '@/core/domain/World';
 import type { EventBus } from '@/lib/EventBus';
 import { View } from '@/lib/View';
+import { getAdvisorPortraitUrl } from '@/ui/art/getAdvisorPortraitUrl';
 import { getFamilyCrestUrl } from '@/ui/art/getFamilyCrestUrl';
 
 import { EndingInspectedEvent } from './EndingInspectedEvent';
@@ -28,6 +29,13 @@ export class CampaignEndingView extends View<CampaignEndingContext> {
           <p class=${styles.date} data-ending-date></p>
           <h2 id="campaign-ending-title" class=${styles.title} data-ending-title></h2>
           <p class=${styles.account} data-ending-account></p>
+          <figure class="${styles.farewell} ${styles.hidden}" data-farewell>
+            <img class=${styles.farewellPortrait} data-farewell-portrait alt="" />
+            <figcaption class=${styles.farewellCaption}>
+              <p class=${styles.farewellLine} data-farewell-line></p>
+              <p class=${styles.farewellName} data-farewell-name></p>
+            </figcaption>
+          </figure>
           <button type="button" class=${styles.action} data-inspect
             @click=${() => this.publish(new EndingInspectedEvent())}>
             Inspect the final map
@@ -64,6 +72,7 @@ export class CampaignEndingView extends View<CampaignEndingContext> {
     );
     this.element.querySelector('[data-ending-account]')!.textContent =
       this.describe(outcome);
+    this.showFarewell(outcome);
     this.panel.classList.remove(styles.hidden!);
     this.reopen.classList.add(styles.hidden!);
     this.element.querySelector<HTMLButtonElement>('[data-inspect]')!.focus();
@@ -73,6 +82,24 @@ export class CampaignEndingView extends View<CampaignEndingContext> {
     this.panel.classList.add(styles.hidden!);
     this.reopen.classList.remove(styles.hidden!);
     this.reopen.focus();
+  }
+
+  private showFarewell(outcome: CampaignOutcome): void {
+    const advisor = this.context.world.campaign.advisor;
+    const farewell =
+      this.element.querySelector<HTMLElement>('[data-farewell]')!;
+
+    farewell.classList.toggle(styles.hidden!, !advisor || !outcome.isVictory);
+
+    if (advisor) {
+      this.element.querySelector<HTMLImageElement>(
+        '[data-farewell-portrait]',
+      )!.src = getAdvisorPortraitUrl(advisor);
+      this.element.querySelector('[data-farewell-line]')!.textContent =
+        `“${advisor.farewell}”`;
+      this.element.querySelector('[data-farewell-name]')!.textContent =
+        `${advisor.name} ${advisor.title}`;
+    }
   }
 
   private describe(outcome: CampaignOutcome): string {

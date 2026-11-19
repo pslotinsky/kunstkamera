@@ -1,3 +1,6 @@
-export function sample<Value>(array: readonly Value[]): Value {
-  return array[Math.floor(Math.random() * array.length)]!;
+export function sample<Value>(
+  array: readonly Value[],
+  random: () => number = Math.random,
+): Value {
+  return array[Math.floor(random() * array.length)]!;
 }

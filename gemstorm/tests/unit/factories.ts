@@ -1,3 +1,4 @@
+import type { Advisor } from '@/core/domain/Advisor';
 import { Army, type ArmyParams } from '@/core/domain/Army';
 import { Battle, type BattleParams } from '@/core/domain/Battle';
 import { Battlefield } from '@/core/domain/Battlefield';
@@ -46,7 +47,7 @@ interface FamilyParams {
   readonly royal?: boolean | undefined;
 }
 
-interface ProvinceParams {
+export interface ProvinceParams {
   readonly number?: number | undefined;
   readonly name?: string | undefined;
   readonly neighbors?: number[] | undefined;
@@ -130,6 +131,7 @@ export function makeWorld(
   provinces: Province[],
   player: Family,
   date: CalendarDate = new CalendarDate(1186, 4),
+  advisor?: Advisor,
 ): { world: World; events: EventBus } {
   const familyMap = new Map<string, Family>();
   const generalMap = new Map<string, General>();
@@ -160,6 +162,7 @@ export function makeWorld(
     families: new Collection(familyMap, 'family'),
     generals: new Collection(generalMap, 'general'),
     player,
+    advisor,
   });
 
   return { world, events: new EventBus() };

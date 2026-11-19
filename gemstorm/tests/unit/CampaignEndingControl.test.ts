@@ -9,6 +9,7 @@ import { CampaignEndedEvent } from '@/core/events/CampaignEndedEvent';
 import { TurnHeldEvent } from '@/core/events/TurnHeldEvent';
 import { TurnReleasedEvent } from '@/core/events/TurnReleasedEvent';
 import { WarReportedEvent } from '@/core/events/WarReportedEvent';
+import { WorldFactory } from '@/core/WorldFactory';
 import { AnnouncementsControl } from '@/ui/Announcements/AnnouncementsControl';
 import { BattleReportClosedEvent } from '@/ui/BattleReport/BattleReportClosedEvent';
 import { BattleReportControl } from '@/ui/BattleReport/BattleReportControl';
@@ -85,7 +86,10 @@ function setup() {
 function setupEnding() {
   const player = makeFamily({ name: 'Alderwyn' });
   const province = makeProvince({ family: player });
-  const context = makeWorld([province], player);
+  const advisor = new WorldFactory()
+    .createAdvisors()
+    .find((candidate) => candidate.name === 'Brannoc')!;
+  const context = makeWorld([province], player, undefined, advisor);
   const container = document.createElement('div');
   const ending = new CampaignEndingControl(context);
 
@@ -94,7 +98,14 @@ function setupEnding() {
 
   return {
     ...context,
+    advisor,
     text: () => container.querySelector('[data-ending-account]')!.textContent,
+    farewell: () =>
+      container
+        .querySelector('[data-farewell]')!
+        .classList.contains(styles.hidden!)
+        ? undefined
+        : container.querySelector('[data-farewell-line]')!.textContent,
   };
 }
 
@@ -264,6 +275,29 @@ describe('Campaign ending presentation', () => {
 
       expect(fixture.text()).toContain(expected);
       expect(fixture.text()).not.toContain(absent);
+    },
+  );
+
+  it.each([
+    { reason: 'unification' as const, speaks: true },
+    { reason: 'last-province-lost' as const, speaks: false },
+  ])(
+    'lets the advisor speak only after a victory: $reason',
+    async ({ reason, speaks }) => {
+      const fixture = setupEnding();
+      const outcome = new CampaignOutcome({
+        reason,
+        date: fixture.world.date,
+        house: 'Alderwyn',
+        ruler: 'Avar',
+      });
+
+      fixture.events.publish(new CampaignEndedEvent(outcome));
+      await Promise.resolve();
+
+      expect(fixture.farewell()).toBe(
+        speaks ? `“${fixture.advisor.farewell}”` : undefined,
+      );
     },
   );
 });

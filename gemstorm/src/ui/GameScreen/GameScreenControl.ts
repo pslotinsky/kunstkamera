@@ -7,6 +7,7 @@ import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
 import { WarReportedEvent } from '@/core/events/WarReportedEvent';
 import { Control } from '@/lib/Control';
 import type { EventClass } from '@/lib/EventBus';
+import { AdviceControl } from '@/ui/Advice/AdviceControl';
 import { AnnouncementsControl } from '@/ui/Announcements/AnnouncementsControl';
 import { IncidentClosedEvent } from '@/ui/Announcements/IncidentClosedEvent';
 import { IncidentShownEvent } from '@/ui/Announcements/IncidentShownEvent';
@@ -41,6 +42,10 @@ export class GameScreenControl extends Control<
 
   public constructor(context: GameScreenContext) {
     const commandDialogs = new CommandDialogsControl({ world: context.world });
+    const advice = new AdviceControl({
+      world: context.world,
+      events: context.events,
+    });
 
     super(GameScreenView, context, {
       worldMap: new WorldMapControl({
@@ -52,8 +57,10 @@ export class GameScreenControl extends Control<
         commands: context.commands,
         events: context.events,
         dialogs: commandDialogs,
+        advice,
       }),
       commandDialogs,
+      advice,
       searchReport: new SearchReportControl({ events: context.events }),
       battleReport: new BattleReportControl({
         world: context.world,

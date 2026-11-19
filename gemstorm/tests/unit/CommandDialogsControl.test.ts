@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { createCommandGroups } from '@/core/commands/province/catalog';
 import { DevelopCommand } from '@/core/commands/province/DevelopCommand';
 import { RecruitCommand } from '@/core/commands/province/RecruitCommand';
+import { AdviceControl } from '@/ui/Advice/AdviceControl';
 import { CommandDialogsControl } from '@/ui/CommandDialogs/CommandDialogsControl';
 import { ProvinceCommandsControl } from '@/ui/ProvinceCommands/ProvinceCommandsControl';
 
@@ -35,16 +36,19 @@ describe('CommandDialogsControl', () => {
       const context = makeWorld([province], family);
       const dialogs = new CommandDialogsControl(context);
       const groups = createCommandGroups(context);
+      const advice = new AdviceControl(context);
       const commands = new ProvinceCommandsControl(
         context.world,
         groups,
         context.events,
         dialogs,
+        advice,
       );
       const dialogContainer = document.createElement('div');
       const menuContainer = document.createElement('div');
 
       dialogs.mount(dialogContainer);
+      advice.mount(document.createElement('div'));
       commands.mount(menuContainer);
       commands.show();
       menuContainer

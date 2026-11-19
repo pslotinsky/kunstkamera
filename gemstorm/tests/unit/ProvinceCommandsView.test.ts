@@ -23,7 +23,7 @@ describe('ProvinceCommandsView', () => {
       ...root.querySelectorAll<HTMLButtonElement>('button[data-command]'),
     ];
     const skipButton = root.querySelector<HTMLButtonElement>(
-      `.${styles.skipTurn}`,
+      'button[data-action="skip-turn"]',
     );
 
     expect(root.classList.contains(styles.hidden!)).toBe(true);

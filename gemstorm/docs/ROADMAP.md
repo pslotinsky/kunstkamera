@@ -194,7 +194,7 @@ Starting a campaign: title screen, scenario and family choice, and an advisor to
 - [x] pick one of the four scenarios
 - [x] choose the family you play
 - [x] pick one of four advisors at setup
-- [ ] get advice on your next move during play
+- [x] get advice on your next move during play
 
 ## 17. Save / load
 

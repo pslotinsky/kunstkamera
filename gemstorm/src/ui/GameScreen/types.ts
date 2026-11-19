@@ -2,6 +2,7 @@ import type { CommandGroup } from '@/core/commands/province/catalog';
 import type { World } from '@/core/domain/World';
 import type { ChildrenViews } from '@/lib/Control';
 import type { EventBus } from '@/lib/EventBus';
+import type { AdviceControl } from '@/ui/Advice/AdviceControl';
 import type { AnnouncementsControl } from '@/ui/Announcements/AnnouncementsControl';
 import type { BattleReportControl } from '@/ui/BattleReport/BattleReportControl';
 import type { CampaignEndingControl } from '@/ui/CampaignEnding/CampaignEndingControl';
@@ -25,6 +26,7 @@ export type GameScreenControls = {
   readonly worldMap: WorldMapControl;
   readonly gamePanel: GamePanelControl;
   readonly commandDialogs: CommandDialogsControl;
+  readonly advice: AdviceControl;
   readonly searchReport: SearchReportControl;
   readonly battleReport: BattleReportControl;
   readonly captiveDialog: CaptiveDialogControl;

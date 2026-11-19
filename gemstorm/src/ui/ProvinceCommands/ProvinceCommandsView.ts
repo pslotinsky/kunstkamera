@@ -27,7 +27,9 @@ import type {
 import type { WorldCommand } from '@/core/commands/WorldCommand';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { View } from '@/lib/View';
+import { getAdvisorPortraitUrl } from '@/ui/art/getAdvisorPortraitUrl';
 
+import { AdviceChosenEvent } from './AdviceChosenEvent';
 import type { CommandStep } from './CommandDialog/CommandStep';
 import { CommandSelectedEvent } from './CommandSelectedEvent';
 import { StepChosenEvent } from './StepChosenEvent';
@@ -115,6 +117,18 @@ export class ProvinceCommandsView extends View<ProvinceCommandsContext> {
     this.setActionsEnabled(false);
   }
 
+  public enableAdvice(enabled: boolean): void {
+    const advice = this.adviceButton;
+
+    if (advice) {
+      advice.disabled = !enabled;
+    }
+  }
+
+  public focusAdvice(): void {
+    this.adviceButton?.focus();
+  }
+
   public get template(): TemplateResult {
     return html`
       <section class="${styles.root} ${styles.hidden}">
@@ -123,15 +137,18 @@ export class ProvinceCommandsView extends View<ProvinceCommandsContext> {
         </div>
         ${this.context.commands.map((group) => this.renderCommands(group))}
         <div class=${styles.step} data-step></div>
-        <button
-          class=${styles.skipTurn}
-          type="button"
-          data-action="skip-turn"
-          disabled
-          @click=${() => this.skipTurn()}
-        >
-          Skip Turn
-        </button>
+        <div class=${styles.turnActions}>
+          ${this.renderAdviceButton()}
+          <button
+            class=${styles.skipTurn}
+            type="button"
+            data-action="skip-turn"
+            disabled
+            @click=${() => this.skipTurn()}
+          >
+            Skip Turn
+          </button>
+        </div>
       </section>
     `;
   }
@@ -184,6 +201,26 @@ export class ProvinceCommandsView extends View<ProvinceCommandsContext> {
     `;
   }
 
+  private renderAdviceButton(): TemplateResult | typeof nothing {
+    const { advisor } = this.context.world.campaign;
+
+    return advisor
+      ? html`
+          <button
+            class=${styles.advice}
+            type="button"
+            data-action="advice"
+            aria-label="Advice"
+            title=${`Ask ${advisor.name} for advice`}
+            disabled
+            @click=${() => this.publish(new AdviceChosenEvent())}
+          >
+            <img class=${styles.advicePortrait} src=${getAdvisorPortraitUrl(advisor)} alt="" />
+          </button>
+        `
+      : nothing;
+  }
+
   private skipTurn(): void {
     const { world, events } = this.context;
 
@@ -201,12 +238,12 @@ export class ProvinceCommandsView extends View<ProvinceCommandsContext> {
       button.disabled = !enabled || !command?.canExecute();
     }
 
-    const skipButton = this.element.querySelector<HTMLButtonElement>(
-      'button[data-action="skip-turn"]',
+    const actionButtons = this.element.querySelectorAll<HTMLButtonElement>(
+      'button[data-action]',
     );
 
-    if (skipButton) {
-      skipButton.disabled = !enabled;
+    for (const button of actionButtons) {
+      button.disabled = !enabled;
     }
   }
 
@@ -260,5 +297,11 @@ export class ProvinceCommandsView extends View<ProvinceCommandsContext> {
 
   private get stepElement(): HTMLElement {
     return this.element.querySelector<HTMLElement>('[data-step]')!;
+  }
+
+  private get adviceButton(): HTMLButtonElement | null {
+    return this.element.querySelector<HTMLButtonElement>(
+      'button[data-action="advice"]',
+    );
   }
 }

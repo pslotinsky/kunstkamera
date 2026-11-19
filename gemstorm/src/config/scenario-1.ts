@@ -5,7 +5,7 @@ export const SCENARIO_1: Scenario = {
   name: 'The Fractured Oath',
   year: 201,
   description:
-    'The Gemstorm has flung the seven Gems across Aureth, and every house has seized what fell on its land. Avar of Alderwyn and Darian of Stormmere rise against Varrengard.',
+    'Malrec of Varrengard swore to keep the seven Gems for all of Aureth, then ruled it through them. The Gemstorm has torn them from his hands, and Avar of Alderwyn and Darian of Stormmere rise against him.',
   playableFamilies: ['Alderwyn', 'Stormmere', 'Emberholt', 'Thornvale'],
   generals: [
     {
