@@ -1,0 +1,14 @@
+.root {
+  position: relative;
+  flex: 0 0 auto;
+  width: 1920px;
+  height: 1080px;
+  margin: auto;
+  overflow: hidden;
+  container-type: size;
+  zoom: var(--frame-scale, 1);
+}
+
+.stage {
+  display: contents;
+}

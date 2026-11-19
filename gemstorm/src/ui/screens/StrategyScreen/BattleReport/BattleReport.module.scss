@@ -1,0 +1,83 @@
+@use "@/ui/common/kit";
+
+.root {
+  @include kit.dialog(30rem);
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 0.95em;
+  font-weight: 600;
+}
+
+.close {
+  margin-left: auto;
+  padding: 0.25rem 0.75rem;
+  font: inherit;
+  color: inherit;
+  background: var(--button);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.close:hover {
+  border-color: var(--edge-bright);
+}
+
+.sides {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85em;
+}
+
+.sides th,
+.sides td {
+  padding: 0.25rem 0.5rem;
+  text-align: right;
+}
+
+.label {
+  text-align: left;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.commander {
+  font-weight: 600;
+}
+
+.mine {
+  color: var(--accent-bright);
+}
+
+.war {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.85em;
+}
+
+.verdict {
+  margin: 0;
+  font-size: 0.85em;
+  line-height: 1.4;
+}
+
+.capture {
+  margin: 0;
+  font-style: italic;
+}
+
+.hidden {
+  display: none;
+}

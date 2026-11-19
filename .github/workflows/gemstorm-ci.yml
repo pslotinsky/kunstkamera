@@ -1,0 +1,46 @@
+name: Gemstorm CI
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: gemstorm
+
+jobs:
+  checks:
+    name: Validate and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: gemstorm/.nvmrc
+          cache: npm
+          cache-dependency-path: gemstorm/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check code
+        run: npm run check:ci
+
+      - name: Run tests
+        if: success() || failure()
+        run: npm test
+
+      - name: Build game
+        run: npm run build -- --base ./
+
+      - name: Upload game build
+        uses: actions/upload-artifact@v7
+        with:
+          name: gemstorm-game
+          path: gemstorm/dist
+          if-no-files-found: error

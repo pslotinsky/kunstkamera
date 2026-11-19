@@ -1,5 +1,5 @@
 export const projectNames = {
-  gemfire: 'Gemfire',
+  gemstorm: 'Gemstorm',
   'total-space': 'Total Space',
   'sink-city': 'Sink City',
   'debt-dungeon': 'Debt Dungeon',

@@ -27,24 +27,24 @@ A React and TypeScript portal for games and documentation. Fumadocs provides the
 - `react-router.config.ts` — static route generation from the project/collection mapping and publication allowlists.
 - `build/preparePages.ts` — combines the generated pages and assets into the Pages artifact and writes a static `404.html` from the pre-rendered not-found page.
 
-Custom components use SCSS modules for spacing and layout, with Fumadocs theme tokens for colors. `src/root.css` is the global Tailwind and Fumadocs stylesheet imported by `root.tsx`. The embedded Gemfire game retains its own UI. Search covers all published documentation, labels results by project, and is available on the index and documentation pages.
+Custom components use SCSS modules for spacing and layout, with Fumadocs theme tokens for colors. `src/root.css` is the global Tailwind and Fumadocs stylesheet imported by `root.tsx`. The embedded Gemstorm game retains its own UI. Search covers all published documentation, labels results by project, and is available on the index and documentation pages.
 
 ## Published documentation
 
-The Gemfire collection reads visitor-facing documents directly from `gemfire/docs`: `ROADMAP.md`, numbered `design/[0-9]*.md` pages, `spec/*.md`, and `guides/README.md`. The Total Space collection reads `README.md` and the Markdown under `game/`, `tech/`, and `mockups/` from `total-space/docs`. The Sink City collection uses the same publication pattern as Total Space in `sink-city/docs`, with Russian design text. The Sink City Map Lab prototype is available at `/kunstkamera/sink-city/prototypes/map-lab/` and shares its building artwork with the illustrated content roster. Content is compiled during development and builds and loaded through Fumadocs' generated modules. Contributor conventions and the Gemfire design template remain in the repository but are not published.
+The Gemstorm collection reads visitor-facing documents directly from `gemstorm/docs`: `ROADMAP.md`, numbered `design/[0-9]*.md` pages, `spec/*.md`, and `guides/README.md`. The Total Space collection reads `README.md` and the Markdown under `game/`, `tech/`, and `mockups/` from `total-space/docs`. The Sink City collection uses the same publication pattern as Total Space in `sink-city/docs`, with Russian design text. The Sink City Map Lab prototype is available at `/kunstkamera/sink-city/prototypes/map-lab/` and shares its building artwork with the illustrated content roster. Content is compiled during development and builds and loaded through Fumadocs' generated modules. Contributor conventions and the Gemstorm design template remain in the repository but are not published.
 
 Third-party guides and manual transcriptions are excluded. The authored references page links to their external sources. Archer remains outside the published scope. Generated `.source/`, `.react-router/`, and `dist/` directories are ignored.
 
-Normal document addresses look like `/kunstkamera/gemfire/docs/design/01-global-map/` and `/kunstkamera/total-space/docs/game/overview/`. Sections use native fragments such as `#glossary`. The Total Space campaign and battle prototypes are available at `/kunstkamera/total-space/prototypes/campaign/` and `/kunstkamera/total-space/prototypes/battle/`.
+Normal document addresses look like `/kunstkamera/gemstorm/docs/design/01-global-map/` and `/kunstkamera/total-space/docs/game/overview/`. Sections use native fragments such as `#glossary`. The Total Space campaign and battle prototypes are available at `/kunstkamera/total-space/prototypes/campaign/` and `/kunstkamera/total-space/prototypes/battle/`.
 
 The documentation route returns an index or document result; unknown document paths raise a 404. Client navigation shows the error inside the project layout. GitHub Pages serves the standalone `404.html` for direct visits to missing URLs, with a link back to the documentation index.
 
 ## Development
 
-Use Node 24, matching `gemfire/.nvmrc`:
+Use Node 24, matching `gemstorm/.nvmrc`:
 
 ```sh
-npm ci --prefix gemfire
+npm ci --prefix gemstorm
 npm ci --prefix showcase
 npm run dev --prefix showcase
 ```
@@ -55,7 +55,7 @@ Open `http://localhost:5173/kunstkamera/`. To play during development, also run:
 npm run dev:game --prefix showcase
 ```
 
-Gemfire runs at `http://localhost:5174/`. `VITE_GAME_URL` can override the iframe URL.
+Gemstorm runs at `http://localhost:5174/`. `VITE_GAME_URL` can override the iframe URL.
 To add another playable project, register it in `src/games.ts` and include its built files at the configured published path in the Pages build.
 
 ## Build and preview
@@ -67,7 +67,7 @@ npm run build:game --prefix showcase
 npm run preview --prefix showcase
 ```
 
-The showcase build generates Fumadocs modules and React Router types, checks TypeScript, pre-renders pages and a combined search database, packages them in `dist/public`, and copies the registered Total Space and Sink City prototypes and published assets into their project directories. For local preview, run `build:game` afterward to build Gemfire into `dist/public/gemfire/game/`. The showcase build recreates `dist/public`, so game files must be added after it finishes.
+The showcase build generates Fumadocs modules and React Router types, checks TypeScript, pre-renders pages and a combined search database, packages them in `dist/public`, and copies the registered Total Space and Sink City prototypes and published assets into their project directories. For local preview, run `build:game` afterward to build Gemstorm into `dist/public/gemstorm/game/`. The showcase build recreates `dist/public`, so game files must be added after it finishes.
 
 Preview serves exactly that static artifact at `http://127.0.0.1:4173/kunstkamera/`, without the framework's development or SSR middleware. Search runs in the browser against the pre-rendered database.
 
@@ -75,6 +75,6 @@ Preview serves exactly that static artifact at `http://127.0.0.1:4173/kunstkamer
 
 ## Publishing
 
-Choose **GitHub Actions** in the repository's **Settings → Pages → Build and deployment**. The **CI** workflow (`.github/workflows/ci.yml`) validates, tests, and builds Gemfire through the reusable `gemfire-ci.yml` workflow, which uploads the `gemfire-game` artifact. The Showcase job then checks and builds the site and downloads that game artifact into `showcase/dist/public/gemfire/game/` before uploading the combined Pages artifact. Showcase does not install Gemfire dependencies or rebuild the game. Pull requests validate and build the site. On `main`, **Deploy GitHub Pages** publishes `showcase/dist/public` after both jobs succeed.
+Choose **GitHub Actions** in the repository's **Settings → Pages → Build and deployment**. The **CI** workflow (`.github/workflows/ci.yml`) validates, tests, and builds Gemstorm through the reusable `gemstorm-ci.yml` workflow, which uploads the `gemstorm-game` artifact. The Showcase job then checks and builds the site and downloads that game artifact into `showcase/dist/public/gemstorm/game/` before uploading the combined Pages artifact. Showcase does not install Gemstorm dependencies or rebuild the game. Pull requests validate and build the site. On `main`, **Deploy GitHub Pages** publishes `showcase/dist/public` after both jobs succeed.
 
 The expected URL is `https://pslotinsky.github.io/kunstkamera/`. Playwright is not a project dependency or a CI step. Do not commit generated files.

@@ -1,0 +1,1412 @@
+{
+  "lands": {
+    "1": {
+      "id": 1,
+      "land": "Frostbreak",
+      "gold": 162,
+      "food": 155,
+      "troops": 136,
+      "loyalty": 49,
+      "cultivation": 45,
+      "protection": 35,
+      "family": "Stormmere",
+      "mercenaries": [
+        {
+          "type": "Grimhides",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Bugbear",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Warriors",
+          "strength": 180,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "2": {
+      "id": 2,
+      "land": "Rimewatch",
+      "gold": 166,
+      "food": 169,
+      "troops": 122,
+      "loyalty": 65,
+      "cultivation": 53,
+      "protection": 53,
+      "family": "Stormmere",
+      "mercenaries": [
+        {
+          "type": "Grimhides",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Fachan",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "3": {
+      "id": 3,
+      "land": "Whitehaven",
+      "gold": 136,
+      "food": 137,
+      "troops": 121,
+      "loyalty": 39,
+      "cultivation": 37,
+      "protection": 36,
+      "family": "Alderwyn",
+      "mercenaries": [
+        {
+          "type": "Grimhides",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Fachan",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "4": {
+      "id": 4,
+      "land": "Snowspire",
+      "gold": 181,
+      "food": 162,
+      "troops": 125,
+      "loyalty": 55,
+      "cultivation": 50,
+      "protection": 55,
+      "family": "Alderwyn",
+      "mercenaries": [
+        {
+          "type": "Grimhides",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Fachan",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "5": {
+      "id": 5,
+      "land": "Wintercairn",
+      "gold": 239,
+      "food": 233,
+      "troops": 189,
+      "loyalty": 66,
+      "cultivation": 54,
+      "protection": 53,
+      "family": "Alderwyn",
+      "mercenaries": [
+        {
+          "type": "Grimhides",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Bugbear",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "6": {
+      "id": 6,
+      "land": "Pineward",
+      "gold": 159,
+      "food": 162,
+      "troops": 131,
+      "loyalty": 41,
+      "cultivation": 43,
+      "protection": 46,
+      "family": "Alderwyn",
+      "mercenaries": [
+        {
+          "type": "Grimhides",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Fachan",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Shooters",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "7": {
+      "id": 7,
+      "land": "Mossvale",
+      "gold": 237,
+      "food": 240,
+      "troops": 198,
+      "loyalty": 55,
+      "cultivation": 49,
+      "protection": 45,
+      "family": "Stormmere",
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Lizards",
+          "strength": 110,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "8": {
+      "id": 8,
+      "land": "Seaglass",
+      "gold": 118,
+      "food": 120,
+      "troops": 96,
+      "loyalty": 38,
+      "cultivation": 41,
+      "protection": 33,
+      "family": "Stormmere",
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Lizards",
+          "strength": 110,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Spearmen",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "9": {
+      "id": 9,
+      "land": "Briarfall",
+      "gold": 119,
+      "food": 125,
+      "troops": 126,
+      "loyalty": 36,
+      "cultivation": 37,
+      "protection": 28,
+      "family": "Stormmere",
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Lizards",
+          "strength": 110,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "10": {
+      "id": 10,
+      "land": "Alderpass",
+      "gold": 124,
+      "food": 127,
+      "troops": 124,
+      "loyalty": 38,
+      "cultivation": 40,
+      "protection": 29,
+      "family": "Stormmere",
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "11": {
+      "id": 11,
+      "land": "Fernholt",
+      "gold": 135,
+      "food": 132,
+      "troops": 131,
+      "loyalty": 39,
+      "cultivation": 50,
+      "protection": 36,
+      "family": "Alderwyn",
+      "mercenaries": [
+        {
+          "type": "Ironbacks",
+          "strength": 110,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "12": {
+      "id": 12,
+      "land": "Eastmere",
+      "gold": 142,
+      "food": 136,
+      "troops": 118,
+      "loyalty": 36,
+      "cultivation": 45,
+      "protection": 39,
+      "family": "Alderwyn",
+      "mercenaries": [
+        {
+          "type": "Ironbacks",
+          "strength": 110,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "13": {
+      "id": 13,
+      "land": "Windrest",
+      "gold": 157,
+      "food": 153,
+      "troops": 135,
+      "loyalty": 41,
+      "cultivation": 42,
+      "protection": 35,
+      "family": "Duskerran",
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Bugbear",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Pikemen",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "14": {
+      "id": 14,
+      "land": "Rookhaven",
+      "gold": 166,
+      "food": 148,
+      "troops": 156,
+      "loyalty": 42,
+      "cultivation": 40,
+      "protection": 35,
+      "family": "Duskerran",
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Bugbear",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Warriors",
+          "strength": 180,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "15": {
+      "id": 15,
+      "land": "Greenmarch",
+      "gold": 85,
+      "food": 83,
+      "troops": 0,
+      "loyalty": 0,
+      "cultivation": 51,
+      "protection": 25,
+      "family": null,
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Wyvern",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Pikemen",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "16": {
+      "id": 16,
+      "land": "Kingsward",
+      "gold": 163,
+      "food": 164,
+      "troops": 145,
+      "loyalty": 58,
+      "cultivation": 60,
+      "protection": 34,
+      "family": "Varrengard",
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Bugbear",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Lancers",
+          "strength": 180,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "17": {
+      "id": 17,
+      "land": "Reedcross",
+      "gold": 185,
+      "food": 189,
+      "troops": 151,
+      "loyalty": 60,
+      "cultivation": 55,
+      "protection": 44,
+      "family": "Varrengard",
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "18": {
+      "id": 18,
+      "land": "Rivermeet",
+      "gold": 215,
+      "food": 206,
+      "troops": 131,
+      "loyalty": 54,
+      "cultivation": 58,
+      "protection": 33,
+      "family": "Varrengard",
+      "mercenaries": [
+        {
+          "type": "Ironbacks",
+          "strength": 110,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Shooters",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "19": {
+      "id": 19,
+      "land": "Fenwatch",
+      "gold": 231,
+      "food": 222,
+      "troops": 202,
+      "loyalty": 56,
+      "cultivation": 60,
+      "protection": 37,
+      "family": "Varrengard",
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "20": {
+      "id": 20,
+      "land": "Deltamere",
+      "gold": 136,
+      "food": 145,
+      "troops": 131,
+      "loyalty": 50,
+      "cultivation": 51,
+      "protection": 33,
+      "family": "Varrengard",
+      "mercenaries": [
+        {
+          "type": "Grimhides",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "21": {
+      "id": 21,
+      "land": "Tideford",
+      "gold": 194,
+      "food": 187,
+      "troops": 142,
+      "loyalty": 56,
+      "cultivation": 60,
+      "protection": 30,
+      "family": "Varrengard",
+      "mercenaries": [
+        {
+          "type": "Grimhides",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "22": {
+      "id": 22,
+      "land": "Skyreach",
+      "gold": 382,
+      "food": 346,
+      "troops": 275,
+      "loyalty": 79,
+      "cultivation": 64,
+      "protection": 64,
+      "family": "Varrengard",
+      "mercenaries": [
+        {
+          "type": "Gargoyles",
+          "strength": 120,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "23": {
+      "id": 23,
+      "land": "Oakrest",
+      "gold": 86,
+      "food": 88,
+      "troops": 0,
+      "loyalty": 0,
+      "cultivation": 55,
+      "protection": 25,
+      "family": null,
+      "mercenaries": [
+        {
+          "type": "Ogre",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Gunners",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "24": {
+      "id": 24,
+      "land": "Stonewake",
+      "gold": 151,
+      "food": 143,
+      "troops": 148,
+      "loyalty": 38,
+      "cultivation": 52,
+      "protection": 32,
+      "family": "Redwake",
+      "mercenaries": [
+        {
+          "type": "Grimhides",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Wyvern",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Spearmen",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "25": {
+      "id": 25,
+      "land": "Cinderpeak",
+      "gold": 163,
+      "food": 162,
+      "troops": 145,
+      "loyalty": 46,
+      "cultivation": 47,
+      "protection": 39,
+      "family": "Redwake",
+      "mercenaries": [
+        {
+          "type": "Gargoyles",
+          "strength": 120,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Lizards",
+          "strength": 110,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Lancers",
+          "strength": 180,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "26": {
+      "id": 26,
+      "land": "Duskcrag",
+      "gold": 141,
+      "food": 152,
+      "troops": 108,
+      "loyalty": 53,
+      "cultivation": 46,
+      "protection": 36,
+      "family": "Redwake",
+      "mercenaries": [
+        {
+          "type": "Grimhides",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Wyvern",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "27": {
+      "id": 27,
+      "land": "Ironpass",
+      "gold": 216,
+      "food": 204,
+      "troops": 174,
+      "loyalty": 58,
+      "cultivation": 56,
+      "protection": 43,
+      "family": "Redwake",
+      "mercenaries": [
+        {
+          "type": "Grimhides",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "28": {
+      "id": 28,
+      "land": "Southfen",
+      "gold": 151,
+      "food": 139,
+      "troops": 163,
+      "loyalty": 55,
+      "cultivation": 60,
+      "protection": 34,
+      "family": "Varrengard",
+      "mercenaries": [
+        {
+          "type": "Gargoyles",
+          "strength": 120,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Wyvern",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "29": {
+      "id": 29,
+      "land": "Rainshore",
+      "gold": 141,
+      "food": 150,
+      "troops": 108,
+      "loyalty": 39,
+      "cultivation": 52,
+      "protection": 34,
+      "family": "Valecross",
+      "mercenaries": [
+        {
+          "type": "Grimhides",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Gargoyles",
+          "strength": 120,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    },
+    "30": {
+      "id": 30,
+      "land": "Mistbay",
+      "gold": 178,
+      "food": 185,
+      "troops": 154,
+      "loyalty": 41,
+      "cultivation": 44,
+      "protection": 30,
+      "family": "Valecross",
+      "mercenaries": [
+        {
+          "type": "Gargoyles",
+          "strength": 120,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Skeletons",
+          "strength": 100,
+          "hired": 0,
+          "available": 1
+        },
+        {
+          "type": "Gunners",
+          "strength": 150,
+          "hired": 0,
+          "available": 1
+        }
+      ]
+    }
+  },
+  "people": {
+    "Caeric": {
+      "name": "Caeric",
+      "political": 74,
+      "war": 86,
+      "charm": 49,
+      "fame": 0,
+      "location": 16,
+      "family": "Varrengard",
+      "title": "Lord",
+      "relation": "Varrengard"
+    },
+    "Vossan": {
+      "name": "Vossan",
+      "political": 54,
+      "war": 72,
+      "charm": 40,
+      "fame": 0,
+      "location": 22,
+      "family": "Varrengard",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Rethan": {
+      "name": "Rethan",
+      "political": 58,
+      "war": 52,
+      "charm": 76,
+      "fame": 0,
+      "location": 7,
+      "family": "Stormmere",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Dornic": {
+      "name": "Dornic",
+      "political": 61,
+      "war": 72,
+      "charm": 70,
+      "fame": 0,
+      "location": 29,
+      "family": "Valecross",
+      "title": "Lord",
+      "relation": "Valecross"
+    },
+    "Darian": {
+      "name": "Darian",
+      "political": 93,
+      "war": 88,
+      "charm": 77,
+      "fame": 18,
+      "location": 7,
+      "family": "Stormmere",
+      "title": "Prince",
+      "relation": "Stormmere",
+      "null": [
+        ""
+      ]
+    },
+    "Hadrin": {
+      "name": "Hadrin",
+      "political": 42,
+      "war": 56,
+      "charm": 39,
+      "fame": 0,
+      "location": 7,
+      "family": "Stormmere",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Veyla": {
+      "name": "Veyla",
+      "political": 72,
+      "war": 18,
+      "charm": 80,
+      "fame": 0,
+      "location": 14,
+      "family": "Duskerran",
+      "title": "Vassal",
+      "relation": "Duskerran"
+    },
+    "Orric": {
+      "name": "Orric",
+      "political": 31,
+      "war": 47,
+      "charm": 50,
+      "fame": 0,
+      "location": 12,
+      "family": "Alderwyn",
+      "title": "Lord",
+      "relation": "Alderwyn"
+    },
+    "Grendan": {
+      "name": "Grendan",
+      "political": 46,
+      "war": 70,
+      "charm": 38,
+      "fame": 0,
+      "location": 22,
+      "family": "Varrengard",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Talven": {
+      "name": "Talven",
+      "political": 89,
+      "war": 77,
+      "charm": 74,
+      "fame": 0,
+      "location": 13,
+      "family": "Duskerran",
+      "title": "Lord",
+      "relation": "Duskerran"
+    },
+    "Selvar": {
+      "name": "Selvar",
+      "political": 89,
+      "war": 77,
+      "charm": 90,
+      "fame": 0,
+      "location": 19,
+      "family": "Varrengard",
+      "title": "Lord",
+      "relation": null
+    },
+    "Iskar": {
+      "name": "Iskar",
+      "political": 67,
+      "war": 72,
+      "charm": 68,
+      "fame": 0,
+      "location": 22,
+      "family": "Varrengard",
+      "title": "Vassal",
+      "relation": "Varrengard"
+    },
+    "Brenic": {
+      "name": "Brenic",
+      "political": 46,
+      "war": 42,
+      "charm": 68,
+      "fame": 0,
+      "location": 27,
+      "family": "Redwake",
+      "title": "Vassal",
+      "relation": "Redwake"
+    },
+    "Drevan": {
+      "name": "Drevan",
+      "political": 83,
+      "war": 77,
+      "charm": 82,
+      "fame": 12,
+      "location": 27,
+      "family": "Redwake",
+      "title": "Prince",
+      "relation": "Redwake",
+      "null": [
+        ""
+      ]
+    },
+    "Avar": {
+      "name": "Avar",
+      "political": 85,
+      "war": 91,
+      "charm": 79,
+      "fame": 18,
+      "location": 5,
+      "family": "Alderwyn",
+      "title": "Prince",
+      "relation": "Alderwyn",
+      "null": [
+        ""
+      ]
+    },
+    "Halric": {
+      "name": "Halric",
+      "political": 61,
+      "war": 68,
+      "charm": 80,
+      "fame": 6,
+      "location": 30,
+      "family": "Valecross",
+      "title": "Prince",
+      "relation": "Valecross",
+      "null": [
+        ""
+      ]
+    },
+    "Malrec": {
+      "name": "Malrec",
+      "political": 42,
+      "war": 38,
+      "charm": 55,
+      "fame": 24,
+      "location": 22,
+      "family": "Varrengard",
+      "title": "Prince",
+      "relation": "Varrengard",
+      "null": [
+        ""
+      ]
+    },
+    "Denric": {
+      "name": "Denric",
+      "political": 63,
+      "war": 62,
+      "charm": 58,
+      "fame": 0,
+      "location": 14,
+      "family": "Duskerran",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Orven": {
+      "name": "Orven",
+      "political": 86,
+      "war": 74,
+      "charm": 76,
+      "fame": 0,
+      "location": 18,
+      "family": "Varrengard",
+      "title": "Lord",
+      "relation": null
+    },
+    "Ithren": {
+      "name": "Ithren",
+      "political": 95,
+      "war": 86,
+      "charm": 63,
+      "fame": 0,
+      "location": 22,
+      "family": "Varrengard",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Fenric": {
+      "name": "Fenric",
+      "political": 40,
+      "war": 86,
+      "charm": 55,
+      "fame": 0,
+      "location": 5,
+      "family": "Alderwyn",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Dovar": {
+      "name": "Dovar",
+      "political": 63,
+      "war": 74,
+      "charm": 60,
+      "fame": 0,
+      "location": 14,
+      "family": "Duskerran",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Elyra": {
+      "name": "Elyra",
+      "political": 76,
+      "war": 51,
+      "charm": 82,
+      "fame": 0,
+      "location": 30,
+      "family": "Valecross",
+      "title": "Vassal",
+      "relation": "Valecross"
+    },
+    "Calder": {
+      "name": "Calder",
+      "political": 75,
+      "war": 85,
+      "charm": 82,
+      "fame": 0,
+      "location": 21,
+      "family": "Varrengard",
+      "title": "Lord",
+      "relation": null
+    },
+    "Heskar": {
+      "name": "Heskar",
+      "political": 70,
+      "war": 48,
+      "charm": 74,
+      "fame": 0,
+      "location": 24,
+      "family": "Redwake",
+      "title": "Lord",
+      "relation": null
+    },
+    "Beran": {
+      "name": "Beran",
+      "political": 81,
+      "war": 60,
+      "charm": 80,
+      "fame": 0,
+      "location": 3,
+      "family": "Alderwyn",
+      "title": "Lord",
+      "relation": "Alderwyn"
+    },
+    "Ysene": {
+      "name": "Ysene",
+      "political": 69,
+      "war": 43,
+      "charm": 77,
+      "fame": 0,
+      "location": 22,
+      "family": "Varrengard",
+      "title": "Vassal",
+      "relation": "Varrengard"
+    },
+    "Renvar": {
+      "name": "Renvar",
+      "political": 71,
+      "war": 68,
+      "charm": 70,
+      "fame": 0,
+      "location": 25,
+      "family": "Redwake",
+      "title": "Lord",
+      "relation": null
+    },
+    "Olyss": {
+      "name": "Olyss",
+      "political": 55,
+      "war": 81,
+      "charm": 83,
+      "fame": 0,
+      "location": 7,
+      "family": "Stormmere",
+      "title": "Vassal",
+      "relation": "Stormmere"
+    },
+    "Kestrel": {
+      "name": "Kestrel",
+      "political": 81,
+      "war": 91,
+      "charm": 79,
+      "fame": 0,
+      "location": 17,
+      "family": "Varrengard",
+      "title": "Lord",
+      "relation": null
+    },
+    "Dravik": {
+      "name": "Dravik",
+      "political": 42,
+      "war": 80,
+      "charm": 60,
+      "fame": 0,
+      "location": 22,
+      "family": "Varrengard",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Lethan": {
+      "name": "Lethan",
+      "political": 64,
+      "war": 84,
+      "charm": 63,
+      "fame": 0,
+      "location": 5,
+      "family": "Alderwyn",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Rhovan": {
+      "name": "Rhovan",
+      "political": 78,
+      "war": 94,
+      "charm": 25,
+      "fame": 0,
+      "location": 6,
+      "family": "Alderwyn",
+      "title": "Lord",
+      "relation": "Alderwyn"
+    },
+    "Kerric": {
+      "name": "Kerric",
+      "political": 33,
+      "war": 91,
+      "charm": 38,
+      "fame": 0,
+      "location": 22,
+      "family": "Varrengard",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Beldran": {
+      "name": "Beldran",
+      "political": 35,
+      "war": 52,
+      "charm": 61,
+      "fame": 0,
+      "location": 8,
+      "family": "Stormmere",
+      "title": "Lord",
+      "relation": "Stormmere"
+    },
+    "Tharen": {
+      "name": "Tharen",
+      "political": 76,
+      "war": 85,
+      "charm": 86,
+      "fame": 0,
+      "location": 5,
+      "family": "Alderwyn",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Vosric": {
+      "name": "Vosric",
+      "political": 38,
+      "war": 42,
+      "charm": 59,
+      "fame": 0,
+      "location": 22,
+      "family": "Varrengard",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Marven": {
+      "name": "Marven",
+      "political": 87,
+      "war": 77,
+      "charm": 72,
+      "fame": 0,
+      "location": 7,
+      "family": "Stormmere",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Uldren": {
+      "name": "Uldren",
+      "political": 52,
+      "war": 77,
+      "charm": 60,
+      "fame": 0,
+      "location": 28,
+      "family": "Varrengard",
+      "title": "Lord",
+      "relation": null
+    },
+    "Ferran": {
+      "name": "Ferran",
+      "political": 51,
+      "war": 87,
+      "charm": 49,
+      "fame": 0,
+      "location": 11,
+      "family": "Alderwyn",
+      "title": "Lord",
+      "relation": null
+    },
+    "Aldren": {
+      "name": "Aldren",
+      "political": 80,
+      "war": 82,
+      "charm": 75,
+      "fame": 6,
+      "location": 14,
+      "family": "Duskerran",
+      "title": "Prince",
+      "relation": "Duskerran",
+      "null": [
+        ""
+      ]
+    },
+    "Sovran": {
+      "name": "Sovran",
+      "political": 71,
+      "war": 58,
+      "charm": 32,
+      "fame": 0,
+      "location": 22,
+      "family": "Varrengard",
+      "title": "Vassal",
+      "relation": null
+    },
+    "Haldric": {
+      "name": "Haldric",
+      "political": 39,
+      "war": 71,
+      "charm": 45,
+      "fame": 0,
+      "location": 2,
+      "family": "Stormmere",
+      "title": "Lord",
+      "relation": null
+    },
+    "Ruskarn": {
+      "name": "Ruskarn",
+      "political": 65,
+      "war": 93,
+      "charm": 65,
+      "fame": 0,
+      "location": 10,
+      "family": "Stormmere",
+      "title": "Lord",
+      "relation": "Stormmere"
+    }
+  },
+  "families": {
+    "Alderwyn": {
+      "family": "Alderwyn",
+      "people": [
+        "Orric",
+        "Avar",
+        "Fenric",
+        "Beran",
+        "Lethan",
+        "Rhovan",
+        "Tharen",
+        "Ferran"
+      ],
+      "leader": "Avar"
+    },
+    "Redwake": {
+      "family": "Redwake",
+      "people": [
+        "Brenic",
+        "Drevan",
+        "Heskar",
+        "Renvar"
+      ],
+      "leader": "Drevan"
+    },
+    "Varrengard": {
+      "family": "Varrengard",
+      "people": [
+        "Caeric",
+        "Vossan",
+        "Grendan",
+        "Selvar",
+        "Iskar",
+        "Malrec",
+        "Orven",
+        "Ithren",
+        "Calder",
+        "Ysene",
+        "Kestrel",
+        "Dravik",
+        "Kerric",
+        "Vosric",
+        "Uldren",
+        "Sovran"
+      ],
+      "leader": "Malrec"
+    },
+    "Stormmere": {
+      "family": "Stormmere",
+      "people": [
+        "Rethan",
+        "Darian",
+        "Hadrin",
+        "Olyss",
+        "Beldran",
+        "Marven",
+        "Haldric",
+        "Ruskarn"
+      ],
+      "leader": "Darian"
+    },
+    "Duskerran": {
+      "family": "Duskerran",
+      "people": [
+        "Veyla",
+        "Talven",
+        "Denric",
+        "Dovar",
+        "Aldren"
+      ],
+      "leader": "Aldren"
+    },
+    "Valecross": {
+      "family": "Valecross",
+      "people": [
+        "Dornic",
+        "Halric",
+        "Elyra"
+      ],
+      "leader": "Halric"
+    }
+  }
+}

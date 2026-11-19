@@ -1,0 +1,37 @@
+@use "@/ui/screens/NewGameScreen/new-game-screen";
+
+.root {
+  @include new-game-screen.screen;
+}
+
+.hidden {
+  display: none;
+}
+
+.frame {
+  @include new-game-screen.frame;
+}
+
+.choices {
+  @include new-game-screen.choices;
+}
+
+.header {
+  @include new-game-screen.header;
+}
+
+.heading {
+  @include new-game-screen.heading;
+}
+
+.actions {
+  @include new-game-screen.actions;
+}
+
+.action {
+  @include new-game-screen.action;
+}
+
+.map {
+  @include new-game-screen.map-pane;
+}

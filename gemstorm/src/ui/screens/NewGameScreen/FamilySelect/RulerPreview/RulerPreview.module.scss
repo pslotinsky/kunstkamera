@@ -1,0 +1,54 @@
+@use "@/ui/common/kit";
+@use "@/ui/screens/NewGameScreen/new-game-screen";
+
+.root {
+  @include new-game-screen.preview;
+}
+
+.portrait {
+  @include new-game-screen.preview-portrait;
+}
+
+.facts {
+  display: flex;
+  flex-direction: column;
+  gap: new-game-screen.$space-small;
+}
+
+.name {
+  @include new-game-screen.preview-name;
+}
+
+.age {
+  color: var(--ink-soft);
+  font-size: 1.35rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-rows: auto auto;
+  grid-auto-flow: column;
+  gap: 0 new-game-screen.$space;
+  justify-content: start;
+  margin: 0;
+}
+
+.statName {
+  color: var(--ink-soft);
+  font-size: 1.15rem;
+  font-variant: small-caps;
+}
+
+.statValue {
+  margin: 0;
+  color: var(--ink);
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.vassals {
+  color: var(--ink-soft);
+  font-size: 1.35rem;
+}

@@ -1,0 +1,171 @@
+// @vitest-environment jsdom
+import { describe, expect, it, vi } from 'vitest';
+
+import type { BattleOutcome } from '@/core/domain/BattleOutcome';
+import { BattleSide } from '@/core/domain/BattleSide';
+import type { Captive } from '@/core/domain/Captive';
+import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
+import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
+import { SoundBoard } from '@/ui/common/sound/SoundBoard';
+import styles from '@/ui/screens/StrategyScreen/BattleReport/BattleReport.module.scss';
+import { BattleReportControl } from '@/ui/screens/StrategyScreen/BattleReport/BattleReportControl';
+
+import {
+  makeArmy,
+  makeCaptive,
+  makeFamily,
+  makeGeneral,
+  makeInvasionReport,
+  makeOutcome,
+  makeProvince,
+  makeWorld,
+} from './factories';
+
+function setup() {
+  const avar = makeGeneral({ name: 'Avar' });
+  const mine = makeFamily({ name: 'Alderwyn', ruler: avar });
+  const marven = makeGeneral({ name: 'Marven' });
+  const rival = makeFamily({ name: 'Stormmere', ruler: marven });
+  const home = makeProvince({ number: 1, family: mine, governor: avar });
+  const target = makeProvince({ number: 22, family: rival, governor: marven });
+  const { world, events } = makeWorld([home, target], mine);
+  const sounds = new SoundBoard();
+
+  function show(
+    captive?: Captive,
+    outcome: BattleOutcome = makeOutcome(),
+  ): HTMLElement {
+    const container = document.createElement('div');
+    const control = new BattleReportControl({ world, events, sounds });
+    const report = makeInvasionReport({
+      source: home,
+      target,
+      attacker: makeArmy({ commander: avar }),
+      defender: makeArmy({ commander: marven }),
+      outcome,
+    });
+
+    report.captive = captive;
+    control.mount(container);
+    events.publish(new BattleReportedEvent(report));
+
+    return container;
+  }
+
+  function showWar(): { root: HTMLElement; ended: TurnEndedEvent[] } {
+    const container = document.createElement('div');
+    const control = new BattleReportControl({ world, events, sounds });
+    const ended: TurnEndedEvent[] = [];
+    const camp = makeProvince({ number: 7, family: rival, governor: marven });
+    const emberholt = makeFamily({ name: 'Emberholt' });
+    const taken = makeProvince({ number: 8, name: 'Pineward', family: rival });
+
+    events.subscribe(TurnEndedEvent, (event) => ended.push(event));
+    control.mount(container);
+    control.showWar(
+      makeInvasionReport({
+        source: camp,
+        target: taken,
+        defending: emberholt,
+        attacker: makeArmy({ commander: marven }),
+      }),
+    );
+
+    return { root: container, ended };
+  }
+
+  return { show, showWar, sounds, mine, rival, avar, marven };
+}
+
+function getCaptureLine(root: HTMLElement): string | null {
+  return root.querySelector('[data-capture]')!.textContent;
+}
+
+function isSidesShown(root: HTMLElement): boolean {
+  return !root
+    .querySelector('[data-sides]')!
+    .classList.contains(styles.hidden!);
+}
+
+describe('BattleReportControl', () => {
+  it('names a commander you have taken', () => {
+    const { show, mine, rival, marven } = setup();
+    const root = show(
+      makeCaptive({ general: marven, house: rival, captor: mine }),
+    );
+
+    expect(getCaptureLine(root)).toBe('Marven of Stormmere is your prisoner.');
+  });
+
+  it('names a commander the enemy has taken from you', () => {
+    const { show, mine, rival, avar } = setup();
+    const root = show(
+      makeCaptive({ general: avar, house: mine, captor: rival }),
+    );
+
+    expect(getCaptureLine(root)).toBe('Avar is taken by Stormmere.');
+  });
+
+  it('says nothing when no one was taken', () => {
+    const { show } = setup();
+
+    expect(getCaptureLine(show())).toBe('');
+  });
+
+  it('tells a rival war from the side of its winner', () => {
+    const { showWar } = setup();
+    const { root } = showWar();
+
+    expect(root.querySelector('[data-war]')!.textContent).toBe(
+      'Stormmere attacks Pineward, held by Emberholt.',
+    );
+    expect(root.querySelector('[data-verdict]')!.textContent).toBe(
+      'Pineward falls to Stormmere. Marven holds it.',
+    );
+  });
+
+  it('shows the troops of each side only in a war you fight', () => {
+    const { show, showWar } = setup();
+
+    expect(isSidesShown(show())).toBe(true);
+    expect(isSidesShown(showWar().root)).toBe(false);
+  });
+
+  it('plays the fanfare when your won war is reported', () => {
+    const { show, sounds } = setup();
+    const fanfare = vi.spyOn(sounds, 'playFanfare');
+
+    show();
+
+    expect(fanfare).toHaveBeenCalledOnce();
+  });
+
+  it('plays the dirge when your lost war is reported', () => {
+    const { show, sounds } = setup();
+    const dirge = vi.spyOn(sounds, 'playDirge');
+
+    show(undefined, makeOutcome({ winner: BattleSide.defender }));
+
+    expect(dirge).toHaveBeenCalledOnce();
+  });
+
+  it('keeps silent over a rival war report', () => {
+    const { showWar, sounds } = setup();
+    const fanfare = vi.spyOn(sounds, 'playFanfare');
+    const dirge = vi.spyOn(sounds, 'playDirge');
+
+    showWar();
+
+    expect(fanfare).not.toHaveBeenCalled();
+    expect(dirge).not.toHaveBeenCalled();
+  });
+
+  it('ends the rival turn when its war report is closed', () => {
+    const { showWar } = setup();
+    const { root, ended } = showWar();
+
+    root.querySelector<HTMLButtonElement>('button')!.click();
+
+    expect(ended).toHaveLength(1);
+  });
+});

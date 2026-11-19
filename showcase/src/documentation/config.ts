@@ -1,7 +1,7 @@
 import { isProjectId, type ProjectId } from '../projects.ts';
 
 export const collectionNames = {
-  gemfire: 'docs',
+  gemstorm: 'docs',
   'debt-dungeon': 'debtDungeonDocs',
   'total-space': 'totalSpaceDocs',
   'sink-city': 'sinkCityDocs',

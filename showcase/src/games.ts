@@ -8,10 +8,10 @@ interface GameConfig {
 }
 
 export const games: Partial<Record<ProjectId, GameConfig>> = {
-  gemfire: {
-    name: projectNames.gemfire,
+  gemstorm: {
+    name: projectNames.gemstorm,
     developmentUrl: 'http://localhost:5174/',
     developmentUrlOverride: 'VITE_GAME_URL',
-    publishedPath: 'gemfire/game/',
+    publishedPath: 'gemstorm/game/',
   },
 };

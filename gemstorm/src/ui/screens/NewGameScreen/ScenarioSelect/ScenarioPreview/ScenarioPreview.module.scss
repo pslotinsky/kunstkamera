@@ -1,0 +1,12 @@
+@use "@/ui/screens/NewGameScreen/new-game-screen";
+
+.root {
+  @include new-game-screen.preview;
+}
+
+.description {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.6rem;
+  line-height: 1.4;
+}

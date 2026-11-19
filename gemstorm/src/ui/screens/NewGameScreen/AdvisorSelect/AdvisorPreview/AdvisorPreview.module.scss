@@ -1,0 +1,32 @@
+@use "@/ui/screens/NewGameScreen/new-game-screen";
+
+.root {
+  @include new-game-screen.preview;
+}
+
+.portrait {
+  @include new-game-screen.preview-portrait;
+}
+
+.facts {
+  display: flex;
+  flex-direction: column;
+  gap: new-game-screen.$space-small;
+}
+
+.name {
+  @include new-game-screen.preview-name;
+}
+
+.title {
+  color: var(--ink-soft);
+  font-size: 1.35rem;
+}
+
+.saying {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.35rem;
+  font-style: italic;
+  line-height: 1.35;
+}

@@ -1,5 +1,5 @@
 import debtDungeonGoblin from '../../../../debt-dungeon/public/unit/goblin_01.webp';
-import gemfireFachan from '../../../../gemfire/public/unit/fachan.webp';
+import gemstormFachan from '../../../../gemstorm/public/unit/fachan.webp';
 import kingdomHrPaper from '../../../../kingdom-hr/docs/mockups/recruitment/dist/assets/paper-with-hand.webp';
 import sinkCityAlcomarket from '../../../../sink-city/docs/game/content/buildings/images/objects/alcohol-08.webp';
 import fleetCarrier from '../../../../total-space/docs/game/content/ships/images/14-fleet-carrier.webp';
@@ -32,12 +32,12 @@ export const projectPresentations = {
     imageAlt: 'Debt Dungeon goblin archer',
     imageFit: 'contain',
   },
-  gemfire: {
+  gemstorm: {
     label: 'Turn-based strategy',
     description:
-      'Develop provinces, command armies, and fight for Ishmeria in a browser remake of Koei’s strategy game.',
-    image: gemfireFachan,
-    imageAlt: 'Gemfire fachan unit',
+      'Develop provinces, command armies, and restore Aureth’s storm wards in a fantasy strategy game.',
+    image: gemstormFachan,
+    imageAlt: 'Gemstorm fachan unit',
     imageFit: 'contain',
   },
   'total-space': {
