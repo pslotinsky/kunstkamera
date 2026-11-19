@@ -1,0 +1,54 @@
+@use "@/ui/common/kit";
+
+.root {
+  @include kit.dialog(28rem);
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 0.95em;
+  font-weight: 600;
+}
+
+.portrait {
+  width: 4rem;
+  height: 4rem;
+  object-fit: cover;
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+}
+
+.captive {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.85em;
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.choice {
+  padding: 0.35rem 0.6rem;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  background: var(--button);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.choice:hover {
+  background: var(--button-hover);
+}
+
+.hidden {
+  display: none;
+}

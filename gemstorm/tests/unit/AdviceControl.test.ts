@@ -4,9 +4,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createCommandGroups } from '@/core/commands/province/catalog';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { WorldFactory } from '@/core/WorldFactory';
-import { AdviceControl } from '@/ui/Advice/AdviceControl';
-import { CommandDialogsControl } from '@/ui/CommandDialogs/CommandDialogsControl';
-import { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
+import { AdviceControl } from '@/ui/screens/StrategyScreen/Advice/AdviceControl';
+import { CommandDialogsControl } from '@/ui/screens/StrategyScreen/CommandDialogs/CommandDialogsControl';
+import { GamePanelControl } from '@/ui/screens/StrategyScreen/GamePanel/GamePanelControl';
 
 import {
   advanceTo,

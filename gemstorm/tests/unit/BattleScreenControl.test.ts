@@ -8,9 +8,9 @@ import { BATTLE_DAY_LIMIT, BattleClock } from '@/core/domain/BattleClock';
 import { BattleSide } from '@/core/domain/BattleSide';
 import { BattleEndedEvent } from '@/core/events/BattleEndedEvent';
 import { BattleStartedEvent } from '@/core/events/BattleStartedEvent';
-import styles from '@/ui/BattleScreen/BattleScreen.module.scss';
-import { BattleScreenControl } from '@/ui/BattleScreen/BattleScreenControl';
-import { SoundBoard } from '@/ui/sound/SoundBoard';
+import { SoundBoard } from '@/ui/common/sound/SoundBoard';
+import styles from '@/ui/screens/BattleScreen/BattleScreen.module.scss';
+import { BattleScreenControl } from '@/ui/screens/BattleScreen/BattleScreenControl';
 
 import {
   advanceTo,

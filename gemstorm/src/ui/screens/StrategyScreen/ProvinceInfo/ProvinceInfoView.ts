@@ -1,0 +1,223 @@
+import { html, nothing, render, type TemplateResult } from 'lit-html';
+
+import cultivationIconUrl from '@/assets/icons/cultivation.webp';
+import foodIconUrl from '@/assets/icons/food.webp';
+import goldIconUrl from '@/assets/icons/gold.webp';
+import loyaltyIconUrl from '@/assets/icons/loyalty.webp';
+import protectionIconUrl from '@/assets/icons/protection.webp';
+import troopsIconUrl from '@/assets/icons/troops.webp';
+import type { DevelopmentKey } from '@/core/domain/Development';
+import type { General } from '@/core/domain/General';
+import type { Province } from '@/core/domain/Province';
+import type { ResourceKey } from '@/core/domain/Resources';
+import type { Stats } from '@/core/domain/Stats';
+import { countTo } from '@/lib/dom/countTo';
+import { View } from '@/lib/View';
+import { getFamilyCrestUrl } from '@/ui/common/art/getFamilyCrestUrl';
+import { getGeneralPortraitUrl } from '@/ui/common/art/getGeneralPortraitUrl';
+
+import styles from './ProvinceInfo.module.scss';
+
+type StatKey = ResourceKey | DevelopmentKey;
+
+const STATS_META: Record<StatKey, { label: string; icon: string }> = {
+  gold: { label: 'Gold', icon: goldIconUrl },
+  food: { label: 'Food', icon: foodIconUrl },
+  troops: { label: 'Troops', icon: troopsIconUrl },
+  loyalty: { label: 'Loyalty', icon: loyaltyIconUrl },
+  cultivation: { label: 'Cultivation', icon: cultivationIconUrl },
+  protection: { label: 'Protection', icon: protectionIconUrl },
+};
+
+export class ProvinceInfoView extends View {
+  protected readonly rootClass = styles.root!;
+
+  private readonly animations = new Map<string, () => void>();
+
+  public get template(): TemplateResult {
+    return html`<section class=${styles.root}></section>`;
+  }
+
+  protected override onMount(): void {
+    this.showHint();
+  }
+
+  protected override onUnmount(): void {
+    this.cancelAnimations();
+  }
+
+  public showHint(): void {
+    this.cancelAnimations();
+    render(this.renderHint(), this.element);
+  }
+
+  public showProvince(province: Province): void {
+    this.cancelAnimations();
+    render(this.renderProvince(province), this.element);
+    this.refreshHeader(province);
+    this.refreshGovernor(province);
+    this.fillStats(province.resources);
+    this.fillStats(province.development);
+  }
+
+  public actualizeProvince(province: Province): void {
+    this.refreshHeader(province);
+    this.refreshGovernor(province);
+    this.animateStats(province.resources);
+    this.animateStats(province.development);
+  }
+
+  private fillStats(stats: Stats): void {
+    for (const [key, value] of stats.entries) {
+      const valueElement = this.getStatValue(key);
+
+      if (valueElement) {
+        valueElement.textContent = String(value);
+      }
+    }
+  }
+
+  private animateStats(stats: Stats): void {
+    for (const [key, value] of stats.entries) {
+      this.animateStat(key, value);
+    }
+  }
+
+  private animateStat(key: string, to: number): void {
+    this.animations.get(key)?.();
+    this.animations.delete(key);
+
+    const statElement = this.getStatElement(key);
+    const valueElement = this.getStatValue(key);
+
+    const from = valueElement ? Number(valueElement.textContent) : 0;
+
+    if (statElement && valueElement && from !== to) {
+      statElement.classList.remove(styles.changed!);
+      statElement.classList.add(styles.changed!);
+      const cancel = countTo(valueElement, from, to);
+
+      this.animations.set(key, cancel);
+    }
+  }
+
+  private cancelAnimations(): void {
+    for (const cancel of this.animations.values()) {
+      cancel();
+    }
+
+    this.animations.clear();
+  }
+
+  private refreshGovernor(province: Province): void {
+    const element = this.governorElement;
+
+    if (element && province.governor) {
+      render(this.renderGovernorContent(province.governor), element);
+    }
+  }
+
+  private renderHint(): TemplateResult {
+    return html`<p class=${styles.hint}>Select a province.</p>`;
+  }
+
+  private renderProvince(province: Province): TemplateResult {
+    return html`
+      <header class=${styles.header}></header>
+      <hr class=${styles.divider} />
+      ${this.renderDetails(province)}
+    `;
+  }
+
+  private renderDetails(province: Province): TemplateResult {
+    return html`
+      ${province.governor ? html`<div class=${styles.governor}></div>` : nothing}
+      ${this.renderStats(province)}
+    `;
+  }
+
+  private refreshHeader(province: Province): void {
+    const element = this.headerElement;
+
+    if (element) {
+      render(this.renderHeaderContent(province), element);
+    }
+  }
+
+  private renderHeaderContent(province: Province): TemplateResult {
+    const family = province.family;
+    const familyName = family?.name ?? 'Neutral';
+
+    return html`
+      ${
+        family
+          ? html`<img
+              class=${styles.crest}
+              src=${getFamilyCrestUrl(family)}
+              alt="${familyName} crest"
+            />`
+          : nothing
+      }
+      <div>
+        <h2>${familyName}</h2>
+        <h2>${String(province)}</h2>
+      </div>
+    `;
+  }
+
+  private renderGovernorContent(governor: General): TemplateResult {
+    return html`
+      <img
+        class=${styles.portrait}
+        src=${getGeneralPortraitUrl(governor)}
+        alt=${governor.name}
+      />
+      <h2>${governor.name}</h2>
+    `;
+  }
+
+  private renderStats(province: Province): TemplateResult {
+    return html`
+      <div class=${styles.stats}>
+        ${this.renderColumn('Resources', province.resources)}
+        ${this.renderColumn('Development', province.development)}
+      </div>
+    `;
+  }
+
+  private renderStat(key: StatKey): TemplateResult {
+    const { icon, label } = STATS_META[key];
+
+    return html`
+      <p class=${styles.stat} data-stat=${key}>
+        <img class=${styles.statIcon} src=${icon} alt=${label} title=${label} />
+        <span></span>
+      </p>
+    `;
+  }
+
+  private renderColumn(title: string, stats: Stats): TemplateResult {
+    return html`
+      <div class=${styles.column}>
+        <h3>${title}</h3>
+        ${stats.entries.map(([key]) => this.renderStat(key as StatKey))}
+      </div>
+    `;
+  }
+
+  private getStatElement(key: string): HTMLElement | null {
+    return this.element.querySelector<HTMLElement>(`[data-stat="${key}"]`);
+  }
+
+  private getStatValue(key: string): HTMLElement | null {
+    return this.getStatElement(key)?.querySelector('span') ?? null;
+  }
+
+  private get headerElement(): HTMLElement | null {
+    return this.element.querySelector<HTMLElement>(`.${styles.header}`);
+  }
+
+  private get governorElement(): HTMLElement | null {
+    return this.element.querySelector<HTMLElement>(`.${styles.governor}`);
+  }
+}

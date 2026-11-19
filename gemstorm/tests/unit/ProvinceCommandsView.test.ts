@@ -4,8 +4,8 @@ import { describe, expect, it } from 'vitest';
 import { createCommandGroups } from '@/core/commands/province/catalog';
 import { WorldFactory } from '@/core/WorldFactory';
 import { EventBus } from '@/lib/EventBus';
-import styles from '@/ui/ProvinceCommands/ProvinceCommands.module.scss';
-import { ProvinceCommandsView } from '@/ui/ProvinceCommands/ProvinceCommandsView';
+import styles from '@/ui/screens/StrategyScreen/ProvinceCommands/ProvinceCommands.module.scss';
+import { ProvinceCommandsView } from '@/ui/screens/StrategyScreen/ProvinceCommands/ProvinceCommandsView';
 
 describe('ProvinceCommandsView', () => {
   it('renders the menu hidden, closed, and disabled until a province takes the turn', () => {

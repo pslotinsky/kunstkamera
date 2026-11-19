@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { ADVISORS } from '@/config/advisors';
 import { SCENARIOS, type Scenario } from '@/config/scenarios';
-import { AdvisorSelectControl } from '@/ui/AdvisorSelect/AdvisorSelectControl';
+import { AdvisorSelectControl } from '@/ui/screens/NewGameScreen/AdvisorSelect/AdvisorSelectControl';
 
 const [SCENARIO] = SCENARIOS as [Scenario];
 

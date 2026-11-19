@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { TileSelectedEvent } from '@/ui/Setup/TileGrid/events/TileSelectedEvent';
-import { TileGridControl } from '@/ui/Setup/TileGrid/TileGridControl';
+import { TileSelectedEvent } from '@/ui/screens/NewGameScreen/TileGrid/events/TileSelectedEvent';
+import { TileGridControl } from '@/ui/screens/NewGameScreen/TileGrid/TileGridControl';
 
 const TILES = [
   { key: 'alderwyn', image: 'alderwyn.webp', label: 'Alderwyn' },

@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { SoundBoard } from '@/ui/sound/SoundBoard';
-import { TitleScreenControl } from '@/ui/TitleScreen/TitleScreenControl';
+import { SoundBoard } from '@/ui/common/sound/SoundBoard';
+import { TitleScreenControl } from '@/ui/screens/TitleScreen/TitleScreenControl';
 
 let title: TitleScreenControl | undefined;
 

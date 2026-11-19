@@ -2,7 +2,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { SCENARIOS, type Scenario } from '@/config/scenarios';
-import { FamilySelectControl } from '@/ui/FamilySelect/FamilySelectControl';
+import { FamilySelectControl } from '@/ui/screens/NewGameScreen/FamilySelect/FamilySelectControl';
 
 const [FIRST, SECOND] = SCENARIOS as [Scenario, Scenario];
 

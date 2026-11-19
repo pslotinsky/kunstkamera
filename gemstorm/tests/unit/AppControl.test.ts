@@ -2,9 +2,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SCENARIOS } from '@/config/scenarios';
-import { AppControl } from '@/ui/App/AppControl';
-import { CampaignControl } from '@/ui/Campaign/CampaignControl';
-import { SoundBoard } from '@/ui/sound/SoundBoard';
+import { AppControl } from '@/ui/app/App/AppControl';
+import { CampaignControl } from '@/ui/app/Campaign/CampaignControl';
+import { SoundBoard } from '@/ui/common/sound/SoundBoard';
 
 let shell: AppControl | undefined;
 const visibility = Object.getOwnPropertyDescriptor(

@@ -1,0 +1,87 @@
+@use "@/ui/common/kit";
+
+.root {
+  @include kit.dialog(30rem);
+}
+
+.title {
+  margin: 0 0 0.75rem;
+  color: var(--gold-text);
+  font-size: 1.35em;
+  font-weight: 600;
+}
+
+.title:empty {
+  display: none;
+}
+
+.prompt {
+  margin: 0 0 0.6rem;
+  color: var(--heading);
+  font-size: 1.05em;
+}
+
+.actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.section {
+  margin-top: 0.5rem;
+}
+
+.footer {
+  margin-top: 1.25rem;
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.options button {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0.25rem 0.5rem;
+}
+
+.lords {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.lords button {
+  width: 100%;
+  text-align: left;
+  padding: 0.25rem 0.5rem;
+}
+
+.button {
+  padding: 0.25rem 0.75rem;
+  font: inherit;
+  color: inherit;
+  background: var(--button);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+  border-color: var(--edge-bright);
+}
+
+.selected {
+  @include kit.selected;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.hidden {
+  display: none;
+}

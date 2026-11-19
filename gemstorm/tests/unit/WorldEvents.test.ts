@@ -7,8 +7,8 @@ import { IncidentReportedEvent } from '@/core/events/IncidentReportedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
 import { WorldEngine } from '@/core/WorldEngine';
-import styles from '@/ui/Announcements/Announcements.module.scss';
-import { AnnouncementsControl } from '@/ui/Announcements/AnnouncementsControl';
+import styles from '@/ui/screens/StrategyScreen/Announcements/Announcements.module.scss';
+import { AnnouncementsControl } from '@/ui/screens/StrategyScreen/Announcements/AnnouncementsControl';
 
 import { makeFamily, makeGeneral, makeProvince, makeWorld } from './factories';
 

@@ -13,8 +13,8 @@ import {
   type SuccessionCause,
   SuccessionReportedEvent,
 } from '@/core/events/SuccessionReportedEvent';
-import { CampaignSoundDirector } from '@/ui/sound/CampaignSoundDirector';
-import { SoundBoard } from '@/ui/sound/SoundBoard';
+import { CampaignSoundDirector } from '@/ui/app/Campaign/CampaignSoundDirector';
+import { SoundBoard } from '@/ui/common/sound/SoundBoard';
 
 import {
   makeBattle,

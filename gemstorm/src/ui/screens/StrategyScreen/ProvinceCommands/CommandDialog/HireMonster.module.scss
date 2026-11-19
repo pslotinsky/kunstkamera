@@ -1,0 +1,270 @@
+@use "@/ui/common/kit";
+
+.root {
+  @include kit.dialog(48rem);
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.title {
+  margin: 0;
+}
+
+.close {
+  margin-left: auto;
+  padding: 0.25rem 0.75rem;
+  font: inherit;
+  color: inherit;
+  background: var(--button);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.close:hover {
+  border-color: var(--edge-bright);
+}
+
+.modes {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.mode {
+  padding: 0.3rem 1rem;
+  font: inherit;
+  color: inherit;
+  background: var(--button);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.mode:hover {
+  border-color: var(--edge-bright);
+}
+
+.units {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  border-bottom: 1px solid var(--edge);
+  padding-bottom: 0.5rem;
+}
+
+.unit {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: var(--button);
+  border: 1px solid var(--edge);
+  border-radius: 4px 4px 0 0;
+  cursor: pointer;
+}
+
+.unit:hover {
+  border-color: var(--edge-bright);
+}
+
+.selected {
+  @include kit.selected;
+}
+
+.thumb {
+  flex: 0 0 auto;
+  width: 32px;
+  aspect-ratio: 1;
+  object-fit: contain;
+  border-radius: 3px;
+  image-rendering: pixelated;
+}
+
+.unitName {
+  flex: 1 1 auto;
+}
+
+.cost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  opacity: 0.85;
+}
+
+.costIcon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+.empty {
+  font-size: 0.85em;
+  opacity: 0.6;
+}
+
+.detail {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
+  min-height: 0;
+  padding: 1rem;
+  overflow-y: auto;
+  background: var(--surface-900);
+  border: 1px solid var(--edge);
+  border-radius: 6px;
+}
+
+.detail:empty {
+  display: none;
+}
+
+.top {
+  align-self: stretch;
+  display: grid;
+  grid-template-columns: 128px 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.portrait {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  border-radius: 4px;
+  image-rendering: pixelated;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.name {
+  margin: 0;
+}
+
+.kind {
+  font-size: 0.75em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+}
+
+.facts {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9em;
+}
+
+.fact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.factIcon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.description {
+  margin: 0.25rem 0 0;
+  font-style: italic;
+  opacity: 0.85;
+}
+
+.showcase {
+  align-self: stretch;
+  display: grid;
+  grid-template-columns: 128px 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.preview {
+  width: 100%;
+  min-width: 0;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 4px;
+  background: var(--surface-900);
+  image-rendering: pixelated;
+}
+
+.range {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.label {
+  font-size: 0.7em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+}
+
+.previewBox {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.grid {
+  border-collapse: separate;
+  border-spacing: 2px;
+}
+
+.cell {
+  width: 22px;
+  height: 22px;
+  border-radius: 2px;
+  background: var(--button);
+}
+
+.cell[data-cell="hit"] {
+  background: var(--edge-bright);
+}
+
+.cell[data-cell="center"] {
+  background: var(--accent-bright);
+}
+
+.action {
+  padding: 0.4rem 1.25rem;
+  font: inherit;
+  color: inherit;
+  background: var(--button);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.action:hover:not(:disabled) {
+  border-color: var(--edge-bright);
+}
+
+.action:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.hidden {
+  display: none;
+}

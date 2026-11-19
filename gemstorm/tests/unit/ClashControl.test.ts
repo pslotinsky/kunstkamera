@@ -9,9 +9,9 @@ import { Facing } from '@/core/domain/Facing';
 import { FifthUnit } from '@/core/domain/FifthUnit';
 import { StandardUnit } from '@/core/domain/StandardUnit';
 import type { Unit } from '@/core/domain/Unit';
-import styles from '@/ui/BattleScreen/Clash/Clash.module.scss';
-import { ClashControl } from '@/ui/BattleScreen/Clash/ClashControl';
-import { SoundBoard } from '@/ui/sound/SoundBoard';
+import { SoundBoard } from '@/ui/common/sound/SoundBoard';
+import styles from '@/ui/screens/BattleScreen/Clash/Clash.module.scss';
+import { ClashControl } from '@/ui/screens/BattleScreen/Clash/ClashControl';
 
 import { makeGeneral } from './factories';
 

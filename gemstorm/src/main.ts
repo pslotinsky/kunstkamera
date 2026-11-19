@@ -1,8 +1,8 @@
 import './style.scss';
 
-import { AppControl } from '@/ui/App/AppControl';
-import { SoundBoard } from '@/ui/sound/SoundBoard';
-import { SoundDirector } from '@/ui/sound/SoundDirector';
+import { AppControl } from '@/ui/app/App/AppControl';
+import { SoundDirector } from '@/ui/app/SoundDirector';
+import { SoundBoard } from '@/ui/common/sound/SoundBoard';
 
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) {

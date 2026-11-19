@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { getPublicAssetUrl } from '@/ui/art/getPublicAssetUrl';
+import { getPublicAssetUrl } from '@/ui/common/art/getPublicAssetUrl';
 
 afterEach(() => vi.unstubAllEnvs());
 

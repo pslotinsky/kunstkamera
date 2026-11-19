@@ -1,0 +1,303 @@
+// biome-ignore-all lint/correctness/noUnknownUnit: Biome 2.6.3 misreads hex colors in SCSS custom properties.
+@use "@/ui/common/kit";
+
+.root {
+  --columns: 10;
+  --rows: 8;
+  --stage-scale: 1;
+  --board-height: 832px;
+  --board-width: calc(var(--board-height) * var(--columns) / var(--rows));
+  --gap: 16px;
+  --sky-sunrise: #e08a53;
+  --sky-noon: #6cadee;
+  --sky-sunset: #bf4d2b;
+  --sky-midnight: #0e1631;
+
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--surface-900);
+}
+
+.stage {
+  display: grid;
+  grid-template-rows: var(--board-height) var(--footer);
+  grid-template-columns: var(--side) var(--board-width) var(--side);
+  gap: var(--gap);
+  zoom: var(--stage-scale);
+}
+
+.hidden {
+  display: none;
+}
+
+.side {
+  @include kit.panel;
+
+  position: relative;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: center;
+  min-height: 0;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  border-color: var(--trim);
+  border-radius: 2px;
+}
+
+.side::after {
+  @include kit.ornate-corners(30px);
+
+  position: absolute;
+  inset: -3px;
+}
+
+.mine {
+  grid-column: 1;
+}
+
+.theirs {
+  grid-column: 3;
+}
+
+.heraldry {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.crest {
+  flex: 0 0 auto;
+  width: 4.5rem;
+  aspect-ratio: 48 / 62;
+  object-fit: contain;
+}
+
+.portrait {
+  flex: 0 1 6rem;
+  min-width: 0;
+  aspect-ratio: 1;
+  object-fit: cover;
+  padding: 2px;
+  border: 1px solid var(--trim);
+  border-radius: 3px;
+}
+
+.commander {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.mine .commander {
+  color: #ff8a72;
+}
+
+.theirs .commander {
+  color: #7fa8ff;
+}
+
+.supply {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  color: var(--ink-cool);
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.foodIcon {
+  width: 1.75rem;
+  height: 1.75rem;
+  image-rendering: pixelated;
+}
+
+@keyframes supplySpent {
+  from {
+    color: #ffd166;
+  }
+
+  to {
+    color: var(--ink-cool);
+  }
+}
+
+.changed {
+  animation: supplySpent 800ms ease;
+}
+
+.divider {
+  @include kit.divider;
+}
+
+.roster {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.unit {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.3rem 0.6rem;
+  text-align: left;
+  @include kit.well;
+}
+
+.unitIcon {
+  flex: 0 0 auto;
+  width: 3rem;
+  height: 3rem;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.unitName {
+  flex: 1 1 auto;
+  font-size: 1.05rem;
+}
+
+.strength {
+  font-size: 1.25rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.clock {
+  color: var(--ink);
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.place {
+  color: var(--ink);
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.field {
+  grid-row: 1;
+  grid-column: 2;
+  width: var(--board-width);
+}
+
+.box {
+  @include kit.panel;
+
+  display: flex;
+  grid-row: 2;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 0 1rem;
+  border-color: var(--trim);
+  border-radius: 2px;
+}
+
+.placeBox {
+  grid-column: 1;
+}
+
+.bar {
+  position: relative;
+  display: grid;
+  grid-column: 2;
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.center {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  min-width: 0;
+}
+
+.bar::after {
+  @include kit.ornate-corners(30px);
+
+  position: absolute;
+  inset: -3px;
+}
+
+.dayBox {
+  position: relative;
+  grid-column: 3;
+  overflow: hidden;
+}
+
+.dayBox .clock {
+  position: relative;
+  z-index: 1;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.85),
+    0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+.prompt {
+  overflow: hidden;
+  color: var(--ink-muted);
+  font-size: 0.95rem;
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.refuge {
+  min-width: 12rem;
+}
+
+button {
+  min-width: 6rem;
+  padding: 0.35rem 1rem;
+  color: var(--ink);
+  font: inherit;
+  font-family: var(--font-display);
+  font-weight: 600;
+  background: var(--button);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: var(--button-hover);
+  border-color: var(--edge-bright);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.orders,
+.actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.5rem;
+}
+
+.actions {
+  justify-self: end;
+}
+
+.fallen {
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+
+.gone {
+  display: none;
+}

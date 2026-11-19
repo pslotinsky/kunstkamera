@@ -15,8 +15,8 @@ import { MissionReportedEvent } from '@/core/events/MissionReportedEvent';
 import { SuccessionReportedEvent } from '@/core/events/SuccessionReportedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { UnitDesertedEvent } from '@/core/events/UnitDesertedEvent';
-import styles from '@/ui/Announcements/Announcements.module.scss';
-import { AnnouncementsControl } from '@/ui/Announcements/AnnouncementsControl';
+import styles from '@/ui/screens/StrategyScreen/Announcements/Announcements.module.scss';
+import { AnnouncementsControl } from '@/ui/screens/StrategyScreen/Announcements/AnnouncementsControl';
 
 import { makeFamily, makeGeneral, makeProvince, makeWorld } from './factories';
 

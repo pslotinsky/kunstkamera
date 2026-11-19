@@ -4,8 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TurnHeldEvent } from '@/core/events/TurnHeldEvent';
 import { TurnReleasedEvent } from '@/core/events/TurnReleasedEvent';
 import { EventBus } from '@/lib/EventBus';
-import { GameMenuControl } from '@/ui/GameMenu/GameMenuControl';
-import { SoundBoard } from '@/ui/sound/SoundBoard';
+import { SoundBoard } from '@/ui/common/sound/SoundBoard';
+import { GameMenuControl } from '@/ui/screens/StrategyScreen/GameMenu/GameMenuControl';
 
 let menu: GameMenuControl | undefined;
 

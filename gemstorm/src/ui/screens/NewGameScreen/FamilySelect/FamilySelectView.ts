@@ -1,0 +1,56 @@
+import { html, type TemplateResult } from 'lit-html';
+
+import { View } from '@/lib/View';
+import { BackChosenEvent } from '@/ui/screens/NewGameScreen/events/BackChosenEvent';
+import { NextChosenEvent } from '@/ui/screens/NewGameScreen/events/NextChosenEvent';
+import layout from '@/ui/screens/NewGameScreen/NewGameScreen.module.scss';
+
+import type { FamilySelectViews } from './types';
+
+export class FamilySelectView extends View<
+  Record<string, never>,
+  FamilySelectViews
+> {
+  protected readonly rootClass = layout.root!;
+
+  protected override get rootSelector(): string {
+    return '[data-new-game-step="family"]';
+  }
+
+  public get template(): TemplateResult {
+    const { views } = this;
+
+    return html`
+      <section class="${layout.root} ${layout.hidden}" data-new-game-step="family"
+        aria-labelledby="family-heading">
+        <div class=${layout.frame} aria-hidden="true"></div>
+        <div class=${layout.choices}>
+          <header class=${layout.header}>
+            <h2 id="family-heading" class=${layout.heading}>Choose Family</h2>
+          </header>
+          ${views.houses.template}
+          ${views.ruler.template}
+          <div class=${layout.actions}>
+            <button class=${layout.action}
+              @click=${() => this.publish(new BackChosenEvent())}>
+              Back
+            </button>
+            <button class=${layout.action}
+              @click=${() => this.publish(new NextChosenEvent())}>
+              Next
+            </button>
+          </div>
+        </div>
+        <div class=${layout.map}>${views.map.template}</div>
+      </section>
+    `;
+  }
+
+  public show(): void {
+    this.element.classList.remove(layout.hidden!);
+  }
+
+  public hide(): void {
+    this.element.classList.add(layout.hidden!);
+  }
+}

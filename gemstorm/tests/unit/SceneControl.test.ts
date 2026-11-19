@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { SceneControl } from '@/ui/TitleScreen/Scene/SceneControl';
+import { SceneControl } from '@/ui/screens/TitleScreen/Scene/SceneControl';
 
 const FRAME_ID = 17;
 const FRAME_MS = 16;

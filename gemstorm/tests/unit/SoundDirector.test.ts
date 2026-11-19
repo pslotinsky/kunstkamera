@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { SoundBoard } from '@/ui/sound/SoundBoard';
-import { SoundDirector } from '@/ui/sound/SoundDirector';
+import { SoundDirector } from '@/ui/app/SoundDirector';
+import { SoundBoard } from '@/ui/common/sound/SoundBoard';
 
 let director: SoundDirector | undefined;
 

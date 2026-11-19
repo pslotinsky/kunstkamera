@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest';
 
 import { ViewCommand } from '@/core/commands/province/ViewCommand';
 import { HiredUnit } from '@/core/domain/HiredUnit';
-import styles from '@/ui/FamilyOverview/FamilyOverview.module.scss';
-import { FamilyOverviewControl } from '@/ui/FamilyOverview/FamilyOverviewControl';
+import styles from '@/ui/screens/StrategyScreen/FamilyOverview/FamilyOverview.module.scss';
+import { FamilyOverviewControl } from '@/ui/screens/StrategyScreen/FamilyOverview/FamilyOverviewControl';
 
 import { makeFamily, makeProvince, makeWorld } from './factories';
 

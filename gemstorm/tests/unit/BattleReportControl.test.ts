@@ -6,9 +6,9 @@ import { BattleSide } from '@/core/domain/BattleSide';
 import type { Captive } from '@/core/domain/Captive';
 import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
-import styles from '@/ui/BattleReport/BattleReport.module.scss';
-import { BattleReportControl } from '@/ui/BattleReport/BattleReportControl';
-import { SoundBoard } from '@/ui/sound/SoundBoard';
+import { SoundBoard } from '@/ui/common/sound/SoundBoard';
+import styles from '@/ui/screens/StrategyScreen/BattleReport/BattleReport.module.scss';
+import { BattleReportControl } from '@/ui/screens/StrategyScreen/BattleReport/BattleReportControl';
 
 import {
   makeArmy,

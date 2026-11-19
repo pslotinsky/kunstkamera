@@ -2,7 +2,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { SCENARIOS } from '@/config/scenarios';
-import { ScenarioSelectControl } from '@/ui/ScenarioSelect/ScenarioSelectControl';
+import { ScenarioSelectControl } from '@/ui/screens/NewGameScreen/ScenarioSelect/ScenarioSelectControl';
 
 let select: ScenarioSelectControl | undefined;
 

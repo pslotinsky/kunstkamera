@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { ProvinceInfoControl } from '@/ui/ProvinceInfo/ProvinceInfoControl';
+import { ProvinceInfoControl } from '@/ui/screens/StrategyScreen/ProvinceInfo/ProvinceInfoControl';
 
 import { makeProvince } from './factories';
 

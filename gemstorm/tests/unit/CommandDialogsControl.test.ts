@@ -4,9 +4,9 @@ import { describe, expect, it } from 'vitest';
 import { createCommandGroups } from '@/core/commands/province/catalog';
 import { DevelopCommand } from '@/core/commands/province/DevelopCommand';
 import { RecruitCommand } from '@/core/commands/province/RecruitCommand';
-import { AdviceControl } from '@/ui/Advice/AdviceControl';
-import { CommandDialogsControl } from '@/ui/CommandDialogs/CommandDialogsControl';
-import { ProvinceCommandsControl } from '@/ui/ProvinceCommands/ProvinceCommandsControl';
+import { AdviceControl } from '@/ui/screens/StrategyScreen/Advice/AdviceControl';
+import { CommandDialogsControl } from '@/ui/screens/StrategyScreen/CommandDialogs/CommandDialogsControl';
+import { ProvinceCommandsControl } from '@/ui/screens/StrategyScreen/ProvinceCommands/ProvinceCommandsControl';
 
 import { makeFamily, makeProvince, makeWorld } from './factories';
 

@@ -2,9 +2,9 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import type { Captive } from '@/core/domain/Captive';
-import { BattleReportClosedEvent } from '@/ui/BattleReport/BattleReportClosedEvent';
-import styles from '@/ui/CaptiveDialog/CaptiveDialog.module.scss';
-import { CaptiveDialogControl } from '@/ui/CaptiveDialog/CaptiveDialogControl';
+import { BattleReportClosedEvent } from '@/ui/screens/StrategyScreen/BattleReport/BattleReportClosedEvent';
+import styles from '@/ui/screens/StrategyScreen/CaptiveDialog/CaptiveDialog.module.scss';
+import { CaptiveDialogControl } from '@/ui/screens/StrategyScreen/CaptiveDialog/CaptiveDialogControl';
 
 import {
   makeCaptive,

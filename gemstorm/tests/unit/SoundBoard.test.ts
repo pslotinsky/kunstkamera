@@ -51,7 +51,7 @@ describe('SoundBoard music', () => {
       const play = vi
         .spyOn(HTMLMediaElement.prototype, 'play')
         .mockResolvedValue();
-      const { SoundBoard } = await import('@/ui/sound/SoundBoard');
+      const { SoundBoard } = await import('@/ui/common/sound/SoundBoard');
       const sounds = new SoundBoard();
 
       sounds.playMusic('map');
@@ -71,7 +71,7 @@ describe('SoundBoard music', () => {
     const play = vi
       .spyOn(HTMLMediaElement.prototype, 'play')
       .mockResolvedValue();
-    const { SoundBoard } = await import('@/ui/sound/SoundBoard');
+    const { SoundBoard } = await import('@/ui/common/sound/SoundBoard');
     const sounds = new SoundBoard();
 
     sounds.playMusic('map');

@@ -6,8 +6,8 @@ import { HiredUnit } from '@/core/domain/HiredUnit';
 import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
 import { BattleStartedEvent } from '@/core/events/BattleStartedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
-import styles from '@/ui/DefenseDialog/DefenseDialog.module.scss';
-import { DefenseDialogControl } from '@/ui/DefenseDialog/DefenseDialogControl';
+import styles from '@/ui/screens/StrategyScreen/DefenseDialog/DefenseDialog.module.scss';
+import { DefenseDialogControl } from '@/ui/screens/StrategyScreen/DefenseDialog/DefenseDialogControl';
 
 import {
   advanceTo,

@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { AttackCommand } from '@/core/commands/province/AttackCommand';
 import { Gem } from '@/core/domain/Gem';
 import { HiredUnit } from '@/core/domain/HiredUnit';
-import { AttackDialogControl } from '@/ui/ProvinceCommands/CommandDialog/AttackDialogControl';
+import { AttackDialogControl } from '@/ui/screens/StrategyScreen/ProvinceCommands/CommandDialog/AttackDialogControl';
 
 import {
   advanceTo,

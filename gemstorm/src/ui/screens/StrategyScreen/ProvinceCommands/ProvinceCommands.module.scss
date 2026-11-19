@@ -1,0 +1,142 @@
+@use "@/ui/common/kit";
+
+.root {
+  display: contents;
+}
+
+.tiles {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: calc(var(--rule-space) * 2);
+}
+
+.tiles::before {
+  @include kit.ornament-rule;
+
+  top: calc(var(--rule-space) * -1);
+}
+
+.tiles ~ .tiles {
+  margin-top: 0.5rem;
+}
+
+.tiles ~ .tiles::before {
+  content: none;
+}
+
+.step {
+  margin-top: 1.25rem;
+  text-align: center;
+}
+
+.step:empty {
+  display: none;
+}
+
+.prompt {
+  margin: 0;
+  color: var(--heading);
+  font-size: 1.25rem;
+}
+
+.choices {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.choice {
+  flex: 1 1 0;
+  padding: 0.5rem;
+  font: inherit;
+  font-size: 1.05rem;
+  color: var(--ink-cool);
+  background: var(--surface-700);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.choice:hover {
+  border-color: var(--edge-bright);
+}
+
+.chosen {
+  @include kit.selected;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  min-height: 5.6rem;
+  padding: 0.7rem 0.15rem 0.5rem;
+  font: inherit;
+  color: inherit;
+  background: var(--surface-700);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.tile span {
+  max-width: 100%;
+  min-height: 2.2em;
+  font-size: 0.64rem;
+  font-weight: 500;
+  line-height: 1.1;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.tile:hover:not(:disabled) {
+  border-color: var(--edge-bright);
+}
+
+.open,
+.selected {
+  @include kit.selected;
+}
+
+.open span,
+.selected span {
+  color: var(--ink);
+}
+
+.tile:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.groupIcon,
+.commandIcon {
+  width: 48px;
+  height: 48px;
+}
+
+.groupIcon {
+  image-rendering: pixelated;
+}
+
+.turnActions {
+  display: flex;
+  flex-shrink: 0;
+  width: 100%;
+  margin-top: auto;
+}
+
+.skipTurn {
+  @include kit.framed-button;
+
+  flex: 1;
+  min-height: 4.25rem;
+}
+
+.hidden {
+  display: none;
+}

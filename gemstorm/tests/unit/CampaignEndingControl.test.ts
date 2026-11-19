@@ -10,13 +10,13 @@ import { TurnHeldEvent } from '@/core/events/TurnHeldEvent';
 import { TurnReleasedEvent } from '@/core/events/TurnReleasedEvent';
 import { WarReportedEvent } from '@/core/events/WarReportedEvent';
 import { WorldFactory } from '@/core/WorldFactory';
-import { AnnouncementsControl } from '@/ui/Announcements/AnnouncementsControl';
-import { BattleReportClosedEvent } from '@/ui/BattleReport/BattleReportClosedEvent';
-import { BattleReportControl } from '@/ui/BattleReport/BattleReportControl';
-import styles from '@/ui/CampaignEnding/CampaignEnding.module.scss';
-import { CampaignEndingControl } from '@/ui/CampaignEnding/CampaignEndingControl';
-import { CaptiveDialogControl } from '@/ui/CaptiveDialog/CaptiveDialogControl';
-import { SoundBoard } from '@/ui/sound/SoundBoard';
+import { SoundBoard } from '@/ui/common/sound/SoundBoard';
+import { AnnouncementsControl } from '@/ui/screens/StrategyScreen/Announcements/AnnouncementsControl';
+import { BattleReportClosedEvent } from '@/ui/screens/StrategyScreen/BattleReport/BattleReportClosedEvent';
+import { BattleReportControl } from '@/ui/screens/StrategyScreen/BattleReport/BattleReportControl';
+import styles from '@/ui/screens/StrategyScreen/CampaignEnding/CampaignEnding.module.scss';
+import { CampaignEndingControl } from '@/ui/screens/StrategyScreen/CampaignEnding/CampaignEndingControl';
+import { CaptiveDialogControl } from '@/ui/screens/StrategyScreen/CaptiveDialog/CaptiveDialogControl';
 
 import {
   advanceTo,

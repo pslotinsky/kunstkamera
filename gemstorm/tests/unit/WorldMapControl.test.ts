@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { getFamilyCrestUrl } from '@/ui/art/getFamilyCrestUrl';
-import { SoundBoard } from '@/ui/sound/SoundBoard';
-import { MARCH_MS } from '@/ui/WorldMap/WarMarch';
-import { WorldMapControl } from '@/ui/WorldMap/WorldMapControl';
+import { getFamilyCrestUrl } from '@/ui/common/art/getFamilyCrestUrl';
+import { SoundBoard } from '@/ui/common/sound/SoundBoard';
+import { MARCH_MS } from '@/ui/screens/StrategyScreen/WorldMap/WarMarch';
+import { WorldMapControl } from '@/ui/screens/StrategyScreen/WorldMap/WorldMapControl';
 
 import {
   makeFamily,

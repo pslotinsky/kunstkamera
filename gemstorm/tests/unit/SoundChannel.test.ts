@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { SoundChannel } from '@/ui/sound/SoundChannel';
+import { SoundChannel } from '@/ui/common/sound/SoundChannel';
 
 function makeMix() {
   const master = new SoundChannel(0.4);

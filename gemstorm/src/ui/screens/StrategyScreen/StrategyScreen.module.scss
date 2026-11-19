@@ -1,0 +1,64 @@
+@use "@/ui/common/kit";
+
+.root {
+  --hud-width: 22.75rem;
+  --band: 5.5rem;
+
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.root::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: var(--surface-900);
+}
+
+.mapArea {
+  position: absolute;
+  inset: 1rem 1rem 1rem calc(var(--hud-width) + 2rem);
+  border: 1px solid var(--trim);
+  border-radius: 2px;
+}
+
+.mapArea::after {
+  @include kit.ornate-corners(30px);
+
+  position: absolute;
+  inset: -3px;
+  z-index: 4;
+}
+
+.mapArea::before {
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 2;
+  width: 150px;
+  height: 150px;
+  opacity: 0.55;
+  pointer-events: none;
+  transition: filter 300ms ease;
+  content: "";
+  background: url("@/assets/ui/compass.webp") center / contain no-repeat;
+}
+
+.turnStatus {
+  position: absolute;
+  top: 1.75rem;
+  left: 1.75rem;
+  z-index: 2;
+  pointer-events: none;
+  transition: filter 300ms ease;
+}
+
+.root:has([data-dimmed]) .mapArea::before {
+  filter: var(--map-dim);
+}
+
+.root:has([data-dimmed]) .turnStatus {
+  filter: var(--map-dim);
+}
