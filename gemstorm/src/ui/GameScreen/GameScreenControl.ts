@@ -16,6 +16,7 @@ import { CampaignEndingControl } from '@/ui/CampaignEnding/CampaignEndingControl
 import { CaptiveDialogControl } from '@/ui/CaptiveDialog/CaptiveDialogControl';
 import { CommandDialogsControl } from '@/ui/CommandDialogs/CommandDialogsControl';
 import { DefenseDialogControl } from '@/ui/DefenseDialog/DefenseDialogControl';
+import { GameMenuControl } from '@/ui/GameMenu/GameMenuControl';
 import { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
 import { PlaqueControl } from '@/ui/Plaque/PlaqueControl';
 import { TargetingEndedEvent } from '@/ui/ProvinceCommands/TargetingEndedEvent';
@@ -81,8 +82,16 @@ export class GameScreenControl extends Control<
       }),
       campaignEnding: new CampaignEndingControl(context),
       turnStatus: new PlaqueControl({ name: 'turn' }),
+      gameMenu: new GameMenuControl({
+        events: context.events,
+        sounds: context.sounds,
+      }),
     });
     this.turnHold = new TurnHold(context.events);
+  }
+
+  public onQuit(handler: () => void): void {
+    this.controls.gameMenu.onQuit(handler);
   }
 
   protected override onMount(): void {
@@ -95,6 +104,7 @@ export class GameScreenControl extends Control<
     this.controls.worldMap.onProvinceSelected((province) => {
       this.selectProvince(province);
     });
+    this.controls.gamePanel.onMenu(() => this.controls.gameMenu.open());
     this.onWorldEvent(MonthStartedEvent, (event) => {
       if (!this.context.world.campaign.isEnded) {
         this.controls.turnStatus.showTitle(String(event.date));

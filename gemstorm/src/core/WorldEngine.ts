@@ -18,7 +18,7 @@ import { TurnHeldEvent } from '@/core/events/TurnHeldEvent';
 import { TurnReleasedEvent } from '@/core/events/TurnReleasedEvent';
 import { TurnScheduledEvent } from '@/core/events/TurnScheduledEvent';
 import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
-import type { EventBus } from '@/lib/EventBus';
+import type { EventBus, EventClass } from '@/lib/EventBus';
 
 export class WorldEngine {
   private readonly executor: CommandExecutor;
@@ -28,6 +28,7 @@ export class WorldEngine {
   private readonly upkeep: UpkeepCommand;
   private readonly provinceEvents: ResolveEventsCommand;
   private readonly holders = new Set<object>();
+  private readonly lifetime = new AbortController();
 
   private fought: Invasion | undefined;
   private started: number | undefined;
@@ -57,42 +58,50 @@ export class WorldEngine {
   }
 
   public start(): void {
-    this.events.subscribe(TurnEndedEvent, (event) =>
+    this.listen(TurnEndedEvent, (event) =>
       this.handleTurnEnd(event.turnNumber),
     );
-    this.events.subscribe(MonthStartedEvent, () => {
+    this.listen(MonthStartedEvent, () => {
       if (this.phase === 'lifecycle') {
         this.advance();
       }
     });
-    this.events.subscribe(MonthEndedEvent, () => {
+    this.listen(MonthEndedEvent, () => {
       if (this.phase === 'next-month') {
         this.advance();
       }
     });
-    this.events.subscribe(BattleStartedEvent, (event) => {
+    this.listen(BattleStartedEvent, (event) => {
       this.fought = event.invasion;
     });
-    this.events.subscribe(TurnScheduledEvent, () => {
+    this.listen(TurnScheduledEvent, () => {
       if (this.phase === 'waiting-turn') {
         this.advance();
       }
     });
-    this.events.subscribe(TurnHeldEvent, (event) => {
+    this.listen(TurnHeldEvent, (event) => {
       this.holders.add(event.holder);
     });
-    this.events.subscribe(TurnReleasedEvent, (event) => {
+    this.listen(TurnReleasedEvent, (event) => {
       this.holders.delete(event.holder);
       queueMicrotask(() => this.advance());
     });
-    this.events.subscribe(BattleEndedEvent, (event) => {
+    this.listen(BattleEndedEvent, (event) => {
       this.settleBattle(event.outcome, event.refuge);
     });
     this.advance();
   }
 
+  public stop(): void {
+    this.lifetime.abort();
+  }
+
   private advance(): void {
-    if (!this.world.campaign.canProgress || this.holders.size > 0) {
+    if (
+      this.lifetime.signal.aborted ||
+      !this.world.campaign.canProgress ||
+      this.holders.size > 0
+    ) {
       return;
     }
 
@@ -237,5 +246,12 @@ export class WorldEngine {
       this.phase = 'waiting-turn';
       this.events.publish(new TurnScheduledEvent());
     }
+  }
+
+  private listen<EventType extends object>(
+    eventClass: EventClass<EventType>,
+    handler: (event: EventType) => void,
+  ): void {
+    this.events.subscribe(eventClass, handler, this.lifetime.signal);
   }
 }

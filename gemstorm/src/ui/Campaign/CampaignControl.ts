@@ -41,6 +41,10 @@ export class CampaignControl extends Control<CampaignView, CampaignControls> {
     this.director = new CampaignSoundDirector(context);
   }
 
+  public onQuit(handler: () => void): void {
+    this.controls.gameScreen.onQuit(handler);
+  }
+
   protected override onMount(): void {
     const { events } = this.context;
 
@@ -64,6 +68,7 @@ export class CampaignControl extends Control<CampaignView, CampaignControls> {
   }
 
   protected override onUnmount(): void {
+    this.engine.stop();
     this.director.stop();
   }
 }

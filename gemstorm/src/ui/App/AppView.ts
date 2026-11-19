@@ -26,8 +26,17 @@ export class AppView extends View<AppContext, AppViews> {
     `;
   }
 
-  public get stage(): HTMLElement {
-    return this.element.querySelector<HTMLElement>('[data-stage]')!;
+  public openStage(): HTMLElement {
+    const slot = document.createElement('div');
+
+    slot.className = styles.stage!;
+    this.stage.replaceChildren(slot);
+
+    return slot;
+  }
+
+  public clearStage(): void {
+    this.stage.replaceChildren();
   }
 
   protected override onMount(): void {
@@ -35,6 +44,10 @@ export class AppView extends View<AppContext, AppViews> {
       signal: this.lifetime.signal,
     });
     this.fitFrame();
+  }
+
+  private get stage(): HTMLElement {
+    return this.element.querySelector<HTMLElement>('[data-stage]')!;
   }
 
   private fitFrame(): void {

@@ -1,8 +1,8 @@
 import { Control } from '@/lib/Control';
+import { OptionsChosenEvent } from '@/ui/Options/events/OptionsChosenEvent';
 import { OptionsClosedEvent } from '@/ui/Options/events/OptionsClosedEvent';
 import { OptionsControl } from '@/ui/Options/OptionsControl';
 
-import { OptionsChosenEvent } from './events/OptionsChosenEvent';
 import { SceneControl } from './Scene/SceneControl';
 import { TitleScreenView } from './TitleScreenView';
 import type { TitleScreenContext, TitleScreenControls } from './types';

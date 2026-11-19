@@ -23,3 +23,56 @@
   inset: -3px;
   z-index: 3;
 }
+
+.bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-bottom: var(--rule-space);
+  padding-bottom: var(--rule-space);
+}
+
+.bar::after {
+  @include kit.ornament-rule;
+
+  top: 100%;
+}
+
+.barButton {
+  @include kit.display-type;
+
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  padding: 0.3rem 0.5rem;
+  color: var(--gold-text);
+  font-size: 1.35rem;
+  font-weight: 600;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.barButton:hover:not(:disabled),
+.barButton:focus-visible {
+  border-color: var(--trim-dim);
+}
+
+.barButton:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.barIcon {
+  color: var(--trim);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.menu {
+  margin-left: auto;
+}

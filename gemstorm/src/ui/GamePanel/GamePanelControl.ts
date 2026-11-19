@@ -3,7 +3,9 @@ import { Control } from '@/lib/Control';
 import { ProvinceCommandsControl } from '@/ui/ProvinceCommands/ProvinceCommandsControl';
 import { ProvinceInfoControl } from '@/ui/ProvinceInfo/ProvinceInfoControl';
 
+import { AdviceChosenEvent } from './AdviceChosenEvent';
 import { GamePanelView } from './GamePanelView';
+import { MenuChosenEvent } from './MenuChosenEvent';
 import type { GamePanelContext, GamePanelControls } from './types';
 
 export class GamePanelControl extends Control<
@@ -26,6 +28,7 @@ export class GamePanelControl extends Control<
   public showHint(): void {
     this.controls.provinceInfo.showHint();
     this.controls.provinceCommands.hide();
+    this.refreshAdvice();
   }
 
   public showProvince(province: Province): void {
@@ -36,14 +39,18 @@ export class GamePanelControl extends Control<
     } else {
       this.controls.provinceCommands.hide();
     }
+
+    this.refreshAdvice();
   }
 
   public hideCommands(): void {
     this.controls.provinceCommands.hide();
+    this.refreshAdvice();
   }
 
   public showProvinceInfo(province: Province): void {
     this.controls.provinceInfo.showProvince(province);
+    this.refreshAdvice();
   }
 
   public actualizeProvince(province: Province): void {
@@ -52,6 +59,21 @@ export class GamePanelControl extends Control<
 
   public pickTarget(province: Province): void {
     this.controls.provinceCommands.pickTarget(province);
+  }
+
+  public onMenu(handler: () => void): void {
+    this.subscribe(MenuChosenEvent, handler);
+  }
+
+  protected override onMount(): void {
+    this.subscribe(AdviceChosenEvent, () =>
+      this.controls.provinceCommands.consultAdvisor(),
+    );
+    this.context.advice.onDismiss(() => this.view.focusAdvice());
+  }
+
+  private refreshAdvice(): void {
+    this.view.enableAdvice(this.context.advice.isAvailable);
   }
 
   private isCommandsVisible(province: Province): boolean {

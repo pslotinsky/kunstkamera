@@ -1,0 +1,59 @@
+@use "@/ui/kit";
+
+.root {
+  display: contents;
+}
+
+.dialog {
+  @include kit.dialog(30rem);
+
+  margin: 0;
+  padding: 2rem 2.5rem 2.25rem;
+  font-size: 1.5rem;
+  line-height: 1.45;
+
+  &::backdrop {
+    background: #020b1b99;
+  }
+}
+
+.heading {
+  @include kit.display-type;
+
+  margin: 0 0 1.5rem;
+  color: var(--gold-text);
+  font-size: 2.5rem;
+  text-align: center;
+}
+
+.choices {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.choice {
+  @include kit.framed-button;
+
+  min-height: 4.25rem;
+}
+
+.warning {
+  margin: 0 0 1.5rem;
+  text-align: center;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.action {
+  @include kit.framed-button;
+
+  flex: 1;
+  min-height: 4.25rem;
+}
+
+.hidden {
+  display: none;
+}

@@ -6,7 +6,7 @@
 
 Begin on a title screen, choose a scenario, family, and advisor, then enter a fresh campaign. During play, consult the advisor for a word of counsel about the current province.
 
-After a campaign ends, return to the title to begin another. Mid-campaign quitting remains part of [Options / settings](../ROADMAP.md#18-options--settings).
+Quit to the title from the in-game Menu at any time, or after a campaign ends, and begin another. Saving before quitting remains part of [Save / load](../ROADMAP.md#17-save--load).
 
 ## Glossary
 
@@ -28,6 +28,13 @@ After a campaign ends, return to the title to begin another. Mid-campaign quitti
 - Open on the title screen with New Game and Options.
 - Options offers an All sounds switch and separate Music and SFX controls, each with an on/off switch and a 0–100% volume slider. Switching a channel off keeps its volume. All sounds disables the channel controls while retaining their choices.
 - The SFX slider previews a click when released. The chosen settings carry into the campaign.
+
+### Game menu
+
+- The game panel opens with a bar: Advisor on the left, Menu on the right. Both stay in place whatever the panel shows below.
+- Menu offers Resume, Options, and Quit to Title. Options is the same dialog as on the title. Closing the menu, by Resume or Escape, returns to play.
+- While the menu is open, time does not advance; computer turns wait.
+- Quit to Title asks first, since the campaign is not saved. Confirming ends the campaign, returns to the title with its music, and New Game then starts an independent one.
 
 ### Starting a campaign
 
@@ -55,7 +62,7 @@ After a campaign ends, return to the title to begin another. Mid-campaign quitti
 
 All four advisors share the same advice rules. Choosing one changes the portrait, name, and wording; it does not change what is advised, statistics, costs, success chances, or computer behaviour.
 
-- Show Advice as a small button with the advisor's portrait beside Skip Turn, which keeps most of the row, during an actionable, player-run province turn. Advice concerns that active province, irrespective of a rival province currently being inspected.
+- Enable Advisor in the panel bar during an actionable, player-run province turn; disable it otherwise. Without a chosen advisor the bar shows only Menu. Skip Turn keeps the whole bottom row. Advice concerns that active province, irrespective of a rival province currently being inspected.
 - Consultation is free and optional. It neither consumes an order nor changes resources, time, goodwill, or the outcomes of subsequent actions and events.
 - Show the advisor's portrait and name and one line of advice in their voice, with Close. Advice never opens or carries out an order; the player returns to the orders and decides.
 - Advice points at a need, not at a finished order. Only two lines name a province: the one urging an attack and the one pointing at an unclaimed neighbour.
@@ -221,11 +228,20 @@ The player loses their last province, acknowledges the ending, and inspects the 
 │                                                        │
 │                                        [ Close ]       │
 └────────────────────────────────────────────────────────┘
+
+┌─ Game panel ───────────┐   ┌─ Menu ─────────────────┐
+│ ? Advisor       ≡ Menu │   │          Menu          │
+│ ─────────◆──────────── │   │     [   Resume    ]    │
+│ [crest] Alderwyn       │   │     [   Options   ]    │
+│         5: Wintercairn │   │     [Quit to Title]    │
+│ ...                    │   └────────────────────────┘
+│ [      Skip Turn     ] │
+└────────────────────────┘
 ```
 
 All three setup screens share one layout: four selectable tiles, a preview of the selection under a divider, and the map with the start date on a plaque at its top-left corner and the scenario name written on the sea at its bottom-right. The Scenario screen's tiles show each scenario's name, and its start year appears on the map's date plaque; its preview shows a short introduction to the starting situation. The Advisor screen offers four portraits with names. The selected advisor's portrait, title, and a sample saying appear below them; the map highlights the chosen family's provinces, and the family's name appears under the scenario name. Begin starts the campaign.
 
-Reuse the existing visual language and map geometry. The setup map shows starting ownership without orders or turn markers. Highlight the selected family's provinces on the map and display its ruler: portrait, name, age, INT, WAR, CHA, and number of vassals. Selection works by keyboard and pointer, with visible focus, accessible labels, and focus restored to Advice when its dialog closes. Escape follows Back in setup and closes optional advice.
+Reuse the existing visual language and map geometry. The setup map shows starting ownership without orders or turn markers. Highlight the selected family's provinces on the map and display its ruler: portrait, name, age, INT, WAR, CHA, and number of vassals. Selection works by keyboard and pointer, with visible focus, accessible labels, and focus restored to Advisor when the advice dialog closes. Escape follows Back in setup, closes optional advice, and resumes play from the Menu.
 
 ### Title screen
 
@@ -347,4 +363,5 @@ When [Save / load](../ROADMAP.md#17-save--load) is available, retain the scenari
 - A victory shows the chosen advisor's portrait and closing line; a defeat shows neither.
 - Check opening reports and first player turns for families whose provinces occur later in turn order. Inspect a rival province and confirm Advice still concerns the active province.
 - Complete setup using only the keyboard, then close Advice and confirm focus returns to its button. The title theme continues across setup and switches to map music at campaign start; unavailable audio does not prevent play.
+- Opening the Menu holds the turn until it closes; Quit to Title asks first, and Stay returns to the menu. After quitting, the title shows with its music, and a new campaign starts cleanly.
 - Finish one campaign and begin another. Confirm no repeated reports, skipped turns, overlapping music, or effects carried over from the prior campaign. Confirm the same advisor remains after succession and consultation is unavailable during mandatory decisions or after the ending.

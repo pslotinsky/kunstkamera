@@ -6,7 +6,7 @@ import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { WorldFactory } from '@/core/WorldFactory';
 import { AdviceControl } from '@/ui/Advice/AdviceControl';
 import { CommandDialogsControl } from '@/ui/CommandDialogs/CommandDialogsControl';
-import { ProvinceCommandsControl } from '@/ui/ProvinceCommands/ProvinceCommandsControl';
+import { GamePanelControl } from '@/ui/GamePanel/GamePanelControl';
 
 import {
   advanceTo,
@@ -58,19 +58,18 @@ function setup(options: Options = {}) {
   );
   const dialogs = new CommandDialogsControl(context);
   const advice = new AdviceControl(context);
-  const commands = new ProvinceCommandsControl(
-    context.world,
-    createCommandGroups(context),
-    context.events,
+  const panel = new GamePanelControl({
+    ...context,
+    commands: createCommandGroups(context),
     dialogs,
     advice,
-  );
+  });
 
   advanceTo(context.world, options.isRivalTurn ? rivalSeat : home);
   dialogs.mount(document.createElement('div'));
   advice.mount(document.body.appendChild(document.createElement('div')));
-  commands.mount(document.body.appendChild(document.createElement('div')));
-  commands.show();
+  panel.mount(document.body.appendChild(document.createElement('div')));
+  panel.showProvince(home);
 
   return { ...context, home };
 }

@@ -1,9 +1,9 @@
 import { html, type TemplateResult } from 'lit-html';
 
 import { View } from '@/lib/View';
+import { OptionsChosenEvent } from '@/ui/Options/events/OptionsChosenEvent';
 
 import { NewGameChosenEvent } from './events/NewGameChosenEvent';
-import { OptionsChosenEvent } from './events/OptionsChosenEvent';
 import type { TitleScreenContext, TitleScreenViews } from './types';
 
 import styles from './TitleScreen.module.scss';

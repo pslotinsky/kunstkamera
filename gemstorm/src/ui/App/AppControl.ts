@@ -14,7 +14,7 @@ import { AppView } from './AppView';
 import type { AppContext, AppControls } from './types';
 
 export class AppControl extends Control<AppView, AppControls> {
-  private campaign?: CampaignControl;
+  private campaign?: CampaignControl | undefined;
 
   public constructor(context: AppContext) {
     super(AppView, context, {
@@ -79,8 +79,17 @@ export class AppControl extends Control<AppView, AppControls> {
       this.context.sounds,
     );
 
+    campaign.onQuit(() => this.quitCampaign());
     advisorSelect.hide();
-    campaign.mount(this.view.stage);
+    campaign.mount(this.view.openStage());
     this.campaign = campaign;
+  }
+
+  private quitCampaign(): void {
+    this.campaign?.unmount();
+    this.campaign = undefined;
+    this.view.clearStage();
+    this.context.sounds.playMusic('title');
+    this.controls.title.show();
   }
 }

@@ -56,8 +56,39 @@ function stage(): HTMLElement {
   return document.querySelector<HTMLElement>('[data-stage]')!;
 }
 
+function beginCampaign(family: string): void {
+  button('New Game').click();
+  document
+    .querySelector<HTMLButtonElement>(
+      '[data-tile-grid="scenarios"] [data-key="2"]',
+    )!
+    .click();
+  button('Next', scenarioSelect()).click();
+  familySelect()
+    .querySelector<HTMLButtonElement>(`[data-key="${family}"]`)!
+    .click();
+  button('Next', familySelect()).click();
+  advisorSelect()
+    .querySelector<HTMLButtonElement>('[data-key="Vesha"]')!
+    .click();
+  button('Begin', advisorSelect()).click();
+}
+
 beforeEach(() => {
   vi.useFakeTimers();
+  Object.defineProperty(HTMLDialogElement.prototype, 'showModal', {
+    configurable: true,
+    value(this: HTMLDialogElement) {
+      this.open = true;
+    },
+  });
+  Object.defineProperty(HTMLDialogElement.prototype, 'close', {
+    configurable: true,
+    value(this: HTMLDialogElement) {
+      this.open = false;
+      this.dispatchEvent(new Event('close'));
+    },
+  });
   Object.defineProperty(HTMLElement.prototype, 'checkVisibility', {
     configurable: true,
     value(this: HTMLElement): boolean {
@@ -82,6 +113,8 @@ afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
   vi.useRealTimers();
+  Reflect.deleteProperty(HTMLDialogElement.prototype, 'showModal');
+  Reflect.deleteProperty(HTMLDialogElement.prototype, 'close');
   if (visibility) {
     Object.defineProperty(HTMLElement.prototype, 'checkVisibility', visibility);
   } else {
@@ -155,22 +188,7 @@ describe('AppControl', () => {
     const family = scenario.playableFamilies[2]!;
     const create = vi.spyOn(CampaignControl, 'create');
     mount();
-    button('New Game').click();
-    document
-      .querySelector<HTMLButtonElement>(
-        '[data-tile-grid="scenarios"] [data-key="2"]',
-      )!
-      .click();
-    button('Next', scenarioSelect()).click();
-    familySelect()
-      .querySelector<HTMLButtonElement>(`[data-key="${family}"]`)!
-      .click();
-    button('Next', familySelect()).click();
-
-    advisorSelect()
-      .querySelector<HTMLButtonElement>('[data-key="Vesha"]')!
-      .click();
-    button('Begin', advisorSelect()).click();
+    beginCampaign(family);
 
     expect(create).toHaveBeenCalledWith(
       {
@@ -181,6 +199,27 @@ describe('AppControl', () => {
       expect.anything(),
     );
     expect(advisorSelect().checkVisibility()).toBe(false);
+    expect(stage().textContent).toContain(`Month 1, ${scenario.year}`);
+  });
+
+  it('quits a campaign from the game menu back to the title', () => {
+    const scenario = SCENARIOS[1]!;
+    const playMusic = vi.spyOn(SoundBoard.prototype, 'playMusic');
+    mount();
+    beginCampaign(scenario.playableFamilies[2]!);
+
+    stage()
+      .querySelector<HTMLButtonElement>('button[data-action="menu"]')!
+      .click();
+    button('Quit to Title', stage()).click();
+    button('Quit', stage()).click();
+
+    expect(stage().childElementCount).toBe(0);
+    expect(title().checkVisibility()).toBe(true);
+    expect(playMusic).toHaveBeenLastCalledWith('title');
+
+    beginCampaign(scenario.playableFamilies[2]!);
+
     expect(stage().textContent).toContain(`Month 1, ${scenario.year}`);
   });
 });

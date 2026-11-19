@@ -17,6 +17,7 @@ import { makeFamily, makeGeneral, makeProvince, makeWorld } from './factories';
 interface Fixture {
   readonly world: ReturnType<typeof makeWorld>['world'];
   readonly events: EventBus;
+  readonly engine: WorldEngine;
 }
 
 function createFixture(date: CalendarDate): Fixture {
@@ -58,7 +59,7 @@ function createFixture(date: CalendarDate): Fixture {
 
   engine.start();
 
-  return { world, events };
+  return { world, events, engine };
 }
 
 function drainMonth(fixture: Fixture): void {
@@ -85,6 +86,16 @@ describe('WorldEngine', () => {
 
     expect(world.turnQueue.current).toBe(province);
     expect(province.actionCount).toBe(1);
+  });
+
+  it('stops advancing turns once stopped', () => {
+    const { world, events, engine } = createFixture(new CalendarDate(1186, 4));
+    const province = world.turnQueue.current!;
+
+    engine.stop();
+    events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
+
+    expect(world.turnQueue.current).toBe(province);
   });
 
   it('keeps the current province after a free command', () => {

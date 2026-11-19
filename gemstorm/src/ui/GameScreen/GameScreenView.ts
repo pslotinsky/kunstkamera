@@ -30,6 +30,7 @@ export class GameScreenView extends View<GameScreenContext, GameScreenViews> {
           ${views.defenseDialog.template}
           ${views.campaignEnding.template}
         </div>
+        ${views.gameMenu.template}
       </div>
     `;
   }

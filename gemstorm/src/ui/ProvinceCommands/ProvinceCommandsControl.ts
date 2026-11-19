@@ -10,7 +10,6 @@ import type { EventBus } from '@/lib/EventBus';
 import type { AdviceControl } from '@/ui/Advice/AdviceControl';
 import type { CommandDialogsControl } from '@/ui/CommandDialogs/CommandDialogsControl';
 
-import { AdviceChosenEvent } from './AdviceChosenEvent';
 import type { AnyCommandDialogControl } from './CommandDialog/CommandDialogControl';
 import { CommandSelectedEvent } from './CommandSelectedEvent';
 import { ProvinceCommandsView } from './ProvinceCommandsView';
@@ -47,7 +46,6 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
 
   public show(): void {
     this.view.show();
-    this.view.enableAdvice(this.advice.isAvailable);
   }
 
   public hide(): void {
@@ -58,6 +56,14 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
     if (this.pending) {
       this.pending.dialog.chooseTarget(province);
       this.showStep();
+    }
+  }
+
+  public consultAdvisor(): void {
+    this.closeDialog();
+
+    if (this.advice.isAvailable) {
+      this.advice.consult();
     }
   }
 
@@ -76,8 +82,6 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
       this.selectCommand(event.command),
     );
     this.subscribe(StepChosenEvent, (event) => this.chooseStep(event.value));
-    this.subscribe(AdviceChosenEvent, () => this.consultAdvisor());
-    this.advice.onDismiss(() => this.view.focusAdvice());
 
     for (const dialog of this.dialogs.all) {
       dialog.onConfirm(() => this.completeCommand());
@@ -92,14 +96,6 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
 
   private showStep(): void {
     this.view.showStep(this.pending?.dialog.step);
-  }
-
-  private consultAdvisor(): void {
-    this.closeDialog();
-
-    if (this.advice.isAvailable) {
-      this.advice.consult();
-    }
   }
 
   private selectCommand(command: WorldCommand): void {
