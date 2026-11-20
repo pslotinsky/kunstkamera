@@ -71,7 +71,7 @@ export class AllyCommand extends ProvinceCommand {
     this.publish(
       new MissionReportedEvent(province, { kind: 'break', family: ally }),
     );
-    this.complete(province);
+    this.complete(province, ALLY_GOODWILL);
   }
 
   private propose(province: Province, family: Family, other: Family): void {

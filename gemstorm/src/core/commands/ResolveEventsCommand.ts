@@ -1,6 +1,6 @@
-import type { Incident } from '@/core/domain/Incident';
 import type { Province } from '@/core/domain/Province';
-import { ProvinceEvents } from '@/core/domain/ProvinceEvents';
+import type { Incident } from '@/core/domain/province-events/Incident';
+import { ProvinceEventResolver } from '@/core/domain/province-events/ProvinceEventResolver';
 import { IncidentReportedEvent } from '@/core/events/IncidentReportedEvent';
 
 import { WorldCommand, type WorldCommandContext } from './WorldCommand';
@@ -27,8 +27,8 @@ export class ResolveEventsCommand extends WorldCommand {
 
   public execute(): void {
     const { world } = this.context;
-    const events = new ProvinceEvents(world.map.provinces, world.date);
-    this.pending = events.resolve();
+    const resolver = new ProvinceEventResolver(world);
+    this.pending = resolver.resolve();
     this.publishUpdates(this.pending.map((incident) => incident.province));
   }
 }

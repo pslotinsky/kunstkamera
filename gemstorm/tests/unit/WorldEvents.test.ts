@@ -51,17 +51,17 @@ describe('Province turn event reports', () => {
     });
     new WorldEngine(world, events).start();
 
-    expect(order).toEqual(['turn', 'fire', 'plague']);
-    expect(province.resources.food).toBe(575);
+    expect(order).toEqual(['turn', 'plague', 'fire']);
+    expect(province.resources.food).toBe(460);
     expect(root.querySelector('[data-title]')?.textContent).toBe(
-      'Alderpass — Fire',
+      'Alderpass — Plague',
     );
     expect(root.querySelector('[data-detail]')?.textContent).toBe('');
     expect(root.querySelector('[data-pending]')?.textContent).toBe('');
     proceed.click();
     await Promise.resolve();
     expect(root.querySelector('[data-title]')?.textContent).toBe(
-      'Alderpass — Plague',
+      'Alderpass — Fire',
     );
     expect(order).toHaveLength(3);
     proceed.click();
@@ -69,7 +69,7 @@ describe('Province turn event reports', () => {
     expect(root.classList.contains(styles.hidden!)).toBe(true);
     expect(province.actionCount).toBe(0);
     events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
-    expect(order).toEqual(['turn', 'fire', 'plague', 'turn']);
+    expect(order).toEqual(['turn', 'plague', 'fire', 'turn']);
     announcements.unmount();
   });
 

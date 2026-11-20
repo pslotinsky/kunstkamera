@@ -2,7 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { CalendarDate } from '@/core/domain/CalendarDate';
-import { ProvinceEvents } from '@/core/domain/ProvinceEvents';
+import { ProvinceEventResolver } from '@/core/domain/province-events/ProvinceEventResolver';
 import { IncidentReportedEvent } from '@/core/events/IncidentReportedEvent';
 import { SoundBoard } from '@/ui/common/sound/SoundBoard';
 import { StrategyScreenControl } from '@/ui/screens/StrategyScreen/StrategyScreenControl';
@@ -80,7 +80,11 @@ function setup() {
       province.recordAction(1);
     }
     const date = disaster ? new CalendarDate(world.date.year, 6) : world.date;
-    const incidents = new ProvinceEvents([province], date, () => 0).resolve();
+    const fixture = makeWorld([province], world.player, date);
+    const incidents = new ProvinceEventResolver(
+      fixture.world,
+      () => 0,
+    ).resolve();
     for (const incident of incidents) {
       events.publish(new IncidentReportedEvent(incident));
     }

@@ -42,6 +42,15 @@ export class HireMonsterCommand extends ProvinceCommand {
     }
   }
 
+  protected override recordAction(goodwill: number): void {
+    const { world } = this.context;
+    const province = this.currentProvince;
+
+    if (province && !world.isPlayerRun(province)) {
+      super.recordAction(goodwill);
+    }
+  }
+
   private runHire(): void {
     const province = this.currentProvince;
     const unit = this.chosen ? HiredUnit.ofName(this.chosen) : undefined;

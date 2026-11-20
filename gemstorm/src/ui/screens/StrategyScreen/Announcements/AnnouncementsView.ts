@@ -2,8 +2,8 @@ import { html, type TemplateResult } from 'lit-html';
 
 import { Coronation } from '@/core/domain/Coronation';
 import type { Disbanding } from '@/core/domain/Disbanding';
-import type { Incident } from '@/core/domain/Incident';
 import type { SabotageDamage } from '@/core/domain/Infiltration';
+import type { Incident } from '@/core/domain/province-events/Incident';
 import type { World } from '@/core/domain/World';
 import type { AllianceOfferedEvent } from '@/core/events/AllianceOfferedEvent';
 import type { ArtifactFoundEvent } from '@/core/events/ArtifactFoundEvent';
@@ -136,9 +136,10 @@ export class AnnouncementsView extends View<
   }
 
   public showIncident(incident: Incident, pending: number): void {
-    const detail = incident.definition.grantsNerith
-      ? 'Available for one battle. No upkeep.'
-      : '';
+    const { definition } = incident;
+    const recruitsNerith =
+      definition.kind === 'good' && definition.effect.kind === 'nerith';
+    const detail = recruitsNerith ? 'Available for one battle. No upkeep.' : '';
     const text = incident.monster
       ? `The ${incident.monster} went on a rampage, ravaging the land.`
       : incident.definition.description.replace(
