@@ -243,24 +243,28 @@ describe('Invasion', () => {
     expect(target.hiredUnits).not.toContain(grimhides);
   });
 
-  it('brings a hired Fifth Unit that survived back with the province', () => {
-    const { invasion, target, attacker } = setup();
+  it('keeps a surviving hired Fifth Unit at its remaining battle strength', () => {
+    const { invasion, target } = setup();
     const grimhides = HiredUnit.ofName('Grimhides')!;
 
     target.addUnit(grimhides);
-    invasion.begin();
-    invasion.conclude(
-      makeOutcome({
-        winner: BattleSide.attacker,
-        reason: 'flag',
-        days: 2,
-        attackerSurvivors: attacker.troops,
-        defenderSurvivors: 0,
-      }),
-    );
+    invasion.muster();
+    const battle = invasion.answer({ answer: 'fight', unit: grimhides });
+    expect(battle).toBeInstanceOf(Battle);
+    if (battle instanceof Battle) {
+      const defender = battle
+        .getUnits(BattleSide.defender)
+        .find((unit) => unit.isFifthUnit)!;
+      defender.strength = 74;
+      battle.retreat(BattleSide.attacker);
+
+      invasion.conclude(battle.findOutcome()!);
+    }
 
     expect(target.hiredUnits).toContain(grimhides);
+    expect(grimhides.strength).toBe(74);
   });
+
   it('rests the gem it summoned a Guardian from', () => {
     const { invasion, rival, attacker, world } = setup();
     const gem = Gem.ofName('Asterion');

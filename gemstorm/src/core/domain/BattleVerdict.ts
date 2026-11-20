@@ -1,6 +1,6 @@
 import type { Battle } from './Battle';
 import { BattleOutcome, type OutcomeReason } from './BattleOutcome';
-import { BattleSide } from './BattleSide';
+import { BattleSide, type BattleSideName } from './BattleSide';
 
 interface Ending {
   readonly winner: BattleSide;
@@ -80,7 +80,21 @@ export class BattleVerdict {
     );
   }
 
+  private collectFifthUnitStrengths(): Partial<Record<BattleSideName, number>> {
+    const strengths: Partial<Record<BattleSideName, number>> = {};
+
+    for (const unit of this.battle.units) {
+      if (unit.isFifthUnit) {
+        strengths[unit.side.name] = unit.strength;
+      }
+    }
+
+    return strengths;
+  }
+
   private decide(ending: Ending): BattleOutcome {
+    const fifthUnitStrengths = this.collectFifthUnitStrengths();
+
     return new BattleOutcome({
       winner: ending.winner,
       reason: ending.reason,
@@ -88,6 +102,7 @@ export class BattleVerdict {
       attackerSurvivors: this.battle.attacker.troops,
       defenderSurvivors: this.battle.defender.troops,
       lostUnits: this.findLostUnits(),
+      fifthUnitStrengths,
     });
   }
 }

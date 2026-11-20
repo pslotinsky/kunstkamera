@@ -1,28 +1,58 @@
+import type { Province } from '../Province';
 import type { World } from '../World';
 import { DisasterEventResolver } from './DisasterEventResolver';
 import { GoodwillEventResolver } from './GoodwillEventResolver';
+import {
+  HiredUnitSelector,
+  type StationedHiredUnit,
+} from './HiredUnitSelector';
 import type { Incident } from './Incident';
+import { MercenaryDesertionResolver } from './MercenaryDesertionResolver';
 import { RampageEventResolver } from './RampageEventResolver';
 
+export interface ProvinceEventResolution {
+  readonly incidents: readonly Incident[];
+  readonly desertion: StationedHiredUnit | undefined;
+}
+
 export class ProvinceEventResolver {
+  private readonly disasters: DisasterEventResolver;
+  private readonly rampages: RampageEventResolver;
+  private readonly goodwill: GoodwillEventResolver;
+  private readonly mercenaryDesertion: MercenaryDesertionResolver;
+
   public constructor(
     private readonly world: World,
-    private readonly random: () => number = Math.random,
-  ) {}
+    random: () => number = Math.random,
+  ) {
+    const hiredUnitSelector = new HiredUnitSelector(random);
 
-  public resolve(): readonly Incident[] {
-    const provinces = this.world.map.provinces
+    this.disasters = new DisasterEventResolver(random);
+    this.rampages = new RampageEventResolver(hiredUnitSelector, random);
+    this.goodwill = new GoodwillEventResolver(world, random);
+    this.mercenaryDesertion = new MercenaryDesertionResolver(hiredUnitSelector);
+  }
+
+  public resolve(): ProvinceEventResolution {
+    const provinces = this.getOwnedProvinces();
+    const { date } = this.world;
+    const disasterAndRampageIncidents = [
+      ...this.disasters.resolve(provinces, date),
+      ...this.rampages.resolve(provinces, date),
+    ];
+
+    const desertion = this.mercenaryDesertion.resolve(provinces);
+    const incidents = [
+      ...disasterAndRampageIncidents,
+      ...this.goodwill.resolve(provinces),
+    ];
+
+    return { incidents, desertion };
+  }
+
+  private getOwnedProvinces(): readonly Province[] {
+    return this.world.map.provinces
       .filter((province) => province.hasOwner())
       .sort((left, right) => left.number - right.number);
-    const { date } = this.world;
-    const disasters = new DisasterEventResolver(date, this.random);
-    const rampages = new RampageEventResolver(date, this.random);
-    const goodwill = new GoodwillEventResolver(this.world, this.random);
-
-    return [
-      ...disasters.resolve(provinces),
-      ...rampages.resolve(provinces),
-      ...goodwill.resolve(provinces),
-    ];
   }
 }

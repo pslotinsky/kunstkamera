@@ -1,3 +1,5 @@
+import { isDefined } from '@/lib/value/isDefined';
+
 import { Army } from './Army';
 import { Battle } from './Battle';
 import { Battlefield } from './Battlefield';
@@ -9,6 +11,7 @@ import { DefensePolicy } from './DefensePolicy';
 import type { Family } from './Family';
 import type { FifthUnit } from './FifthUnit';
 import type { General } from './General';
+import { HiredUnit } from './HiredUnit';
 import { InvasionReport, type InvasionReportParams } from './InvasionReport';
 import type { Province } from './Province';
 import type { World } from './World';
@@ -193,6 +196,7 @@ export class Invasion {
     if (report.isFought) {
       this.applyLosses(report.defender);
       this.buryUnits(report);
+      this.persistHiredUnitStrengths(report);
       this.restGems(report);
     }
 
@@ -247,6 +251,39 @@ export class Invasion {
       outcome.hasLostUnit(BattleSide.defender)
     ) {
       this.dismiss(report.defender.unit, this.target);
+    }
+  }
+
+  private persistHiredUnitStrengths(report: InvasionReport): void {
+    const { outcome } = report;
+
+    if (outcome) {
+      this.persistHiredUnitStrength(
+        report.attacker.unit,
+        outcome,
+        BattleSide.attacker,
+      );
+      this.persistHiredUnitStrength(
+        report.defender.unit,
+        outcome,
+        BattleSide.defender,
+      );
+    }
+  }
+
+  private persistHiredUnitStrength(
+    unit: FifthUnit | undefined,
+    outcome: BattleOutcome,
+    side: BattleSide,
+  ): void {
+    const strength = outcome.getFifthUnitStrength(side);
+
+    if (
+      unit instanceof HiredUnit &&
+      isDefined(strength) &&
+      !outcome.hasLostUnit(side)
+    ) {
+      unit.retainBattleStrength(strength);
     }
   }
 

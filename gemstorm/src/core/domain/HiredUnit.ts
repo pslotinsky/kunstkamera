@@ -2,6 +2,8 @@ import { HIRED_UNITS } from '@/config/fifth-units';
 
 import { FifthUnit, type FifthUnitParams } from './FifthUnit';
 
+const RECOVERY_DIVISOR = 6;
+
 export type UnitCategory = 'monster' | 'mercenary';
 
 export interface HiredUnitParams extends FifthUnitParams {
@@ -44,9 +46,23 @@ export class HiredUnit extends FifthUnit {
     return false;
   }
 
-  public getDesertionRisk(fame: number): number {
-    return fame < this.fameToKeep
-      ? (this.fameToKeep - fame) / this.fameToKeep
-      : 0;
+  public needsMoreFame(fame: number): boolean {
+    return fame < this.fameToKeep;
+  }
+
+  public retainBattleStrength(strength: number): void {
+    this.currentStrength = Math.max(
+      0,
+      Math.min(strength, this.currentStrength),
+    );
+  }
+
+  public recover(): void {
+    const recovered = Math.floor(this.maximumStrength / RECOVERY_DIVISOR);
+
+    this.currentStrength = Math.min(
+      this.maximumStrength,
+      this.strength + recovered,
+    );
   }
 }

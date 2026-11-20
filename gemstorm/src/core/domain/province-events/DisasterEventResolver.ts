@@ -10,21 +10,21 @@ import { IncidentBuilder } from './IncidentBuilder';
 const MAX_DISASTER_PROTECTION = 100;
 
 export class DisasterEventResolver {
-  public constructor(
-    private readonly date: CalendarDate,
-    private readonly random: () => number,
-  ) {}
+  public constructor(private readonly random: () => number) {}
 
-  public resolve(provinces: readonly Province[]): readonly Incident[] {
+  public resolve(
+    provinces: readonly Province[],
+    date: CalendarDate,
+  ): readonly Incident[] {
     const incidents: Incident[] = [];
 
     const activeDisasters = DISASTERS.filter((disaster) =>
-      disaster.months.includes(this.date.month),
+      disaster.months.includes(date.month),
     );
 
     for (const disaster of activeDisasters) {
       for (const province of provinces) {
-        const incident = this.resolveProvince(disaster, province);
+        const incident = this.resolveProvince(disaster, province, date);
 
         if (isDefined(incident)) {
           incidents.push(incident);
@@ -38,11 +38,12 @@ export class DisasterEventResolver {
   private resolveProvince(
     disaster: DisasterDefinition,
     province: Province,
+    date: CalendarDate,
   ): Incident | undefined {
     const eligible = disaster.provinces?.includes(province.number) ?? true;
     const occurs = eligible && this.rollDisaster(disaster, province);
 
-    return occurs ? this.apply(disaster, province) : undefined;
+    return occurs ? this.apply(disaster, province, date) : undefined;
   }
 
   private rollDisaster(
@@ -59,12 +60,13 @@ export class DisasterEventResolver {
   private apply(
     disaster: DisasterDefinition,
     province: Province,
+    date: CalendarDate,
   ): Incident | undefined {
     const incidentBuilder = new IncidentBuilder(province);
 
     this.applyLosses(disaster, province);
 
-    const incident = incidentBuilder.build(disaster, this.date);
+    const incident = incidentBuilder.build(disaster, date);
 
     return incident.changes.length > 0 ? incident : undefined;
   }

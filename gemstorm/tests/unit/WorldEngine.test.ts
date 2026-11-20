@@ -3,12 +3,15 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { RecruitCommand } from '@/core/commands/province/RecruitCommand';
 import { TradeCommand } from '@/core/commands/province/TradeCommand';
 import { CalendarDate } from '@/core/domain/CalendarDate';
+import { HiredUnit } from '@/core/domain/HiredUnit';
+import { IncidentReportedEvent } from '@/core/events/IncidentReportedEvent';
 import { MonthStartedEvent } from '@/core/events/MonthStartedEvent';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { TurnHeldEvent } from '@/core/events/TurnHeldEvent';
 import { TurnReleasedEvent } from '@/core/events/TurnReleasedEvent';
 import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
+import { UnitDesertedEvent } from '@/core/events/UnitDesertedEvent';
 import { WorldEngine } from '@/core/WorldEngine';
 import { EventBus } from '@/lib/EventBus';
 
@@ -201,6 +204,45 @@ describe('WorldEngine', () => {
     expect(fixture.world.date.month).toBe(5);
     expect(playerProvince.resources.gold).toBe(500);
     expect(playerProvince.resources.food).toBe(400);
+  });
+
+  it('removes unpaid units before rampage and restores paid units before the first turn', () => {
+    const family = makeFamily({ fame: 12 });
+    const province = makeProvince({
+      family,
+      gold: 20,
+      loyalty: 80,
+      cultivation: 100,
+    });
+    const spearmen = HiredUnit.ofName('Spearmen')!;
+    spearmen.retainBattleStrength(90);
+    province.addUnit(spearmen);
+    const monster = HiredUnit.ofName('Ogre')!;
+    monster.retainBattleStrength(74);
+    province.addUnit(monster);
+    const march = new CalendarDate(1186, 3);
+    const { world, events } = makeWorld([province], family, march);
+    const desertions: UnitDesertedEvent[] = [];
+    const incidents: string[] = [];
+    const strengthAtTurnStart: number[] = [];
+
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    events.subscribe(UnitDesertedEvent, (event) => desertions.push(event));
+    events.subscribe(IncidentReportedEvent, (event) =>
+      incidents.push(event.incident.definition.kind),
+    );
+    events.subscribe(TurnStartedEvent, () =>
+      strengthAtTurnStart.push(spearmen.strength),
+    );
+    new WorldEngine(world, events).start();
+
+    expect(desertions).toEqual([
+      new UnitDesertedEvent(province, monster, 'unpaid'),
+    ]);
+    expect(incidents).toEqual(['disaster']);
+    expect(province.hiredUnits).toEqual([spearmen]);
+    expect(strengthAtTurnStart).toEqual([115]);
+    expect(monster.strength).toBe(74);
   });
 
   it("stops the clock once the player's family is no more", () => {

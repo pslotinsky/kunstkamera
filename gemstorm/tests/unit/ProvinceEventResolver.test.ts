@@ -57,15 +57,19 @@ describe('Province events', () => {
     province.recordAction(1);
     const random = vi.fn(() => 0.99);
 
-    expect(createResolver([province], APRIL, random).resolve()).toEqual([]);
+    expect(
+      createResolver([province], APRIL, random).resolve().incidents,
+    ).toEqual([]);
     expect(random).not.toHaveBeenCalled();
     expect(province.actionCount).toBe(2);
     province.recordAction(1);
     expect(province.isEventDue).toBe(true);
-    expect(createResolver([province], APRIL, random).resolve()).toEqual([]);
+    expect(
+      createResolver([province], APRIL, random).resolve().incidents,
+    ).toEqual([]);
     expect(province.actionCount).toBe(0);
     expect(province.goodwill).toBe(0);
-    createResolver([province], APRIL, () => 0).resolve();
+    createResolver([province], APRIL, () => 0).resolve().incidents;
     expect(province.development.cultivation).toBe(100);
   });
 
@@ -74,7 +78,9 @@ describe('Province events', () => {
     completeCycle(province, 0);
     const random = vi.fn(() => 0);
 
-    expect(createResolver([province], APRIL, random).resolve()).toEqual([]);
+    expect(
+      createResolver([province], APRIL, random).resolve().incidents,
+    ).toEqual([]);
     expect(random).not.toHaveBeenCalled();
     expect(province.actionCount).toBe(0);
   });
@@ -94,7 +100,8 @@ describe('Province events', () => {
     const { world } = makeWorld([province, distantProvince], family, APRIL);
     completeCycle(province, -1);
 
-    const [incident] = new ProvinceEventResolver(world, () => 0).resolve();
+    const [incident] = new ProvinceEventResolver(world, () => 0).resolve()
+      .incidents;
 
     expect(incident?.definition.image).toBe('banshee');
     expect(incident?.recipient).toBe(courtier.name);
@@ -109,7 +116,8 @@ describe('Province events', () => {
     province.recordAction(1);
     province.recordAction(0);
     const random = vi.fn().mockReturnValueOnce(0).mockReturnValue(0.45);
-    const [incident] = createResolver([province], APRIL, random).resolve();
+    const [incident] = createResolver([province], APRIL, random).resolve()
+      .incidents;
 
     expect(incident?.definition.image).toBe('far-gorta');
     expect(incident?.changes).toEqual([
@@ -123,7 +131,8 @@ describe('Province events', () => {
     family.homeProvince = makeProvince({ number: 1, family, governor: lord });
     completeCycle(province);
     const random = vi.fn().mockReturnValueOnce(0).mockReturnValue(0.1);
-    const [incident] = createResolver([province], APRIL, random).resolve();
+    const [incident] = createResolver([province], APRIL, random).resolve()
+      .incidents;
 
     expect(incident?.definition.image).toBe('unicorn');
     expect(incident?.recipient).toBe(lord.name);
@@ -149,16 +158,18 @@ describe('Province events', () => {
       [province],
       APRIL,
       selectNerith(),
-    ).resolve();
+    ).resolve().incidents;
     completeCycle(province);
-    const repeat = createResolver([province], APRIL, selectNerith()).resolve();
+    const repeat = createResolver([province], APRIL, selectNerith()).resolve()
+      .incidents;
     completeCycle(guarded);
     const guardedRoll = vi
       .fn()
       .mockReturnValueOnce(0.99)
       .mockReturnValueOnce(0)
       .mockReturnValue(0.99);
-    const blocked = createResolver([guarded], APRIL, guardedRoll).resolve();
+    const blocked = createResolver([guarded], APRIL, guardedRoll).resolve()
+      .incidents;
 
     expect(incident?.definition.image).toBe('nerith');
     expect(repeat).toEqual([]);
@@ -178,7 +189,9 @@ describe('Province events', () => {
 
     expect(province.isEventDue).toBe(false);
     expect(province.goodwill).toBe(0);
-    expect(createResolver([province], APRIL, () => 0).resolve()).toEqual([]);
+    expect(
+      createResolver([province], APRIL, () => 0).resolve().incidents,
+    ).toEqual([]);
   });
 
   it('applies plague before flood and preserves both damage snapshots', () => {
@@ -187,7 +200,7 @@ describe('Province events', () => {
       [province],
       new CalendarDate(1186, 6),
       () => 0,
-    ).resolve();
+    ).resolve().incidents;
 
     expect(plague?.definition.image).toBe('plague');
     expect(plague?.changes).toContainEqual({
@@ -219,7 +232,7 @@ describe('Province events', () => {
       [unowned, beyond, wetland],
       new CalendarDate(1186, 6),
       () => 0,
-    ).resolve();
+    ).resolve().incidents;
 
     expect(
       incidents.map((incident) => [
@@ -232,7 +245,9 @@ describe('Province events', () => {
       ['flood', 17],
     ]);
     expect(unowned.development.cultivation).toBe(100);
-    expect(createResolver([wetland], APRIL, () => 0).resolve()).toEqual([]);
+    expect(
+      createResolver([wetland], APRIL, () => 0).resolve().incidents,
+    ).toEqual([]);
   });
 
   it('uses Loyalty to prevent fire and Protection to absorb its damage', () => {
@@ -250,7 +265,8 @@ describe('Province events', () => {
       .mockReturnValueOnce(0.99)
       .mockReturnValue(0);
 
-    const incidents = createResolver(provinces, date, random).resolve();
+    const incidents = createResolver(provinces, date, random).resolve()
+      .incidents;
 
     expect(incidents.map((incident) => incident.province.number)).toEqual([10]);
     expect(
@@ -258,23 +274,62 @@ describe('Province events', () => {
     ).toEqual([100, 100, 80]);
   });
 
-  it('can rampage during good management without counted actions, but never blames mercenaries or Nerith', () => {
-    const { province } = setup(200);
+  it('rolls one monster across the map and bases damage on its current Strength', () => {
+    const { province, family } = setup(200);
+    family.fame = 0;
+    const otherProvince = makeProvince({
+      number: 18,
+      family,
+      cultivation: 100,
+    });
     const monster = HiredUnit.ofName('Grimhides')!;
-    const mercenary = HiredUnit.ofName('Spearmen')!;
+    monster.retainBattleStrength(74);
     province.addUnit(monster);
-    province.addUnit(mercenary);
     province.addUnit(new Nerith());
+    otherProvince.addUnit(HiredUnit.ofName('Grimhides')!);
     province.recordAction(1);
-    const [incident] = createResolver([province], APRIL, () => 0).resolve();
 
-    expect(incident?.definition.kind).toBe('rampage');
-    expect(incident?.monster).toBe('Grimhides');
-    expect(province.hiredUnits).toEqual([monster, mercenary]);
-    expect(province.development.cultivation).toBe(90);
+    const { incidents } = createResolver(
+      [otherProvince, province],
+      APRIL,
+      () => 0,
+    ).resolve();
+
+    expect(incidents.map((incident) => incident.monster)).toEqual([
+      'Grimhides',
+    ]);
+    expect(incidents[0]?.province).toBe(province);
+    expect(province.resources.gold).toBe(90);
+    expect(province.resources.food).toBe(980);
+    expect(province.development.cultivation).toBe(98);
+    expect(province.development.protection).toBe(200);
+    expect(otherProvince.development.cultivation).toBe(100);
     expect(province.actionCount).toBe(1);
-    province.removeUnit(monster);
-    expect(createResolver([province], APRIL, () => 0).resolve()).toEqual([]);
+    expect(monster.strength).toBe(74);
+    expect(province.hiredUnits).toContain(monster);
+  });
+
+  it('checks only the selected mercenary against its Fame requirement', () => {
+    const { province, family } = setup();
+    family.fame = 12;
+    const spearmen = HiredUnit.ofName('Spearmen')!;
+    const lancers = HiredUnit.ofName('Lancers')!;
+    province.addUnit(spearmen);
+    province.addUnit(lancers);
+
+    const safeRoll = createResolver([province], APRIL, () => 0).resolve();
+
+    expect(safeRoll.desertion).toBeUndefined();
+    const checkLancers = vi.fn().mockReturnValueOnce(0).mockReturnValue(0.99);
+    const { desertion } = createResolver(
+      [province],
+      APRIL,
+      checkLancers,
+    ).resolve();
+
+    expect(desertion).toEqual({ province, unit: lancers });
+    expect(province.hiredUnits).toEqual([spearmen]);
+    expect(province.hirePool).toContain(lancers.name);
   });
 
   it('rolls the same harmful policy event for both protection levels', () => {
@@ -287,16 +342,13 @@ describe('Province events', () => {
     }
     const random = () => 0.25;
 
-    const [exposedIncident] = createResolver(
-      [exposed],
-      APRIL,
-      random,
-    ).resolve();
+    const [exposedIncident] = createResolver([exposed], APRIL, random).resolve()
+      .incidents;
     const [protectedIncident] = createResolver(
       [protectedProvince],
       APRIL,
       random,
-    ).resolve();
+    ).resolve().incidents;
 
     expect(exposedIncident?.definition.image).toBe('durahan');
     expect(protectedIncident?.definition.image).toBe('durahan');

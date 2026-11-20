@@ -46,7 +46,7 @@ export class Province {
   public actionCount = 0;
   public governor?: General | undefined;
   public stationedUnits: readonly FifthUnit[] = [];
-  public readonly hirePool: readonly string[];
+  private availableForHire: readonly string[];
 
   private house: Family | undefined;
   private entrusted = false;
@@ -60,7 +60,7 @@ export class Province {
     this.governor = params.governor;
     this.resources = params.resources ?? Resources.empty();
     this.development = params.development ?? Development.empty();
-    this.hirePool = params.hirePool ?? [];
+    this.availableForHire = params.hirePool ?? [];
   }
 
   public get family(): Family | undefined {
@@ -103,6 +103,18 @@ export class Province {
 
   public cancelEntrust(): void {
     this.entrusted = false;
+  }
+
+  public get hirePool(): readonly string[] {
+    return this.availableForHire;
+  }
+
+  public returnToHirePool(unit: HiredUnit): void {
+    this.removeUnit(unit);
+
+    if (!this.availableForHire.includes(unit.name)) {
+      this.availableForHire = [...this.availableForHire, unit.name];
+    }
   }
 
   public get hiredUnits(): readonly HiredUnit[] {

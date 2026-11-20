@@ -1,80 +1,66 @@
-import { EVENT_BALANCE, RAMPAGE } from '@/config/province-events';
-import { sample } from '@/lib/array/sample';
+import { RAMPAGE } from '@/config/province-events';
 import { isDefined } from '@/lib/value/isDefined';
 
 import type { CalendarDate } from '../CalendarDate';
-import type { DevelopmentGains } from '../Development';
+import type { HiredUnit } from '../HiredUnit';
 import type { Province } from '../Province';
+import type { HiredUnitSelector } from './HiredUnitSelector';
 import type { Incident } from './Incident';
 import { IncidentBuilder } from './IncidentBuilder';
 
+const MIN_RESOURCE_LOSS = 10;
+const MAX_RESOURCE_LOSS = 30;
+const STRENGTH_PER_DEVELOPMENT_LOSS = 25;
+
 export class RampageEventResolver {
   public constructor(
-    private readonly date: CalendarDate,
+    private readonly hiredUnitSelector: HiredUnitSelector,
     private readonly random: () => number,
   ) {}
 
-  public resolve(provinces: readonly Province[]): readonly Incident[] {
-    const incidents: Incident[] = [];
-
-    for (const province of provinces) {
-      const incident = this.resolveProvince(province);
-
-      if (isDefined(incident)) {
-        incidents.push(incident);
-      }
-    }
-
-    return incidents;
-  }
-
-  private resolveProvince(province: Province): Incident | undefined {
-    const monsters = province.hiredUnits.filter(
-      (unit) => unit.category === 'monster',
-    );
+  public resolve(
+    provinces: readonly Province[],
+    date: CalendarDate,
+  ): readonly Incident[] {
+    const candidate = this.hiredUnitSelector.select(provinces, 'monster');
     let incident: Incident | undefined;
 
-    if (
-      monsters.length > 0 &&
-      this.canRampage(province) &&
-      this.random() < EVENT_BALANCE.rampageChance
-    ) {
-      const monster = sample(monsters, this.random);
+    if (isDefined(candidate)) {
+      const { province, unit } = candidate;
+      const fame = province.family?.fame ?? 0;
 
-      incident = this.apply(province, monster.name);
-    }
-
-    return incident;
-  }
-
-  private apply(province: Province, monster: string): Incident {
-    const incidentBuilder = new IncidentBuilder(province);
-    const development = this.calculateLosses(province);
-
-    province.reduceDevelopment(development);
-
-    return incidentBuilder.build(RAMPAGE, this.date, { monster });
-  }
-
-  private calculateLosses(province: Province): DevelopmentGains {
-    const { protection } = province.development;
-    const damageShare = 1 - protection / EVENT_BALANCE.rampageProtectionScale;
-    const losses: DevelopmentGains = {};
-
-    for (const [key] of province.development.entries) {
-      const damage = RAMPAGE.development?.[key];
-
-      if (isDefined(damage)) {
-        losses[key] = -Math.trunc(damage * damageShare);
+      if (unit.needsMoreFame(fame)) {
+        incident = this.apply(province, unit, date);
       }
     }
 
-    return losses;
+    return isDefined(incident) ? [incident] : [];
   }
 
-  private canRampage(province: Province): boolean {
-    return province.development.entries.some(
-      ([key, value]) => value > 0 && isDefined(RAMPAGE.development?.[key]),
+  private apply(
+    province: Province,
+    monster: HiredUnit,
+    date: CalendarDate,
+  ): Incident {
+    const incidentBuilder = new IncidentBuilder(province);
+    const gold = this.rollResourceLoss();
+    const food = this.rollResourceLoss();
+    const developmentLoss = Math.floor(
+      monster.strength / STRENGTH_PER_DEVELOPMENT_LOSS,
     );
+
+    province.reduceResources({ gold, food });
+    province.reduceDevelopment({
+      loyalty: developmentLoss,
+      cultivation: developmentLoss,
+    });
+
+    return incidentBuilder.build(RAMPAGE, date, { monster: monster.name });
+  }
+
+  private rollResourceLoss(): number {
+    const range = MAX_RESOURCE_LOSS - MIN_RESOURCE_LOSS + 1;
+
+    return MIN_RESOURCE_LOSS + Math.floor(this.random() * range);
   }
 }

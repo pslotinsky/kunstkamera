@@ -2,6 +2,7 @@ import { ComputerPlayer } from '@/core/ai/ComputerPlayer';
 import { CommandExecutor } from '@/core/CommandExecutor';
 import { ConcludeBattleCommand } from '@/core/commands/ConcludeBattleCommand';
 import { LifecycleCommand } from '@/core/commands/LifecycleCommand';
+import { RecoverHiredUnitsCommand } from '@/core/commands/RecoverHiredUnitsCommand';
 import { ResolveEventsCommand } from '@/core/commands/ResolveEventsCommand';
 import { TaxAndHarvestCommand } from '@/core/commands/TaxAndHarvestCommand';
 import { UpkeepCommand } from '@/core/commands/UpkeepCommand';
@@ -27,6 +28,7 @@ export class WorldEngine {
   private readonly taxAndHarvest: TaxAndHarvestCommand;
   private readonly upkeep: UpkeepCommand;
   private readonly provinceEvents: ResolveEventsCommand;
+  private readonly hiredUnitRecovery: RecoverHiredUnitsCommand;
   private readonly holders = new Set<object>();
   private readonly lifetime = new AbortController();
 
@@ -37,6 +39,7 @@ export class WorldEngine {
     | 'lifecycle'
     | 'events'
     | 'harvest'
+    | 'recovery'
     | 'market'
     | 'waiting-turn'
     | 'reporting-turn'
@@ -56,6 +59,7 @@ export class WorldEngine {
     this.taxAndHarvest = new TaxAndHarvestCommand({ world, events });
     this.upkeep = new UpkeepCommand({ world, events });
     this.provinceEvents = new ResolveEventsCommand({ world, events });
+    this.hiredUnitRecovery = new RecoverHiredUnitsCommand({ world, events });
   }
 
   public start(): void {
@@ -118,6 +122,9 @@ export class WorldEngine {
         break;
       case 'harvest':
         this.collectTaxAndHarvest();
+        break;
+      case 'recovery':
+        this.recoverHiredUnits();
         break;
       case 'market':
         this.updateMarket();
@@ -186,8 +193,14 @@ export class WorldEngine {
   }
 
   private resolveEvents(): void {
-    this.phase = 'market';
+    this.phase = 'recovery';
     this.executor.execute(this.provinceEvents);
+    this.events.afterDispatch(() => this.advance());
+  }
+
+  private recoverHiredUnits(): void {
+    this.phase = 'market';
+    this.executor.execute(this.hiredUnitRecovery);
     this.events.afterDispatch(() => this.advance());
   }
 

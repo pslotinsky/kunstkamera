@@ -1,8 +1,5 @@
 import type { CharacteristicsKey } from '@/core/domain/Characteristics';
-import type {
-  DevelopmentGains,
-  DevelopmentKey,
-} from '@/core/domain/Development';
+import type { DevelopmentKey } from '@/core/domain/Development';
 import type { ResourceKey } from '@/core/domain/Resources';
 
 interface EventDescription {
@@ -35,8 +32,6 @@ export type ProvinceEventDefinition =
 
 export const EVENT_BALANCE = {
   goodwillEventChance: 0.4,
-  rampageProtectionScale: 400,
-  rampageChance: 0.02,
 } as const;
 
 export const GOOD_EVENTS: readonly GoodwillEventDefinition[] = [
@@ -173,12 +168,6 @@ export const BAD_EVENTS: readonly GoodwillEventDefinition[] = [
   },
 ];
 
-const DISASTER_DAMAGE = {
-  loyalty: -20,
-  cultivation: -20,
-  protection: -20,
-} as const;
-
 export interface DisasterDefinition extends EventDescription {
   readonly kind: 'disaster';
   readonly months: readonly number[];
@@ -261,7 +250,6 @@ export const DISASTERS: readonly DisasterDefinition[] = [
 
 interface RampageDefinition extends EventDescription {
   readonly kind: 'rampage';
-  readonly development: DevelopmentGains;
 }
 
 export const RAMPAGE: RampageDefinition = {
@@ -269,5 +257,4 @@ export const RAMPAGE: RampageDefinition = {
   description: 'A hired monster went on a rampage.',
   image: 'rampage',
   kind: 'rampage',
-  development: DISASTER_DAMAGE,
 };

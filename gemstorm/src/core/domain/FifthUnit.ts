@@ -9,12 +9,19 @@ export interface FifthUnitParams extends UnitParams {
 
 export class FifthUnit extends Unit {
   public readonly description: string;
-  public readonly strength: number;
+  public readonly maximumStrength: number;
+
+  protected currentStrength: number;
 
   public constructor(params: FifthUnitParams) {
     super(params);
     this.description = params.description;
-    this.strength = params.strength;
+    this.maximumStrength = params.strength;
+    this.currentStrength = params.strength;
+  }
+
+  public get strength(): number {
+    return this.currentStrength;
   }
 
   public override get attackFatigue(): number {

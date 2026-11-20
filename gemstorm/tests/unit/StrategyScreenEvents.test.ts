@@ -81,7 +81,7 @@ function setup() {
     }
     const date = disaster ? new CalendarDate(world.date.year, 6) : world.date;
     const fixture = makeWorld([province], world.player, date);
-    const incidents = new ProvinceEventResolver(
+    const { incidents } = new ProvinceEventResolver(
       fixture.world,
       () => 0,
     ).resolve();
