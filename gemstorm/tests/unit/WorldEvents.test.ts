@@ -18,7 +18,7 @@ afterEach(() => {
 });
 
 describe('Province turn event reports', () => {
-  it('resolves September damage before income but shows reports after the province turn starts', async () => {
+  it('resolves September damage after harvest and upkeep but shows reports after the province turn starts', async () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     const family = makeFamily();
     const province = makeProvince({
@@ -52,7 +52,7 @@ describe('Province turn event reports', () => {
     new WorldEngine(world, events).start();
 
     expect(order).toEqual(['turn', 'fire', 'plague']);
-    expect(province.resources.food).toBe(260);
+    expect(province.resources.food).toBe(575);
     expect(root.querySelector('[data-title]')?.textContent).toBe(
       'Alderpass — Fire',
     );

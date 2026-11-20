@@ -34,7 +34,9 @@ export class Infiltration {
     const damage = sample(DAMAGES);
 
     if (damage === 'troops') {
-      this.target.addResources({ troops: -this.getFifthOf(damage) });
+      const troopsLost = this.getFifthOf(damage);
+
+      this.target.reduceResources({ troops: troopsLost });
     } else {
       this.target.addDevelopment({ [damage]: -this.getFifthOf(damage) });
     }

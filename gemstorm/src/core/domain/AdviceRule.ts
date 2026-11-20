@@ -7,8 +7,6 @@ import type { World } from './World';
 const ATTACK_ADVANTAGE = 1.5;
 const SMALL_ARMY = 300;
 const DEVELOPMENT_FLOOR = 75;
-const CULTIVATION_PER_GOLD = 5;
-const SOLDIERS_PER_FOOD = 10;
 const MONTHS_PER_SEASON = 4;
 
 type Topic = 'war' | 'army' | 'domestic';
@@ -57,9 +55,9 @@ export class AdviceRule {
   }
 
   private adviseShortage(province: Province): Advice | undefined {
-    const { gold, food, troops } = province.resources;
+    const { gold, food } = province.resources;
     const lacksGold = gold < this.measureGoldUpkeep(province);
-    const lacksFood = food < Math.floor(troops / SOLDIERS_PER_FOOD);
+    const lacksFood = food < province.troopFoodUpkeep;
     let meaning: AdviceMeaning | undefined;
 
     if (lacksGold && lacksFood) {
@@ -164,14 +162,11 @@ export class AdviceRule {
   }
 
   private measureGoldUpkeep(province: Province): number {
-    const lordUpkeep = province.governor
-      ? Math.floor(province.development.cultivation / CULTIVATION_PER_GOLD)
-      : 0;
     const unitUpkeep = province.hiredUnits.reduce(
       (total, unit) => total + unit.cost,
       0,
     );
 
-    return lordUpkeep + unitUpkeep;
+    return province.governorUpkeep + unitUpkeep;
   }
 }

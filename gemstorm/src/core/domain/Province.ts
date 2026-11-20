@@ -25,6 +25,8 @@ export interface ProvinceParams {
 const MAX_GOODWILL = 15;
 const ACTIONS_PER_CYCLE = 3;
 const REMOTE_PENALTY = 0.5;
+const CULTIVATION_PER_GOVERNOR_GOLD = 5;
+const TROOPS_PER_FOOD = 10;
 
 export type ProvinceStatus =
   | 'capital'
@@ -159,6 +161,20 @@ export class Province {
     return status;
   }
 
+  public get governorUpkeep(): number {
+    const hasResidentGovernor =
+      isDefined(this.governor) && !this.isRemotelyRuled;
+    const { cultivation } = this.development;
+
+    return hasResidentGovernor
+      ? Math.floor(cultivation / CULTIVATION_PER_GOVERNOR_GOLD)
+      : 0;
+  }
+
+  public get troopFoodUpkeep(): number {
+    return Math.floor(this.resources.troops / TROOPS_PER_FOOD);
+  }
+
   public get effectiveStats(): Characteristics {
     const stats = this.governor?.stats ?? Characteristics.empty();
 
@@ -169,8 +185,16 @@ export class Province {
     this.resources = this.resources.increase(gains);
   }
 
+  public reduceResources(losses: ResourceGains): void {
+    this.resources = this.resources.decrease(losses);
+  }
+
   public addDevelopment(gains: DevelopmentGains): void {
     this.development = this.development.increase(gains);
+  }
+
+  public reduceDevelopment(losses: DevelopmentGains): void {
+    this.development = this.development.decrease(losses);
   }
 
   public recordAction(goodwill: number): void {

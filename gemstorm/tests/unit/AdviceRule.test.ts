@@ -63,6 +63,8 @@ function setup(situation: Situation = {}) {
     ...situation.home,
   });
 
+  player.homeProvince = home;
+
   if (situation.isGuarded ?? true) {
     home.addUnit(HiredUnit.ofName('Spearmen')!);
   }

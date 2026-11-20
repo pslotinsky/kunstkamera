@@ -16,7 +16,7 @@ export class GiveFoodCommand extends ProvinceCommand {
       const charisma = province.effectiveStats.charisma;
       const loyalty = Math.floor((charisma * this.food) / CHARISMA_DIVISOR);
 
-      province.addResources({ food: -this.food });
+      province.reduceResources({ food: this.food });
       province.addDevelopment({ loyalty });
 
       this.complete(province, 1);

@@ -175,10 +175,19 @@ describe('WorldEngine', () => {
     drainMonth(fixture);
 
     expect(fixture.world.date.month).toBe(9);
-    expect(playerProvince.resources.food).toBe(400 + 10 + 20 * 2 + 30);
+    expect(playerProvince.resources.food).toBe(
+      400 +
+        10 * 2 +
+        20 * 3 +
+        Math.floor(playerProvince.effectiveStats.charisma) +
+        30 -
+        10,
+    );
     expect(playerProvince.resources.gold).toBeGreaterThan(500);
     expect(playerProvince.resources.troops).toBe(100);
-    expect(rivalHarvest).toBe(5 + 5 * 2 + 5);
+    expect(rivalHarvest).toBe(
+      5 * 3 + 5 * 2 + Math.floor(rivalProvince.effectiveStats.charisma) + 30,
+    );
     expect(neutralProvince.resources.food).toBe(0);
     expect(neutralProvince.resources.gold).toBe(0);
   });

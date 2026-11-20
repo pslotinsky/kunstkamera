@@ -56,7 +56,7 @@ describe.each(targets)('DevelopCommand (%s)', (target) => {
     command.execute();
 
     expect(province.resources.gold).toBe(INITIAL_GOLD - 10);
-    expect(province.development[target]).toBe(INITIAL_STAT + 4);
+    expect(province.development[target]).toBe(INITIAL_STAT + 2);
     expect(province.goodwill).toBe(1);
     expect(province.actionCount).toBe(1);
     expect(
@@ -74,8 +74,23 @@ describe.each(targets)('DevelopCommand (%s)', (target) => {
     dull.command.execute();
     bright.command.execute();
 
-    expect(dull.province.development[target]).toBe(INITIAL_STAT + 2);
-    expect(bright.province.development[target]).toBe(INITIAL_STAT + 5);
+    expect(dull.province.development[target]).toBe(INITIAL_STAT + 1);
+    expect(bright.province.development[target]).toBe(INITIAL_STAT + 4);
+  });
+
+  it('reaches the cap without spending gold on a second attempt', () => {
+    const { province, command } = createFixture(target, {
+      gold: INITIAL_GOLD,
+      intelligence: 99,
+    });
+    province.addDevelopment({ [target]: 99 - INITIAL_STAT });
+
+    command.execute();
+    command.execute();
+
+    expect(province.development[target]).toBe(100);
+    expect(province.resources.gold).toBe(INITIAL_GOLD - 10);
+    expect(province.actionCount).toBe(1);
   });
 
   it('refuses when gold is short', () => {

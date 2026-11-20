@@ -36,7 +36,8 @@ export class WorldEngine {
     | 'start-month'
     | 'lifecycle'
     | 'events'
-    | 'tax'
+    | 'harvest'
+    | 'market'
     | 'waiting-turn'
     | 'reporting-turn'
     | 'ready-turn'
@@ -62,7 +63,7 @@ export class WorldEngine {
       this.handleTurnEnd(event.turnNumber),
     );
     this.listen(MonthStartedEvent, () => {
-      if (this.phase === 'lifecycle') {
+      if (this.phase === 'harvest') {
         this.advance();
       }
     });
@@ -115,8 +116,11 @@ export class WorldEngine {
       case 'events':
         this.resolveEvents();
         break;
-      case 'tax':
+      case 'harvest':
         this.collectTaxAndHarvest();
+        break;
+      case 'market':
+        this.updateMarket();
         break;
       case 'waiting-turn':
         this.startTurn();
@@ -160,14 +164,14 @@ export class WorldEngine {
   private handleTurnEnd(turnNumber: number): void {
     if (this.phase === 'taking-turn' && turnNumber === this.started) {
       this.started = undefined;
-      this.phase = 'upkeep';
+      this.phase = 'next-turn';
       this.advance();
     }
   }
 
   private startMonth(): void {
     this.world.turnQueue.reset();
-    this.phase = 'lifecycle';
+    this.phase = 'harvest';
     this.events.publish(new MonthStartedEvent(this.world.date));
   }
 
@@ -175,21 +179,26 @@ export class WorldEngine {
     this.executor.execute(this.lifecycle);
 
     if (this.lifecycle.isComplete) {
-      this.phase = 'events';
+      this.phase = 'upkeep';
     }
 
     this.events.afterDispatch(() => this.advance());
   }
 
   private resolveEvents(): void {
-    this.phase = 'tax';
+    this.phase = 'market';
     this.executor.execute(this.provinceEvents);
     this.events.afterDispatch(() => this.advance());
   }
 
   private collectTaxAndHarvest(): void {
-    this.world.market.swing(this.world.date.month);
+    this.phase = 'lifecycle';
     this.executor.execute(this.taxAndHarvest);
+    this.events.afterDispatch(() => this.advance());
+  }
+
+  private updateMarket(): void {
+    this.world.market.swing(this.world.date.month);
     this.phase = 'waiting-turn';
     this.events.publish(new TurnScheduledEvent());
   }
@@ -231,9 +240,9 @@ export class WorldEngine {
   }
 
   private chargeUpkeep(): void {
-    this.phase = 'next-turn';
+    this.phase = 'events';
     this.executor.execute(this.upkeep);
-    this.advance();
+    this.events.afterDispatch(() => this.advance());
   }
 
   private nextTurn(): void {

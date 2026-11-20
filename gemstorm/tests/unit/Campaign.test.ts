@@ -318,7 +318,7 @@ describe('Campaign completion through game actions', () => {
     expect(target.resources.troops).toBe(0);
   });
 
-  it('resumes deferred upkeep once after an heir is chosen during a turn', async () => {
+  it('resumes a paused turn without charging upkeep again when an heir is chosen', async () => {
     const context = island();
     const { world, events, player, rival } = context;
     const heirs = ['Rhovan', 'Beran'].map((name) =>
@@ -373,7 +373,7 @@ describe('Campaign completion through game actions', () => {
     events.publish(new TurnEndedEvent(turnNumber));
 
     expect(world.turnQueue.turnNumber).toBe(turnNumber + 1);
-    expect(province.resources.gold).toBe(gold - unit.cost);
+    expect(province.resources.gold).toBe(gold);
     expect(player.ruler).toBe(heirs[1]);
   });
 
@@ -645,7 +645,7 @@ describe('Campaign completion through game actions', () => {
     expect(world.date).toBe(now);
   });
 
-  it('stops a monthly death sequence before another death, tax, or a province turn', () => {
+  it('stops a monthly death sequence before another death or a province turn', () => {
     const date = new CalendarDate(1230, 9);
     const ruler = makeGeneral({ name: 'Avar', deathDate: date });
     const player = makeFamily({ name: 'Alderwyn', ruler });
@@ -668,7 +668,7 @@ describe('Campaign completion through game actions', () => {
 
     expect(world.campaign.outcome?.reason).toBe('no-heir');
     expect(world.generals.all).toContain(otherRuler);
-    expect(theirs.resources.gold).toBe(0);
+    expect(theirs.resources.gold).toBe(2);
     expect(reports).toHaveLength(1);
     expect(turns).toEqual([]);
     expect(world.date).toBe(date);
@@ -709,7 +709,7 @@ describe('Campaign completion through game actions', () => {
     expect(world.campaign.outcome?.isVictory).toBe(true);
   });
 
-  it('waits for the player’s heir choice before resuming the month and paying tax', async () => {
+  it('waits for the player’s heir choice after harvest before resuming the month', async () => {
     const date = new CalendarDate(1200, 9);
     const ruler = makeGeneral({ name: 'Avar', deathDate: date });
     const heirs = ['Rhovan', 'Beran'].map((name) =>
@@ -746,7 +746,7 @@ describe('Campaign completion through game actions', () => {
     new WorldEngine(context.world, context.events).start();
 
     expect(coronation).toBeDefined();
-    expect(home.resources.gold).toBe(10);
+    expect(home.resources.gold).toBe(12);
     expect(context.world.campaign.outcome).toBeUndefined();
 
     const crown = new CrownCommand(context);
@@ -758,7 +758,7 @@ describe('Campaign completion through game actions', () => {
 
     expect(player.ruler).toBe(heirs[1]);
     expect(context.world.campaign.isAwaitingHeir).toBe(false);
-    expect(home.resources.gold).toBe(110);
+    expect(home.resources.gold).toBe(12);
     expect(context.world.campaign.isEnded).toBe(false);
   });
 });

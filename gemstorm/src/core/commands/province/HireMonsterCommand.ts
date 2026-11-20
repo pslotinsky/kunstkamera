@@ -53,7 +53,7 @@ export class HireMonsterCommand extends ProvinceCommand {
       !province.hasUnit(unit.name) &&
       province.resources.gold >= unit.cost
     ) {
-      province.addResources({ gold: -unit.cost });
+      province.reduceResources({ gold: unit.cost });
       province.addUnit(unit);
       this.complete(province);
     }

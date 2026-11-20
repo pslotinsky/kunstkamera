@@ -171,7 +171,7 @@ export class EconomyPolicy {
 
     develop.target = protection < cultivation ? 'protection' : 'cultivation';
 
-    return develop.canExecute() ? develop : undefined;
+    return develop.canDevelop(develop.target) ? develop : undefined;
   }
 
   private findAffordableUnit(
