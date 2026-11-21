@@ -170,10 +170,17 @@ describe('Campaign outcome', () => {
 
   it('waits for the selected heir and continues the same house', () => {
     const { world, player, events, source } = island();
-    const heirs = ['Rhovan', 'Beran'].map((name) =>
-      makeGeneral({ name, lineage: player.name }),
-    );
+    const heirs = [
+      makeGeneral({
+        name: 'Rhovan',
+        lineage: player.name,
+        war: 90,
+        charisma: 40,
+      }),
+      makeGeneral({ name: 'Beran', lineage: player.name, charisma: 50 }),
+    ];
 
+    player.loseFame(1);
     for (const heir of heirs) {
       player.enlist(heir);
     }
@@ -183,6 +190,8 @@ describe('Campaign outcome', () => {
     expect(succession).toBeInstanceOf(Coronation);
     expect(world.campaign.isAwaitingHeir).toBe(true);
     expect(world.campaign.assess()).toBeUndefined();
+    expect(player.ruler).toBe(heirs[0]);
+    expect(player.fame).toBe(49);
 
     const recruit = new RecruitCommand({ world, events });
     const troops = source.resources.troops;
@@ -200,6 +209,7 @@ describe('Campaign outcome', () => {
     }
 
     expect(player.ruler).toBe(heirs[1]);
+    expect(player.fame).toBe(99);
     expect(world.campaign.isAwaitingHeir).toBe(false);
     expect(world.campaign.outcome).toBeUndefined();
 

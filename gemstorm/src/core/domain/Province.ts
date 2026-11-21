@@ -26,6 +26,7 @@ const ACTIONS_PER_CYCLE = 3;
 const REMOTE_PENALTY = 0.5;
 const CULTIVATION_PER_GOVERNOR_GOLD = 5;
 const TROOPS_PER_FOOD = 10;
+const UNOWNED_PROVINCE_FAME = 3;
 
 export type ProvinceStatus =
   | 'capital'
@@ -70,6 +71,14 @@ export class Province {
     }
     this.house = family;
     this.entrusted = false;
+  }
+
+  public claimUnowned(family: Family, governor = family.ruler): void {
+    if (this.isNeutral()) {
+      this.claim(family);
+      this.assignGovernor(governor);
+      family.gainFame(UNOWNED_PROVINCE_FAME);
+    }
   }
 
   public unclaim(): void {

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Battle } from '@/core/domain/Battle';
 import { BattleOutcome } from '@/core/domain/BattleOutcome';
@@ -21,6 +21,8 @@ import {
 const SOURCE_GOLD = 200;
 const SOURCE_TROOPS = 156;
 const SOURCE_FOOD = 300;
+
+afterEach(() => vi.restoreAllMocks());
 
 interface SetupParams {
   readonly defenders?: number;
@@ -63,6 +65,24 @@ function setup(params: SetupParams = {}) {
 }
 
 describe('Invasion', () => {
+  it.each([
+    [BattleSide.attacker, 22, 16],
+    [BattleSide.defender, 18, 20],
+  ])(
+    'applies victory, defeat, and Fifth Unit Fame changes when %s wins',
+    (winner, attackingFame, defendingFame) => {
+      const { invasion, mine, rival } = setup();
+      mine.loseFame(80);
+      rival.loseFame(80);
+
+      invasion.begin();
+      invasion.conclude(makeOutcome({ winner, lostUnits: BattleSide.all }));
+
+      expect(mine.fame).toBe(attackingFame);
+      expect(rival.fame).toBe(defendingFame);
+    },
+  );
+
   it('lets an untrooped province defend with its stationed Nerith', () => {
     const { source, target, world } = setup({ defenders: 0 });
     const nerith = new Nerith();
@@ -396,6 +416,42 @@ function setupRefuges() {
 }
 
 describe('Invasion answered by its defender', () => {
+  it('awards three Fame when an uncaptured defender retreats into unowned land', () => {
+    const { invasion, target, neighbor, rival } = setupRefuges();
+    const lord = target.governor;
+    neighbor.unclaim();
+    rival.loseFame(90);
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
+
+    invasion.muster();
+    invasion.answer({ answer: 'retreat', refuge: neighbor });
+
+    expect(neighbor.family).toBe(rival);
+    expect(neighbor.governor).toBe(lord);
+    expect(rival.fame).toBe(13);
+    expect(invasion.affected).toContain(neighbor);
+  });
+
+  it('awards the neutral land bonus separately from an attacker’s defeat', () => {
+    const { invasion, neighbor } = setupRefuges();
+    const attacker = invasion.source.family!;
+    neighbor.unclaim();
+    attacker.moveHome(invasion.source);
+    attacker.loseFame(90);
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
+
+    invasion.begin();
+    invasion.conclude(
+      makeOutcome({ winner: BattleSide.defender, reason: 'retreat' }),
+      neighbor,
+    );
+
+    expect(neighbor.family).toBe(attacker);
+    expect(attacker.homeProvince).toBe(neighbor);
+    expect(attacker.fame).toBe(12);
+    expect(invasion.affected).toContain(neighbor);
+  });
+
   it('fights with the Fifth Unit the defender picks, not the strongest', () => {
     const { invasion, target, rival } = setupRefuges();
     const grimhides = HiredUnit.ofName('Grimhides')!;

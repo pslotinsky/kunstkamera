@@ -13,6 +13,10 @@ import type { Province } from './Province';
 import { TurnQueue } from './TurnQueue';
 import type { WorldMap } from './WorldMap';
 
+const BREAKAWAY_FAME = 3;
+const ABSORBED_PROVINCE_FAME = 3;
+const DEFECTING_LORD_FAME = 3;
+
 export interface WorldParams {
   readonly date: CalendarDate;
   readonly map: WorldMap;
@@ -115,6 +119,7 @@ export class World {
       ruler: lord,
       members: [lord],
       homeProvince: province,
+      fame: BREAKAWAY_FAME,
     });
 
     this.findFamilyOf(lord)?.discharge(lord);
@@ -135,8 +140,9 @@ export class World {
 
   public absorb(family: Family, victor: Family): void {
     this.campaign.recordFall(family, 'absorption', victor);
+    const provinces = this.getFamilyProvinces(family);
 
-    for (const province of this.getFamilyProvinces(family)) {
+    for (const province of provinces) {
       province.claim(victor);
     }
 
@@ -144,6 +150,7 @@ export class World {
       victor.enlist(member);
     }
 
+    victor.gainFame(provinces.length * ABSORBED_PROVINCE_FAME);
     this.dissolve(family, victor);
   }
 
@@ -154,7 +161,11 @@ export class World {
 
     former?.discharge(general);
     to.enlist(general);
-    province?.claim(to);
+    if (former && province?.belongsTo(former) && !former.isEqual(to)) {
+      province.claim(to);
+      former.loseFame(DEFECTING_LORD_FAME);
+      to.gainFame(DEFECTING_LORD_FAME);
+    }
 
     if (former && this.countProvinces(former) === 0) {
       this.campaign.recordFall(former, 'last-province-lost', to);

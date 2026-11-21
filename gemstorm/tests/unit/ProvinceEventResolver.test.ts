@@ -276,7 +276,7 @@ describe('Province events', () => {
 
   it('rolls one monster across the map and bases damage on its current Strength', () => {
     const { province, family } = setup(200);
-    family.fame = 0;
+    family.loseFame(family.fame);
     const otherProvince = makeProvince({
       number: 18,
       family,
@@ -311,7 +311,7 @@ describe('Province events', () => {
 
   it('checks only the selected mercenary against its Fame requirement', () => {
     const { province, family } = setup();
-    family.fame = 12;
+    family.loseFame(family.fame - 12);
     const spearmen = HiredUnit.ofName('Spearmen')!;
     const lancers = HiredUnit.ofName('Lancers')!;
     province.fifthUnits.addUnit(spearmen);

@@ -102,7 +102,11 @@ export class Conquest {
   }
 
   private isLastStand({ house, general }: Loser): boolean {
-    return house.isRuler(general) && this.world.countProvinces(house) === 1;
+    return (
+      house.isRuler(general) &&
+      this.world.countProvinces(house) === 1 &&
+      !this.report.refuge
+    );
   }
 
   private weighOdds(): number {
@@ -110,7 +114,7 @@ export class Conquest {
   }
 
   private isCornered(): boolean {
-    return this.report.isTaken && !this.hasRefuge();
+    return this.report.isTaken && !this.report.refuge && !this.hasRefuge();
   }
 
   private hasRefuge(): boolean {
@@ -121,7 +125,7 @@ export class Conquest {
       isDefined(house) &&
       this.world.map
         .getNeighbors(target)
-        .some((neighbor) => neighbor.belongsTo(house))
+        .some((neighbor) => neighbor.belongsTo(house) || neighbor.isNeutral())
     );
   }
 }

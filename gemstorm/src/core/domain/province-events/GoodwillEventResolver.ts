@@ -22,7 +22,6 @@ import type { Incident } from './Incident';
 import { IncidentBuilder } from './IncidentBuilder';
 
 const GOODWILL_EVENTS = [...GOOD_EVENTS, ...BAD_EVENTS];
-const MAX_FAME = 100;
 const MAX_FAME_REWARD = 4;
 const RESOURCE_EVENT_RANGE = [25, 50] as const;
 const DEVELOPMENT_EVENT_RANGE = [2, 7] as const;
@@ -184,7 +183,7 @@ export class GoodwillEventResolver {
   private rewardFamily(family: Family): void {
     const fame = this.rollBetween(0, MAX_FAME_REWARD);
 
-    family.fame = Math.min(MAX_FAME, family.fame + fame);
+    family.gainFame(fame);
   }
 
   private applyBanshee(

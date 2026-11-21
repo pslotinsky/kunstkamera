@@ -2,6 +2,8 @@ import type { Family } from './Family';
 import type { General } from './General';
 import type { Province } from './Province';
 
+const REDUCED_FAME_DIVISOR = 2;
+
 export interface CoronationParams {
   readonly family: Family;
   readonly deposed: General;
@@ -15,12 +17,14 @@ export class Coronation {
   public readonly heirs: readonly General[];
   public readonly provinces: readonly Province[];
   public heir: General | undefined;
+  private readonly deposedFame: number;
 
   public constructor(params: CoronationParams) {
     this.family = params.family;
     this.deposed = params.deposed;
     this.heirs = params.heirs;
     this.provinces = params.provinces;
+    this.deposedFame = params.family.fame;
   }
 
   public isChoiceFor(family: Family): boolean {
@@ -33,8 +37,14 @@ export class Coronation {
         province.assignGovernor(heir);
       }
 
-      this.family.crown(heir);
+      this.family.crown(heir, this.inheritedFame(heir));
       this.heir = heir;
     }
+  }
+
+  private inheritedFame(heir: General): number {
+    return heir.stats.charisma >= this.deposed.stats.charisma
+      ? this.deposedFame
+      : Math.floor(this.deposedFame / REDUCED_FAME_DIVISOR);
   }
 }

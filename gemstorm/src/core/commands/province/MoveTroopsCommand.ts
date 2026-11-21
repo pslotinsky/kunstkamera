@@ -69,9 +69,7 @@ export class MoveTroopsCommand extends ProvinceCommand {
       troops: this.troops,
     });
 
-    if (target.isNeutral()) {
-      this.claim(target, owner);
-    }
+    target.claimUnowned(owner);
 
     this.relocateUnit(source, target);
 
@@ -84,11 +82,6 @@ export class MoveTroopsCommand extends ProvinceCommand {
       source.fifthUnits.removeUnit(this.carried!);
       target.fifthUnits.addUnit(this.carried!);
     }
-  }
-
-  private claim(target: Province, owner: Family): void {
-    target.claim(owner);
-    target.assignGovernor(owner.ruler);
   }
 
   private canMove(source: Province, target: Province): boolean {

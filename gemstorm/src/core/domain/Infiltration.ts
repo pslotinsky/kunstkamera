@@ -6,7 +6,7 @@ import { Resources } from './Resources';
 const SABOTAGE_MARGIN = 10;
 const PLUNDER_MARGIN = 5;
 const SHARE = 1 / 5;
-const PLUNDER_FAME_LOSS = 1;
+const MAX_PLUNDER_FAME_LOSS = 2;
 
 const DAMAGES = ['troops', 'loyalty', 'protection'] as const;
 
@@ -45,11 +45,12 @@ export class Infiltration {
   }
 
   public plunder(): Resources | undefined {
-    if (!this.canSlipPast(PLUNDER_MARGIN)) {
+    const { gold, food } = this.target.resources;
+
+    if (!this.canSlipPast(PLUNDER_MARGIN) || (gold === 0 && food === 0)) {
       return undefined;
     }
 
-    const { gold, food } = this.target.resources;
     const loot = {
       gold: Math.floor(gold * SHARE),
       food: Math.floor(food * SHARE),
@@ -57,7 +58,9 @@ export class Infiltration {
 
     this.target.addResources({ gold: -loot.gold, food: -loot.food });
     this.source.addResources(loot);
-    this.target.family?.loseFame(PLUNDER_FAME_LOSS);
+    const fameLoss = Math.floor(Math.random() * (MAX_PLUNDER_FAME_LOSS + 1));
+
+    this.source.family?.loseFame(fameLoss);
 
     return Resources.from(loot);
   }

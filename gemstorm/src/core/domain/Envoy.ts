@@ -8,7 +8,6 @@ const ALLY_ODDS = 0.8;
 const ALLY_REFUSAL_RATIO = 2;
 const SWORN_DEFECTION_ODDS = 0.4;
 const KIN_DEFECTION_ODDS = 0.1;
-const MAX_DEFECTION_ODDS = 0.9;
 const SURRENDER_RATIO = 3;
 const SURRENDER_ODDS = 0.25;
 
@@ -92,19 +91,13 @@ export class Envoy {
   }
 
   private weighDefection(general: General, rival: Family): number {
-    const base = general.isKinOf(rival)
-      ? KIN_DEFECTION_ODDS
-      : SWORN_DEFECTION_ODDS;
-    const pressure = (this.family.fame - rival.fame) / 100;
-
-    return Math.min(MAX_DEFECTION_ODDS, Math.max(0, base + pressure));
+    return general.isKinOf(rival) ? KIN_DEFECTION_ODDS : SWORN_DEFECTION_ODDS;
   }
 
   private canForceSurrender(rival: Family): boolean {
     return (
       this.world.countProvinces(this.family) >=
-        this.world.countProvinces(rival) * SURRENDER_RATIO &&
-      this.family.fame > rival.fame
+      this.world.countProvinces(rival) * SURRENDER_RATIO
     );
   }
 }

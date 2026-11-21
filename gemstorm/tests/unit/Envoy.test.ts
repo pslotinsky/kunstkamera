@@ -114,12 +114,14 @@ describe('Envoy', () => {
     expect(pineward.fifthUnits.hiredUnits).toContain(warriors);
     expect(alderwyn.members).toContain(marven);
     expect(stormmere.members).not.toContain(marven);
+    expect(alderwyn.fame).toBe(13);
+    expect(stormmere.fame).toBe(7);
   });
 
   it('turns a sworn vassal more easily than a kinsman', () => {
     rollAt(0.2);
 
-    const { envoy, marven, ruskarn } = setup();
+    const { envoy, marven, ruskarn } = setup({ ourFame: 0, theirFame: 100 });
 
     expect(envoy.persuade(marven)).toBe(true);
     expect(envoy.persuade(ruskarn)).toBe(false);
@@ -131,14 +133,11 @@ describe('Envoy', () => {
     expect(envoy.canPersuade(darian)).toBe(false);
   });
 
-  it('wins no surrender short of three times the provinces and the greater fame', () => {
+  it('refuses surrender below the province threshold despite higher Fame', () => {
     rollAt(0);
 
     const tooFew = setup({ ours: 8, ourFame: 20 });
-    const lessFamous = setup({ ours: 9, ourFame: 5, theirFame: 20 });
-
     expect(tooFew.envoy.demandSurrender(tooFew.stormmere)).toBe(false);
-    expect(lessFamous.envoy.demandSurrender(lessFamous.stormmere)).toBe(false);
   });
 
   it('absorbs a family that yields: its provinces, its members, and its gems', () => {
@@ -146,13 +145,15 @@ describe('Envoy', () => {
 
     const { world, envoy, alderwyn, stormmere, marven } = setup({
       ours: 9,
-      ourFame: 20,
+      ourFame: 5,
+      theirFame: 20,
     });
 
     expect(envoy.demandSurrender(stormmere)).toBe(true);
     expect(world.getFamilyProvinces(alderwyn)).toHaveLength(12);
     expect(alderwyn.members).toContain(marven);
     expect(alderwyn.gems.map((gem) => gem.name)).toEqual(['Asterion']);
+    expect(alderwyn.fame).toBe(14);
     expect(world.families.all).not.toContain(stormmere);
   });
 });

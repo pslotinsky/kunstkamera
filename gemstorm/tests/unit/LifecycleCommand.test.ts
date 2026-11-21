@@ -194,6 +194,8 @@ describe('LifecycleCommand', () => {
     expect(stronger?.members).toContain(denric);
     expect(weaker?.members).not.toContain(denric);
     expect(stronger?.gems.map((gem) => gem.name)).toEqual(['Cindrath']);
+    expect(weaker?.fame).toBe(3);
+    expect(stronger?.fame).toBe(3);
   });
 
   it('decays development in every province and ages survivors only in January', () => {

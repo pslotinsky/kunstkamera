@@ -18,7 +18,12 @@ const SOURCE_FOOD = 100;
 
 function setup() {
   const ruler = makeGeneral({ name: 'Avar' });
-  const family = makeFamily({ name: 'Alderwyn', ruler, members: [ruler] });
+  const family = makeFamily({
+    name: 'Alderwyn',
+    ruler,
+    members: [ruler],
+    fame: 10,
+  });
   const rival = makeFamily({ name: 'Crowe' });
 
   const source = makeProvince({
@@ -92,6 +97,7 @@ describe('MoveTroopsCommand', () => {
     expect(owned.resources.food).toBe(30);
     expect(owned.belongsTo(family)).toBe(true);
     expect(owned.governor).toBeUndefined();
+    expect(family.fame).toBe(10);
     expect(source.goodwill).toBe(0);
     expect(source.actionCount).toBe(1);
   });
@@ -108,6 +114,7 @@ describe('MoveTroopsCommand', () => {
     expect(neutral.resources.gold).toBe(40);
     expect(neutral.resources.troops).toBe(60);
     expect(neutral.resources.food).toBe(30);
+    expect(family.fame).toBe(13);
   });
 
   it('offers adjacent provinces you own or that are neutral only', () => {

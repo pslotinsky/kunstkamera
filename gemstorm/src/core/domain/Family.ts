@@ -6,6 +6,8 @@ import type { Gem } from './Gem';
 import type { General } from './General';
 import type { Province } from './Province';
 
+const MAX_FAME = 100;
+
 export interface FamilyParams {
   readonly name: string;
   readonly ruler: General;
@@ -21,17 +23,17 @@ export class Family {
   public ruler: General;
   public members: readonly General[];
   public homeProvince: Province;
-  public fame: number;
   public gems: readonly Gem[];
   public ally: Family | undefined;
   public readonly royal: boolean;
+  private rulerFame: number;
 
   public constructor(params: FamilyParams) {
     this.name = params.name;
     this.ruler = params.ruler;
     this.members = params.members;
     this.homeProvince = params.homeProvince;
-    this.fame = params.fame ?? 0;
+    this.rulerFame = this.clampFame(params.fame ?? 0);
     this.gems = params.gems ?? [];
     this.royal = params.royal ?? false;
   }
@@ -60,12 +62,21 @@ export class Family {
     );
   }
 
-  public loseFame(amount: number): void {
-    this.fame = Math.max(0, this.fame - amount);
+  public get fame(): number {
+    return this.rulerFame;
   }
 
-  public crown(heir: General): void {
+  public gainFame(amount: number): void {
+    this.rulerFame = this.clampFame(this.rulerFame + amount);
+  }
+
+  public loseFame(amount: number): void {
+    this.rulerFame = this.clampFame(this.rulerFame - amount);
+  }
+
+  public crown(heir: General, fame = this.rulerFame): void {
     this.ruler = heir;
+    this.rulerFame = this.clampFame(fame);
   }
 
   public enlist(general: General): void {
@@ -113,5 +124,9 @@ export class Family {
 
   public isEqual(other: Family): boolean {
     return this.name === other.name;
+  }
+
+  private clampFame(fame: number): number {
+    return Math.max(0, Math.min(MAX_FAME, fame));
   }
 }

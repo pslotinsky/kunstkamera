@@ -13,7 +13,7 @@ import {
 
 function setup() {
   const avar = makeGeneral({ name: 'Avar' });
-  const mine = makeFamily({ name: 'Alderwyn', ruler: avar });
+  const mine = makeFamily({ name: 'Alderwyn', ruler: avar, fame: 20 });
   const darian = makeGeneral({ name: 'Darian' });
   const marven = makeGeneral({ name: 'Marven', war: 77 });
   const rival = makeFamily({
@@ -75,6 +75,7 @@ describe('Captivity', () => {
     expect(captivity.recruit(hold())).toBe(true);
     expect(mine.members).toContain(marven);
     expect(rival.members).not.toContain(marven);
+    expect(mine.fame).toBe(20);
   });
 
   it('leaves a vassal where he is when he refuses', () => {
@@ -99,6 +100,7 @@ describe('Captivity', () => {
     expect(ostgard.family).toBe(mine);
     expect(mine.members).toContain(marven);
     expect(mine.gems.map((gem) => gem.name)).toContain('Asterion');
+    expect(mine.fame).toBe(26);
     expect(houses(world)).not.toContain('Stormmere');
   });
 

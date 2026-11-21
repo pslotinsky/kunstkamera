@@ -1,3 +1,4 @@
+import type { Family } from './Family';
 import type { Province } from './Province';
 import type { World } from './World';
 
@@ -34,16 +35,17 @@ export class DefensePolicy {
     return answers.length > 0 ? answers : ['surrender'];
   }
 
-  public getRefuges(province: Province): readonly Province[] {
-    const { family } = province;
-
+  public getRefuges(
+    province: Province,
+    family: Family | undefined = province.family,
+  ): readonly Province[] {
     if (!family) {
       return [];
     }
 
     const neighbors = this.world.map
       .getNeighbors(province)
-      .filter((neighbor) => neighbor.belongsTo(family));
+      .filter((neighbor) => neighbor.belongsTo(family) || neighbor.isNeutral());
     const home = family.homeProvince;
     const isHomeApart =
       !home.isEqual(province) &&

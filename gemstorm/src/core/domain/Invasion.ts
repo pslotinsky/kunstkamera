@@ -18,6 +18,9 @@ import type { World } from './World';
 
 const GEM_REST_MONTHS = 3;
 const GEM_REST_MONTHS_DEFEATED = 5;
+const ATTACK_VICTORY_FAME = 3;
+const DEFENSE_VICTORY_FAME = 1;
+const DESTROYED_UNIT_FAME_LOSS = 1;
 
 export interface InvasionParams {
   readonly world: World;
@@ -69,11 +72,19 @@ export class Invasion {
   }
 
   public get refuges(): readonly Province[] {
-    return this.policy.getRefuges(this.target);
+    return this.getRetreatProvinces(BattleSide.defender);
   }
 
-  public chooseRefuge(): Province | undefined {
-    return this.policy.chooseRefuge(this.target);
+  public chooseRefuge(side = BattleSide.defender): Province | undefined {
+    return side.isDefender
+      ? this.policy.chooseRefuge(this.target)
+      : this.source;
+  }
+
+  public getRetreatProvinces(side: BattleSide): readonly Province[] {
+    const family = side.isAttacker ? this.source.family : this.target.family;
+
+    return this.policy.getRefuges(this.target, family);
   }
 
   public get defendingUnits(): readonly FifthUnit[] {
@@ -106,7 +117,10 @@ export class Invasion {
     }
 
     const report = this.compileReport(answer, {
-      refuge: answer === 'retreat' ? this.findRefuge(choice.refuge) : undefined,
+      refuge:
+        answer === 'retreat'
+          ? this.findRefuge(BattleSide.defender, choice.refuge)
+          : undefined,
     });
 
     this.settle(report);
@@ -126,9 +140,10 @@ export class Invasion {
 
     const report = this.compileReport(answer, {
       outcome,
-      refuge: outcome.isWithdrawnBy(BattleSide.defender)
-        ? this.findRefuge(refuge)
-        : undefined,
+      refuge:
+        outcome.reason === 'retreat'
+          ? this.findRefuge(outcome.winner.opposite, refuge)
+          : undefined,
     });
 
     this.settle(report);
@@ -167,10 +182,15 @@ export class Invasion {
     });
   }
 
-  private findRefuge(refuge: Province | undefined): Province | undefined {
-    const allowed = this.refuges.find((open) => open.isEqual(refuge));
+  private findRefuge(
+    side: BattleSide,
+    refuge: Province | undefined,
+  ): Province | undefined {
+    const allowed = this.getRetreatProvinces(side).find((open) =>
+      open.isEqual(refuge),
+    );
 
-    return allowed ?? this.chooseRefuge();
+    return allowed ?? this.chooseRefuge(side);
   }
 
   private deploy(): void {
@@ -193,15 +213,16 @@ export class Invasion {
   }
 
   private settle(report: InvasionReport): void {
-    if (report.isFought) {
-      this.applyLosses(report.defender);
-      this.buryUnits(report);
-      this.persistHiredUnitStrengths(report);
-      this.restGems(report);
+    const { outcome, refuge } = report;
+
+    if (isDefined(outcome)) {
+      this.settleBattle(report, outcome);
     }
 
-    if (report.refuge) {
-      this.evacuate(report.refuge);
+    const defendingRefuge = report.isTaken ? refuge : undefined;
+
+    if (isDefined(defendingRefuge) && !defendingRefuge.isNeutral()) {
+      this.evacuate(defendingRefuge);
     }
 
     const conquest = new Conquest({
@@ -216,17 +237,55 @@ export class Invasion {
 
     if (captive) {
       this.world.hold(captive);
+    } else if (defendingRefuge?.isNeutral()) {
+      this.evacuate(defendingRefuge);
     }
-    this.displaced = report.isTaken ? this.overrun(conquest) : this.comeHome();
+
+    this.displaced = report.isTaken
+      ? this.overrun(conquest, defendingRefuge)
+      : this.returnArmy(captive ? this.source : (refuge ?? this.source));
   }
 
-  private overrun(conquest: Conquest): readonly Province[] {
+  private settleBattle(report: InvasionReport, outcome: BattleOutcome): void {
+    this.applyLosses(report.defender);
+    this.settleBattleFame(outcome);
+    this.buryUnits(report);
+    this.persistHiredUnitStrengths(report);
+    this.restGems(report);
+  }
+
+  private settleBattleFame(outcome: BattleOutcome): void {
+    const attacking = this.source.family;
+    const defending = this.target.family;
+    const victoryFame = outcome.winner.isAttacker
+      ? ATTACK_VICTORY_FAME
+      : DEFENSE_VICTORY_FAME;
+    const winner = outcome.winner.isAttacker ? attacking : defending;
+    const loser = outcome.winner.isAttacker ? defending : attacking;
+
+    if (outcome.hasLostUnit(BattleSide.attacker)) {
+      attacking?.loseFame(DESTROYED_UNIT_FAME_LOSS);
+    }
+    if (outcome.hasLostUnit(BattleSide.defender)) {
+      defending?.loseFame(DESTROYED_UNIT_FAME_LOSS);
+    }
+
+    winner?.gainFame(victoryFame);
+    loser?.loseFame(victoryFame);
+  }
+
+  private overrun(
+    conquest: Conquest,
+    refuge: Province | undefined,
+  ): readonly Province[] {
     const defending = this.target.family;
     const displaced = this.capture();
 
     conquest.endHouse(defending);
 
-    return displaced;
+    return defending && refuge?.belongsTo(defending)
+      ? [...displaced, refuge]
+      : displaced;
   }
 
   private applyLosses(defender: Army): void {
@@ -331,6 +390,7 @@ export class Invasion {
 
   private evacuate(refuge: Province): void {
     const lord = this.target.governor;
+    const owner = this.target.family;
     const { troops, food, gold } = this.target.resources;
     const carried = {
       troops,
@@ -345,7 +405,12 @@ export class Invasion {
     });
     refuge.addResources(carried);
 
-    if (lord && !refuge.governor) {
+    if (isDefined(owner) && refuge.isNeutral()) {
+      refuge.claimUnowned(owner, lord ?? owner.ruler);
+      if (this.target.isHome) {
+        owner.moveHome(refuge);
+      }
+    } else if (lord && !refuge.governor) {
       refuge.assignGovernor(lord);
     }
   }
@@ -359,7 +424,7 @@ export class Invasion {
     const vacated = this.seat(this.attacker.commander, owner);
 
     this.garrison();
-    this.relocateUnit();
+    this.relocateUnit(this.target);
 
     return vacated ? [vacated] : [];
   }
@@ -384,23 +449,52 @@ export class Invasion {
     });
   }
 
-  private relocateUnit(): void {
+  private relocateUnit(destination: Province): void {
     const marched = this.source.fifthUnits.units.find(
       (unit) => unit === this.attacker.unit,
     );
 
     if (marched) {
       this.source.fifthUnits.removeUnit(marched);
-      this.target.fifthUnits.addUnit(marched);
+      destination.fifthUnits.addUnit(marched);
     }
   }
 
-  private comeHome(): readonly Province[] {
-    this.source.addResources({
+  private returnArmy(refuge: Province): readonly Province[] {
+    refuge.addResources({
       troops: this.attacker.troops,
       food: this.attacker.food,
     });
 
-    return [];
+    const owner = this.source.family;
+    const { commander } = this.attacker;
+    const relocates = !refuge.isEqual(this.source);
+
+    if (isDefined(owner) && relocates) {
+      this.resettleAttacker(refuge, owner, commander);
+      this.relocateUnit(refuge);
+    }
+
+    return relocates ? [refuge] : [];
+  }
+
+  private resettleAttacker(
+    refuge: Province,
+    owner: Family,
+    commander: General,
+  ): void {
+    const isRuler = owner.isRuler(commander);
+
+    if (refuge.isNeutral()) {
+      refuge.claimUnowned(owner, commander);
+    } else if (!isRuler && !refuge.isHome && !refuge.hasLord) {
+      refuge.assignGovernor(commander);
+    }
+
+    if (isRuler && this.source.isHome) {
+      owner.moveHome(refuge);
+    } else if (!isRuler && this.source.ruledBy(commander)) {
+      this.source.assignGovernor(owner.ruler, { preserveEntrust: true });
+    }
   }
 }

@@ -66,10 +66,10 @@ export class BattleScreenControl extends Control<
 
     this.side = defends ? BattleSide.defender : BattleSide.attacker;
     this.enemy = new TacticalPolicy(this.side.opposite);
-    this.refuges = defends ? invasion!.refuges : [];
+    this.refuges = invasion?.getRetreatProvinces(this.side) ?? [];
     this.battle = battle;
     this.auto = undefined;
-    this.offerRefuges(invasion?.chooseRefuge());
+    this.offerRefuges(invasion?.chooseRefuge(this.side));
     this.skipping = false;
     this.clearOrder();
 
@@ -318,7 +318,7 @@ export class BattleScreenControl extends Control<
     if (this.battle?.turn.isEqual(this.side)) {
       this.asking = 'retreat';
 
-      if (this.side.isAttacker) {
+      if (this.side.isAttacker && this.refuges.length <= 1) {
         this.view.askToRetreat();
       } else {
         this.view.askToFlee();
@@ -602,9 +602,11 @@ export class BattleScreenControl extends Control<
     if (outcome) {
       this.stopOrdering();
       this.battle = undefined;
-      this.context.events.publish(
-        new BattleEndedEvent(outcome, this.findChosenRefuge()),
-      );
+      const refuge = outcome.isWithdrawnBy(this.side)
+        ? this.findChosenRefuge()
+        : undefined;
+
+      this.context.events.publish(new BattleEndedEvent(outcome, refuge));
     }
   }
 }
