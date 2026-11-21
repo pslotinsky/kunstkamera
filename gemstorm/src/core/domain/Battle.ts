@@ -1,3 +1,5 @@
+import { isDefined } from '@/lib/value/isDefined';
+
 import type { Army } from './Army';
 import { AttackRange } from './AttackRange';
 import { BattleClock } from './BattleClock';
@@ -19,41 +21,54 @@ export interface BattleParams {
   readonly units?: readonly BattleUnit[] | undefined;
 }
 
+interface BattleState {
+  readonly clock: BattleClock;
+  readonly turn: BattleSide;
+  readonly abandonedBy: BattleSide | undefined;
+  readonly starvedSide: BattleSide | undefined;
+}
+
 export class Battle {
   public readonly attacker: Army;
   public readonly defender: Army;
   public readonly field: Battlefield;
   public readonly units: readonly BattleUnit[];
 
-  public clock = new BattleClock();
-  public turn: BattleSide = BattleSide.attacker;
+  public clock: BattleClock;
+  public turn: BattleSide;
 
-  private abandonedBy?: BattleSide | undefined;
+  private abandonedBy: BattleSide | undefined;
+  private starvedSide: BattleSide | undefined;
 
-  public constructor(params: BattleParams) {
+  public constructor(params: BattleParams, state?: BattleState) {
     this.attacker = params.attacker;
     this.defender = params.defender;
     this.field = params.field;
-
     this.units = params.units ?? this.deploy(params.field);
+    this.clock = state?.clock ?? new BattleClock();
+    this.turn = state?.turn ?? BattleSide.attacker;
+    this.abandonedBy = state?.abandonedBy;
+    this.starvedSide = state?.starvedSide;
+
+    if (!isDefined(state)) {
+      this.feedArmies();
+    }
   }
 
   public clone(): Battle {
     const field = this.field.clone();
-    const copy = new Battle({
+    const units = this.units.map((unit) =>
+      unit.clone(field.getCell(unit.cell.column, unit.cell.row) ?? unit.cell),
+    );
+    const params = {
       attacker: this.attacker.clone(),
       defender: this.defender.clone(),
       field,
-      units: this.units.map((unit) =>
-        unit.clone(field.getCell(unit.cell.column, unit.cell.row) ?? unit.cell),
-      ),
-    });
+      units,
+    };
+    const { clock, turn, abandonedBy, starvedSide } = this;
 
-    copy.clock = this.clock;
-    copy.turn = this.turn;
-    copy.abandonedBy = this.abandonedBy;
-
-    return copy;
+    return new Battle(params, { clock, turn, abandonedBy, starvedSide });
   }
 
   public get isOver(): boolean {
@@ -162,7 +177,7 @@ export class Battle {
   }
 
   public findOutcome(): BattleOutcome | undefined {
-    return new BattleVerdict(this, this.abandonedBy).find();
+    return new BattleVerdict(this, this.abandonedBy, this.starvedSide).find();
   }
 
   private deploy(field: Battlefield): readonly BattleUnit[] {
@@ -217,13 +232,33 @@ export class Battle {
   }
 
   private turnClock(): void {
-    const opensNewDay = this.clock.isDayEnd;
+    if (this.clock.isDayEnd) {
+      this.finishDay();
+    } else {
+      this.clock = this.clock.next();
+    }
+  }
 
-    this.clock = this.clock.next();
+  private finishDay(): void {
+    this.starvedSide = BattleSide.all.find(
+      (side) => this.getArmy(side).isStarving,
+    );
 
-    if (opensNewDay) {
-      this.attacker.eat();
-      this.defender.eat();
+    if (!isDefined(this.starvedSide)) {
+      this.clock = this.clock.next();
+
+      if (!this.clock.isSpent) {
+        this.feedArmies();
+      }
+    }
+  }
+
+  private feedArmies(): void {
+    for (const side of BattleSide.all) {
+      const fifthUnit = this.getUnits(side).find((unit) => unit.isFifthUnit);
+      const fifthUnitStrength = fifthUnit?.strength ?? 0;
+
+      this.getArmy(side).eat(fifthUnitStrength);
     }
   }
 }

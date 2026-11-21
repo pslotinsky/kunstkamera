@@ -4,6 +4,7 @@ import { BattleSide } from '@/core/domain/BattleSide';
 import type { BattleUnit } from '@/core/domain/BattleUnit';
 import { Facing } from '@/core/domain/Facing';
 import { FifthUnit } from '@/core/domain/FifthUnit';
+import { Gem } from '@/core/domain/Gem';
 import { HiredUnit } from '@/core/domain/HiredUnit';
 
 import {
@@ -14,6 +15,7 @@ import {
 } from './factories';
 
 const SKYREACH = 22;
+const TURNS_PER_DAY = 8;
 
 function makeBattle(troops = 156, food = 400, unit?: HiredUnit) {
   return makeShared({
@@ -30,6 +32,12 @@ function makeBattle(troops = 156, food = 400, unit?: HiredUnit) {
 
 function destroy(unit: BattleUnit): void {
   unit.takeLosses(unit.strength);
+}
+
+function finishDay(battle: ReturnType<typeof makeBattle>): void {
+  for (let turns = 0; turns < TURNS_PER_DAY; turns += 1) {
+    battle.endTurn();
+  }
 }
 
 describe('Battle', () => {
@@ -111,20 +119,44 @@ describe('Battle', () => {
     expect(north.facing).toBe(Facing.north);
   });
 
-  it('runs four turns a side to the day and charges food as it turns', () => {
+  it('charges both armies at the start of each day, including day one', () => {
     const battle = makeBattle();
-    const before = battle.attacker.food;
 
     expect(battle.clock.phase).toBe('sunrise');
     expect(battle.turn).toBe(BattleSide.attacker);
+    expect(battle.attacker.food).toBe(384);
+    expect(battle.defender.food).toBe(379);
 
-    for (let turns = 0; turns < 8; turns += 1) {
-      battle.endTurn();
-    }
+    finishDay(battle);
 
     expect(battle.clock.day).toBe(2);
     expect(battle.clock.phase).toBe('sunrise');
-    expect(battle.attacker.food).toBeLessThan(before);
+    expect(battle.attacker.food).toBe(368);
+    expect(battle.defender.food).toBe(358);
+  });
+
+  it('charges for the remaining strength of a hired Fifth Unit', () => {
+    const battle = makeBattle(156, 400, HiredUnit.ofName('Grimhides')!);
+    const grimhides = battle.getUnits(BattleSide.attacker).at(-1)!;
+
+    expect(battle.attacker.food).toBe(374);
+    grimhides.takeLosses(43);
+    finishDay(battle);
+    expect(battle.attacker.food).toBe(352);
+
+    destroy(grimhides);
+    finishDay(battle);
+    expect(battle.attacker.food).toBe(336);
+  });
+
+  it('exempts a Gem Guardian from the daily ration', () => {
+    const attacker = makeArmy({
+      troops: 156,
+      unit: Gem.ofName('Voltryn')?.guardian,
+    });
+    const battle = makeShared({ attacker });
+
+    expect(battle.attacker.food).toBe(384);
   });
 
   it('frees a unit to act again only on its own next turn', () => {
@@ -155,19 +187,61 @@ describe('Battle', () => {
     expect(outcome.reason).toBe('flag');
   });
 
-  it('loses the battle for the side whose food runs out', () => {
-    const battle = makeBattle(156, 0);
-    const outcome = battle.findOutcome()!;
+  it('checks for empty supplies only after the final turn of a day', () => {
+    const battle = makeBattle(156, 17);
 
-    expect(outcome.isWonBy(BattleSide.defender)).toBe(true);
-    expect(outcome.reason).toBe('starvation');
+    expect(battle.attacker.food).toBe(1);
+    finishDay(battle);
+    expect(battle.attacker.food).toBe(0);
+    expect(battle.findOutcome()).toBeUndefined();
+    for (let turn = 1; turn < TURNS_PER_DAY; turn += 1) {
+      battle.endTurn();
+    }
+    expect(battle.findOutcome()).toBeUndefined();
+
+    battle.endTurn();
+    expect(battle.findOutcome()).toMatchObject({
+      winner: BattleSide.defender,
+      reason: 'starvation',
+      days: 2,
+    });
+    expect(battle.clone().findOutcome()).toEqual(battle.findOutcome());
+  });
+
+  it.each([
+    [0, BattleSide.defender],
+    [400, BattleSide.attacker],
+  ])(
+    'resolves day-one starvation when the attacker starts with %s food',
+    (food, winner) => {
+      const battle = makeShared({
+        attacker: makeArmy({ food }),
+        defender: makeArmy({ food: 0 }),
+      });
+
+      finishDay(battle);
+
+      expect(battle.findOutcome()).toMatchObject({
+        winner,
+        reason: 'starvation',
+        days: 1,
+      });
+    },
+  );
+
+  it('preserves the first day’s supplies when cloning a battle', () => {
+    const battle = makeBattle();
+    const copy = battle.clone();
+
+    expect(copy.attacker.food).toBe(battle.attacker.food);
+    expect(copy.defender.food).toBe(battle.defender.food);
   });
 
   it('gives the defender the battle when the fifth day closes', () => {
     const battle = makeBattle();
 
-    for (let turns = 0; turns < 8 * 5; turns += 1) {
-      battle.endTurn();
+    for (let day = 0; day < 5; day += 1) {
+      finishDay(battle);
     }
 
     const outcome = battle.findOutcome()!;
@@ -175,6 +249,8 @@ describe('Battle', () => {
     expect(outcome.isWonBy(BattleSide.defender)).toBe(true);
     expect(outcome.reason).toBe('endurance');
     expect(outcome.days).toBe(5);
+    expect(battle.attacker.food).toBe(320);
+    expect(battle.defender.food).toBe(295);
   });
   it('strikes the one unit it was pointed at, whatever the pattern reaches', () => {
     const battle = makeBattle(156, 400, HiredUnit.ofName('Fachan')!);

@@ -93,11 +93,16 @@ export class Army {
   }
 
   public get isStarving(): boolean {
-    return this.food < this.dailyFood;
+    return this.food === 0;
   }
 
-  public eat(): void {
-    this.food = Math.max(this.food - this.dailyFood, 0);
+  public eat(fifthUnitStrength = this.unit?.strength ?? 0): void {
+    const hiredStrength = this.unit?.consumesFood ? fifthUnitStrength : 0;
+    const ration =
+      Math.floor((this.troops + hiredStrength) / DAILY_FOOD_PER_STRENGTH) +
+      DAILY_FOOD_BASE;
+
+    this.food = Math.max(this.food - ration, 0);
   }
 
   public takeCasualties(losses: number): void {

@@ -85,18 +85,6 @@ function setup(gold = 100) {
         )!
         .click(),
     commander: () => root.querySelector('[data-commander]')!.textContent,
-    days: () =>
-      [
-        ...root.querySelectorAll<HTMLElement>(
-          '[data-dropdown="days"] [data-dropdown-option]',
-        ),
-      ].map((option) => option.dataset.value),
-    chooseDays: (days: number) =>
-      root
-        .querySelector<HTMLElement>(
-          `[data-dropdown="days"] [data-value="${days}"]`,
-        )!
-        .click(),
     slotOptions: () =>
       [
         ...root.querySelectorAll<HTMLElement>(
@@ -118,7 +106,6 @@ describe('AttackDialogControl', () => {
 
     expect(dialog.commander()).toContain('Avar');
     expect(dialog.slotOptions()).toEqual(['', 'Voltryn', 'Grimhides']);
-    expect(dialog.days()).toEqual(['3', '5', '8', '10']);
   });
 
   it('leaves out a Guardian whose gem is still resting', () => {
@@ -130,17 +117,17 @@ describe('AttackDialogControl', () => {
     expect(dialog.slotOptions()).toEqual(['', 'Grimhides']);
   });
 
-  it('updates the gold and food costs as troops, days and the Fifth Unit change', () => {
+  it('estimates supply days from the entered food, troops and Fifth Unit', () => {
     const dialog = setup();
 
     dialog.commit('troops', 156);
-    dialog.chooseDays(8);
+    dialog.commit('food', 129);
 
-    expect(dialog.figures()).toBe('Deployment 29 Gold · 128 Food');
+    expect(dialog.figures()).toBe('Deployment 29 gold · supply 8 days');
 
     dialog.bring('Grimhides');
 
-    expect(dialog.figures()).toBe('Deployment 29 Gold · 208 Food');
+    expect(dialog.figures()).toBe('Deployment 29 gold · supply 4 days');
   });
 
   it('withholds the order until the province can pay and feed the army', () => {
@@ -149,13 +136,13 @@ describe('AttackDialogControl', () => {
     expect(dialog.confirms()).toBe(false);
 
     dialog.commit('troops', 156);
+    dialog.commit('food', 16);
     expect(dialog.confirms()).toBe(true);
 
     dialog.bring('Grimhides');
-    dialog.chooseDays(10);
     expect(dialog.confirms()).toBe(false);
 
-    dialog.chooseDays(5);
+    dialog.commit('food', 26);
     expect(dialog.confirms()).toBe(true);
   });
 
@@ -163,7 +150,7 @@ describe('AttackDialogControl', () => {
     const dialog = setup(10);
 
     dialog.commit('troops', 156);
-    dialog.chooseDays(5);
+    dialog.commit('food', 80);
 
     expect(dialog.confirms()).toBe(false);
   });

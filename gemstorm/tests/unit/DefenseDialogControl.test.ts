@@ -74,7 +74,7 @@ function setup(params: SetupParams = {}) {
 
   const attack = new AttackCommand({ world, events });
 
-  attack.attackAt(attacked, { troops: 400, days: 5 });
+  attack.attackAt(attacked, { troops: 400, food: 205 });
   attack.execute();
 
   const root = container.querySelector<HTMLElement>(`.${styles.root}`)!;

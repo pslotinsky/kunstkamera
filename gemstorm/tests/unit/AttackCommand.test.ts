@@ -113,7 +113,7 @@ function setup(params: SetupParams = {}) {
   const attack = (order: Partial<AttackForce> = {}) => {
     const force: AttackForce = {
       troops: SOURCE_TROOPS,
-      days: 3,
+      food: 48,
       ...order,
     };
 
@@ -186,31 +186,32 @@ describe('AttackCommand', () => {
   it('spends the troops, the food, the deployment gold, and the turn', () => {
     const { source, attack } = setup();
 
-    attack({ troops: 156, days: 8 });
+    attack({ troops: 156, food: 129 });
 
     expect(source.resources.gold).toBe(SOURCE_GOLD - 29);
     expect(source.resources.troops).toBe(0);
-    expect(source.resources.food).toBe(SOURCE_FOOD - 128);
+    expect(source.resources.food).toBe(SOURCE_FOOD - 129);
     expect(source.goodwill).toBe(-1);
     expect(source.actionCount).toBe(1);
   });
 
-  it('refuses an unsupported duration or an army it cannot pay for, man, or feed', () => {
+  it('refuses an army the province cannot pay for, man, or feed', () => {
     const cases = [
-      { troops: 156, days: 3, food: SOURCE_FOOD, gold: 10 },
-      { troops: 0, days: 3, food: SOURCE_FOOD, gold: SOURCE_GOLD },
-      { troops: 156, days: 3, food: 47, gold: SOURCE_GOLD },
-      { troops: 156, days: 4, food: SOURCE_FOOD, gold: SOURCE_GOLD },
+      { troops: 156, carried: 48, food: SOURCE_FOOD, gold: 10 },
+      { troops: 0, carried: 48, food: SOURCE_FOOD, gold: SOURCE_GOLD },
+      { troops: 156, carried: 48, food: 47, gold: SOURCE_GOLD },
+      { troops: 156, carried: 15, food: SOURCE_FOOD, gold: SOURCE_GOLD },
+      { troops: 156, carried: 48.5, food: SOURCE_FOOD, gold: SOURCE_GOLD },
     ];
 
-    for (const { troops, days, food, gold } of cases) {
+    for (const { troops, carried, food, gold } of cases) {
       const { source, enemy, attack } = setup();
       source.addResources({
         gold: gold - SOURCE_GOLD,
         food: food - SOURCE_FOOD,
       });
 
-      attack({ troops, days });
+      attack({ troops, food: carried });
 
       expect(source.resources.troops).toBe(SOURCE_TROOPS);
       expect(source.resources.food).toBe(food);

@@ -46,7 +46,8 @@ export class WarPolicy {
     const troops = countSendable(province);
     const [unit] = this.world.getFifthUnits(province);
     const days = AttackDeployment.COMPUTER_SUPPLY_DAYS;
-    const force = { troops, unit, days };
+    const food = AttackDeployment.foodForDays(troops, days, unit);
+    const force = { troops, unit, food };
     const attack = new AttackCommand(this.context);
     const deployment = attack.prepare(force);
     let command: AttackCommand | undefined;

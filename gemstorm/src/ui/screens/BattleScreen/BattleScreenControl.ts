@@ -368,9 +368,8 @@ export class BattleScreenControl extends Control<
     const battle = this.battle;
 
     if (battle && !this.busy && battle.turn.isEqual(this.side)) {
-      battle.endTurn();
       this.clearOrder();
-      this.startEnemyTurn(battle);
+      this.advanceTurn(battle);
     }
   }
 
@@ -417,12 +416,16 @@ export class BattleScreenControl extends Control<
     if (next) {
       this.orderNext(battle, side, next);
     } else {
-      battle.endTurn();
-      this.settleOrEnd(battle);
+      this.advanceTurn(battle);
+    }
+  }
 
-      if (this.battle === battle) {
-        this.openTurn(battle);
-      }
+  private advanceTurn(battle: Battle): void {
+    battle.endTurn();
+    this.settleOrEnd(battle);
+
+    if (this.battle === battle) {
+      this.openTurn(battle);
     }
   }
 

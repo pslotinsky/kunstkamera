@@ -35,8 +35,10 @@ export class AttackCommand extends ProvinceCommand {
     const days =
       isDefined(source) && this.context.world.isComputerRun(source)
         ? AttackDeployment.COMPUTER_SUPPLY_DAYS
-        : AttackDeployment.MIN_SUPPLY_DAYS;
-    const minimum = this.prepare({ troops: AttackDeployment.MIN_TROOPS, days });
+        : 1;
+    const troops = AttackDeployment.MIN_TROOPS;
+    const food = AttackDeployment.foodForDays(troops, days);
+    const minimum = this.prepare({ troops, food });
 
     return this.requiresTarget && (minimum?.isAffordable ?? false);
   }
@@ -95,12 +97,12 @@ export class AttackCommand extends ProvinceCommand {
   }
 
   private canSupply(deployment: AttackDeployment): boolean {
-    const { source, force } = deployment;
+    const { source, dailyFood, food } = deployment;
     const isComputerRun = this.context.world.isComputerRun(source);
-    const hasRequiredDays =
-      !isComputerRun || force.days === AttackDeployment.COMPUTER_SUPPLY_DAYS;
+    const computerFood = dailyFood * AttackDeployment.COMPUTER_SUPPLY_DAYS;
+    const hasRequiredFood = !isComputerRun || food === computerFood;
 
-    return hasRequiredDays && deployment.isAffordable;
+    return hasRequiredFood && deployment.isAffordable;
   }
 
   private canBringUnit(deployment: AttackDeployment): boolean {

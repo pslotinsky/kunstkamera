@@ -86,7 +86,7 @@ function setup() {
   const attack = (target: typeof mine) => {
     const command = new AttackCommand({ world, events });
 
-    command.attackAt(target, { troops: 500, days: 5 });
+    command.attackAt(target, { troops: 500, food: 255 });
     command.execute();
 
     return command;

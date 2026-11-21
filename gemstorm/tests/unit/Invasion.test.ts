@@ -230,7 +230,7 @@ describe('Invasion', () => {
     invasion.conclude(makeOutcome({ winner: BattleSide.attacker }));
 
     expect(target.belongsTo(mine)).toBe(true);
-    expect(target.resources).toMatchObject({ gold: 63, food: 170, troops: 60 });
+    expect(target.resources).toMatchObject({ gold: 63, food: 149, troops: 60 });
     expect(target.development).toMatchObject({
       loyalty: 0,
       cultivation: 81,
@@ -509,7 +509,7 @@ describe('Invasion answered by its defender', () => {
     expect(attacker.fame).toBe(12);
     expect(neighbor.resources.troops).toBe(0);
     expect(source.resources.troops).toBe(SOURCE_TROOPS - 100 + 30);
-    expect(target.resources.food).toBe(420);
+    expect(target.resources.food).toBe(388);
     expect(invasion.affected).toContain(neighbor);
   });
 
@@ -576,7 +576,7 @@ describe('Invasion answered by its defender', () => {
       food: 105,
       troops: 35,
     });
-    expect(target.resources).toMatchObject({ gold: 40, food: 225, troops: 60 });
+    expect(target.resources).toMatchObject({ gold: 40, food: 214, troops: 60 });
   });
 
   it('recovers less when the ruler commanded the defeated army remotely', () => {
@@ -589,7 +589,7 @@ describe('Invasion answered by its defender', () => {
     expect(report.recoveredTroops).toBe(15);
     expect(neighbor.resources).toMatchObject({
       gold: 16,
-      food: 60,
+      food: 55,
       troops: 15,
     });
     expect(invasion.affected).toContain(neighbor);

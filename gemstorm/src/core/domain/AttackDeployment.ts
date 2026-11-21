@@ -7,20 +7,21 @@ import type { Province } from './Province';
 
 export interface AttackForce {
   readonly troops: number;
-  readonly days: number;
+  readonly food: number;
   readonly unit?: FifthUnit | undefined;
 }
 
 export class AttackDeployment {
-  public static readonly MIN_SUPPLY_DAYS = 3;
   public static readonly COMPUTER_SUPPLY_DAYS = 5;
-  public static readonly SUPPLY_DAYS: readonly number[] = [
-    AttackDeployment.MIN_SUPPLY_DAYS,
-    AttackDeployment.COMPUTER_SUPPLY_DAYS,
-    8,
-    10,
-  ];
   public static readonly MIN_TROOPS = 1;
+
+  public static foodForDays(
+    troops: number,
+    days: number,
+    unit?: FifthUnit,
+  ): number {
+    return Army.measureDailyFood(troops, unit) * days;
+  }
 
   public constructor(
     public readonly source: Province,
@@ -33,9 +34,17 @@ export class AttackDeployment {
   }
 
   public get food(): number {
-    const { troops, unit, days } = this.force;
+    return this.force.food;
+  }
 
-    return Army.measureDailyFood(troops, unit) * days;
+  public get dailyFood(): number {
+    const { troops, unit } = this.force;
+
+    return Army.measureDailyFood(troops, unit);
+  }
+
+  public get supplyDays(): number {
+    return Math.floor(this.food / this.dailyFood);
   }
 
   public get strength(): number {
@@ -45,16 +54,17 @@ export class AttackDeployment {
   }
 
   public get isAffordable(): boolean {
-    const { troops, days } = this.force;
+    const { troops, food } = this.force;
     const resources = this.source.resources;
 
     return (
       Number.isInteger(troops) &&
       troops >= AttackDeployment.MIN_TROOPS &&
-      AttackDeployment.SUPPLY_DAYS.includes(days) &&
+      Number.isInteger(food) &&
+      food >= this.dailyFood &&
       resources.troops >= troops &&
       resources.gold >= this.gold &&
-      resources.food >= this.food
+      resources.food >= food
     );
   }
 

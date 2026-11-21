@@ -14,7 +14,7 @@ interface AttackDialogContext {
 
 type AttackViews = {
   readonly troops: AmountFieldView;
-  readonly days: DropdownView;
+  readonly food: AmountFieldView;
   readonly unit: DropdownView;
 };
 
@@ -40,8 +40,12 @@ export class AttackDialogView extends CommandDialogView<
       : `Led by ${name}`;
   }
 
-  public showFigures(gold: number, food: number): void {
-    this.figures.textContent = `Deployment ${gold} Gold · ${food} Food`;
+  public setFoodRange(min: number, max: number): void {
+    this.foodPrompt.textContent = `How much food (${min}-${max})?`;
+  }
+
+  public showFigures(gold: number, days: number): void {
+    this.figures.textContent = `Deployment ${gold} gold · supply ${days} days`;
   }
 
   public enableConfirm(enabled: boolean): void {
@@ -58,8 +62,8 @@ export class AttackDialogView extends CommandDialogView<
           ${this.views.troops.template}
         </div>
         <div class=${styles.section}>
-          <p class=${styles.prompt}>Days of supplies</p>
-          ${this.views.days.template}
+          <p class=${styles.prompt} data-food-prompt></p>
+          ${this.views.food.template}
         </div>
         <div class=${styles.section}>
           <p class=${styles.prompt}>Bring a 5th unit?</p>
@@ -102,6 +106,10 @@ export class AttackDialogView extends CommandDialogView<
 
   private get commander(): HTMLElement {
     return this.element.querySelector<HTMLElement>('[data-commander]')!;
+  }
+
+  private get foodPrompt(): HTMLElement {
+    return this.element.querySelector<HTMLElement>('[data-food-prompt]')!;
   }
 
   private get figures(): HTMLElement {

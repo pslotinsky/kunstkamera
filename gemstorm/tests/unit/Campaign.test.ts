@@ -555,7 +555,7 @@ describe('Campaign completion through game actions', () => {
       expect(target.resources.troops).toBe(50);
     });
     events.subscribe(CampaignEndedEvent, () => order.push('ending'));
-    command.attackAt(target, { troops: 50, days: 5 });
+    command.attackAt(target, { troops: 50, food: 30 });
     execute(context, command);
 
     expect(order).toEqual(['battle']);
@@ -605,7 +605,7 @@ describe('Campaign completion through game actions', () => {
     events.subscribe(BattleReportedEvent, () =>
       events.publish(new TurnHeldEvent(reportHold)),
     );
-    attack.attackAt(target, { troops: 50, days: 5 });
+    attack.attackAt(target, { troops: 50, food: 30 });
     execute(context, attack);
 
     expect(world.campaign.isEnded).toBe(false);
@@ -667,7 +667,7 @@ describe('Campaign completion through game actions', () => {
     context.events.subscribe(CampaignEndedEvent, () => order.push('ending'));
     const attack = new AttackCommand(context);
 
-    attack.attackAt(target, { troops: 50, days: 5 });
+    attack.attackAt(target, { troops: 50, food: 30 });
     execute(context, attack);
 
     expect(context.world.campaign.outcome?.reason).toBe('last-province-lost');

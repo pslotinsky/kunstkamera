@@ -11,6 +11,7 @@ export class BattleVerdict {
   public constructor(
     private readonly battle: Battle,
     private readonly abandonedBy: BattleSide | undefined,
+    private readonly starvedSide: BattleSide | undefined,
   ) {}
 
   public find(): BattleOutcome | undefined {
@@ -21,9 +22,9 @@ export class BattleVerdict {
 
   private findEnding(): Ending | undefined {
     return (
-      this.findRetreat() ??
       this.findCapture() ??
       this.findRout() ??
+      this.findRetreat() ??
       this.findStarvation() ??
       this.findEndurance()
     );
@@ -58,9 +59,7 @@ export class BattleVerdict {
   }
 
   private findStarvation(): Ending | undefined {
-    const starved = BattleSide.all.find(
-      (side) => this.battle.getArmy(side).isStarving,
-    );
+    const starved = this.starvedSide;
 
     return starved && { winner: starved.opposite, reason: 'starvation' };
   }

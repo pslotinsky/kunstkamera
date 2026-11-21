@@ -164,7 +164,7 @@ describe('BattleScreenControl', () => {
 
     expect(command.suspendsTurn()).toBe(false);
 
-    command.attackAt(target, { troops: 100, days: 5 });
+    command.attackAt(target, { troops: 100, food: 55 });
     command.execute();
 
     expect(started).toBeDefined();
@@ -406,6 +406,29 @@ describe('BattleScreenControl', () => {
 
     expect(endings).toHaveLength(1);
     expect(endings[0]?.outcome.reason).toBe('endurance');
+  });
+
+  it('reports starvation when the player closes the day as defender', () => {
+    const { control, events, root } = mountScreen();
+    const invasion = makeInvasion({
+      attacker: makeArmy({ troops: 156, food: 16 }),
+    });
+    const battle = invasion.begin() as Battle;
+    const endings: BattleEndedEvent[] = [];
+
+    battle.clock = new BattleClock(1, 'midnight');
+    battle.turn = BattleSide.defender;
+    events.subscribe(BattleEndedEvent, (event) => endings.push(event));
+    control.play(battle, invasion);
+
+    orderButton(root, 'done').click();
+
+    expect(endings).toHaveLength(1);
+    expect(endings[0]?.outcome).toMatchObject({
+      reason: 'starvation',
+      winner: BattleSide.defender,
+      days: 1,
+    });
   });
 
   it('offers Auto beside Retreat, and asks before it fires', () => {

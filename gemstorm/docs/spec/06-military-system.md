@@ -520,12 +520,12 @@ flowchart TD
 ```text
 Gold cost   = troops ÷ 8 + 10
 Food / day  = unit Strength ÷ 10 + troops ÷ 10 + 1
-Days        = 3, 5, 8, or 10
-Food taken  = Food / day × Days
+Supply days = Food taken ÷ (Food / day)
 ```
 
 - "Unit Strength" is the Strength of the accompanying hired Fifth Unit. A Gem Guardian adds nothing to food.
 - Requires an adjacent, non-allied enemy province, at least 1 soldier, 10 Gold, and 1 Food.
+- The player enters the amount of Food to take. The attack dialog shows the equivalent number of full supply days. An army needs at least one day's Food to launch.
 - A Gem Guardian cannot be taken while its rest counter is above 0.
 - The defender commits all its soldiers and food.
 - Attack counts as a −1 command for policy events.

@@ -1,8 +1,5 @@
 import type { AttackCommand } from '@/core/commands/province/AttackCommand';
-import {
-  AttackDeployment,
-  type AttackForce,
-} from '@/core/domain/AttackDeployment';
+import type { AttackForce } from '@/core/domain/AttackDeployment';
 import type { FifthUnit } from '@/core/domain/FifthUnit';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
@@ -16,14 +13,9 @@ import { CommandDialogControl } from './CommandDialogControl';
 
 type AttackControls = {
   readonly troops: AmountFieldControl;
-  readonly days: DropdownControl;
+  readonly food: AmountFieldControl;
   readonly unit: DropdownControl;
 };
-
-const SUPPLY_OPTIONS = AttackDeployment.SUPPLY_DAYS.map((days) => ({
-  value: String(days),
-  label: `${days} days`,
-}));
 
 export class AttackDialogControl extends CommandDialogControl<
   AttackDialogView,
@@ -39,7 +31,7 @@ export class AttackDialogControl extends CommandDialogControl<
       { name },
       {
         troops: new AmountFieldControl({ name: 'troops' }),
-        days: new DropdownControl({ name: 'days' }),
+        food: new AmountFieldControl({ name: 'food' }),
         unit: new DropdownControl({ name: 'unit' }),
       },
     );
@@ -50,8 +42,7 @@ export class AttackDialogControl extends CommandDialogControl<
     this.target = undefined;
     this.controls.troops.reset();
     this.controls.unit.reset();
-    this.controls.days.setOptions(SUPPLY_OPTIONS);
-    this.controls.days.setValue(String(AttackDeployment.MIN_SUPPLY_DAYS));
+    this.controls.food.reset();
     super.open(command);
     this.update();
   }
@@ -69,7 +60,7 @@ export class AttackDialogControl extends CommandDialogControl<
 
   protected override onMount(): void {
     this.controls.troops.onChange(() => this.update());
-    this.controls.days.onChange(() => this.update());
+    this.controls.food.onChange(() => this.update());
     this.controls.unit.onChange(() => this.update());
   }
 
@@ -82,9 +73,11 @@ export class AttackDialogControl extends CommandDialogControl<
   private update(): void {
     const { current } = this.world.turnQueue;
     const maxTroops = current?.resources.troops ?? 0;
+    const maxFood = current?.resources.food ?? 0;
 
     this.controls.unit.setOptions(toUnitOptions(this.availableUnits()));
     this.controls.troops.setMax(maxTroops);
+    this.controls.food.setMax(maxFood);
     this.view.setTroopsRange(maxTroops);
     this.view.showTarget(this.target);
     this.view.showForm(isDefined(this.target));
@@ -103,19 +96,23 @@ export class AttackDialogControl extends CommandDialogControl<
       isDefined(deployment) && !isDefined(deployment.source.residentGovernor);
 
     this.view.showCommander(commander, remote);
-    this.view.showFigures(deployment?.gold ?? 0, deployment?.food ?? 0);
+    this.view.setFoodRange(
+      deployment?.dailyFood ?? 0,
+      deployment?.source.resources.food ?? 0,
+    );
+    this.view.showFigures(deployment?.gold ?? 0, deployment?.supplyDays ?? 0);
     this.view.enableConfirm(canLaunch);
   }
 
   private buildForce(): AttackForce {
     const troops = this.controls.troops.value;
-    const days = Number(this.controls.days.value);
+    const food = this.controls.food.value;
     const selected = this.controls.unit.value;
     const unit = this.availableUnits().find(
       (candidate) => candidate.name === selected,
     );
 
-    return { troops, days, unit };
+    return { troops, food, unit };
   }
 
   private availableUnits(): readonly FifthUnit[] {

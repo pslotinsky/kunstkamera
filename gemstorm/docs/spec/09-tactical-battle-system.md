@@ -221,7 +221,7 @@ An attack requires Gold to deploy; the deployment cost is set on the strategic s
 
 ### Food Requirement
 
-Food determines how many days the army can remain in battle; the daily consumption rate is set on the strategic side (military chapter §6), and Gem Guardians do not count toward it.
+The attack dialog estimates supply days from the amount of Food the player enters. During battle the daily ration uses the surviving troops and the remaining strength of the ordinary Fifth Unit.
 
 ---
 
