@@ -10,7 +10,6 @@ import { WarReportedEvent } from '@/core/events/WarReportedEvent';
 
 import {
   advanceTo,
-  makeArmy,
   makeFamily,
   makeGeneral,
   makeProvince,
@@ -87,10 +86,7 @@ function setup() {
   const attack = (target: typeof mine) => {
     const command = new AttackCommand({ world, events });
 
-    command.attackAt(
-      target,
-      makeArmy({ commander: darian, troops: 500, food: 500 }),
-    );
+    command.attackAt(target, { troops: 500, days: 5 });
     command.execute();
 
     return command;

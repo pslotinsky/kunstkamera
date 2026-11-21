@@ -2,7 +2,6 @@ import { BattleSide } from './BattleSide';
 import type { Cell } from './Cell';
 import { Clash } from './Clash';
 import { Facing } from './Facing';
-import type { General } from './General';
 import type { RangePattern, Unit } from './Unit';
 
 export type Approach = 'front' | 'flank' | 'rear';
@@ -38,7 +37,7 @@ const RANGE_WEIGHT: Readonly<Record<RangePattern, number>> = {
 export interface BattleUnitParams {
   readonly unit: Unit;
   readonly side: BattleSide;
-  readonly commander: General;
+  readonly commanderWar: number;
   readonly strength: number;
   readonly cell: Cell;
   readonly facing: Facing;
@@ -47,7 +46,7 @@ export interface BattleUnitParams {
 export class BattleUnit {
   public readonly unit: Unit;
   public readonly side: BattleSide;
-  public readonly commander: General;
+  private readonly commanderWar: number;
   public readonly committedStrength: number;
 
   public strength: number;
@@ -59,7 +58,7 @@ export class BattleUnit {
   public constructor(params: BattleUnitParams) {
     this.unit = params.unit;
     this.side = params.side;
-    this.commander = params.commander;
+    this.commanderWar = params.commanderWar;
     this.committedStrength = params.strength;
     this.strength = params.strength;
     this.cell = params.cell;
@@ -70,7 +69,7 @@ export class BattleUnit {
     const copy = new BattleUnit({
       unit: this.unit,
       side: this.side,
-      commander: this.commander,
+      commanderWar: this.commanderWar,
       strength: this.committedStrength,
       cell,
       facing: this.facing,
@@ -142,7 +141,7 @@ export class BattleUnit {
   }
 
   public get sharpness(): number {
-    return 1 + (this.commander.stats.war / MAX_WAR) * WAR_LEVERAGE;
+    return 1 + (this.commanderWar / MAX_WAR) * WAR_LEVERAGE;
   }
 
   public canEnter(cell: Cell): boolean {

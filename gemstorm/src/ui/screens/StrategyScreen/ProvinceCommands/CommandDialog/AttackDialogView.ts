@@ -13,9 +13,8 @@ interface AttackDialogContext {
 }
 
 type AttackViews = {
-  readonly commander: DropdownView;
   readonly troops: AmountFieldView;
-  readonly food: AmountFieldView;
+  readonly days: DropdownView;
   readonly unit: DropdownView;
 };
 
@@ -35,12 +34,14 @@ export class AttackDialogView extends CommandDialogView<
     this.troopsPrompt.textContent = `How many troops (1-${max})?`;
   }
 
-  public setFoodRange(min: number, max: number): void {
-    this.foodPrompt.textContent = `How much food (${min}-${max})?`;
+  public showCommander(name: string, remote: boolean): void {
+    this.commander.textContent = remote
+      ? `Orders from ${name}`
+      : `Led by ${name}`;
   }
 
-  public showFigures(cost: number, days: number): void {
-    this.figures.textContent = `Deployment ${cost} gold — supply ${days} days`;
+  public showFigures(gold: number, food: number): void {
+    this.figures.textContent = `Deployment ${gold} Gold · ${food} Food`;
   }
 
   public enableConfirm(enabled: boolean): void {
@@ -51,17 +52,14 @@ export class AttackDialogView extends CommandDialogView<
     return html`
       <h2 class=${styles.title} data-target></h2>
       <div class=${styles.hidden} data-form>
-        <div class=${styles.section}>
-          <p class=${styles.prompt}>Who leads?</p>
-          ${this.views.commander.template}
-        </div>
+        <p class="${styles.prompt} ${styles.section}" data-commander></p>
         <div class=${styles.section}>
           <p class=${styles.prompt} data-troops-prompt></p>
           ${this.views.troops.template}
         </div>
         <div class=${styles.section}>
-          <p class=${styles.prompt} data-food-prompt></p>
-          ${this.views.food.template}
+          <p class=${styles.prompt}>Days of supplies</p>
+          ${this.views.days.template}
         </div>
         <div class=${styles.section}>
           <p class=${styles.prompt}>Bring a 5th unit?</p>
@@ -102,8 +100,8 @@ export class AttackDialogView extends CommandDialogView<
     return this.element.querySelector<HTMLElement>('[data-troops-prompt]')!;
   }
 
-  private get foodPrompt(): HTMLElement {
-    return this.element.querySelector<HTMLElement>('[data-food-prompt]')!;
+  private get commander(): HTMLElement {
+    return this.element.querySelector<HTMLElement>('[data-commander]')!;
   }
 
   private get figures(): HTMLElement {

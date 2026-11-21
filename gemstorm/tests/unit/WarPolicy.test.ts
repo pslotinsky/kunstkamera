@@ -18,6 +18,7 @@ interface SetupParams {
   readonly weakDefenders?: number;
   readonly strongDefenders?: number;
   readonly unclaimed?: boolean;
+  readonly food?: number;
 }
 
 function setup(params: SetupParams = {}) {
@@ -34,7 +35,7 @@ function setup(params: SetupParams = {}) {
     family: rival,
     governor: darian,
     gold: 200,
-    food: 400,
+    food: params.food ?? 400,
     troops: params.troops ?? 300,
   });
   const weak = makeProvince({
@@ -67,6 +68,7 @@ function setup(params: SetupParams = {}) {
     [source, weak, strong, allied, empty],
     player,
   );
+  rival.moveHome(source);
 
   const attacked: Province[] = [];
 
@@ -118,5 +120,18 @@ describe('WarPolicy', () => {
     play();
 
     expect(attacked).toHaveLength(0);
+  });
+
+  it('takes exactly five days of food and skips an attack if it cannot afford them', () => {
+    const supplied = setup({ food: 105 });
+    const short = setup({ food: 104 });
+
+    supplied.play();
+    short.play();
+
+    expect(supplied.attacked).toEqual([supplied.weak]);
+    expect(supplied.source.resources.food).toBe(0);
+    expect(short.attacked).toEqual([]);
+    expect(short.source.resources.food).toBe(104);
   });
 });

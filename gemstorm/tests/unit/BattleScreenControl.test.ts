@@ -2,7 +2,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AttackCommand } from '@/core/commands/province/AttackCommand';
-import { Army } from '@/core/domain/Army';
 import { Battle } from '@/core/domain/Battle';
 import { BATTLE_DAY_LIMIT, BattleClock } from '@/core/domain/BattleClock';
 import { BattleSide } from '@/core/domain/BattleSide';
@@ -165,10 +164,7 @@ describe('BattleScreenControl', () => {
 
     expect(command.suspendsTurn()).toBe(false);
 
-    command.attackAt(
-      target,
-      new Army({ commander: avar, troops: 100, food: 120 }),
-    );
+    command.attackAt(target, { troops: 100, days: 5 });
     command.execute();
 
     expect(started).toBeDefined();

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { AttackCommand } from '@/core/commands/province/AttackCommand';
-import { Army, type ArmyParams } from '@/core/domain/Army';
+import type { AttackForce } from '@/core/domain/AttackDeployment';
 import { BattleOutcome } from '@/core/domain/BattleOutcome';
 import { BattleSide } from '@/core/domain/BattleSide';
 import { Gem } from '@/core/domain/Gem';
@@ -89,6 +89,7 @@ function setup(params: SetupParams = {}) {
 
   mine.ally = friend;
   friend.ally = mine;
+  mine.moveHome(source);
 
   const { world, events } = makeWorld(
     [source, enemy, neutral, owned, allied, refuge, distant],
@@ -108,15 +109,14 @@ function setup(params: SetupParams = {}) {
     started = event;
   });
 
-  const attack = (order: Partial<ArmyParams>) => {
-    const params: ArmyParams = {
-      commander: order.commander ?? avar,
-      troops: order.troops ?? 156,
-      food: order.food ?? 120,
-      unit: order.unit,
+  const attack = (order: Partial<AttackForce> = {}) => {
+    const force: AttackForce = {
+      troops: SOURCE_TROOPS,
+      days: 3,
+      ...order,
     };
 
-    command.attackAt(enemy, new Army(params));
+    command.attackAt(enemy, force);
     command.execute();
   };
 
@@ -157,17 +157,20 @@ function setup(params: SetupParams = {}) {
 }
 
 describe('AttackCommand', () => {
-  it('can attack with Nerith alone, but cannot summon a visit that has already departed', () => {
+  it('requires soldiers alongside a Fifth Unit and checks that the unit is still available', () => {
     const { source, attack, started } = setup();
     const nerith = new Nerith();
     source.fifthUnits.addUnit(nerith);
-    source.fifthUnits.removeUnit(nerith);
     attack({ troops: 0, unit: nerith });
     expect(started()).toBeUndefined();
+
+    source.fifthUnits.removeUnit(nerith);
+    attack({ troops: 100, unit: nerith });
+    expect(started()).toBeUndefined();
+
     source.fifthUnits.addUnit(nerith);
-    attack({ troops: 0, unit: nerith });
+    attack({ troops: 100, unit: nerith });
     expect(started()?.battle.attacker.unit).toBe(nerith);
-    expect(started()?.battle.getUnits(BattleSide.attacker)).toHaveLength(1);
   });
 
   it('offers adjacent provinces held by another house only', () => {
@@ -179,38 +182,46 @@ describe('AttackCommand', () => {
   it('spends the troops, the food, the deployment gold, and the turn', () => {
     const { source, attack } = setup();
 
-    attack({ troops: 156, food: 120 });
+    attack({ troops: 156, days: 8 });
 
     expect(source.resources.gold).toBe(SOURCE_GOLD - 29);
+    expect(source.resources.troops).toBe(0);
+    expect(source.resources.food).toBe(SOURCE_FOOD - 128);
     expect(source.goodwill).toBe(-1);
     expect(source.actionCount).toBe(1);
   });
 
-  it('refuses an army it cannot pay for, man, or feed for a day', () => {
+  it('refuses an unsupported duration or an army it cannot pay for, man, or feed', () => {
     const cases = [
-      { troops: 156, food: 120, gold: 10 },
-      { troops: 0, food: 120, gold: SOURCE_GOLD },
-      { troops: 156, food: 10, gold: SOURCE_GOLD },
+      { troops: 156, days: 3, food: SOURCE_FOOD, gold: 10 },
+      { troops: 0, days: 3, food: SOURCE_FOOD, gold: SOURCE_GOLD },
+      { troops: 156, days: 3, food: 47, gold: SOURCE_GOLD },
+      { troops: 156, days: 4, food: SOURCE_FOOD, gold: SOURCE_GOLD },
     ];
 
-    for (const { troops, food, gold } of cases) {
+    for (const { troops, days, food, gold } of cases) {
       const { source, enemy, attack } = setup();
-      source.addResources({ gold: gold - SOURCE_GOLD });
+      source.addResources({
+        gold: gold - SOURCE_GOLD,
+        food: food - SOURCE_FOOD,
+      });
 
-      attack({ troops, food });
+      attack({ troops, days });
 
       expect(source.resources.troops).toBe(SOURCE_TROOPS);
-      expect(source.resources.food).toBe(SOURCE_FOOD);
+      expect(source.resources.food).toBe(food);
       expect(source.goodwill).toBe(0);
       expect(enemy.belongsTo(source.family!)).toBe(false);
     }
   });
 
   it('hands the province to the winner, garrisoned under its commander', () => {
-    const { avar, rhovan, mine, source, enemy, attack, finish, report } =
+    const { avar, rhovan, mine, source, owned, enemy, attack, finish, report } =
       setup();
 
-    attack({ commander: rhovan });
+    mine.moveHome(owned);
+    source.assignGovernor(rhovan);
+    attack();
     finish(BattleSide.attacker);
 
     const outcome = report()!.outcome!;
@@ -222,10 +233,15 @@ describe('AttackCommand', () => {
     expect(source.ruledBy(avar)).toBe(true);
   });
 
-  it('rules a province taken by the ruler himself at a distance', () => {
-    const { avar, enemy, attack, finish } = setup();
+  it('uses half the ruler’s War for an attack from an unstaffed province', () => {
+    const { mine, avar, source, owned, enemy, attack, finish, started } =
+      setup();
+    mine.moveHome(owned);
+    source.assignGovernor(undefined);
 
-    attack({ commander: avar });
+    attack();
+    expect(started()?.battle.attacker.commander).toBe(avar);
+    expect(started()?.battle.attacker.commanderWar).toBe(25);
     finish(BattleSide.attacker);
 
     expect(enemy.ruledBy(avar)).toBe(true);
@@ -238,7 +254,7 @@ describe('AttackCommand', () => {
       defenderFood: 400,
     });
 
-    attack({ troops: 20, food: 120 });
+    attack({ troops: 20 });
     finish(BattleSide.defender);
 
     const outcome = report()!.outcome!;
@@ -259,7 +275,7 @@ describe('AttackCommand', () => {
       defenderFood: 0,
     });
 
-    attack({ troops: 156, food: 120 });
+    attack();
 
     expect(report()!.answer).toBe('retreat');
     expect(report()!.outcome).toBeUndefined();

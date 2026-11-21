@@ -32,4 +32,11 @@ describe('Army', () => {
   it('charges deployment gold by the troops committed', () => {
     expect(makeArmy().deploymentCost).toBe(29);
   });
+
+  it('rounds the troops and hired Fifth Unit food costs separately', () => {
+    const unit = HiredUnit.ofName('Lancers')!;
+    unit.retainBattleStrength(155);
+
+    expect(Army.measureDailyFood(TROOPS, unit)).toBe(31);
+  });
 });

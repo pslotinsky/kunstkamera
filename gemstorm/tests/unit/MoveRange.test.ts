@@ -9,15 +9,13 @@ import { MoveRange } from '@/core/domain/MoveRange';
 import { StandardUnit } from '@/core/domain/StandardUnit';
 import type { Unit } from '@/core/domain/Unit';
 
-import { makeGeneral } from './factories';
-
 const SKYREACH = 22;
 
 function place(unit: Unit, cell: Cell): BattleUnit {
   return new BattleUnit({
     unit,
     side: BattleSide.attacker,
-    commander: makeGeneral(),
+    commanderWar: 50,
     strength: 10,
     cell,
     facing: Facing.east,

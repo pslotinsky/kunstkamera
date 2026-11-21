@@ -37,7 +37,6 @@ import { WorldEngine } from '@/core/WorldEngine';
 
 import {
   advanceTo,
-  makeArmy,
   makeCaptive,
   makeFamily,
   makeGeneral,
@@ -543,7 +542,7 @@ describe('Campaign completion through game actions', () => {
 
   it('waits for the captured ruler’s fate before declaring victory', () => {
     const context = island();
-    const { world, events, source, target, player } = context;
+    const { world, events, target, player } = context;
     const order: string[] = [];
     const command = new AttackCommand(context);
 
@@ -556,10 +555,7 @@ describe('Campaign completion through game actions', () => {
       expect(target.resources.troops).toBe(50);
     });
     events.subscribe(CampaignEndedEvent, () => order.push('ending'));
-    command.attackAt(
-      target,
-      makeArmy({ commander: source.governor!, troops: 50, food: 100 }),
-    );
+    command.attackAt(target, { troops: 50, days: 5 });
     execute(context, command);
 
     expect(order).toEqual(['battle']);
@@ -609,10 +605,7 @@ describe('Campaign completion through game actions', () => {
     events.subscribe(BattleReportedEvent, () =>
       events.publish(new TurnHeldEvent(reportHold)),
     );
-    attack.attackAt(
-      target,
-      makeArmy({ commander: source.governor!, troops: 50, food: 100 }),
-    );
+    attack.attackAt(target, { troops: 50, days: 5 });
     execute(context, attack);
 
     expect(world.campaign.isEnded).toBe(false);
@@ -674,10 +667,7 @@ describe('Campaign completion through game actions', () => {
     context.events.subscribe(CampaignEndedEvent, () => order.push('ending'));
     const attack = new AttackCommand(context);
 
-    attack.attackAt(
-      target,
-      makeArmy({ commander: rival.ruler, troops: 50, food: 100 }),
-    );
+    attack.attackAt(target, { troops: 50, days: 5 });
     execute(context, attack);
 
     expect(context.world.campaign.outcome?.reason).toBe('last-province-lost');

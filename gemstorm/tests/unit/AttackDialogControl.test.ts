@@ -43,6 +43,7 @@ function setup(gold = 100) {
   });
 
   source.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
+  mine.moveHome(source);
 
   const { world, events } = makeWorld([source, enemy], mine);
 
@@ -83,9 +84,19 @@ function setup(gold = 100) {
           `[data-dropdown="unit"] [data-value="${name}"]`,
         )!
         .click(),
-    commander: () =>
-      root.querySelector('[data-dropdown="commander"] [data-dropdown-label]')!
-        .textContent,
+    commander: () => root.querySelector('[data-commander]')!.textContent,
+    days: () =>
+      [
+        ...root.querySelectorAll<HTMLElement>(
+          '[data-dropdown="days"] [data-dropdown-option]',
+        ),
+      ].map((option) => option.dataset.value),
+    chooseDays: (days: number) =>
+      root
+        .querySelector<HTMLElement>(
+          `[data-dropdown="days"] [data-value="${days}"]`,
+        )!
+        .click(),
     slotOptions: () =>
       [
         ...root.querySelectorAll<HTMLElement>(
@@ -93,7 +104,6 @@ function setup(gold = 100) {
         ),
       ].map((option) => option.dataset.value),
     figures: () => root.querySelector('[data-figures]')!.textContent,
-    foodRange: () => root.querySelector('[data-food-prompt]')!.textContent,
     confirms: () =>
       !root.querySelector<HTMLButtonElement>('button[data-action="confirm"]')!
         .disabled,
@@ -108,6 +118,7 @@ describe('AttackDialogControl', () => {
 
     expect(dialog.commander()).toContain('Avar');
     expect(dialog.slotOptions()).toEqual(['', 'Voltryn', 'Grimhides']);
+    expect(dialog.days()).toEqual(['3', '5', '8', '10']);
   });
 
   it('leaves out a Guardian whose gem is still resting', () => {
@@ -119,18 +130,17 @@ describe('AttackDialogControl', () => {
     expect(dialog.slotOptions()).toEqual(['', 'Grimhides']);
   });
 
-  it('moves the deployment gold and the supply days with the commitment', () => {
+  it('updates the gold and food costs as troops, days and the Fifth Unit change', () => {
     const dialog = setup();
 
     dialog.commit('troops', 156);
-    dialog.commit('food', 120);
+    dialog.chooseDays(8);
 
-    expect(dialog.figures()).toBe('Deployment 29 gold — supply 7 days');
-    expect(dialog.foodRange()).toBe('How much food (16-200)?');
+    expect(dialog.figures()).toBe('Deployment 29 Gold · 128 Food');
 
     dialog.bring('Grimhides');
 
-    expect(dialog.figures()).toBe('Deployment 29 gold — supply 4 days');
+    expect(dialog.figures()).toBe('Deployment 29 Gold · 208 Food');
   });
 
   it('withholds the order until the province can pay and feed the army', () => {
@@ -139,15 +149,13 @@ describe('AttackDialogControl', () => {
     expect(dialog.confirms()).toBe(false);
 
     dialog.commit('troops', 156);
+    expect(dialog.confirms()).toBe(true);
 
+    dialog.bring('Grimhides');
+    dialog.chooseDays(10);
     expect(dialog.confirms()).toBe(false);
 
-    dialog.commit('food', 15);
-
-    expect(dialog.confirms()).toBe(false);
-
-    dialog.commit('food', 120);
-
+    dialog.chooseDays(5);
     expect(dialog.confirms()).toBe(true);
   });
 
@@ -155,7 +163,7 @@ describe('AttackDialogControl', () => {
     const dialog = setup(10);
 
     dialog.commit('troops', 156);
-    dialog.commit('food', 120);
+    dialog.chooseDays(5);
 
     expect(dialog.confirms()).toBe(false);
   });

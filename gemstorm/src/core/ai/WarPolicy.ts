@@ -4,10 +4,10 @@ import type {
   WorldCommand,
   WorldCommandContext,
 } from '@/core/commands/WorldCommand';
-import { Army } from '@/core/domain/Army';
-import { BATTLE_DAY_LIMIT } from '@/core/domain/BattleClock';
+import { AttackDeployment } from '@/core/domain/AttackDeployment';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
+import { isDefined } from '@/lib/value/isDefined';
 
 import { countSendable } from './garrison';
 
@@ -43,29 +43,25 @@ export class WarPolicy {
 
   private chooseAttack(province: Province): WorldCommand | undefined {
     const target = this.findWeakestTarget(province);
-    const army = this.raiseArmy(province);
-
-    if (!target || !army || !this.canBreak(army, target, province)) {
-      return undefined;
-    }
-
-    const attack = new AttackCommand(this.context);
-
-    attack.attackAt(target, army);
-
-    return attack;
-  }
-
-  private raiseArmy(province: Province): Army | undefined {
-    const commander = province.governor;
     const troops = countSendable(province);
     const [unit] = this.world.getFifthUnits(province);
-    const supply = Army.measureDailyFood(troops, unit) * BATTLE_DAY_LIMIT;
-    const food = Math.min(province.resources.food, supply);
+    const days = AttackDeployment.COMPUTER_SUPPLY_DAYS;
+    const force = { troops, unit, days };
+    const attack = new AttackCommand(this.context);
+    const deployment = attack.prepare(force);
+    let command: AttackCommand | undefined;
 
-    return commander && (troops > 0 || unit?.standsAlone)
-      ? new Army({ commander, troops, food, unit })
-      : undefined;
+    if (
+      isDefined(target) &&
+      isDefined(deployment) &&
+      attack.canLaunch(target, deployment) &&
+      this.hasAdvantage(deployment, target)
+    ) {
+      attack.attackAt(target, force);
+      command = attack;
+    }
+
+    return command;
   }
 
   private findWeakestTarget(province: Province): Province | undefined {
@@ -75,11 +71,12 @@ export class WarPolicy {
     )[0];
   }
 
-  private canBreak(army: Army, target: Province, source: Province): boolean {
+  private hasAdvantage(
+    deployment: AttackDeployment,
+    target: Province,
+  ): boolean {
     return (
-      army.supplyDays > 0 &&
-      source.resources.gold >= army.deploymentCost &&
-      army.strength >= this.world.getDefense(target) * ATTACK_ADVANTAGE
+      deployment.strength >= this.world.getDefense(target) * ATTACK_ADVANTAGE
     );
   }
 

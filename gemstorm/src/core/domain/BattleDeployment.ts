@@ -68,10 +68,12 @@ export class BattleDeployment {
     side: BattleSide,
     cell: Cell,
   ): BattleUnit {
+    const commanderWar = army.commanderWar;
+
     return new BattleUnit({
       unit: body.unit,
       side,
-      commander: army.commander,
+      commanderWar,
       strength: body.strength,
       cell,
       facing: Facing.towardEnemy(side),

@@ -10,8 +10,6 @@ import { FifthUnit } from '@/core/domain/FifthUnit';
 import { StandardUnit } from '@/core/domain/StandardUnit';
 import type { RangePattern, Unit } from '@/core/domain/Unit';
 
-import { makeGeneral } from './factories';
-
 const SKYREACH = 22;
 const field = Battlefield.ofProvince(SKYREACH);
 
@@ -29,7 +27,7 @@ function station(unit: Unit, column: number, row: number): BattleUnit {
   return new BattleUnit({
     unit,
     side: BattleSide.attacker,
-    commander: makeGeneral(),
+    commanderWar: 50,
     strength: 40,
     cell: field.getCell(column, row)!,
     facing: Facing.east,

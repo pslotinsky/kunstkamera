@@ -10,8 +10,6 @@ import { Nerith } from '@/core/domain/Nerith';
 import { StandardUnit } from '@/core/domain/StandardUnit';
 import type { RangePattern, Unit } from '@/core/domain/Unit';
 
-import { makeGeneral } from './factories';
-
 const SKYREACH = 22;
 const TARGET_COLUMN = 3;
 const TARGET_ROW = 3;
@@ -57,7 +55,7 @@ function place(
   return new BattleUnit({
     unit,
     side: BattleSide.attacker,
-    commander: makeGeneral({ war }),
+    commanderWar: war,
     strength,
     cell: field.getCell(column, row)!,
     facing,

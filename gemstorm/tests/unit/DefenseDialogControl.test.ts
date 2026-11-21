@@ -11,7 +11,6 @@ import { DefenseDialogControl } from '@/ui/screens/StrategyScreen/DefenseDialog/
 
 import {
   advanceTo,
-  makeArmy,
   makeFamily,
   makeGeneral,
   makeProvince,
@@ -75,10 +74,7 @@ function setup(params: SetupParams = {}) {
 
   const attack = new AttackCommand({ world, events });
 
-  attack.attackAt(
-    attacked,
-    makeArmy({ commander: darian, troops: 400, food: 400 }),
-  );
+  attack.attackAt(attacked, { troops: 400, days: 5 });
   attack.execute();
 
   const root = container.querySelector<HTMLElement>(`.${styles.root}`)!;

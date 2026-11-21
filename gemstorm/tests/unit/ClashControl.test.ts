@@ -13,13 +13,11 @@ import { SoundBoard } from '@/ui/common/sound/SoundBoard';
 import styles from '@/ui/screens/BattleScreen/Clash/Clash.module.scss';
 import { ClashControl } from '@/ui/screens/BattleScreen/Clash/ClashControl';
 
-import { makeGeneral } from './factories';
-
 function muster(unit: Unit, strength: number, side: BattleSide) {
   return new BattleUnit({
     unit,
     side,
-    commander: makeGeneral(),
+    commanderWar: 50,
     strength,
     cell: new Cell(side.isAttacker ? 0 : 1, 0, 'plains'),
     facing: Facing.east,

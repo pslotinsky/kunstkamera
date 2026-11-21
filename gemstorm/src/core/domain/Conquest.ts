@@ -84,10 +84,20 @@ export class Conquest {
   }
 
   private isCaught(loser: Loser): boolean {
-    return (
-      this.isLastStand(loser) ||
-      (!this.isStandIn(loser) && Math.random() < this.weighOdds())
-    );
+    const army = this.report.isTaken
+      ? this.report.defender
+      : this.report.attacker;
+    let caught = false;
+
+    if (!army.remotelyCommanded) {
+      if (this.isLastStand(loser)) {
+        caught = true;
+      } else if (!this.isStandIn(loser)) {
+        caught = Math.random() < this.weighOdds();
+      }
+    }
+
+    return caught;
   }
 
   private isStandIn({ house, general }: Loser): boolean {
