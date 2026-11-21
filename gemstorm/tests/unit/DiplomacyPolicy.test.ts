@@ -12,8 +12,8 @@ import {
   makeWorld,
 } from './factories';
 
-function setup() {
-  const darian = makeGeneral({ name: 'Darian' });
+function setup(adjacent = true) {
+  const darian = makeGeneral({ name: 'Darian', charisma: 70 });
   const rival = makeFamily({ name: 'Stormmere', ruler: darian });
   const avar = makeGeneral({ name: 'Avar' });
   const rhovan = makeGeneral({ name: 'Rhovan' });
@@ -25,7 +25,7 @@ function setup() {
 
   const home = makeProvince({
     number: 1,
-    neighbors: [2, 3],
+    neighbors: adjacent ? [2, 3] : [],
     family: rival,
     governor: darian,
     gold: 100,
@@ -139,11 +139,24 @@ describe('DiplomacyPolicy', () => {
   it('tries to turn the lord of a hostile neighbour', () => {
     const { missions, rhovan, play } = setup();
 
-    play([0.9, 0.1, 0.99]);
+    play([0.9, 0.1, 0.99, 0]);
 
     expect(missions[0]?.outcome).toMatchObject({
       kind: 'defection',
       general: rhovan,
+      persuaded: true,
+    });
+  });
+
+  it('can send a defection offer beyond the borders of its capital', () => {
+    const { missions, rhovan, play } = setup(false);
+
+    play([0.9, 0.1, 0]);
+
+    expect(missions[0]?.outcome).toMatchObject({
+      kind: 'defection',
+      general: rhovan,
+      persuaded: true,
     });
   });
 });

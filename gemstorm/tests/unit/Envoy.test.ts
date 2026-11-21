@@ -1,8 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { Characteristics } from '@/core/domain/Characteristics';
 import { Envoy } from '@/core/domain/Envoy';
 import type { Family } from '@/core/domain/Family';
 import { Gem } from '@/core/domain/Gem';
+import type { DefectionClass } from '@/core/domain/General';
 import { HiredUnit } from '@/core/domain/HiredUnit';
 import type { Province } from '@/core/domain/Province';
 
@@ -13,17 +15,27 @@ interface SetupOptions {
   readonly theirs?: number;
   readonly ourFame?: number;
   readonly theirFame?: number;
+  readonly defectionClass?: DefectionClass;
+  readonly royal?: boolean;
 }
 
 function setup(options: SetupOptions = {}) {
-  const avar = makeGeneral({ name: 'Avar', lineage: 'Alderwyn' });
+  const avar = makeGeneral({ name: 'Avar', lineage: 'Alderwyn', charisma: 80 });
   const darian = makeGeneral({ name: 'Darian', lineage: 'Stormmere' });
-  const marven = makeGeneral({ name: 'Marven' });
-  const ruskarn = makeGeneral({ name: 'Ruskarn', lineage: 'Stormmere' });
+  const marven = makeGeneral({
+    name: 'Marven',
+    defectionClass: options.defectionClass ?? 0,
+  });
+  const ruskarn = makeGeneral({
+    name: 'Ruskarn',
+    lineage: 'Stormmere',
+    defectionClass: 3,
+  });
   const alderwyn = makeFamily({
     name: 'Alderwyn',
     ruler: avar,
     fame: options.ourFame ?? 10,
+    royal: options.royal,
   });
   const stormmere = makeFamily({
     name: 'Stormmere',
@@ -42,6 +54,8 @@ function setup(options: SetupOptions = {}) {
 
   const ours = makeProvinces(alderwyn, options.ours ?? 1);
   const theirs = makeProvinces(stormmere, options.theirs ?? 1);
+  alderwyn.moveHome(ours[0]!);
+  stormmere.moveHome(theirs[0]!);
   const pineward = makeProvince({
     number: 100,
     name: 'Pineward',
@@ -118,19 +132,73 @@ describe('Envoy', () => {
     expect(stormmere.fame).toBe(7);
   });
 
-  it('turns a sworn vassal more easily than a kinsman', () => {
-    rollAt(0.2);
+  it.each([
+    [0, 0.03],
+    [1, 0.15],
+    [2, 0.3],
+    [3, 0.5],
+  ] as const)('uses the fixed odds for class %s', (defectionClass, chance) => {
+    const { envoy, marven } = setup({
+      defectionClass,
+      ourFame: 0,
+      theirFame: 100,
+    });
 
-    const { envoy, marven, ruskarn } = setup({ ourFame: 0, theirFame: 100 });
+    rollAt(chance);
+    expect(envoy.persuade(marven)).toBe(false);
 
+    rollAt(chance - 0.01);
     expect(envoy.persuade(marven)).toBe(true);
+  });
+
+  it('always fails a mission to a member of the rival ruler’s house', () => {
+    const { envoy, ruskarn } = setup();
+    const roll = vi.spyOn(Math, 'random').mockReturnValue(0);
+
+    expect(envoy.canApproach(ruskarn)).toBe(true);
     expect(envoy.persuade(ruskarn)).toBe(false);
+    expect(roll).not.toHaveBeenCalled();
+  });
+
+  it('requires strictly higher Charisma and a strictly stronger ruler', () => {
+    const { envoy, marven, darian } = setup();
+
+    marven.stats = Characteristics.from({ charisma: 80 });
+    expect(envoy.canPersuade(marven)).toBe(false);
+
+    marven.stats = Characteristics.from({ charisma: 79 });
+    darian.stats = Characteristics.from({
+      intelligence: 65,
+      war: 65,
+      charisma: 50,
+    });
+    expect(envoy.canPersuade(marven)).toBe(false);
+
+    darian.stats = darian.stats.decrease({ war: 1 });
+    expect(envoy.canPersuade(marven)).toBe(true);
+  });
+
+  it('uses half the ruler’s Charisma when the acting province has no governor', () => {
+    const { envoy, alderwyn, marven } = setup();
+
+    alderwyn.homeProvince.assignGovernor(undefined);
+    marven.stats = Characteristics.from({ charisma: 40 });
+    expect(envoy.canPersuade(marven)).toBe(false);
+
+    marven.stats = marven.stats.decrease({ charisma: 1 });
+    expect(envoy.canPersuade(marven)).toBe(true);
+  });
+
+  it('keeps the royal house from sending defection offers', () => {
+    const { envoy, marven } = setup({ royal: true });
+
+    expect(envoy.canApproach(marven)).toBe(false);
   });
 
   it('never asks a ruler to defect', () => {
     const { envoy, darian } = setup();
 
-    expect(envoy.canPersuade(darian)).toBe(false);
+    expect(envoy.canApproach(darian)).toBe(false);
   });
 
   it('refuses surrender below the province threshold despite higher Fame', () => {

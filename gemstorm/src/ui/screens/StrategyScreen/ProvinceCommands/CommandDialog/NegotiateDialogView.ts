@@ -31,10 +31,15 @@ export class NegotiateDialogView extends CommandDialogView {
     this.prompt.textContent = target ? `Send an envoy to ${target}` : '';
   }
 
-  public showMission(mission: NegotiationMission | undefined): void {
+  public showMission(
+    mission: NegotiationMission | undefined,
+    canSendForDefection: boolean,
+  ): void {
     this.missions.classList.toggle(styles.hidden!, !isDefined(mission));
 
     for (const button of this.missionButtons) {
+      button.disabled =
+        button.dataset.mission === 'defection' && !canSendForDefection;
       button.classList.toggle(
         styles.selected!,
         button.dataset.mission === mission,

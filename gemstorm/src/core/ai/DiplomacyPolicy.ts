@@ -88,15 +88,19 @@ export class DiplomacyPolicy {
 
   private chooseCovertOrder(home: Province): WorldCommand | undefined {
     const targets = this.world.getHostileNeighbors(home);
+    const defection = this.chooseDefection(home);
 
-    if (targets.length === 0 || Math.random() >= COVERT_ODDS) {
+    if (
+      (targets.length === 0 && !isDefined(defection)) ||
+      Math.random() >= COVERT_ODDS
+    ) {
       return undefined;
     }
 
-    const order = sample(COVERT_ORDERS);
+    const order = targets.length > 0 ? sample(COVERT_ORDERS) : 'defection';
 
     return order === 'defection'
-      ? this.chooseDefection(targets)
+      ? defection
       : this.chooseInfiltration(order, targets);
   }
 
@@ -117,23 +121,27 @@ export class DiplomacyPolicy {
     return infiltration;
   }
 
-  private chooseDefection(
-    targets: readonly Province[],
-  ): WorldCommand | undefined {
-    const strongest = targets
-      .filter((target) => target.hasLord)
-      .sort((left, right) => right.resources.troops - left.resources.troops)[0];
-    const lord = strongest?.governor;
+  private chooseDefection(home: Province): WorldCommand | undefined {
+    const { family } = home;
+    let defection: NegotiateCommand | undefined;
 
-    if (!lord) {
-      return undefined;
+    if (isDefined(family)) {
+      const envoy = new Envoy({ world: this.world, family });
+      const command = new NegotiateCommand(this.context);
+      const targets = this.world.map.provinces
+        .filter((target) => family.isHostileTo(target.family))
+        .sort((left, right) => right.resources.troops - left.resources.troops);
+      const candidate = targets
+        .flatMap((target) => command.getCandidates(target))
+        .find((general) => envoy.canPersuade(general));
+
+      if (isDefined(candidate)) {
+        command.persuade(candidate);
+        defection = command;
+      }
     }
 
-    const negotiate = new NegotiateCommand(this.context);
-
-    negotiate.persuade(lord);
-
-    return negotiate;
+    return defection;
   }
 
   private get world(): World {

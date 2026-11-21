@@ -765,8 +765,10 @@ describe('Campaign completion through game actions', () => {
     const lord = makeGeneral({ name: 'Marven' });
 
     rival.homeProvince = provinces[0]!;
+    player.ruler.stats = player.ruler.stats.increase({ charisma: 10 });
     rival.enlist(lord);
     target.assignGovernor(lord);
+    advanceTo(world, player.homeProvince);
     vi.spyOn(Math, 'random').mockReturnValue(0);
     const negotiate = new NegotiateCommand(context);
 

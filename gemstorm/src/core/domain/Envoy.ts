@@ -6,8 +6,8 @@ import type { World } from './World';
 
 const ALLY_ODDS = 0.8;
 const ALLY_REFUSAL_RATIO = 2;
-const SWORN_DEFECTION_ODDS = 0.4;
-const KIN_DEFECTION_ODDS = 0.1;
+const UNSTAFFED_CHARISMA_DIVISOR = 2;
+const DEFECTION_CHANCES = [0.03, 0.15, 0.3, 0.5] as const;
 const SURRENDER_RATIO = 3;
 const SURRENDER_ODDS = 0.25;
 
@@ -45,22 +45,28 @@ export class Envoy {
     return accepted;
   }
 
+  public canApproach(general: General): boolean {
+    const rival = this.world.findFamilyOf(general);
+
+    return isDefined(rival) && this.isDefectionTarget(general, rival);
+  }
+
   public canPersuade(general: General): boolean {
     const rival = this.world.findFamilyOf(general);
 
     return (
       isDefined(rival) &&
-      this.family.isHostileTo(rival) &&
-      !rival.isRuler(general)
+      this.isDefectionTarget(general, rival) &&
+      !general.isKinOf(rival) &&
+      this.actingCharisma > general.stats.charisma &&
+      this.family.ruler.stats.total > rival.ruler.stats.total
     );
   }
 
   public persuade(general: General): boolean {
-    const rival = this.world.findFamilyOf(general);
     const persuaded =
-      isDefined(rival) &&
       this.canPersuade(general) &&
-      Math.random() < this.weighDefection(general, rival);
+      Math.random() < DEFECTION_CHANCES[general.defectionClass];
 
     if (persuaded) {
       this.world.transfer(general, this.family);
@@ -90,8 +96,22 @@ export class Envoy {
     return ALLY_ODDS * Math.min(1, Math.max(0, share));
   }
 
-  private weighDefection(general: General, rival: Family): number {
-    return general.isKinOf(rival) ? KIN_DEFECTION_ODDS : SWORN_DEFECTION_ODDS;
+  private isDefectionTarget(general: General, rival: Family): boolean {
+    return (
+      !this.family.royal &&
+      this.family.isHostileTo(rival) &&
+      !rival.isRuler(general) &&
+      !this.world.isHeld(general)
+    );
+  }
+
+  private get actingCharisma(): number {
+    const { homeProvince, ruler } = this.family;
+
+    return (
+      homeProvince.governor?.stats.charisma ??
+      Math.floor(ruler.stats.charisma / UNSTAFFED_CHARISMA_DIVISOR)
+    );
   }
 
   private canForceSurrender(rival: Family): boolean {

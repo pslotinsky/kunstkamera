@@ -4,6 +4,7 @@ import type { General } from '@/core/domain/General';
 import type { Province } from '@/core/domain/Province';
 import { MissionReportedEvent } from '@/core/events/MissionReportedEvent';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
+import { isDefined } from '@/lib/value/isDefined';
 
 import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
@@ -28,6 +29,12 @@ export class NegotiateCommand extends ProvinceCommand {
     this.approach = { mission: 'surrender', family };
   }
 
+  public get canSendForDefection(): boolean {
+    const province = this.currentProvince;
+
+    return isDefined(province) && province.isHome && !province.family?.royal;
+  }
+
   public override get selectableTargets(): readonly number[] {
     const family = this.currentProvince?.family;
 
@@ -39,16 +46,36 @@ export class NegotiateCommand extends ProvinceCommand {
   }
 
   public getCandidates(target: Province): readonly General[] {
-    const { family, governor } = target;
+    const { world } = this.context;
+    const source = this.currentProvince?.family;
+    const { family } = target;
     let candidates: readonly General[] = [];
 
-    if (family && target.isHome) {
-      candidates = this.context.world.getVassals(family);
-    } else if (governor && target.hasLord) {
-      candidates = [governor];
+    if (this.canSendForDefection && isDefined(source) && isDefined(family)) {
+      const envoy = new Envoy({ world, family: source });
+
+      candidates = this.getPostedGenerals(target, family).filter((general) =>
+        envoy.canApproach(general),
+      );
     }
 
     return candidates;
+  }
+
+  private getPostedGenerals(
+    target: Province,
+    family: Family,
+  ): readonly General[] {
+    const { governor } = target;
+    let generals: readonly General[] = [];
+
+    if (target.isHome) {
+      generals = this.context.world.getVassals(family);
+    } else if (isDefined(governor) && target.hasLord) {
+      generals = [governor];
+    }
+
+    return generals;
   }
 
   public execute(): void {
@@ -76,7 +103,11 @@ export class NegotiateCommand extends ProvinceCommand {
     const rival = world.findFamilyOf(general);
     const governed = world.getRuledProvince(general);
 
-    if (rival && envoy.canPersuade(general)) {
+    if (
+      this.canSendForDefection &&
+      isDefined(rival) &&
+      envoy.canApproach(general)
+    ) {
       const persuaded = envoy.persuade(general);
 
       this.publish(

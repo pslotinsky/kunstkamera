@@ -28,7 +28,7 @@ export class NegotiateDialogControl extends CommandDialogControl<
 
   public override open(command: NegotiateCommand): void {
     this.target = undefined;
-    this.mission = 'defection';
+    this.mission = command.canSendForDefection ? 'defection' : 'surrender';
     this.choice = undefined;
     super.open(command);
     this.update();
@@ -73,7 +73,12 @@ export class NegotiateDialogControl extends CommandDialogControl<
     const family = target?.family;
 
     this.view.showTarget(target);
-    this.view.showMission(target ? this.mission : undefined);
+    const canSendForDefection = this.command?.canSendForDefection ?? false;
+
+    this.view.showMission(
+      target ? this.mission : undefined,
+      canSendForDefection,
+    );
 
     if (target && family && this.mission === 'surrender') {
       this.view.showDemand(family, this.world.player);
