@@ -40,6 +40,7 @@ interface GeneralParams {
   readonly lineage?: string | undefined;
   readonly recruitClass?: RecruitClass;
   readonly defectionClass?: DefectionClass;
+  readonly captureImmune?: boolean;
 }
 
 interface FamilyParams {
@@ -77,6 +78,7 @@ export function makeGeneral(params: GeneralParams = {}): General {
     birth: params.birth ?? new CalendarDate(1156, 1),
     recruitClass: params.recruitClass ?? 3,
     defectionClass: params.defectionClass ?? 0,
+    captureImmune: params.captureImmune,
     stats: Characteristics.from({
       intelligence: params.intelligence ?? 50,
       war: params.war ?? 50,
@@ -197,6 +199,7 @@ export function makeArmy(params: Partial<ArmyParams> = {}): Army {
     troops: params.troops ?? 200,
     food: params.food ?? 400,
     unit: params.unit,
+    remotelyCommanded: params.remotelyCommanded ?? false,
   });
 }
 

@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { BattleOutcome } from '@/core/domain/BattleOutcome';
 import { BattleSide } from '@/core/domain/BattleSide';
 import type { Captive } from '@/core/domain/Captive';
+import type { Province } from '@/core/domain/Province';
 import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { SoundBoard } from '@/ui/common/sound/SoundBoard';
@@ -34,6 +35,7 @@ function setup() {
   function show(
     captive?: Captive,
     outcome: BattleOutcome = makeOutcome(),
+    refuge?: Province,
   ): HTMLElement {
     const container = document.createElement('div');
     const control = new BattleReportControl({ world, events, sounds });
@@ -43,6 +45,7 @@ function setup() {
       attacker: makeArmy({ commander: avar }),
       defender: makeArmy({ commander: marven }),
       outcome,
+      refuge,
     });
 
     report.captive = captive;
@@ -110,6 +113,43 @@ describe('BattleReportControl', () => {
     const { show } = setup();
 
     expect(getCaptureLine(show())).toBe('');
+  });
+
+  it('describes where an attacking commander flees after a defeat', () => {
+    const { show } = setup();
+    const outcome = makeOutcome({ winner: BattleSide.defender });
+    const refuge = makeProvince({ number: 7, name: 'Pineward' });
+
+    const atHome = show(undefined, outcome);
+    expect(atHome.querySelector('[data-verdict]')!.textContent).toContain(
+      'Avar goes home',
+    );
+
+    const atRefuge = show(undefined, outcome, refuge);
+    expect(atRefuge.querySelector('[data-verdict]')!.textContent).toContain(
+      'Avar flees to Pineward',
+    );
+  });
+
+  it('omits a defender’s flight when the commander was captured', () => {
+    const { show, mine, rival, marven } = setup();
+    const outcome = makeOutcome();
+    const refuge = makeProvince({ number: 7, name: 'Pineward' });
+    const captive = makeCaptive({
+      general: marven,
+      house: rival,
+      captor: mine,
+    });
+
+    const escaped = show(undefined, outcome, refuge);
+    expect(escaped.querySelector('[data-verdict]')!.textContent).toContain(
+      'Marven flees to Pineward',
+    );
+
+    const captured = show(captive, outcome, refuge);
+    expect(captured.querySelector('[data-verdict]')!.textContent).not.toContain(
+      'flees',
+    );
   });
 
   it('tells a rival war from the side of its winner', () => {

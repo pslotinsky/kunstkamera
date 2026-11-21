@@ -7,6 +7,7 @@ import type { InvasionReport } from '@/core/domain/InvasionReport';
 import type { World } from '@/core/domain/World';
 import type { EventBus } from '@/lib/EventBus';
 import { View } from '@/lib/View';
+import { isDefined } from '@/lib/value/isDefined';
 import type { SoundBoard } from '@/ui/common/sound/SoundBoard';
 
 import { BattleReportDismissedEvent } from './BattleReportDismissedEvent';
@@ -109,23 +110,61 @@ export class BattleReportView extends View<BattleReportContext> {
   }
 
   private renderVerdict(report: InvasionReport): string {
-    const { attacker, defender, outcome, refuge } = report;
+    const { attacker, defender, outcome } = report;
     const province = report.target.name;
-    const flight = refuge
-      ? `${defender.commander.name} flees to ${refuge.name}${this.renderEscort(report)}. `
-      : '';
+    const occupier = this.describeLeader(attacker, 'The attacking army');
+    const flight = this.renderDefenderFlight(report);
 
     let verdict = `${defender.commander.name} surrenders. ${this.renderFall(report)}`;
 
     if (outcome && report.isTaken) {
-      verdict = `${flight}${this.renderFall(report)} ${attacker.commander.name} holds it${this.renderSurvivors(report, outcome)}.`;
+      verdict = `${flight}${this.renderFall(report)} ${occupier} holds it${this.renderSurvivors(report, outcome)}.`;
     } else if (outcome) {
-      verdict = `${province} holds. ${attacker.commander.name} goes home${this.renderSurvivors(report, outcome)}.`;
-    } else if (refuge) {
+      verdict = `${province} holds.${this.renderAttackerReturn(report, outcome)}`;
+    } else if (report.answer === 'retreat') {
       verdict = `${flight}${this.renderFall(report)}`;
     }
 
     return verdict;
+  }
+
+  private renderDefenderFlight(report: InvasionReport): string {
+    const { defender, defenderRetreatDestination: destination } = report;
+    let flight = '';
+
+    if (isDefined(destination)) {
+      const leader = this.describeLeader(defender, 'The defending army');
+      const escort = this.renderEscort(report);
+
+      flight = `${leader} flees to ${destination.name}${escort}. `;
+    }
+
+    return flight;
+  }
+
+  private renderAttackerReturn(
+    report: InvasionReport,
+    outcome: BattleOutcome,
+  ): string {
+    const { attacker, source } = report;
+    const destination = report.attackerRetreatDestination;
+    let arrival = '';
+
+    if (isDefined(destination)) {
+      const leader = this.describeLeader(attacker, 'The attacking army');
+      const movement = destination.isEqual(source)
+        ? 'goes home'
+        : `flees to ${destination.name}`;
+      const survivors = this.renderSurvivors(report, outcome);
+
+      arrival = ` ${leader} ${movement}${survivors}.`;
+    }
+
+    return arrival;
+  }
+
+  private describeLeader(army: Army, remoteLabel: string): string {
+    return army.remotelyCommanded ? remoteLabel : army.commander.name;
   }
 
   private renderFall(report: InvasionReport): string {
@@ -159,7 +198,7 @@ export class BattleReportView extends View<BattleReportContext> {
   private renderEscort(report: InvasionReport): string {
     const { defender } = report;
 
-    return this.isPlayerSide(report) && defender.hasTroops
+    return report.isRetreat && this.isPlayerSide(report) && defender.hasTroops
       ? ` with ${defender.troops} troops`
       : '';
   }

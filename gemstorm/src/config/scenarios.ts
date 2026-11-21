@@ -14,6 +14,7 @@ export interface GeneralDefinition {
   readonly war: number;
   readonly charisma: number;
   readonly lineage?: string;
+  readonly captureImmune?: boolean;
 }
 
 export interface FamilyDefinition {

@@ -1,3 +1,5 @@
+import { sample } from '@/lib/array/sample';
+
 import type { Family } from './Family';
 import type { Province } from './Province';
 import type { World } from './World';
@@ -59,5 +61,12 @@ export class DefensePolicy {
     return [...this.getRefuges(province)].sort(
       (left, right) => right.resources.troops - left.resources.troops,
     )[0];
+  }
+
+  public chooseFallback(province: Province): Province | undefined {
+    const refuges = this.getRefuges(province);
+    const adjacent = refuges.filter((refuge) => province.isNeighbor(refuge));
+
+    return adjacent.length > 1 ? sample(adjacent) : (adjacent[0] ?? refuges[0]);
   }
 }

@@ -127,6 +127,7 @@ export const SCENARIO_2: Scenario = {
     },
     {
       name: 'Malrec',
+      captureImmune: true,
       birth: 163,
       recruitClass: 0,
       defectionClass: 0,

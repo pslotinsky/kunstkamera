@@ -1,3 +1,5 @@
+import { isDefined } from '@/lib/value/isDefined';
+
 import type { Army } from './Army';
 import type { BattleOutcome } from './BattleOutcome';
 import { BattleSide } from './BattleSide';
@@ -44,8 +46,27 @@ export class InvasionReport {
     return this.outcome !== undefined;
   }
 
+  public get isRetreat(): boolean {
+    return this.answer === 'retreat' || this.outcome?.reason === 'retreat';
+  }
+
   public get isTaken(): boolean {
     return this.outcome?.isWonBy(BattleSide.attacker) ?? true;
+  }
+
+  public get defenderRetreatDestination(): Province | undefined {
+    const defenderFled = this.isRetreat || !this.defender.remotelyCommanded;
+    const commanderEscaped = !isDefined(this.captive);
+
+    return this.isTaken && defenderFled && commanderEscaped
+      ? this.refuge
+      : undefined;
+  }
+
+  public get attackerRetreatDestination(): Province | undefined {
+    const attackerEscaped = !this.isTaken && !isDefined(this.captive);
+
+    return attackerEscaped ? (this.refuge ?? this.source) : undefined;
   }
 
   public hasSide(family: Family): boolean {

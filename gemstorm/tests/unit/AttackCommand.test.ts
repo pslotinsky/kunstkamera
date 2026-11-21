@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { AttackCommand } from '@/core/commands/province/AttackCommand';
 import type { AttackForce } from '@/core/domain/AttackDeployment';
@@ -90,6 +90,7 @@ function setup(params: SetupParams = {}) {
   mine.ally = friend;
   friend.ally = mine;
   mine.moveHome(source);
+  rival.moveHome(enemy);
 
   const { world, events } = makeWorld(
     [source, enemy, neutral, owned, allied, refuge, distant],
@@ -144,6 +145,7 @@ function setup(params: SetupParams = {}) {
     marven,
     mine,
     rival,
+    world,
     source,
     enemy,
     owned,
@@ -157,6 +159,8 @@ function setup(params: SetupParams = {}) {
 }
 
 describe('AttackCommand', () => {
+  afterEach(() => vi.restoreAllMocks());
+
   it('requires soldiers alongside a Fifth Unit and checks that the unit is still available', () => {
     const { source, attack, started } = setup();
     const nerith = new Nerith();
@@ -222,6 +226,7 @@ describe('AttackCommand', () => {
     mine.moveHome(owned);
     source.assignGovernor(rhovan);
     attack();
+    expect(source.governor).toBeUndefined();
     finish(BattleSide.attacker);
 
     const outcome = report()!.outcome!;
@@ -231,6 +236,35 @@ describe('AttackCommand', () => {
     expect(enemy.ruledBy(rhovan)).toBe(true);
     expect(enemy.resources.troops).toBe(outcome.attackerSurvivors);
     expect(source.ruledBy(avar)).toBe(true);
+  });
+
+  it('moves the ruler and court to the conquered province, leaving the origin under remote rule', () => {
+    const { avar, rhovan, mine, world, source, enemy, attack, finish } =
+      setup();
+
+    attack();
+    expect(source.residentGovernor).toBeUndefined();
+    finish(BattleSide.attacker);
+
+    expect(enemy.residentGovernor).toBe(avar);
+    expect(mine.homeProvince).toBe(enemy);
+    expect(world.getResidence(mine, rhovan)).toBe(enemy);
+    expect(source.isRemotelyRuled).toBe(true);
+  });
+
+  it('keeps a captured attacking lord out of his former province', () => {
+    const { avar, rhovan, mine, owned, source, attack, finish, report } =
+      setup();
+    mine.moveHome(owned);
+    source.assignGovernor(rhovan);
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
+    attack();
+    finish(BattleSide.defender);
+
+    expect(report()?.captive?.general).toBe(rhovan);
+    expect(source.governor).toBe(avar);
+    expect(source.isRemotelyRuled).toBe(true);
   });
 
   it('uses half the ruler’s War for an attack from an unstaffed province', () => {
@@ -269,17 +303,19 @@ describe('AttackCommand', () => {
     expect(source.goodwill).toBe(-1);
   });
 
-  it('takes an abandoned province and moves the lord to his refuge', () => {
-    const { mine, marven, enemy, refuge, attack, report } = setup({
+  it('takes an abandoned province and moves the escaping defender to his refuge', () => {
+    const { mine, marven, rival, enemy, refuge, attack, report } = setup({
       defenders: 0,
       defenderFood: 0,
     });
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
 
     attack();
 
     expect(report()!.answer).toBe('retreat');
     expect(report()!.outcome).toBeUndefined();
     expect(refuge.ruledBy(marven)).toBe(true);
+    expect(rival.homeProvince).toBe(refuge);
     expect(enemy.belongsTo(mine)).toBe(true);
     expect(enemy.resources.troops).toBe(156);
   });

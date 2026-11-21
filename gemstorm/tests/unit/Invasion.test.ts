@@ -65,6 +65,25 @@ function setup(params: SetupParams = {}) {
 }
 
 describe('Invasion', () => {
+  it('keeps Entrust at a lord’s origin when he departs and takes new land', () => {
+    const { world, mine, source, target } = setup();
+    const lord = makeGeneral();
+    mine.enlist(lord);
+    source.assignGovernor(lord);
+    source.entrust();
+    const attacker = makeArmy({ commander: lord, troops: 100, food: 120 });
+    const invasion = new Invasion({ world, source, target, attacker });
+
+    invasion.begin();
+    expect(source.governor).toBeUndefined();
+    expect(source.isEntrusted).toBe(true);
+    invasion.conclude(makeOutcome());
+
+    expect(target.governor).toBe(lord);
+    expect(source.isRemotelyRuled).toBe(true);
+    expect(source.isEntrusted).toBe(true);
+  });
+
   it.each([
     [BattleSide.attacker, 22, 16],
     [BattleSide.defender, 18, 20],
@@ -363,7 +382,7 @@ describe('Invasion', () => {
   });
 });
 
-function setupRefuges() {
+function setupRefuges(adjacentHome = false) {
   const avar = makeGeneral({ name: 'Avar' });
   const mine = makeFamily({ name: 'Alderwyn', ruler: avar });
   const marven = makeGeneral({ name: 'Marven' });
@@ -386,7 +405,7 @@ function setupRefuges() {
   const target = makeProvince({
     number: 22,
     name: 'Skyreach',
-    neighbors: [1, 23],
+    neighbors: adjacentHome ? [1, 23, 30] : [1, 23],
     family: rival,
     governor: marven,
     gold: 80,
@@ -412,7 +431,7 @@ function setupRefuges() {
   const attacker = makeArmy({ commander: avar, troops: 100, food: 120 });
   const invasion = new Invasion({ world, source, target, attacker });
 
-  return { invasion, target, neighbor, home, rival };
+  return { invasion, target, neighbor, home, rival, world };
 }
 
 describe('Invasion answered by its defender', () => {
@@ -470,7 +489,7 @@ describe('Invasion answered by its defender', () => {
     expect(battle.defender.unit).toBe(grimhides);
   });
 
-  it('flees to the refuge the defender picks, home taking the gold too', () => {
+  it('flees to the chosen distant capital and leaves supplies behind', () => {
     const { invasion, target, home } = setupRefuges();
 
     invasion.muster();
@@ -478,8 +497,8 @@ describe('Invasion answered by its defender', () => {
     const report = invasion.answer({ answer: 'retreat', refuge: home });
 
     expect((report as InvasionReport).refuge).toBe(home);
-    expect(home.resources).toMatchObject({ troops: 200, food: 300, gold: 80 });
-    expect(target.resources.gold).toBe(0);
+    expect(home.resources).toMatchObject({ troops: 200, food: 0, gold: 0 });
+    expect(target.resources.gold).toBe(80);
   });
 
   it('leaves the gold behind when fleeing to a neighbour', () => {
@@ -495,6 +514,7 @@ describe('Invasion answered by its defender', () => {
     const { invasion, neighbor } = setupRefuges();
 
     invasion.begin();
+    invasion.defender.takeCasualties(130);
 
     const report = invasion.conclude(
       makeOutcome({
@@ -506,6 +526,77 @@ describe('Invasion answered by its defender', () => {
     );
 
     expect(report.refuge).toBe(neighbor);
-    expect(neighbor.resources.troops).toBe(200);
+    expect(neighbor.resources.troops).toBe(70);
+  });
+
+  it.each([
+    [0, 'neighbor'],
+    [0.99, 'home'],
+  ] as const)(
+    'uses the random neighboring refuge on a defeat (%s)',
+    (refugeRoll, choice) => {
+      const { invasion, target, neighbor, home, rival, world } =
+        setupRefuges(true);
+      const lord = target.governor!;
+      neighbor.assignGovernor(rival.ruler);
+      vi.spyOn(Math, 'random')
+        .mockReturnValue(0.99)
+        .mockReturnValueOnce(refugeRoll);
+
+      invasion.begin();
+      const report = invasion.conclude(makeOutcome());
+      const refuge = choice === 'home' ? home : neighbor;
+
+      expect(report.refuge).toBe(refuge);
+      expect(report.captive).toBeUndefined();
+      expect(world.getResidence(rival, lord)).toBe(refuge);
+      expect(refuge.governor).toBe(choice === 'home' ? rival.ruler : lord);
+    },
+  );
+
+  it('falls back to the distant capital when none of the neighbors can receive the lord', () => {
+    const { invasion, target, neighbor, home, rival, world } = setupRefuges();
+    const lord = target.governor!;
+    neighbor.claim(invasion.source.family!);
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
+
+    invasion.begin();
+    const report = invasion.conclude(makeOutcome());
+
+    expect(report.refuge).toBe(home);
+    expect(home.governor).toBe(rival.ruler);
+    expect(world.getVassals(rival)).toContain(lord);
+  });
+
+  it('keeps a remote defender at court when the army is defeated', () => {
+    const { invasion, target, neighbor, home, rival } = setupRefuges();
+    target.assignGovernor(rival.ruler);
+    neighbor.unclaim();
+
+    invasion.begin();
+    const report = invasion.conclude(makeOutcome());
+
+    expect(report.defender.remotelyCommanded).toBe(true);
+    expect(report.captive).toBeUndefined();
+    expect(rival.homeProvince).toBe(home);
+    expect(neighbor.isNeutral()).toBe(true);
+  });
+
+  it('moves an escaping ruler’s court into the refuge and clears its Entrust setting', () => {
+    const { invasion, target, neighbor, rival, world } = setupRefuges();
+    const lord = target.governor!;
+    rival.moveHome(target);
+    neighbor.assignGovernor(lord);
+    neighbor.entrust();
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
+
+    invasion.begin();
+    const report = invasion.conclude(makeOutcome());
+
+    expect(report.refuge).toBe(neighbor);
+    expect(rival.homeProvince).toBe(neighbor);
+    expect(neighbor.governor).toBe(rival.ruler);
+    expect(neighbor.isEntrusted).toBe(false);
+    expect(world.getVassals(rival)).toContain(lord);
   });
 });

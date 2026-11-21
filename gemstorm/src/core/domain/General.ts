@@ -25,6 +25,7 @@ export interface GeneralParams {
   readonly recruitClass: RecruitClass;
   readonly defectionClass: DefectionClass;
   readonly lineage?: string | undefined;
+  readonly captureImmune?: boolean | undefined;
 }
 
 export class General {
@@ -33,6 +34,7 @@ export class General {
   public readonly birth: CalendarDate;
   public readonly recruitClass: RecruitClass;
   public readonly defectionClass: DefectionClass;
+  public readonly captureImmune: boolean;
   private readonly lineage: string | undefined;
   private hasHouseMembership = true;
 
@@ -43,6 +45,7 @@ export class General {
     this.recruitClass = params.recruitClass;
     this.defectionClass = params.defectionClass;
     this.lineage = params.lineage;
+    this.captureImmune = params.captureImmune ?? false;
   }
 
   public ageYear(date: CalendarDate, rank: GeneralRank): void {

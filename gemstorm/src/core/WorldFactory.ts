@@ -107,6 +107,7 @@ export class WorldFactory {
           recruitClass: definition.recruitClass,
           defectionClass: definition.defectionClass,
           lineage: definition.lineage,
+          captureImmune: definition.captureImmune,
         }),
       );
     }
