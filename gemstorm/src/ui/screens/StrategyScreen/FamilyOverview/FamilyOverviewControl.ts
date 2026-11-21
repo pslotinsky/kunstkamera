@@ -18,6 +18,7 @@ export class FamilyOverviewControl extends CommandDialogControl<
 > {
   private readonly world: World;
   private viewed: Family;
+  private viewedProvince: Province | undefined;
 
   public constructor(name: string, world: World) {
     super(FamilyOverviewView, { name });
@@ -27,6 +28,7 @@ export class FamilyOverviewControl extends CommandDialogControl<
 
   public override open(command: ViewCommand): void {
     this.viewed = this.world.player;
+    this.viewedProvince = undefined;
     super.open(command);
   }
 
@@ -35,7 +37,7 @@ export class FamilyOverviewControl extends CommandDialogControl<
   }
 
   public override get targetPrompt(): string {
-    return 'View whose family?';
+    return 'View which territory?';
   }
 
   public override get inspectsTarget(): boolean {
@@ -43,10 +45,13 @@ export class FamilyOverviewControl extends CommandDialogControl<
   }
 
   public override pickTarget(province: Province): void {
+    this.viewedProvince = province;
+
     if (province.family) {
       this.showFamily(province.family);
     } else {
-      this.view.hide();
+      this.view.showNeutralProvince(province);
+      this.view.show();
     }
   }
 
@@ -64,21 +69,26 @@ export class FamilyOverviewControl extends CommandDialogControl<
   }
 
   private showMode(mode: FamilyOverviewMode): void {
-    this.view.selectTab(mode);
+    if (this.viewedProvince?.hasOwner()) {
+      this.view.selectTab(mode);
 
-    switch (mode) {
-      case 'general':
-        this.view.showGeneral(this.buildGeneral());
-        break;
-      case 'land':
-        this.view.showLand(this.buildLand());
-        break;
-      case 'units':
-        this.view.showFifthUnits(this.buildFifthUnits(), this.viewsOwnHouse());
-        break;
-      case 'gems':
-        this.view.showGems(this.viewed.gems);
-        break;
+      switch (mode) {
+        case 'general':
+          this.view.showGeneral(this.buildGeneral());
+          break;
+        case 'land':
+          this.view.showLand(this.buildLand());
+          break;
+        case 'units':
+          this.view.showFifthUnits(
+            this.buildFifthUnits(),
+            this.viewsOwnHouse(),
+          );
+          break;
+        case 'gems':
+          this.view.showGems(this.viewed.gems);
+          break;
+      }
     }
   }
 
@@ -93,6 +103,7 @@ export class FamilyOverviewControl extends CommandDialogControl<
       general: member,
       province: world.getResidence(viewed, member),
       rank: world.getGeneralRank(viewed, member),
+      kin: member.isKinOf(viewed),
       fame: viewed.isRuler(member) ? viewed.fame : undefined,
       age: member.getAgeAt(world.date),
     }));
@@ -103,13 +114,22 @@ export class FamilyOverviewControl extends CommandDialogControl<
   }
 
   private buildFifthUnits(): FifthUnitRow[] {
-    return this.viewsOwnHouse()
-      ? this.world.getFamilyProvinces(this.viewed).flatMap((province) =>
-          province.fifthUnits.units.map((unit) => ({
-            unit,
-            province,
-          })),
-        )
-      : [];
+    const province = this.viewedProvince;
+    let rows: FifthUnitRow[] = [];
+
+    if (province && this.viewsOwnHouse()) {
+      const hired = province.fifthUnits.hiredUnits.map((unit) => ({
+        unit,
+        province,
+      }));
+      const guardians = this.viewed.guardians.map((unit) => ({
+        unit,
+        province: undefined,
+      }));
+
+      rows = [...hired, ...guardians];
+    }
+
+    return rows;
   }
 }

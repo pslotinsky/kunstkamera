@@ -20,13 +20,14 @@ export interface GeneralRow {
   readonly general: General;
   readonly province: Province;
   readonly rank: GeneralRank;
+  readonly kin: boolean;
   readonly fame: number | undefined;
   readonly age: number;
 }
 
 export interface FifthUnitRow {
   readonly unit: FifthUnit;
-  readonly province: Province;
+  readonly province: Province | undefined;
 }
 
 const TABS: Tab[] = [
@@ -61,17 +62,19 @@ export class FamilyOverviewView extends CommandDialogView {
     return html`
       <header class=${styles.header}>
         <h2 class=${styles.crest} data-family></h2>
-        <div class=${styles.tabs}>
-          ${TABS.map(
-            ({ mode, label }) => html`<button
-              class=${styles.tab}
-              type="button"
-              data-mode=${mode}
-              @click=${() => this.publish(new FamilyOverviewTabSelectedEvent(mode))}
-            >
-              ${label}
-            </button>`,
-          )}
+        <div data-tabs>
+          <div class=${styles.tabs}>
+            ${TABS.map(
+              ({ mode, label }) => html`<button
+                class=${styles.tab}
+                type="button"
+                data-mode=${mode}
+                @click=${() => this.publish(new FamilyOverviewTabSelectedEvent(mode))}
+              >
+                ${label}
+              </button>`,
+            )}
+          </div>
         </div>
         <button
           class=${styles.close}
@@ -86,7 +89,14 @@ export class FamilyOverviewView extends CommandDialogView {
   }
 
   public showFamily(family: Family): void {
+    this.tabs.hidden = false;
     this.familyName.textContent = family.name;
+  }
+
+  public showNeutralProvince(province: Province): void {
+    this.tabs.hidden = true;
+    this.familyName.textContent = `${province.name} · Neutral`;
+    this.showLand([province]);
   }
 
   public selectTab(mode: FamilyOverviewMode): void {
@@ -97,12 +107,13 @@ export class FamilyOverviewView extends CommandDialogView {
 
   public showGeneral(rows: readonly GeneralRow[]): void {
     this.body.innerHTML = this.renderTable(
-      ['', 'INT', 'WAR', 'CHA', 'Fame', 'Province'],
+      ['', 'INT', 'WAR', 'CHA', 'Kin', 'Fame', 'Province'],
       rows.map((row) => [
         this.renderGeneralCard(row),
         String(row.general.stats.intelligence),
         String(row.general.stats.war),
         String(row.general.stats.charisma),
+        row.kin ? 'Yes' : '—',
         row.fame === undefined ? '' : String(row.fame),
         String(row.province),
       ]),
@@ -130,14 +141,20 @@ export class FamilyOverviewView extends CommandDialogView {
         'Status',
         'Province',
         'Governor',
+        'Gold',
+        'Food',
+        'Troops',
         'Cultivation',
         'Protection',
         'Loyalty',
       ],
       provinces.map((province) => [
-        STATUS_LABELS[province.status],
+        province.isEntrusted ? 'Entrusted' : STATUS_LABELS[province.status],
         String(province),
         province.governor?.name ?? '—',
+        String(province.resources.gold),
+        String(province.resources.food),
+        String(province.resources.troops),
         String(province.development.cultivation),
         String(province.development.protection),
         String(province.development.loyalty),
@@ -159,7 +176,7 @@ export class FamilyOverviewView extends CommandDialogView {
               : row.unit.description,
           ),
           String(row.unit.strength),
-          String(row.province),
+          row.province ? String(row.province) : 'House',
         ]),
       );
     } else {
@@ -210,6 +227,10 @@ export class FamilyOverviewView extends CommandDialogView {
 
   private get familyName(): HTMLElement {
     return this.element.querySelector<HTMLElement>('[data-family]')!;
+  }
+
+  private get tabs(): HTMLElement {
+    return this.element.querySelector<HTMLElement>('[data-tabs]')!;
   }
 
   private get tabButtons(): NodeListOf<HTMLButtonElement> {

@@ -15,6 +15,7 @@ export interface LordItem {
 }
 
 export interface MovableLord extends LordItem {
+  readonly provinceNumber: number;
   readonly from: string;
 }
 
@@ -57,7 +58,7 @@ export class ChangeLordDialogView extends CommandDialogView<ChangeLordDialogCont
     this.options.innerHTML = this.renderList(
       lords.map((lord) =>
         this.renderSelect(
-          lord.name,
+          String(lord.provinceNumber),
           `${lord.name} — ${lord.from}`,
           lord.selected,
         ),
@@ -68,6 +69,12 @@ export class ChangeLordDialogView extends CommandDialogView<ChangeLordDialogCont
 
   public enableConfirm(enabled: boolean): void {
     this.confirmButton.disabled = !enabled;
+  }
+
+  public askAboutMovingRuler(moving: boolean): void {
+    this.question.textContent = moving
+      ? 'OK to move yourself?'
+      : 'Who shall rule?';
   }
 
   protected override onMount(): void {

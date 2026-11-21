@@ -108,6 +108,7 @@ export class Family {
   public moveHome(province: Province): void {
     this.homeProvince = province;
     province.assignGovernor(this.ruler);
+    province.cancelEntrust();
   }
 
   public isEqual(other: Family): boolean {

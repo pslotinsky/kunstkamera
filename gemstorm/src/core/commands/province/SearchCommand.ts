@@ -3,6 +3,7 @@ import { Artifact } from '@/core/domain/Artifact';
 import type { Province } from '@/core/domain/Province';
 import { ArtifactFoundEvent } from '@/core/events/ArtifactFoundEvent';
 import { SearchReportedEvent } from '@/core/events/SearchReportedEvent';
+import { sample } from '@/lib/array/sample';
 
 import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
@@ -35,17 +36,21 @@ export class SearchCommand extends ProvinceCommand {
 
     if (province && target && this.canExecute() && this.isForeign(target)) {
       province.reduceResources({ gold: SEARCH_COST });
-      this.publish(new SearchReportedEvent(target, target.fifthUnits.units));
-      this.reportFind(province, target);
+      this.reportResult(province, target);
       this.complete(province);
     }
   }
 
-  private reportFind(province: Province, target: Province): void {
+  private reportResult(province: Province, target: Province): void {
     if (Math.random() < ARTIFACT_FIND_CHANCE) {
       this.publish(
         new ArtifactFoundEvent(province, target, Artifact.createRandom()),
       );
+    } else {
+      const hired = target.fifthUnits.hiredUnits;
+      const revealed = hired.length > 0 ? [sample(hired)] : [];
+
+      this.publish(new SearchReportedEvent(target, revealed));
     }
   }
 

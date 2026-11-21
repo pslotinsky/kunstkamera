@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ARTIFACT_FIND_CHANCE } from '@/config/artifacts';
 import { SearchCommand } from '@/core/commands/province/SearchCommand';
 import { HiredUnit } from '@/core/domain/HiredUnit';
+import { Nerith } from '@/core/domain/Nerith';
 import { ArtifactFoundEvent } from '@/core/events/ArtifactFoundEvent';
 import { SearchReportedEvent } from '@/core/events/SearchReportedEvent';
 
@@ -25,6 +26,7 @@ function setup(options: { readonly gold?: number } = {}) {
   const neutral = makeProvince({ number: 3, name: 'Hollow' });
   const enemy = makeProvince({ number: 4, name: 'Anjou', family: rival });
 
+  enemy.fifthUnits.addUnit(new Nerith());
   enemy.fifthUnits.addUnit(HiredUnit.ofName('Warriors')!);
   enemy.fifthUnits.addUnit(HiredUnit.ofName('Gargoyles')!);
 
@@ -47,7 +49,8 @@ function rollAt(roll: number): void {
 describe('SearchCommand', () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it("spends 5 gold and the province's turn to name the units stationed there", () => {
+  it("spends 5 gold and the province's turn to report one hired unit", () => {
+    rollAt(0.99);
     const { source, enemy, command, reports } = setup();
 
     command.searchAt(enemy);
@@ -57,10 +60,7 @@ describe('SearchCommand', () => {
     expect(source.actionCount).toBe(1);
     expect(reports).toHaveLength(1);
     expect(reports[0]?.province).toBe(enemy);
-    expect(reports[0]?.units.map((unit) => unit.name)).toEqual([
-      'Warriors',
-      'Gargoyles',
-    ]);
+    expect(reports[0]?.units.map((unit) => unit.name)).toEqual(['Gargoyles']);
   });
 
   it('refuses to send a spy the province cannot pay for', () => {
@@ -100,6 +100,7 @@ describe('SearchCommand', () => {
     lucky.command.searchAt(lucky.enemy);
     lucky.command.execute();
 
+    expect(lucky.reports).toEqual([]);
     expect(lucky.finds).toHaveLength(1);
     expect(lucky.finds[0]?.province).toBe(lucky.source);
     expect(lucky.finds[0]?.foundIn).toBe(lucky.enemy);

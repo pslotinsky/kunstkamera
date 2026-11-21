@@ -78,8 +78,11 @@ export class Province {
     this.entrusted = false;
   }
 
-  public assignGovernor(governor: General | undefined): void {
-    if (!this.ruledBy(governor)) {
+  public assignGovernor(
+    governor: General | undefined,
+    options: { readonly preserveEntrust?: boolean } = {},
+  ): void {
+    if (!options.preserveEntrust && !this.ruledBy(governor)) {
       this.entrusted = false;
     }
 

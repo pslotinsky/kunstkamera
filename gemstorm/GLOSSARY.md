@@ -13,6 +13,12 @@ A ruling family that holds provinces, commands generals, and keeps its own treas
 **General**:
 A member of a house who can govern a province or command its troops.
 
+**Governor**:
+The general who governs a province. This can be the house's ruler or an appointed lord.
+
+**Lord**:
+A general appointed to govern a province on behalf of the house's ruler.
+
 **Gem Guardian**:
 A named being bound to a house's Gem, deployable as an army's Fifth Unit.
 
