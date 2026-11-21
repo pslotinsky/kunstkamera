@@ -138,12 +138,18 @@ export class Battle {
     unit: BattleUnit,
     from: Cell = unit.cell,
   ): readonly Cell[] {
-    return this.findBeside(from).filter(
-      (cell) =>
-        cell.terrain === 'plains' &&
-        !this.isFlag(cell) &&
-        this.getUnit(cell) === undefined,
-    );
+    let sites: readonly Cell[] = [];
+
+    if (unit.canBuild) {
+      sites = this.findBeside(from).filter(
+        (cell) =>
+          cell.terrain === 'plains' &&
+          !this.isFlag(cell) &&
+          !isDefined(this.getUnit(cell)),
+      );
+    }
+
+    return sites;
   }
 
   public getBreakable(
@@ -154,14 +160,14 @@ export class Battle {
   }
 
   public build(unit: BattleUnit, cell: Cell): boolean {
-    return this.work(unit, cell, this.getBuildSites(unit), () =>
-      cell.raiseFence(),
+    return this.work(unit, cell, this.getBuildSites(unit), (site) =>
+      site.raiseFence(),
     );
   }
 
   public breakDown(unit: BattleUnit, cell: Cell): boolean {
-    return this.work(unit, cell, this.getBreakable(unit), () =>
-      cell.breakFence(),
+    return this.work(unit, cell, this.getBreakable(unit), (site) =>
+      site.breakFence(),
     );
   }
 
@@ -213,21 +219,31 @@ export class Battle {
     unit: BattleUnit,
     cell: Cell,
     allowed: readonly Cell[],
-    change: () => void,
+    change: (site: Cell) => void,
   ): boolean {
-    if (!allowed.some((open) => open.isEqual(cell))) {
-      return false;
+    const site = allowed.find((open) => open.isEqual(cell));
+    let succeeded = false;
+
+    if (isDefined(site) && this.canWork(unit)) {
+      succeeded = Math.random() < unit.fenceOdds;
+
+      if (succeeded) {
+        change(site);
+      }
+
+      unit.finishTurn();
     }
 
-    const done = Math.random() < unit.fenceOdds;
+    return succeeded;
+  }
 
-    if (done) {
-      change();
-    }
-
-    unit.finishTurn();
-
-    return done;
+  private canWork(unit: BattleUnit): boolean {
+    return (
+      unit.isStanding &&
+      !unit.hasActed &&
+      unit.side.isEqual(this.turn) &&
+      this.units.includes(unit)
+    );
   }
 
   private chargeCasualties(unit: BattleUnit, losses: number): void {

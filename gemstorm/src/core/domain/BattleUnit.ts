@@ -7,10 +7,10 @@ import type { RangePattern, Unit } from './Unit';
 
 export type Approach = 'front' | 'flank' | 'rear';
 
-const FENCE_ODDS_BASE = 0.4;
-const FENCE_ODDS_PER_STRENGTH = 0.005;
-const FENCE_ODDS_FLOOR = 0.3;
-const FENCE_ODDS_CEILING = 0.9;
+const FENCE_STRENGTH_STEP = 6;
+const FENCE_BASE_CHANCE = 6;
+const FENCE_WAR_PER_POINT = 20;
+const PERCENT = 100;
 
 export interface BattleUnitParams {
   readonly unit: Unit;
@@ -113,9 +113,12 @@ export class BattleUnit {
   }
 
   public get fenceOdds(): number {
-    const odds = FENCE_ODDS_BASE + this.strength * FENCE_ODDS_PER_STRENGTH;
+    const strengthSteps = Math.floor(this.strength / FENCE_STRENGTH_STEP);
+    const strengthBonus = strengthSteps * FENCE_STRENGTH_STEP;
+    const warBonus = Math.floor(this.commanderWar / FENCE_WAR_PER_POINT);
+    const chance = FENCE_BASE_CHANCE + strengthBonus + warBonus;
 
-    return Math.min(Math.max(odds, FENCE_ODDS_FLOOR), FENCE_ODDS_CEILING);
+    return Math.min(chance, PERCENT) / PERCENT;
   }
 
   public canEnter(cell: Cell): boolean {
