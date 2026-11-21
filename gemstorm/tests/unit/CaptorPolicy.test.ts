@@ -11,15 +11,19 @@ import {
   makeWorld,
 } from './factories';
 
-function setup() {
-  const rhovan = makeGeneral({ name: 'Rhovan' });
+function setup(fame: number, charisma = 70) {
+  const rhovan = makeGeneral({ name: 'Rhovan', recruitClass: 1 });
   const avar = makeGeneral({ name: 'Avar' });
   const player = makeFamily({
     name: 'Alderwyn',
     ruler: avar,
     members: [avar, rhovan],
   });
-  const captor = makeFamily({ name: 'Stormmere' });
+  const captor = makeFamily({
+    name: 'Stormmere',
+    ruler: makeGeneral({ charisma }),
+    fame,
+  });
   const { world, events } = makeWorld(
     [
       makeProvince({ number: 1, family: player, governor: avar }),
@@ -28,6 +32,7 @@ function setup() {
     player,
   );
   const captive = makeCaptive({ general: rhovan, house: player, captor });
+  const policy = new CaptorPolicy({ world, events });
   const verdicts: CaptiveJudgedEvent[] = [];
 
   world.hold(captive);
@@ -36,12 +41,7 @@ function setup() {
   const judge = (roll: number) => {
     vi.spyOn(Math, 'random').mockReturnValue(roll);
 
-    for (const judgement of new CaptorPolicy({
-      world,
-      events,
-    }).chooseJudgements(captor)) {
-      judgement.execute();
-    }
+    policy.chooseJudgement(captive).execute();
   };
 
   return { world, rhovan, captor, verdicts, judge };
@@ -50,23 +50,35 @@ function setup() {
 describe('CaptorPolicy', () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it('tries to recruit a captive and sets him free when he refuses', () => {
-    const joined = setup();
-    const refused = setup();
+  it('always recruits when the captor has enough Fame', () => {
+    const { captor, rhovan, verdicts, judge } = setup(31);
 
-    joined.judge(0.3);
-    refused.judge(0.9);
+    judge(0);
 
-    expect(joined.captor.members).toContain(joined.rhovan);
-    expect(refused.verdicts[0]?.outcome).toBe('refused');
-    expect(refused.world.isHeld(refused.rhovan)).toBe(false);
+    expect(captor.members).toContain(rhovan);
+    expect(verdicts[0]?.outcome).toBe('joined');
   });
 
-  it('banishes only on the rare roll', () => {
-    const { world, rhovan, judge } = setup();
+  it('banishes an ineligible captive when the roll is below the CHA-based chance', () => {
+    const { world, rhovan, judge } = setup(30);
 
-    judge(0.01);
+    judge(0.09);
 
     expect(world.isExiled(rhovan)).toBe(true);
   });
+
+  it.each([
+    [70, 0.1],
+    [101, 0],
+  ])(
+    'releases an ineligible captive with CHA %s and roll %s',
+    (charisma, roll) => {
+      const { world, rhovan, verdicts, judge } = setup(30, charisma);
+
+      judge(roll);
+
+      expect(verdicts[0]?.outcome).toBe('released');
+      expect(world.isHeld(rhovan)).toBe(false);
+    },
+  );
 });

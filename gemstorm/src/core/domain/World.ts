@@ -147,6 +147,9 @@ export class World {
     }
 
     for (const member of family.members) {
+      if (member.isKinOf(family)) {
+        member.renounceHouse();
+      }
       victor.enlist(member);
     }
 

@@ -11,6 +11,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Caeric',
       birth: 181,
+      recruitClass: 3,
       intelligence: 72,
       war: 83,
       charisma: 48,
@@ -19,6 +20,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Vossan',
       birth: 173,
+      recruitClass: 3,
       intelligence: 53,
       war: 70,
       charisma: 40,
@@ -26,6 +28,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Darian',
       birth: 180,
+      recruitClass: 0,
       intelligence: 90,
       war: 86,
       charisma: 76,
@@ -34,6 +37,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Nemer',
       birth: 186,
+      recruitClass: 2,
       intelligence: 81,
       war: 55,
       charisma: 78,
@@ -42,6 +46,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Orric',
       birth: 191,
+      recruitClass: 3,
       intelligence: 29,
       war: 44,
       charisma: 48,
@@ -50,6 +55,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Talven',
       birth: 189,
+      recruitClass: 1,
       intelligence: 86,
       war: 75,
       charisma: 71,
@@ -58,6 +64,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Selvar',
       birth: 175,
+      recruitClass: 1,
       intelligence: 86,
       war: 76,
       charisma: 89,
@@ -65,6 +72,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Iskar',
       birth: 191,
+      recruitClass: 2,
       intelligence: 65,
       war: 71,
       charisma: 67,
@@ -73,6 +81,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Voric',
       birth: 178,
+      recruitClass: 2,
       intelligence: 60,
       war: 95,
       charisma: 38,
@@ -81,6 +90,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Drevan',
       birth: 159,
+      recruitClass: 2,
       intelligence: 81,
       war: 76,
       charisma: 71,
@@ -89,6 +99,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Avar',
       birth: 182,
+      recruitClass: 0,
       intelligence: 83,
       war: 90,
       charisma: 77,
@@ -97,6 +108,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Halric',
       birth: 157,
+      recruitClass: 2,
       intelligence: 60,
       war: 66,
       charisma: 79,
@@ -104,6 +116,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Malrec',
       birth: 163,
+      recruitClass: 0,
       intelligence: 41,
       war: 36,
       charisma: 56,
@@ -112,6 +125,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Jorven',
       birth: 174,
+      recruitClass: 2,
       intelligence: 53,
       war: 65,
       charisma: 57,
@@ -119,6 +133,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Denric',
       birth: 171,
+      recruitClass: 2,
       intelligence: 62,
       war: 60,
       charisma: 55,
@@ -126,6 +141,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Maeron',
       birth: 149,
+      recruitClass: 3,
       intelligence: 39,
       war: 50,
       charisma: 56,
@@ -133,6 +149,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Torric',
       birth: 178,
+      recruitClass: 3,
       intelligence: 55,
       war: 75,
       charisma: 58,
@@ -141,6 +158,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Orven',
       birth: 191,
+      recruitClass: 2,
       intelligence: 84,
       war: 73,
       charisma: 74,
@@ -148,6 +166,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Ithren',
       birth: 164,
+      recruitClass: 0,
       intelligence: 96,
       war: 88,
       charisma: 66,
@@ -155,6 +174,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Fenric',
       birth: 189,
+      recruitClass: 1,
       intelligence: 38,
       war: 85,
       charisma: 53,
@@ -162,6 +182,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Dovar',
       birth: 185,
+      recruitClass: 3,
       intelligence: 62,
       war: 71,
       charisma: 58,
@@ -169,6 +190,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Vaelor',
       birth: 185,
+      recruitClass: 2,
       intelligence: 70,
       war: 86,
       charisma: 77,
@@ -176,6 +198,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Calder',
       birth: 190,
+      recruitClass: 2,
       intelligence: 73,
       war: 84,
       charisma: 81,
@@ -183,6 +206,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Heskar',
       birth: 175,
+      recruitClass: 3,
       intelligence: 69,
       war: 49,
       charisma: 72,
@@ -190,6 +214,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Beran',
       birth: 180,
+      recruitClass: 2,
       intelligence: 78,
       war: 59,
       charisma: 78,
@@ -198,6 +223,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Ysene',
       birth: 168,
+      recruitClass: 0,
       intelligence: 67,
       war: 43,
       charisma: 79,
@@ -206,6 +232,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Olyss',
       birth: 190,
+      recruitClass: 1,
       intelligence: 53,
       war: 78,
       charisma: 81,
@@ -214,6 +241,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Brennor',
       birth: 158,
+      recruitClass: 3,
       intelligence: 45,
       war: 60,
       charisma: 42,
@@ -221,6 +249,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Ordran',
       birth: 153,
+      recruitClass: 3,
       intelligence: 68,
       war: 64,
       charisma: 69,
@@ -229,6 +258,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Veldis',
       birth: 172,
+      recruitClass: 3,
       intelligence: 50,
       war: 60,
       charisma: 58,
@@ -236,6 +266,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Kestrel',
       birth: 172,
+      recruitClass: 1,
       intelligence: 79,
       war: 91,
       charisma: 76,
@@ -243,6 +274,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Dravik',
       birth: 172,
+      recruitClass: 2,
       intelligence: 41,
       war: 78,
       charisma: 57,
@@ -250,6 +282,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Thevon',
       birth: 165,
+      recruitClass: 3,
       intelligence: 48,
       war: 54,
       charisma: 60,
@@ -257,6 +290,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Cadran',
       birth: 174,
+      recruitClass: 2,
       intelligence: 75,
       war: 83,
       charisma: 69,
@@ -264,6 +298,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Rhovan',
       birth: 184,
+      recruitClass: 1,
       intelligence: 75,
       war: 92,
       charisma: 28,
@@ -272,6 +307,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Kerric',
       birth: 182,
+      recruitClass: 1,
       intelligence: 33,
       war: 89,
       charisma: 40,
@@ -279,6 +315,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Arveth',
       birth: 148,
+      recruitClass: 2,
       intelligence: 82,
       war: 73,
       charisma: 76,
@@ -286,6 +323,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Tharen',
       birth: 157,
+      recruitClass: 1,
       intelligence: 76,
       war: 86,
       charisma: 85,
@@ -293,6 +331,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Nivren',
       birth: 175,
+      recruitClass: 3,
       intelligence: 50,
       war: 42,
       charisma: 63,
@@ -301,6 +340,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Marven',
       birth: 154,
+      recruitClass: 1,
       intelligence: 87,
       war: 78,
       charisma: 72,
@@ -308,6 +348,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Uldren',
       birth: 177,
+      recruitClass: 2,
       intelligence: 51,
       war: 75,
       charisma: 57,
@@ -315,6 +356,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Ferran',
       birth: 154,
+      recruitClass: 2,
       intelligence: 52,
       war: 88,
       charisma: 46,
@@ -322,6 +364,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Aldren',
       birth: 173,
+      recruitClass: 1,
       intelligence: 78,
       war: 80,
       charisma: 74,
@@ -330,6 +373,7 @@ export const SCENARIO_2: Scenario = {
     {
       name: 'Ruskarn',
       birth: 181,
+      recruitClass: 2,
       intelligence: 64,
       war: 91,
       charisma: 63,

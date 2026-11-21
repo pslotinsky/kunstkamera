@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import type { Captive } from '@/core/domain/Captive';
 import { BattleReportClosedEvent } from '@/ui/screens/StrategyScreen/BattleReport/BattleReportClosedEvent';
@@ -14,16 +14,17 @@ import {
   makeWorld,
 } from './factories';
 
-function setup() {
+function setup(fame = 100) {
   const avar = makeGeneral({ name: 'Avar' });
   const wintercairn = makeProvince({ number: 5, gold: 216 });
   const mine = makeFamily({
     name: 'Alderwyn',
     ruler: avar,
     homeProvince: wintercairn,
+    fame,
   });
   const darian = makeGeneral({ name: 'Darian' });
-  const marven = makeGeneral({ name: 'Marven', war: 77 });
+  const marven = makeGeneral({ name: 'Marven', war: 77, recruitClass: 1 });
   const pineward = makeProvince({ number: 6, gold: 300 });
   const rival = makeFamily({
     name: 'Stormmere',
@@ -74,12 +75,12 @@ function setup() {
 }
 
 describe('CaptiveDialogControl', () => {
-  it('offers the three choices for any prisoner', () => {
+  it('offers all three choices when recruitment is available', () => {
     const { open, choice, mine, rival, marven } = setup();
 
     open(makeCaptive({ general: marven, house: rival, captor: mine }));
 
-    expect(choice('Recruit')).not.toBeNull();
+    expect(choice('Recruit')?.disabled).toBe(false);
     expect(choice('Release')).not.toBeNull();
     expect(choice('Banish')).not.toBeNull();
   });
@@ -106,20 +107,18 @@ describe('CaptiveDialogControl', () => {
     expect(isOpen()).toBe(false);
   });
 
-  it('says when a recruit refuses to turn', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.9);
-
-    const { open, choice, title, mine, rival, marven } = setup();
+  it('disables Recruit when Fame is too low and keeps the prisoner held', () => {
+    const { open, choice, world, mine, rival, marven } = setup(30);
 
     open(makeCaptive({ general: marven, house: rival, captor: mine }));
     choice('Recruit')!.click();
 
-    expect(title()).toBe('Marven refuses to join you');
+    expect(choice('Recruit')?.disabled).toBe(true);
+    expect(choice('Release')?.disabled).toBe(false);
+    expect(world.isHeld(marven)).toBe(true);
   });
 
-  it('takes a recruit into the house when he agrees', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.1);
-
+  it('takes an eligible recruit into the house', () => {
     const { open, choice, title, mine, rival, marven } = setup();
 
     open(makeCaptive({ general: marven, house: rival, captor: mine }));

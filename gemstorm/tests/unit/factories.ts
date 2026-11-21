@@ -14,7 +14,7 @@ import { Characteristics } from '@/core/domain/Characteristics';
 import { Development } from '@/core/domain/Development';
 import { Family } from '@/core/domain/Family';
 import type { Gem } from '@/core/domain/Gem';
-import { General } from '@/core/domain/General';
+import { General, type RecruitClass } from '@/core/domain/General';
 import { Invasion, type InvasionParams } from '@/core/domain/Invasion';
 import {
   InvasionReport,
@@ -34,6 +34,7 @@ interface GeneralParams {
   readonly war?: number | undefined;
   readonly charisma?: number | undefined;
   readonly lineage?: string | undefined;
+  readonly recruitClass?: RecruitClass;
 }
 
 interface FamilyParams {
@@ -69,6 +70,7 @@ export function makeGeneral(params: GeneralParams = {}): General {
   return new General({
     name: params.name ?? `General ${generalSequence}`,
     birth: params.birth ?? new CalendarDate(1156, 1),
+    recruitClass: params.recruitClass ?? 3,
     stats: Characteristics.from({
       intelligence: params.intelligence ?? 50,
       war: params.war ?? 50,

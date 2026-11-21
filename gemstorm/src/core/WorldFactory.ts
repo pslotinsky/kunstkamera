@@ -104,6 +104,7 @@ export class WorldFactory {
           name: definition.name,
           stats: Characteristics.from(definition),
           birth,
+          recruitClass: definition.recruitClass,
           lineage: definition.lineage,
         }),
       );

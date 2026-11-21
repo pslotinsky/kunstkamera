@@ -1,7 +1,8 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { Captivity } from '@/core/domain/Captivity';
 import { Gem } from '@/core/domain/Gem';
+import type { RecruitClass } from '@/core/domain/General';
 
 import {
   makeCaptive,
@@ -11,11 +12,21 @@ import {
   makeWorld,
 } from './factories';
 
-function setup() {
+interface SetupOptions {
+  readonly recruitClass?: RecruitClass;
+  readonly lineage?: string;
+}
+
+function setup({ recruitClass = 2, lineage }: SetupOptions = {}) {
   const avar = makeGeneral({ name: 'Avar' });
   const mine = makeFamily({ name: 'Alderwyn', ruler: avar, fame: 20 });
   const darian = makeGeneral({ name: 'Darian' });
-  const marven = makeGeneral({ name: 'Marven', war: 77 });
+  const marven = makeGeneral({
+    name: 'Marven',
+    war: 77,
+    recruitClass,
+    lineage,
+  });
   const rival = makeFamily({
     name: 'Stormmere',
     ruler: darian,
@@ -67,51 +78,77 @@ function houses(world: ReturnType<typeof setup>['world']): readonly string[] {
 }
 
 describe('Captivity', () => {
-  it('turns a vassal who can be talked round', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.1);
+  it.each([
+    [0, 51],
+    [1, 31],
+    [2, 16],
+    [3, 0],
+  ] as const)(
+    'requires exactly the Fame threshold for recruit class %s',
+    (recruitClass, threshold) => {
+      const { captivity, hold, mine } = setup({ recruitClass });
+      const captive = hold();
+      mine.loseFame(mine.fame);
 
-    const { captivity, hold, mine, rival, marven } = setup();
+      if (threshold > 0) {
+        mine.gainFame(threshold - 1);
+        expect(captivity.canRecruit(captive)).toBe(false);
+        expect(captivity.recruit(captive)).toBe(false);
+        mine.gainFame(1);
+      }
+
+      expect(captivity.canRecruit(captive)).toBe(true);
+      expect(captivity.recruit(captive)).toBe(true);
+    },
+  );
+
+  it('recruits a lord into court without his province or former house membership', () => {
+    const { captivity, hold, mine, rival, marven, ostgard } = setup({
+      lineage: 'Stormmere',
+    });
 
     expect(captivity.recruit(hold())).toBe(true);
     expect(mine.members).toContain(marven);
     expect(rival.members).not.toContain(marven);
+    expect(marven.isKinOf(rival)).toBe(false);
+    expect(ostgard.family).toBe(rival);
+    expect(ostgard.governor).toBe(rival.ruler);
     expect(mine.fame).toBe(20);
   });
 
-  it('leaves a vassal where he is when he refuses', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.9);
-
-    const { captivity, hold, mine, rival, marven } = setup();
-
-    expect(captivity.recruit(hold())).toBe(false);
-    expect(mine.members).not.toContain(marven);
-    expect(rival.members).toContain(marven);
-  });
-
   it('takes the whole house when its ruler is recruited', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.1);
+    const {
+      captivity,
+      hold,
+      world,
+      mine,
+      rival,
+      darian,
+      marven,
+      pineward,
+      ostgard,
+    } = setup({ lineage: 'Stormmere' });
 
-    const { captivity, hold, world, mine, darian, marven, pineward, ostgard } =
-      setup();
-
-    captivity.recruit(hold(darian));
+    world.hold(hold(marven));
+    expect(captivity.recruit(hold(darian))).toBe(true);
 
     expect(pineward.family).toBe(mine);
     expect(ostgard.family).toBe(mine);
+    expect(mine.members).toContain(darian);
     expect(mine.members).toContain(marven);
+    expect(marven.isKinOf(rival)).toBe(false);
+    expect(world.isHeld(marven)).toBe(false);
     expect(mine.gems.map((gem) => gem.name)).toContain('Asterion');
     expect(mine.fame).toBe(26);
     expect(houses(world)).not.toContain('Stormmere');
   });
 
-  it('finds a ruler far harder to turn than his vassals', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.35);
+  it('protects a ruler with an eligible heir', () => {
+    const { captivity, hold, rival, darian } = setup();
+    rival.enlist(makeGeneral({ lineage: rival.name }));
 
-    const vassal = setup();
-    const ruler = setup();
-
-    expect(vassal.captivity.recruit(vassal.hold())).toBe(true);
-    expect(ruler.captivity.recruit(ruler.hold(ruler.darian))).toBe(false);
+    expect(captivity.canRecruit(hold(darian))).toBe(false);
+    expect(captivity.recruit(hold(darian))).toBe(false);
   });
 
   it('sends a released vassal home the weaker for it', () => {

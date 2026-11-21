@@ -7,6 +7,17 @@ import { SCENARIOS } from '@/config/scenarios';
 const PROVINCE_COUNT = 30;
 const PLAYABLE_COUNT = 4;
 
+it('keeps each general’s recruit class across scenarios', () => {
+  const classes = new Map<string, number>();
+
+  for (const { generals } of SCENARIOS) {
+    for (const { name, recruitClass } of generals) {
+      expect(recruitClass, name).toBe(classes.get(name) ?? recruitClass);
+      classes.set(name, recruitClass);
+    }
+  }
+});
+
 describe.each(SCENARIOS)('Scenario $number: $name', (scenario) => {
   const generals = new Set(scenario.generals.map((general) => general.name));
   const families = new Set(scenario.families.map((family) => family.name));

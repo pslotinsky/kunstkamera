@@ -59,7 +59,6 @@ type Verdict = CaptiveJudgedEvent['outcome'];
 
 const VERDICTS: Record<Verdict, string> = {
   joined: 'recruited',
-  refused: 'released',
   released: 'released',
   banished: 'banished',
 };

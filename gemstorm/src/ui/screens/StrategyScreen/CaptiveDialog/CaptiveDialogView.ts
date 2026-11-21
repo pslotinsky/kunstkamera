@@ -14,7 +14,6 @@ import styles from './CaptiveDialog.module.scss';
 
 const OUTCOMES: Record<DisposalOutcome, (name: string) => string> = {
   joined: (name) => `${name} joins your house`,
-  refused: (name) => `${name} refuses to join you`,
   released: (name) => `${name} is sent home`,
   banished: (name) => `${name} is banished from Aureth`,
 };
@@ -44,14 +43,18 @@ export class CaptiveDialogView extends View<CaptiveDialogContext> {
     `;
   }
 
-  public showDisposals(captive: Captive): void {
+  public showDisposals(captive: Captive, canRecruit: boolean): void {
     this.show(captive, `${captive.general.name} is your prisoner`);
     this.choices.replaceChildren(
-      ...DISPOSALS.map(({ kind, label }) =>
-        this.renderChoice(label, () =>
+      ...DISPOSALS.map(({ kind, label }) => {
+        const choice = this.renderChoice(label, () =>
           this.publish(new DisposalChosenEvent(kind)),
-        ),
-      ),
+        );
+
+        choice.disabled = kind === 'recruit' && !canRecruit;
+
+        return choice;
+      }),
     );
   }
 

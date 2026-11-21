@@ -245,7 +245,7 @@ describe('Campaign outcome', () => {
 describe('Campaign completion through game actions', () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it('ends an AI turn after recruiting the player ruler, before another captive or order', () => {
+  it('ends an AI turn after banishing a player ruler with no heir', () => {
     const context = island();
     const { world, events, player, rival, target } = context;
     const captive = makeCaptive({
@@ -271,7 +271,7 @@ describe('Campaign completion through game actions', () => {
     computer.play(target);
     computer.play(target);
 
-    expect(world.campaign.outcome?.reason).toBe('absorption');
+    expect(world.campaign.outcome?.reason).toBe('no-heir');
     expect(world.isHeld(captive.general)).toBe(false);
     expect(world.isHeld(other)).toBe(true);
     expect(target.resources.gold).toBe(200);
@@ -491,29 +491,44 @@ describe('Campaign completion through game actions', () => {
     expect(world.campaign.outcome?.isVictory).toBe(true);
   });
 
-  it.each(['victory', 'defeat'] as const)(
-    'ruler recruitment produces %s, while capture alone does not',
-    (result) => {
-      const context = island();
-      const { world, player, rival } = context;
-      const house = result === 'victory' ? rival : player;
-      const captor = result === 'victory' ? player : rival;
-      const captive = makeCaptive({ general: house.ruler, house, captor });
-      const judge = new JudgeCaptiveCommand(context);
+  it('wins by recruiting an heirless computer ruler', () => {
+    const context = island();
+    const { world, player, rival } = context;
+    const captive = makeCaptive({
+      general: rival.ruler,
+      house: rival,
+      captor: player,
+    });
+    const judge = new JudgeCaptiveCommand(context);
 
-      world.hold(captive);
-      expect(world.campaign.assess()).toBeUndefined();
-      vi.spyOn(Math, 'random').mockReturnValue(0);
-      judge.judge(captive, 'recruit');
-      execute(context, judge);
+    world.hold(captive);
+    expect(world.campaign.assess()).toBeUndefined();
+    judge.judge(captive, 'recruit');
+    execute(context, judge);
 
-      expect(world.campaign.outcome?.isVictory).toBe(result === 'victory');
-      expect(world.isHeld(captive.general)).toBe(false);
-      expect(world.campaign.outcome?.reason).toBe(
-        result === 'victory' ? 'unification' : 'absorption',
-      );
-    },
-  );
+    expect(world.campaign.outcome?.reason).toBe('unification');
+    expect(world.isHeld(captive.general)).toBe(false);
+  });
+
+  it('rejects recruitment of the player ruler and keeps the prisoner held', () => {
+    const context = island();
+    const { world, player, rival } = context;
+    const captive = makeCaptive({
+      general: player.ruler,
+      house: player,
+      captor: rival,
+    });
+    const judge = new JudgeCaptiveCommand(context);
+
+    world.hold(captive);
+    rival.gainFame(100);
+    judge.judge(captive, 'recruit');
+    execute(context, judge);
+
+    expect(judge.outcome).toBeUndefined();
+    expect(world.campaign.outcome).toBeUndefined();
+    expect(world.isHeld(captive.general)).toBe(true);
+  });
 
   it('wins a conceded invasion after spoils and transfers, before the report is published', () => {
     const context = island();

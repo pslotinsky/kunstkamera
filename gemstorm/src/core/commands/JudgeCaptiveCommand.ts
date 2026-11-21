@@ -6,6 +6,7 @@ import {
 } from '@/core/domain/Captivity';
 import { CaptiveJudgedEvent } from '@/core/events/CaptiveJudgedEvent';
 import { SuccessionReportedEvent } from '@/core/events/SuccessionReportedEvent';
+import { isDefined } from '@/lib/value/isDefined';
 
 import { WorldCommand, type WorldCommandContext } from './WorldCommand';
 
@@ -25,6 +26,11 @@ export class JudgeCaptiveCommand extends WorldCommand {
   public judge(captive: Captive, disposal: Disposal): void {
     this.captive = captive;
     this.disposal = disposal;
+    this.outcome = undefined;
+  }
+
+  public canRecruit(captive: Captive): boolean {
+    return this.captivity.canRecruit(captive);
   }
 
   public override consumesTurn(): boolean {
@@ -33,18 +39,24 @@ export class JudgeCaptiveCommand extends WorldCommand {
 
   public execute(): void {
     const captive = this.captive;
+    const { world } = this.context;
 
-    if (captive) {
-      const provinces = this.context.world.getFamilyProvinces(captive.house);
+    if (
+      isDefined(captive) &&
+      world.getCaptivesOf(captive.captor).includes(captive)
+    ) {
+      const provinces = world.getFamilyProvinces(captive.house);
       const outcome = this.carryOut(captive);
 
-      this.outcome = outcome;
-      this.context.world.free(captive);
-      this.publishUpdates(provinces);
+      if (isDefined(outcome)) {
+        this.outcome = outcome;
+        world.free(captive);
+        this.publishUpdates(provinces);
+      }
     }
   }
 
-  private carryOut(captive: Captive): DisposalOutcome {
+  private carryOut(captive: Captive): DisposalOutcome | undefined {
     if (this.disposal === 'recruit') {
       return this.recruit(captive);
     }
@@ -61,12 +73,14 @@ export class JudgeCaptiveCommand extends WorldCommand {
     return 'banished';
   }
 
-  private recruit(captive: Captive): DisposalOutcome {
-    const outcome = this.captivity.recruit(captive) ? 'joined' : 'refused';
+  private recruit(captive: Captive): DisposalOutcome | undefined {
+    const recruited = this.captivity.recruit(captive);
 
-    this.publish(new CaptiveJudgedEvent(captive, outcome));
+    if (recruited) {
+      this.publish(new CaptiveJudgedEvent(captive, 'joined'));
+    }
 
-    return outcome;
+    return recruited ? 'joined' : undefined;
   }
 
   private banish(captive: Captive): void {

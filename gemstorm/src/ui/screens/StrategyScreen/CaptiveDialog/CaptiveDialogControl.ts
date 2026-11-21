@@ -3,6 +3,7 @@ import { JudgeCaptiveCommand } from '@/core/commands/JudgeCaptiveCommand';
 import type { Captive } from '@/core/domain/Captive';
 import type { Disposal } from '@/core/domain/Captivity';
 import { Control } from '@/lib/Control';
+import { isDefined } from '@/lib/value/isDefined';
 import { BattleReportClosedEvent } from '@/ui/screens/StrategyScreen/BattleReport/BattleReportClosedEvent';
 import { TurnHold } from '@/ui/screens/StrategyScreen/TurnHold';
 
@@ -42,7 +43,7 @@ export class CaptiveDialogControl extends Control<CaptiveDialogView> {
 
     if (captive) {
       this.turnHold.hold();
-      this.view.showDisposals(captive);
+      this.view.showDisposals(captive, this.judge.canRecruit(captive));
     }
   }
 
@@ -57,7 +58,14 @@ export class CaptiveDialogControl extends Control<CaptiveDialogView> {
     if (captive) {
       this.judge.judge(captive, disposal);
       this.executor.execute(this.judge);
-      this.view.showOutcome(captive, this.judge.outcome!);
+
+      const { outcome } = this.judge;
+
+      if (isDefined(outcome)) {
+        this.view.showOutcome(captive, outcome);
+      } else {
+        this.view.showDisposals(captive, this.judge.canRecruit(captive));
+      }
     }
   }
 

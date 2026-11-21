@@ -1,3 +1,5 @@
+import type { RecruitClass } from '@/core/domain/General';
+
 import { SCENARIO_1 } from './scenario-1';
 import { SCENARIO_2 } from './scenario-2';
 import { SCENARIO_3 } from './scenario-3';
@@ -6,6 +8,7 @@ import { SCENARIO_4 } from './scenario-4';
 export interface GeneralDefinition {
   readonly name: string;
   readonly birth: number;
+  readonly recruitClass: RecruitClass;
   readonly intelligence: number;
   readonly war: number;
   readonly charisma: number;

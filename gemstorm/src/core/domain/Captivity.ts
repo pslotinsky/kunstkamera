@@ -1,13 +1,18 @@
 import type { Captive } from './Captive';
+import type { RecruitClass } from './General';
 import { Succession, type SuccessionOutcome } from './Succession';
 import type { World } from './World';
 
 export type Disposal = 'recruit' | 'release' | 'banish';
 
-export type DisposalOutcome = 'joined' | 'refused' | 'released' | 'banished';
+export type DisposalOutcome = 'joined' | 'released' | 'banished';
 
-const RECRUIT_ODDS = 0.5;
-const RULER_RECRUIT_ODDS = 0.2;
+const REQUIRED_FAME: Readonly<Record<RecruitClass, number>> = {
+  0: 51,
+  1: 31,
+  2: 16,
+  3: 0,
+};
 const RELEASE_WAR_LOSS = 5;
 
 export class Captivity {
@@ -17,18 +22,25 @@ export class Captivity {
     this.world = world;
   }
 
-  public recruit(captive: Captive): boolean {
-    const success = Math.random() < this.weighOdds(captive);
+  public canRecruit(captive: Captive): boolean {
+    const { general, house, captor } = captive;
+    const hasRequiredFame = captor.fame >= REQUIRED_FAME[general.recruitClass];
+    const isProtectedRuler =
+      captive.isRuler &&
+      (house.isEqual(this.world.player) ||
+        this.world.getHeirs(house).length > 0);
 
-    if (success) {
+    return hasRequiredFame && !isProtectedRuler;
+  }
+
+  public recruit(captive: Captive): boolean {
+    const canRecruit = this.canRecruit(captive);
+
+    if (canRecruit) {
       this.turn(captive);
     }
 
-    return success;
-  }
-
-  private weighOdds(captive: Captive): number {
-    return captive.isRuler ? RULER_RECRUIT_ODDS : RECRUIT_ODDS;
+    return canRecruit;
   }
 
   public release(captive: Captive): void {
@@ -52,13 +64,34 @@ export class Captivity {
   }
 
   private turn(captive: Captive): void {
-    const wasRuler = captive.isRuler;
-
-    captive.house.discharge(captive.general);
-    captive.captor.enlist(captive.general);
-
-    if (wasRuler) {
-      this.world.absorb(captive.house, captive.captor);
+    captive.general.renounceHouse();
+    if (captive.isRuler) {
+      this.recruitRuler(captive);
+    } else {
+      this.bringToCourt(captive);
     }
+  }
+
+  private recruitRuler(captive: Captive): void {
+    const { house, captor } = captive;
+
+    this.world.absorb(house, captor);
+    for (const prisoner of this.world.getCaptivesOf(captor)) {
+      if (prisoner.house.isEqual(house)) {
+        this.world.free(prisoner);
+      }
+    }
+  }
+
+  private bringToCourt(captive: Captive): void {
+    const { general, house, captor } = captive;
+    const province = this.world.getRuledProvince(general);
+
+    if (province?.belongsTo(house)) {
+      province.assignGovernor(house.ruler);
+    }
+
+    house.discharge(general);
+    captor.enlist(general);
   }
 }

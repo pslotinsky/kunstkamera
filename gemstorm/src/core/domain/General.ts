@@ -4,6 +4,7 @@ import { Characteristics } from './Characteristics';
 import type { Family } from './Family';
 
 export type GeneralRank = 'ruler' | 'lord' | 'vassal';
+export type RecruitClass = 0 | 1 | 2 | 3;
 
 const DECLINE_AGE = 65;
 const YEARLY_STAT_LOSS = 5;
@@ -20,6 +21,7 @@ export interface GeneralParams {
   readonly name: string;
   readonly stats: Characteristics;
   readonly birth: CalendarDate;
+  readonly recruitClass: RecruitClass;
   readonly lineage?: string | undefined;
 }
 
@@ -27,12 +29,14 @@ export class General {
   public readonly name: string;
   public stats: Characteristics;
   public readonly birth: CalendarDate;
-  public readonly lineage: string | undefined;
+  public readonly recruitClass: RecruitClass;
+  private lineage: string | undefined;
 
   public constructor(params: GeneralParams) {
     this.name = params.name;
     this.stats = params.stats;
     this.birth = params.birth;
+    this.recruitClass = params.recruitClass;
     this.lineage = params.lineage;
   }
 
@@ -68,6 +72,10 @@ export class General {
 
   public isKinOf(family: Family): boolean {
     return this.lineage === family.name;
+  }
+
+  public renounceHouse(): void {
+    this.lineage = undefined;
   }
 
   public isEqual(other: General): boolean {

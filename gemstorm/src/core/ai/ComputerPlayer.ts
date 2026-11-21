@@ -56,9 +56,13 @@ export class ComputerPlayer {
   }
 
   private judgeCaptives(family: Family): void {
-    if (!family.isEqual(this.context.world.player)) {
-      for (const judgement of this.captor.chooseJudgements(family)) {
-        this.executor.execute(judgement);
+    const { world } = this.context;
+
+    if (!family.isEqual(world.player)) {
+      for (const captive of world.getCaptivesOf(family)) {
+        if (world.campaign.canProgress && world.isHeld(captive.general)) {
+          this.executor.execute(this.captor.chooseJudgement(captive));
+        }
       }
     }
   }
