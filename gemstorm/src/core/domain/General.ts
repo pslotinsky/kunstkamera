@@ -56,10 +56,6 @@ export class General {
     return age >= OLD_AGE ? Math.min(age / PERCENT_SCALE, 1) : 0;
   }
 
-  public decreaseWar(amount: number): void {
-    this.stats = this.stats.decrease({ war: amount });
-  }
-
   public receive(artifact: Artifact): void {
     this.stats = this.stats.increase({
       [artifact.characteristic]: artifact.bonus,

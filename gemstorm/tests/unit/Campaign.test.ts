@@ -530,7 +530,7 @@ describe('Campaign completion through game actions', () => {
     expect(world.isHeld(captive.general)).toBe(true);
   });
 
-  it('wins a conceded invasion after spoils and transfers, before the report is published', () => {
+  it('waits for the captured ruler’s fate before declaring victory', () => {
     const context = island();
     const { world, events, source, target, player } = context;
     const order: string[] = [];
@@ -539,9 +539,9 @@ describe('Campaign completion through game actions', () => {
     context.rival.gems[0]!.rest(world.date, 3);
     events.subscribe(BattleReportedEvent, () => {
       order.push('battle');
-      expect(world.campaign.outcome?.isVictory).toBe(true);
+      expect(world.campaign.outcome).toBeUndefined();
       expect(target.family).toBe(player);
-      expect(target.resources.gold).toBe(100);
+      expect(target.resources.gold).toBe(200);
       expect(target.resources.troops).toBe(50);
     });
     events.subscribe(CampaignEndedEvent, () => order.push('ending'));
@@ -551,13 +551,23 @@ describe('Campaign completion through game actions', () => {
     );
     execute(context, command);
 
+    expect(order).toEqual(['battle']);
+    const captive = world.findCaptiveOf(player)!;
+    const judge = new JudgeCaptiveCommand(context);
+
+    expect(captive.isRuler).toBe(true);
+    expect(captive.ransom).toBeUndefined();
+    judge.judge(captive, 'release');
+    execute(context, judge);
+
+    expect(world.campaign.outcome?.isVictory).toBe(true);
     expect(order).toEqual(['battle', 'ending']);
   });
 
   it('waits for a fought invasion, then ignores late battle and turn events', async () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.999);
     const context = island();
-    const { world, events, source, target } = context;
+    const { world, events, source, target, player } = context;
 
     target.addResources({ troops: 100 });
     new WorldEngine(world, events).start();
@@ -574,8 +584,12 @@ describe('Campaign completion through game actions', () => {
 
     const attack = new AttackCommand(context);
     const endings: CampaignEndedEvent[] = [];
+    const reportHold = {};
 
     events.subscribe(CampaignEndedEvent, (event) => endings.push(event));
+    events.subscribe(BattleReportedEvent, () =>
+      events.publish(new TurnHeldEvent(reportHold)),
+    );
     attack.attackAt(
       target,
       makeArmy({ commander: source.governor!, troops: 50, food: 100 }),
@@ -588,6 +602,10 @@ describe('Campaign completion through game actions', () => {
     const endingTurn = world.turnQueue.turnNumber;
 
     events.publish(new BattleEndedEvent(makeOutcome()));
+    const judge = new JudgeCaptiveCommand(context);
+    judge.judge(world.findCaptiveOf(player)!, 'recruit');
+    execute(context, judge);
+    events.publish(new TurnReleasedEvent(reportHold));
     const gold = source.resources.gold;
     const recruit = new RecruitCommand(context);
 

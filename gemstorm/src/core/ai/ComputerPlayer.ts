@@ -3,6 +3,7 @@ import type {
   WorldCommand,
   WorldCommandContext,
 } from '@/core/commands/WorldCommand';
+import type { Captive } from '@/core/domain/Captive';
 import type { Family } from '@/core/domain/Family';
 import type { Province } from '@/core/domain/Province';
 
@@ -60,10 +61,28 @@ export class ComputerPlayer {
 
     if (!family.isEqual(world.player)) {
       for (const captive of world.getCaptivesOf(family)) {
-        if (world.campaign.canProgress && world.isHeld(captive.general)) {
+        this.demandRansom(captive);
+        if (
+          world.campaign.canProgress &&
+          world.hasCaptive(captive) &&
+          !captive.ransom
+        ) {
           this.executor.execute(this.captor.chooseJudgement(captive));
         }
       }
+    }
+  }
+
+  public demandRansom(captive: Captive): void {
+    const { world } = this.context;
+
+    if (
+      world.campaign.canProgress &&
+      world.hasCaptive(captive) &&
+      !captive.captor.isEqual(world.player) &&
+      captive.canDemandRansom
+    ) {
+      this.executor.execute(this.captor.demandRansom(captive));
     }
   }
 

@@ -257,12 +257,22 @@ export function makeInvasionReport(
   });
 }
 
-export function makeCaptive(params: Partial<CaptiveParams> = {}): Captive {
-  return new Captive({
+export function makeCaptive(
+  params: Partial<CaptiveParams> & { readonly pendingRansom?: boolean } = {},
+): Captive {
+  const captor = params.captor ?? makeFamily();
+  const captive = new Captive({
     general: params.general ?? makeGeneral(),
     house: params.house ?? makeFamily(),
-    captor: params.captor ?? makeFamily(),
+    captor,
+    battlefield: params.battlefield ?? captor.homeProvince,
   });
+
+  if (!params.pendingRansom) {
+    captive.closeRansom();
+  }
+
+  return captive;
 }
 
 export function makeBattle(params: MakeBattleParams = {}): Battle {

@@ -1,5 +1,6 @@
 import { BREAKAWAY_NAMES } from '@/config/families';
 import type { Collection } from '@/lib/Collection';
+import { isDefined } from '@/lib/value/isDefined';
 
 import type { Advisor } from './Advisor';
 import type { CalendarDate } from './CalendarDate';
@@ -65,6 +66,12 @@ export class World {
     return this.held.filter((captive) => captive.captor.isEqual(captor));
   }
 
+  public findRansomFor(house: Family): Captive | undefined {
+    return this.held.find(
+      (captive) => captive.house.isEqual(house) && isDefined(captive.demand),
+    );
+  }
+
   public exile(general: General): void {
     this.exiled = [...this.exiled, general];
     this.generals.remove(general.name);
@@ -76,6 +83,10 @@ export class World {
 
   public isHeld(general: General): boolean {
     return this.held.some((captive) => captive.general.isEqual(general));
+  }
+
+  public hasCaptive(captive: Captive): boolean {
+    return this.held.includes(captive);
   }
 
   public bury(general: General): void {

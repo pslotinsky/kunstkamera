@@ -4,6 +4,8 @@ import { RecruitCommand } from '@/core/commands/province/RecruitCommand';
 import { TradeCommand } from '@/core/commands/province/TradeCommand';
 import { CalendarDate } from '@/core/domain/CalendarDate';
 import { HiredUnit } from '@/core/domain/HiredUnit';
+import { InvasionReport } from '@/core/domain/InvasionReport';
+import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
 import { IncidentReportedEvent } from '@/core/events/IncidentReportedEvent';
 import { MonthStartedEvent } from '@/core/events/MonthStartedEvent';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
@@ -15,7 +17,14 @@ import { UnitDesertedEvent } from '@/core/events/UnitDesertedEvent';
 import { WorldEngine } from '@/core/WorldEngine';
 import { EventBus } from '@/lib/EventBus';
 
-import { makeFamily, makeGeneral, makeProvince, makeWorld } from './factories';
+import {
+  makeArmy,
+  makeCaptive,
+  makeFamily,
+  makeGeneral,
+  makeProvince,
+  makeWorld,
+} from './factories';
 
 interface Fixture {
   readonly world: ReturnType<typeof makeWorld>['world'];
@@ -77,6 +86,43 @@ function drainMonth(fixture: Fixture): void {
 
 describe('WorldEngine', () => {
   afterEach(() => vi.restoreAllMocks());
+
+  it('gets an AI ransom demand ready for the player when the battle is reported', () => {
+    const { world, events } = createFixture(new CalendarDate(1186, 4));
+    const { player } = world;
+    const home = world.map.getProvince(1);
+    const battlefield = world.map.getProvince(3);
+    const captor = battlefield.family!;
+    const general = makeGeneral();
+    const captive = makeCaptive({
+      general,
+      house: player,
+      captor,
+      battlefield,
+      pendingRansom: true,
+    });
+    const report = new InvasionReport({
+      source: home,
+      target: battlefield,
+      defending: captor,
+      attacker: makeArmy({ commander: general }),
+      defender: makeArmy({ commander: captor.ruler }),
+      answer: 'fight',
+    });
+
+    player.enlist(general);
+    player.moveHome(home);
+    world.hold(captive);
+    report.captive = captive;
+    vi.spyOn(Math, 'random').mockReturnValue(0.75);
+    const before = home.resources.food;
+
+    events.publish(new BattleReportedEvent(report));
+
+    expect(world.findRansomFor(player)).toBe(captive);
+    expect(captive.demand).toBe('food');
+    expect(home.resources.food).toBe(before);
+  });
 
   it('records the action but leaves the turn for the orchestrator when a command executes', () => {
     const { world, events } = createFixture(new CalendarDate(1186, 4));

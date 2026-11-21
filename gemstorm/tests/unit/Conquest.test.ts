@@ -110,7 +110,7 @@ describe('Conquest', () => {
     expect(conquest.takeCaptive()?.general).toBe(marven);
   });
 
-  it('lets a beaten commander buy his way out of a province that can pay', () => {
+  it('holds a beaten commander for a ransom demand without charging the battlefield', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.01);
 
     const { conquest, target } = setup({
@@ -119,8 +119,11 @@ describe('Conquest', () => {
       targetGold: 500,
     });
 
-    expect(conquest.takeCaptive()).toBeUndefined();
-    expect(target.resources.gold).toBe(500 - 100);
+    const captive = conquest.takeCaptive();
+
+    expect(captive?.battlefield).toBe(target);
+    expect(captive?.canDemandRansom).toBe(true);
+    expect(target.resources.gold).toBe(500);
   });
 
   it('never takes a ruler who was only commanding from afar', () => {

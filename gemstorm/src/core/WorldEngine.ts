@@ -10,9 +10,11 @@ import { TaxAndHarvestCommand } from '@/core/commands/TaxAndHarvestCommand';
 import { UpkeepCommand } from '@/core/commands/UpkeepCommand';
 import type { BattleOutcome } from '@/core/domain/BattleOutcome';
 import type { Invasion } from '@/core/domain/Invasion';
+import type { InvasionReport } from '@/core/domain/InvasionReport';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
 import { BattleEndedEvent } from '@/core/events/BattleEndedEvent';
+import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
 import { BattleStartedEvent } from '@/core/events/BattleStartedEvent';
 import { MonthEndedEvent } from '@/core/events/MonthEndedEvent';
 import { MonthStartedEvent } from '@/core/events/MonthStartedEvent';
@@ -21,6 +23,7 @@ import { TurnHeldEvent } from '@/core/events/TurnHeldEvent';
 import { TurnReleasedEvent } from '@/core/events/TurnReleasedEvent';
 import { TurnScheduledEvent } from '@/core/events/TurnScheduledEvent';
 import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
+import { WarReportedEvent } from '@/core/events/WarReportedEvent';
 import type { EventBus, EventClass } from '@/lib/EventBus';
 
 export class WorldEngine {
@@ -86,6 +89,10 @@ export class WorldEngine {
     this.listen(BattleStartedEvent, (event) => {
       this.fought = event.invasion;
     });
+    this.listen(BattleReportedEvent, ({ report }) =>
+      this.requestRansom(report),
+    );
+    this.listen(WarReportedEvent, ({ report }) => this.requestRansom(report));
     this.listen(TurnScheduledEvent, () => {
       if (this.phase === 'waiting-turn') {
         this.advance();
@@ -106,6 +113,12 @@ export class WorldEngine {
 
   public stop(): void {
     this.lifetime.abort();
+  }
+
+  private requestRansom({ captive }: InvasionReport): void {
+    if (captive) {
+      this.computer.demandRansom(captive);
+    }
   }
 
   private advance(): void {
@@ -168,13 +181,16 @@ export class WorldEngine {
 
     if (invasion) {
       this.fought = undefined;
+      const { turnNumber } = this.world.turnQueue;
       const command = new ConcludeBattleCommand(
         { world: this.world, events: this.events },
         { invasion, outcome, refuge },
       );
 
       this.executor.execute(command);
-      this.events.publish(new TurnEndedEvent(this.world.turnQueue.turnNumber));
+      this.events.afterDispatch(() =>
+        this.events.publish(new TurnEndedEvent(turnNumber)),
+      );
     }
   }
 

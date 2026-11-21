@@ -1,7 +1,9 @@
 import { CommandExecutor } from '@/core/CommandExecutor';
 import { JudgeCaptiveCommand } from '@/core/commands/JudgeCaptiveCommand';
+import { RansomCommand } from '@/core/commands/RansomCommand';
 import type { Captive } from '@/core/domain/Captive';
 import type { Disposal } from '@/core/domain/Captivity';
+import type { RansomCurrency } from '@/core/domain/Ransom';
 import { Control } from '@/lib/Control';
 import { isDefined } from '@/lib/value/isDefined';
 import { BattleReportClosedEvent } from '@/ui/screens/StrategyScreen/BattleReport/BattleReportClosedEvent';
@@ -13,16 +15,21 @@ import {
 } from './CaptiveDialogView';
 import { CaptiveDismissedEvent } from './CaptiveDismissedEvent';
 import { DisposalChosenEvent } from './DisposalChosenEvent';
+import { RansomAnsweredEvent } from './RansomAnsweredEvent';
+import { RansomCurrencyChosenEvent } from './RansomCurrencyChosenEvent';
 
 export class CaptiveDialogControl extends Control<CaptiveDialogView> {
   private readonly executor: CommandExecutor;
   private readonly judge: JudgeCaptiveCommand;
+  private readonly ransom: RansomCommand;
   private readonly turnHold: TurnHold;
+  private captive: Captive | undefined;
 
   public constructor(context: CaptiveDialogContext) {
     super(CaptiveDialogView, context);
     this.executor = new CommandExecutor(context);
     this.judge = new JudgeCaptiveCommand(context);
+    this.ransom = new RansomCommand(context);
     this.turnHold = new TurnHold(context.events);
   }
 
@@ -36,26 +43,44 @@ export class CaptiveDialogControl extends Control<CaptiveDialogView> {
       this.dispose(event.disposal),
     );
     this.subscribe(CaptiveDismissedEvent, () => this.close());
+    this.subscribe(RansomCurrencyChosenEvent, ({ currency }) =>
+      this.demand(currency),
+    );
+    this.subscribe(RansomAnsweredEvent, ({ accepted }) =>
+      this.answer(accepted),
+    );
   }
 
   private open(): void {
-    const captive = this.findCaptive();
+    const { world } = this.context;
+    const { player } = world;
 
-    if (captive) {
-      this.turnHold.hold();
-      this.view.showDisposals(captive, this.judge.canRecruit(captive));
+    if (!world.campaign.isEnded && !isDefined(this.captive)) {
+      const captive =
+        world.findRansomFor(player) ?? world.findCaptiveOf(player);
+
+      if (isDefined(captive)) {
+        this.captive = captive;
+        this.turnHold.hold();
+        this.showChoices(captive);
+      }
     }
   }
 
   private close(): void {
+    this.captive = undefined;
     this.view.hide();
     this.turnHold.release();
+    this.open();
   }
 
   private dispose(disposal: Disposal): void {
-    const captive = this.findCaptive();
+    const { captive } = this;
 
-    if (captive) {
+    if (
+      isDefined(captive) &&
+      captive.captor.isEqual(this.context.world.player)
+    ) {
       this.judge.judge(captive, disposal);
       this.executor.execute(this.judge);
 
@@ -64,16 +89,65 @@ export class CaptiveDialogControl extends Control<CaptiveDialogView> {
       if (isDefined(outcome)) {
         this.view.showOutcome(captive, outcome);
       } else {
-        this.view.showDisposals(captive, this.judge.canRecruit(captive));
+        this.showChoices(captive);
       }
     }
   }
 
-  private findCaptive(): Captive | undefined {
-    const { world } = this.context;
+  private showChoices(captive: Captive): void {
+    const { ransom, demand } = captive;
 
-    return world.campaign.isEnded
-      ? undefined
-      : world.findCaptiveOf(world.player);
+    if (isDefined(ransom) && isDefined(demand)) {
+      const amount = ransom[demand];
+      const canPay = this.ransom.canPay(captive);
+
+      this.view.showRansomAnswer(captive, demand, amount, canPay);
+    } else if (isDefined(ransom)) {
+      this.view.showRansomDemand(captive, ransom);
+    } else {
+      this.view.showDisposals(captive, this.judge.canRecruit(captive));
+    }
+  }
+
+  private demand(currency: RansomCurrency): void {
+    const { captive } = this;
+
+    if (
+      isDefined(captive) &&
+      captive.captor.isEqual(this.context.world.player)
+    ) {
+      this.ransom.demand(captive, currency);
+      this.executor.execute(this.ransom);
+
+      if (this.ransom.outcome === 'paid') {
+        this.view.showOutcome(captive, 'ransomed');
+      } else if (this.ransom.outcome === 'declined') {
+        this.view.showDisposals(
+          captive,
+          this.judge.canRecruit(captive),
+          `${captive.house.name} refused the ransom`,
+        );
+      }
+    }
+  }
+
+  private answer(accepted: boolean): void {
+    const { captive } = this;
+
+    if (
+      isDefined(captive) &&
+      captive.house.isEqual(this.context.world.player)
+    ) {
+      this.ransom.answer(captive, accepted);
+      this.executor.execute(this.ransom);
+
+      if (this.ransom.outcome === 'paid') {
+        this.view.showOutcome(captive, 'ransomed');
+      } else if (this.ransom.outcome === 'declined') {
+        this.close();
+      } else {
+        this.showChoices(captive);
+      }
+    }
   }
 }

@@ -58,7 +58,7 @@ function setup({ recruitClass = 2, lineage }: SetupOptions = {}) {
   const { world } = makeWorld([wintercairn, pineward, ostgard], mine);
 
   const hold = (general = marven) =>
-    makeCaptive({ general, house: rival, captor: mine });
+    makeCaptive({ general, house: rival, captor: mine, battlefield: pineward });
 
   return {
     captivity: new Captivity(world),
@@ -151,12 +151,44 @@ describe('Captivity', () => {
     expect(captivity.recruit(hold(darian))).toBe(false);
   });
 
-  it('sends a released vassal home the weaker for it', () => {
-    const { captivity, hold, marven } = setup();
+  it('returns a released lord to court and puts his province under direct rule', () => {
+    const { captivity, hold, marven, rival, ostgard } = setup();
 
     captivity.release(hold());
 
-    expect(marven.stats.war).toBe(72);
+    expect(marven.stats.war).toBe(77);
+    expect(rival.members).toContain(marven);
+    expect(ostgard.governor).toBe(rival.ruler);
+  });
+
+  it('moves a released ruler to a remaining province away from the battlefield', () => {
+    const { captivity, hold, darian, rival, ostgard } = setup();
+
+    expect(captivity.release(hold(darian))).toBe(ostgard);
+    expect(rival.homeProvince).toBe(ostgard);
+    expect(ostgard.governor).toBe(darian);
+  });
+
+  it('lets a landless ruler claim unowned land next to the battlefield', () => {
+    const { captivity, hold, darian, rival, mine, pineward, ostgard } = setup();
+    pineward.claim(mine);
+    ostgard.unclaim();
+
+    expect(captivity.release(hold(darian))).toBe(ostgard);
+    expect(ostgard.family).toBe(rival);
+    expect(rival.homeProvince).toBe(ostgard);
+    expect(ostgard.governor).toBe(darian);
+  });
+
+  it('dissolves a released ruler’s house when there is nowhere for him to go', () => {
+    const { captivity, hold, world, darian, rival, mine, pineward, ostgard } =
+      setup();
+    pineward.claim(mine);
+    ostgard.claim(mine);
+
+    expect(captivity.release(hold(darian))).toBeUndefined();
+    expect(world.families.all).not.toContain(rival);
+    expect(mine.gems.map((gem) => gem.name)).toContain('Asterion');
   });
 
   it('puts a banished vassal out of the game for good', () => {

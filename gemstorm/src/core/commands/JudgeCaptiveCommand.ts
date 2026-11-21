@@ -43,7 +43,8 @@ export class JudgeCaptiveCommand extends WorldCommand {
 
     if (
       isDefined(captive) &&
-      world.getCaptivesOf(captive.captor).includes(captive)
+      world.hasCaptive(captive) &&
+      !isDefined(captive.ransom)
     ) {
       const provinces = world.getFamilyProvinces(captive.house);
       const outcome = this.carryOut(captive);
@@ -57,20 +58,14 @@ export class JudgeCaptiveCommand extends WorldCommand {
   }
 
   private carryOut(captive: Captive): DisposalOutcome | undefined {
-    if (this.disposal === 'recruit') {
-      return this.recruit(captive);
+    switch (this.disposal) {
+      case 'recruit':
+        return this.recruit(captive);
+      case 'release':
+        return this.release(captive);
+      case 'banish':
+        return this.banish(captive);
     }
-
-    if (this.disposal === 'release') {
-      this.captivity.release(captive);
-      this.publish(new CaptiveJudgedEvent(captive, 'released'));
-
-      return 'released';
-    }
-
-    this.banish(captive);
-
-    return 'banished';
   }
 
   private recruit(captive: Captive): DisposalOutcome | undefined {
@@ -83,7 +78,18 @@ export class JudgeCaptiveCommand extends WorldCommand {
     return recruited ? 'joined' : undefined;
   }
 
-  private banish(captive: Captive): void {
+  private release(captive: Captive): 'released' {
+    const destination = this.captivity.release(captive);
+
+    if (isDefined(destination)) {
+      this.publishUpdates([destination]);
+    }
+    this.publish(new CaptiveJudgedEvent(captive, 'released'));
+
+    return 'released';
+  }
+
+  private banish(captive: Captive): 'banished' {
     const outcome = this.captivity.banish(captive);
 
     if (outcome) {
@@ -92,5 +98,7 @@ export class JudgeCaptiveCommand extends WorldCommand {
     } else {
       this.publish(new CaptiveJudgedEvent(captive, 'banished'));
     }
+
+    return 'banished';
   }
 }

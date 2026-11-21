@@ -61,6 +61,7 @@ const VERDICTS: Record<Verdict, string> = {
   joined: 'recruited',
   released: 'released',
   banished: 'banished',
+  ransomed: 'ransomed',
 };
 
 interface Announcement {

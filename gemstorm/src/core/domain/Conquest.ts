@@ -14,7 +14,6 @@ interface Loser {
   readonly general: General;
   readonly house: Family;
   readonly captor: Family;
-  readonly seat: Province;
 }
 
 export interface ConquestParams {
@@ -37,13 +36,9 @@ export class Conquest {
   public takeCaptive(): Captive | undefined {
     const loser = this.findLoser();
 
-    if (!loser || !this.isCaught(loser)) {
-      return undefined;
-    }
-
-    const captive = new Captive(loser);
-
-    return captive.ransom.spendFrom(loser.seat) ? undefined : captive;
+    return loser && this.isCaught(loser)
+      ? new Captive({ ...loser, battlefield: this.report.target })
+      : undefined;
   }
 
   public endHouse(house?: Family): boolean {
@@ -60,7 +55,11 @@ export class Conquest {
   }
 
   private hasFallen(house?: Family): house is Family {
-    return isDefined(house) && this.world.countProvinces(house) === 0;
+    return (
+      isDefined(house) &&
+      this.world.countProvinces(house) === 0 &&
+      !this.world.isHeld(house.ruler)
+    );
   }
 
   private findLoser(): Loser | undefined {
@@ -76,13 +75,11 @@ export class Conquest {
           general: this.report.defender.commander,
           house: defending,
           captor: attacking,
-          seat: this.report.target,
         }
       : {
           general: this.report.attacker.commander,
           house: attacking,
           captor: defending,
-          seat: this.source,
         };
   }
 

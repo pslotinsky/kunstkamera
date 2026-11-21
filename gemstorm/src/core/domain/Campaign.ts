@@ -4,7 +4,11 @@ import { isDefined } from '@/lib/value/isDefined';
 
 import type { Advisor } from './Advisor';
 import { Artifact } from './Artifact';
-import { CampaignOutcome, type DefeatReason } from './CampaignOutcome';
+import {
+  CampaignOutcome,
+  type CampaignReason,
+  type DefeatReason,
+} from './CampaignOutcome';
 import type { Coronation } from './Coronation';
 import type { Family } from './Family';
 import type { World } from './World';
@@ -77,42 +81,68 @@ export class Campaign {
     rival?: Family,
   ): void {
     if (family === this.world.player && !this.fallen && !this.isEnded) {
-      this.fallen = new CampaignOutcome({
-        reason,
-        date: this.world.date,
-        house: family.name,
-        ruler: family.ruler.name,
-        rival: rival?.name,
-      });
+      this.fallen = this.buildOutcome(reason, rival);
     }
   }
 
   public assess(): CampaignOutcome | undefined {
-    if (!this.canProgress) {
-      return undefined;
+    let outcome: CampaignOutcome | undefined;
+
+    if (this.canProgress) {
+      outcome = this.fallen ?? this.assessMap();
+      this.concluded = outcome;
     }
 
-    const { player, families, map, date } = this.world;
-    const owned = map.provinces.filter(
+    return outcome;
+  }
+
+  private assessMap(): CampaignOutcome | undefined {
+    const { player, map } = this.world;
+    const ownedCount = map.provinces.filter(
       (province) => province.family === player,
-    );
-    const survives = families.all.includes(player) && owned.length > 0;
-    const unified =
-      owned.length === AURETH_PROVINCES &&
-      owned.length === map.provinces.length &&
-      families.all.every((family) => family === player);
+    ).length;
+    let reason: CampaignReason | undefined;
 
-    if (this.fallen || !survives || unified) {
-      this.concluded =
-        this.fallen ??
-        new CampaignOutcome({
-          reason: survives ? 'unification' : 'last-province-lost',
-          date,
-          house: player.name,
-          ruler: player.ruler.name,
-        });
+    if (!this.playerSurvives(ownedCount)) {
+      reason = 'last-province-lost';
+    } else if (this.isUnified(ownedCount)) {
+      reason = 'unification';
     }
 
-    return this.concluded;
+    return isDefined(reason) ? this.buildOutcome(reason) : undefined;
+  }
+
+  private playerSurvives(ownedCount: number): boolean {
+    const { player, families } = this.world;
+
+    return (
+      families.all.includes(player) &&
+      (ownedCount > 0 || this.world.isHeld(player.ruler))
+    );
+  }
+
+  private isUnified(ownedCount: number): boolean {
+    const { player, families, map } = this.world;
+
+    return (
+      ownedCount === AURETH_PROVINCES &&
+      ownedCount === map.provinces.length &&
+      families.all.every((family) => family === player)
+    );
+  }
+
+  private buildOutcome(
+    reason: CampaignReason,
+    rival?: Family,
+  ): CampaignOutcome {
+    const { player, date } = this.world;
+
+    return new CampaignOutcome({
+      reason,
+      date,
+      house: player.name,
+      ruler: player.ruler.name,
+      rival: rival?.name,
+    });
   }
 }
