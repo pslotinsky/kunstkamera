@@ -246,8 +246,8 @@ describe('WorldEngine', () => {
   });
 
   it("stops the clock once the player's family is no more", () => {
-    const now = new CalendarDate(1186, 4);
-    const avar = makeGeneral({ deathDate: now });
+    const now = new CalendarDate(1186, 1);
+    const avar = makeGeneral({ birth: new CalendarDate(1111, 1) });
     const alderwyn = makeFamily({ name: 'Alderwyn', ruler: avar });
     const alderpass = makeProvince({
       number: 1,

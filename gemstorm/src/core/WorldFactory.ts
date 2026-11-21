@@ -11,7 +11,7 @@ import { Characteristics } from '@/core/domain/Characteristics';
 import { Development } from '@/core/domain/Development';
 import { Family } from '@/core/domain/Family';
 import { Gem } from '@/core/domain/Gem';
-import { General, LIFESPAN_MONTHS } from '@/core/domain/General';
+import { General } from '@/core/domain/General';
 import { Province } from '@/core/domain/Province';
 import { Resources } from '@/core/domain/Resources';
 import { World } from '@/core/domain/World';
@@ -20,7 +20,6 @@ import { Collection } from '@/lib/Collection';
 
 const START_MONTH = 1;
 const MONTHS_PER_YEAR = 12;
-const DEATH_SPREAD_MONTHS = 3;
 
 // TODO: replaced by the family chosen at new-game setup (feature 16)
 const DEFAULT_PLAYER_FAMILY = 'Alderwyn';
@@ -105,7 +104,6 @@ export class WorldFactory {
           name: definition.name,
           stats: Characteristics.from(definition),
           birth,
-          deathDate: this.scheduleDeath(birth),
           lineage: definition.lineage,
         }),
       );
@@ -116,14 +114,6 @@ export class WorldFactory {
 
   private randomMonth(): number {
     return Math.floor(Math.random() * MONTHS_PER_YEAR) + 1;
-  }
-
-  private scheduleDeath(birth: CalendarDate): CalendarDate {
-    const spread =
-      Math.floor(Math.random() * (DEATH_SPREAD_MONTHS * 2 + 1)) -
-      DEATH_SPREAD_MONTHS;
-
-    return birth.plus(LIFESPAN_MONTHS + spread);
   }
 
   private createProvinces(scenario: Scenario): Collection<number, Province> {

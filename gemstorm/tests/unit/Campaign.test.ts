@@ -377,9 +377,10 @@ describe('Campaign completion through game actions', () => {
     expect(player.ruler).toBe(heirs[1]);
   });
 
-  it('resumes the remaining January deaths without aging survivors twice', async () => {
+  it('resumes January after succession without repeating the yearly updates', async () => {
     const date = new CalendarDate(1200, 1);
-    const ruler = makeGeneral({ deathDate: date });
+    const oldBirth = new CalendarDate(1125, 1);
+    const ruler = makeGeneral({ birth: oldBirth });
     const heirs = ['Rhovan', 'Beran'].map((name) =>
       makeGeneral({
         name,
@@ -387,14 +388,19 @@ describe('Campaign completion through game actions', () => {
         birth: new CalendarDate(1170, 1),
       }),
     );
-    const lord = makeGeneral({ name: 'Halric', deathDate: date });
+    const lord = makeGeneral({ name: 'Halric', birth: oldBirth });
     const player = makeFamily({
       name: 'Alderwyn',
       ruler,
       members: [ruler, ...heirs, lord],
     });
     const rival = makeFamily({ name: 'Stormmere' });
-    const home = makeProvince({ number: 1, family: player, governor: ruler });
+    const home = makeProvince({
+      number: 1,
+      family: player,
+      governor: ruler,
+      protection: 100,
+    });
     const other = makeProvince({
       number: 2,
       family: rival,
@@ -414,10 +420,9 @@ describe('Campaign completion through game actions', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     new WorldEngine(world, events).start();
 
-    const agedWar = heirs[1]!.stats.war;
-
     expect(world.generals.all).toContain(lord);
-    expect(agedWar).toBeGreaterThan(50);
+    expect(heirs[1]!.stats.war).toBe(50);
+    expect(home.development.protection).toBe(94);
 
     const crown = new CrownCommand(context);
 
@@ -427,7 +432,8 @@ describe('Campaign completion through game actions', () => {
     await Promise.resolve();
 
     expect(world.generals.all).not.toContain(lord);
-    expect(heirs[1]!.stats.war).toBe(agedWar);
+    expect(heirs[1]!.stats.war).toBe(52);
+    expect(home.development.protection).toBe(94);
     expect(world.date).toBe(date);
     expect(world.turnQueue.current).toBe(home);
   });
@@ -645,11 +651,12 @@ describe('Campaign completion through game actions', () => {
     expect(world.date).toBe(now);
   });
 
-  it('stops a monthly death sequence before another death or a province turn', () => {
-    const date = new CalendarDate(1230, 9);
-    const ruler = makeGeneral({ name: 'Avar', deathDate: date });
+  it('stops the January death sequence before another death or a province turn', () => {
+    const date = new CalendarDate(1230, 1);
+    const oldBirth = new CalendarDate(1155, 1);
+    const ruler = makeGeneral({ name: 'Avar', birth: oldBirth });
     const player = makeFamily({ name: 'Alderwyn', ruler });
-    const otherRuler = makeGeneral({ name: 'Marven', deathDate: date });
+    const otherRuler = makeGeneral({ name: 'Marven', birth: oldBirth });
     const rival = makeFamily({ name: 'Stormmere', ruler: otherRuler });
     const mine = makeProvince({ number: 1, family: player, governor: ruler });
     const theirs = makeProvince({
@@ -668,7 +675,7 @@ describe('Campaign completion through game actions', () => {
 
     expect(world.campaign.outcome?.reason).toBe('no-heir');
     expect(world.generals.all).toContain(otherRuler);
-    expect(theirs.resources.gold).toBe(2);
+    expect(otherRuler.stats.war).toBe(50);
     expect(reports).toHaveLength(1);
     expect(turns).toEqual([]);
     expect(world.date).toBe(date);
@@ -678,7 +685,7 @@ describe('Campaign completion through game actions', () => {
     const context = island();
     const { world, target, rival } = context;
 
-    world.date = rival.ruler.deathDate;
+    world.date = new CalendarDate(rival.ruler.birth.year + 75, 1);
     vi.spyOn(Math, 'random').mockReturnValue(0);
     // Only the rival is due to die.
     vi.spyOn(world.player.ruler, 'getDeathRisk').mockReturnValue(0);
@@ -709,17 +716,13 @@ describe('Campaign completion through game actions', () => {
     expect(world.campaign.outcome?.isVictory).toBe(true);
   });
 
-  it('waits for the player’s heir choice after harvest before resuming the month', async () => {
+  it('harvests in September without checking old-age deaths', () => {
     const date = new CalendarDate(1200, 9);
-    const ruler = makeGeneral({ name: 'Avar', deathDate: date });
-    const heirs = ['Rhovan', 'Beran'].map((name) =>
-      makeGeneral({ name, lineage: 'Alderwyn' }),
-    );
-    const player = makeFamily({
-      name: 'Alderwyn',
-      ruler,
-      members: [ruler, ...heirs],
+    const ruler = makeGeneral({
+      name: 'Avar',
+      birth: new CalendarDate(1125, 1),
     });
+    const player = makeFamily({ name: 'Alderwyn', ruler });
     const rival = makeFamily({ name: 'Stormmere' });
     const home = makeProvince({
       number: 1,
@@ -732,33 +735,14 @@ describe('Campaign completion through game actions', () => {
       family: rival,
       governor: rival.ruler,
     });
-    const context = makeWorld([home, other], player, date);
-    const holder = {};
-    let coronation: Coronation | undefined;
-
-    context.events.subscribe(SuccessionReportedEvent, (event) => {
-      if (event.outcome instanceof Coronation) {
-        coronation = event.outcome;
-        context.events.publish(new TurnHeldEvent(holder));
-      }
-    });
+    const { world, events } = makeWorld([home, other], player, date);
     vi.spyOn(Math, 'random').mockReturnValue(0);
-    new WorldEngine(context.world, context.events).start();
+    new WorldEngine(world, events).start();
 
-    expect(coronation).toBeDefined();
+    expect(world.generals.all).toContain(ruler);
+    expect(player.ruler).toBe(ruler);
+    expect(world.campaign.isAwaitingHeir).toBe(false);
     expect(home.resources.gold).toBe(12);
-    expect(context.world.campaign.outcome).toBeUndefined();
-
-    const crown = new CrownCommand(context);
-
-    crown.crown(coronation!, heirs[1]!);
-    execute(context, crown);
-    context.events.publish(new TurnReleasedEvent(holder));
-    await Promise.resolve();
-
-    expect(player.ruler).toBe(heirs[1]);
-    expect(context.world.campaign.isAwaitingHeir).toBe(false);
-    expect(home.resources.gold).toBe(12);
-    expect(context.world.campaign.isEnded).toBe(false);
+    expect(world.campaign.isEnded).toBe(false);
   });
 });

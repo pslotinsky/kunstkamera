@@ -13,8 +13,8 @@ import {
   makeWorld,
 } from './factories';
 
-const MAY = new CalendarDate(1230, 5);
-const LATER = new CalendarDate(1260, 1);
+const JANUARY = new CalendarDate(1230, 1);
+const OLD_BIRTH = new CalendarDate(1155, 1);
 
 interface SetupOptions {
   readonly heirs?: readonly General[];
@@ -28,12 +28,12 @@ function setup(options: SetupOptions = {}) {
   const tovren = makeGeneral({
     name: 'Tovren',
     lineage: 'Emberholt',
-    deathDate: dying === 'ruler' ? MAY : LATER,
+    birth: dying === 'ruler' ? OLD_BIRTH : undefined,
   });
   const halric = makeGeneral({
     name: 'Halric',
     intelligence: 90,
-    deathDate: dying === 'lord' ? MAY : LATER,
+    birth: dying === 'lord' ? OLD_BIRTH : undefined,
   });
   const denric = makeGeneral({ name: 'Denric' });
   const emberholt = makeFamily({
@@ -69,7 +69,7 @@ function setup(options: SetupOptions = {}) {
   const { world, events } = makeWorld(
     [cinderpeak, duskcrag, pineward, ironpass],
     stormmere,
-    MAY,
+    JANUARY,
   );
 
   return {
@@ -93,26 +93,25 @@ function rollAt(roll: number): void {
 describe('LifecycleCommand', () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it('takes a general on his death date, and gives a rare survivor another month', () => {
-    const early = setup();
+  it('checks mortality once in January and increases the risk with age', () => {
+    const { world, lifecycle, tovren } = setup();
 
-    early.world.date = new CalendarDate(1230, 4);
+    rollAt(0.75);
+    lifecycle.execute();
+    expect(world.generals.all).toContain(tovren);
+
     rollAt(0);
-    early.lifecycle.execute();
+    lifecycle.execute();
+    expect(world.generals.all).toContain(tovren);
 
-    expect(early.emberholt.ruler).toBe(early.tovren);
+    world.date = JANUARY.next();
+    lifecycle.execute();
+    expect(world.generals.all).toContain(tovren);
 
-    rollAt(0.9);
-    early.world.date = MAY;
-    early.lifecycle.execute();
-
-    expect(early.world.generals.all).toContain(early.tovren);
-
-    rollAt(0.89);
-    early.world.date = new CalendarDate(1230, 6);
-    early.lifecycle.execute();
-
-    expect(early.world.generals.all).not.toContain(early.tovren);
+    rollAt(0.75);
+    world.date = new CalendarDate(1231, 1);
+    lifecycle.execute();
+    expect(world.generals.all).not.toContain(tovren);
   });
 
   it('buries a lord and hands his province back to his ruler', () => {
@@ -197,29 +196,46 @@ describe('LifecycleCommand', () => {
     expect(stronger?.gems.map((gem) => gem.name)).toEqual(['Cindrath']);
   });
 
-  it('ages generals in January, one year in three, and never in other months', () => {
+  it('decays development in every province and ages survivors only in January', () => {
     const january = new CalendarDate(1200, 1);
     const ruler = makeGeneral({ birth: new CalendarDate(1170, 1), war: 50 });
     const family = makeFamily({ ruler });
-    const { world, events } = makeWorld(
-      [makeProvince({ family, governor: ruler })],
+    const owned = makeProvince({
       family,
-      january,
+      governor: ruler,
+      loyalty: 55,
+      cultivation: 39,
+      protection: 40,
+    });
+    const neutral = makeProvince({ number: 2, loyalty: 20, cultivation: 10 });
+    const { world, events } = makeWorld(
+      [owned, neutral],
+      family,
+      january.next(),
     );
     const lifecycle = new LifecycleCommand({ world, events });
 
-    rollAt(0.34);
-    lifecycle.execute();
-    world.date = january.next();
     rollAt(0);
     lifecycle.execute();
 
     expect(ruler.stats.war).toBe(50);
+    expect(owned.development.loyalty).toBe(55);
+    expect(neutral.development.loyalty).toBe(20);
 
     world.date = january;
-    rollAt(0.33);
+    lifecycle.execute();
     lifecycle.execute();
 
     expect(ruler.stats.war).toBe(52);
+    expect(owned.development).toMatchObject({
+      loyalty: 52,
+      cultivation: 37,
+      protection: 37,
+    });
+    expect(neutral.development).toMatchObject({
+      loyalty: 17,
+      cultivation: 9,
+      protection: 0,
+    });
   });
 });

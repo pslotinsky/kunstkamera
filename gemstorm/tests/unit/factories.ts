@@ -34,7 +34,6 @@ interface GeneralParams {
   readonly war?: number | undefined;
   readonly charisma?: number | undefined;
   readonly lineage?: string | undefined;
-  readonly deathDate?: CalendarDate | undefined;
 }
 
 interface FamilyParams {
@@ -76,7 +75,6 @@ export function makeGeneral(params: GeneralParams = {}): General {
       charisma: params.charisma ?? 50,
     }),
     lineage: params.lineage,
-    deathDate: params.deathDate,
   });
 }
 
