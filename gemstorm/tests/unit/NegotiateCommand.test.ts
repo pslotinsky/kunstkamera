@@ -107,4 +107,33 @@ describe('NegotiateCommand', () => {
     expect(outpost.actionCount).toBe(0);
     expect(pineward.family).toBe(stormmere);
   });
+
+  it('can demand surrender from the capital and uses its action on refusal', () => {
+    const { command, events, alderpass, stormmere } = setup();
+    const reports: MissionReportedEvent[] = [];
+
+    events.subscribe(MissionReportedEvent, (event) => reports.push(event));
+
+    expect(command.canDemandSurrender(stormmere)).toBe(true);
+    command.demandSurrender(stormmere);
+    command.execute();
+
+    expect(reports[0]?.outcome).toMatchObject({
+      kind: 'surrender',
+      yielded: false,
+    });
+    expect(alderpass.actionCount).toBe(1);
+    expect(alderpass.resources.gold).toBe(100);
+  });
+
+  it('rejects surrender demands from a province other than the capital', () => {
+    const { command, world, outpost, stormmere } = setup();
+
+    advanceTo(world, outpost);
+    command.demandSurrender(stormmere);
+    command.execute();
+
+    expect(command.canDemandSurrender(stormmere)).toBe(false);
+    expect(outpost.actionCount).toBe(0);
+  });
 });

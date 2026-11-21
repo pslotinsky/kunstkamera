@@ -28,7 +28,7 @@ export class NegotiateDialogControl extends CommandDialogControl<
 
   public override open(command: NegotiateCommand): void {
     this.target = undefined;
-    this.mission = command.canSendForDefection ? 'defection' : 'surrender';
+    this.mission = 'defection';
     this.choice = undefined;
     super.open(command);
     this.update();
@@ -61,8 +61,10 @@ export class NegotiateDialogControl extends CommandDialogControl<
   protected override setupCommand(command: NegotiateCommand): void {
     const family = this.target?.family;
 
-    if (this.mission === 'surrender' && family) {
-      command.demandSurrender(family);
+    if (this.mission === 'surrender') {
+      if (isDefined(family) && command.canDemandSurrender(family)) {
+        command.demandSurrender(family);
+      }
     } else if (isDefined(this.choice)) {
       command.persuade(this.world.generals.getOrFail(this.choice));
     }
@@ -71,13 +73,17 @@ export class NegotiateDialogControl extends CommandDialogControl<
   private update(): void {
     const target = this.target;
     const family = target?.family;
+    const canDemandSurrender =
+      isDefined(family) && this.command?.canDemandSurrender(family) === true;
+
+    if (!canDemandSurrender && this.mission === 'surrender') {
+      this.mission = 'defection';
+    }
 
     this.view.showTarget(target);
-    const canSendForDefection = this.command?.canSendForDefection ?? false;
-
     this.view.showMission(
       target ? this.mission : undefined,
-      canSendForDefection,
+      canDemandSurrender,
     );
 
     if (target && family && this.mission === 'surrender') {

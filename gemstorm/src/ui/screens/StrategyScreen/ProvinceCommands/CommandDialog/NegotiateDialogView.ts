@@ -33,13 +33,13 @@ export class NegotiateDialogView extends CommandDialogView {
 
   public showMission(
     mission: NegotiationMission | undefined,
-    canSendForDefection: boolean,
+    canDemandSurrender: boolean,
   ): void {
     this.missions.classList.toggle(styles.hidden!, !isDefined(mission));
 
     for (const button of this.missionButtons) {
       button.disabled =
-        button.dataset.mission === 'defection' && !canSendForDefection;
+        button.dataset.mission === 'surrender' && !canDemandSurrender;
       button.classList.toggle(
         styles.selected!,
         button.dataset.mission === mission,

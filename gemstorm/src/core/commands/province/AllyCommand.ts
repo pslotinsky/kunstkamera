@@ -30,34 +30,40 @@ export class AllyCommand extends ProvinceCommand {
   }
 
   public override canExecute(): boolean {
-    return this.currentProvince?.isHome ?? false;
+    const province = this.currentProvince;
+
+    return isDefined(province) && province.isHome && !province.family?.royal;
   }
 
   public override get selectableTargets(): readonly number[] {
     const family = this.currentProvince?.family;
 
-    if (!family || family.ally || !this.canExecute()) {
-      return [];
+    let targets: readonly number[] = [];
+
+    if (isDefined(family) && this.canExecute()) {
+      const envoy = this.createEnvoy(family);
+
+      targets = this.context.world.map.provinces
+        .filter(({ family }) => isDefined(family) && envoy.canAllyWith(family))
+        .map((province) => province.number);
     }
 
-    const envoy = this.createEnvoy(family);
-
-    return this.context.world.map.provinces
-      .filter(({ family }) => isDefined(family) && envoy.canAllyWith(family))
-      .map((province) => province.number);
+    return targets;
   }
 
   public execute(): void {
     const province = this.currentProvince;
     const family = province?.family;
+    const proposed = this.proposed;
 
+    this.proposed = undefined;
     this.offered = false;
 
-    if (province && family && this.canExecute()) {
-      if (family.ally) {
+    if (isDefined(province) && isDefined(family) && this.canExecute()) {
+      if (isDefined(proposed)) {
+        this.propose(province, family, proposed);
+      } else if (isDefined(family.ally)) {
         this.breakAlliance(province, family, family.ally);
-      } else if (this.proposed) {
-        this.propose(province, family, this.proposed);
       }
     }
   }
@@ -71,29 +77,29 @@ export class AllyCommand extends ProvinceCommand {
     this.publish(
       new MissionReportedEvent(province, { kind: 'break', family: ally }),
     );
-    this.complete(province, ALLY_GOODWILL);
+    this.complete(province);
   }
 
   private propose(province: Province, family: Family, other: Family): void {
-    if (other.isEqual(this.context.world.player)) {
-      this.offer(province, family);
-    } else {
-      this.send(province, family, other);
+    const envoy = this.createEnvoy(family);
+
+    if (envoy.canAllyWith(other)) {
+      if (other.isEqual(this.context.world.player)) {
+        this.offer(province, family);
+      } else {
+        this.send(province, envoy, other);
+      }
     }
   }
 
   private offer(province: Province, family: Family): void {
-    const envoy = this.createEnvoy(family);
-
-    if (envoy.canAllyWith(this.context.world.player)) {
-      this.offered = true;
-      this.publish(new AllianceOfferedEvent(province, family));
-      this.complete(province, ALLY_GOODWILL);
-    }
+    this.offered = true;
+    this.publish(new AllianceOfferedEvent(province, family));
+    this.complete(province, ALLY_GOODWILL);
   }
 
-  private send(province: Province, family: Family, other: Family): void {
-    const accepted = this.createEnvoy(family).proposeAlliance(other);
+  private send(province: Province, envoy: Envoy, other: Family): void {
+    const accepted = envoy.proposeAlliance(other);
 
     this.publish(
       new MissionReportedEvent(province, {

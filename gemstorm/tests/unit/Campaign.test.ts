@@ -487,7 +487,7 @@ describe('Campaign completion through game actions', () => {
     const command = new NegotiateCommand(context);
     const endings: CampaignEndedEvent[] = [];
 
-    vi.spyOn(Math, 'random').mockReturnValue(0);
+    advanceTo(world, player.homeProvince);
     events.subscribe(CampaignEndedEvent, (event) => {
       endings.push(event);
       expect(target.family).toBe(player);

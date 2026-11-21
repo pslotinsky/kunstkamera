@@ -29,16 +29,26 @@ export class NegotiateCommand extends ProvinceCommand {
     this.approach = { mission: 'surrender', family };
   }
 
-  public get canSendForDefection(): boolean {
+  public override canExecute(): boolean {
     const province = this.currentProvince;
 
     return isDefined(province) && province.isHome && !province.family?.royal;
   }
 
+  public canDemandSurrender(target: Family): boolean {
+    const family = this.currentProvince?.family;
+
+    return (
+      isDefined(family) &&
+      this.canExecute() &&
+      this.createEnvoy(family).canDemandSurrender(target)
+    );
+  }
+
   public override get selectableTargets(): readonly number[] {
     const family = this.currentProvince?.family;
 
-    return family
+    return isDefined(family) && this.canExecute()
       ? this.context.world.map.provinces
           .filter((province) => family.isHostileTo(province.family))
           .map((province) => province.number)
@@ -46,13 +56,12 @@ export class NegotiateCommand extends ProvinceCommand {
   }
 
   public getCandidates(target: Province): readonly General[] {
-    const { world } = this.context;
     const source = this.currentProvince?.family;
     const { family } = target;
     let candidates: readonly General[] = [];
 
-    if (this.canSendForDefection && isDefined(source) && isDefined(family)) {
-      const envoy = new Envoy({ world, family: source });
+    if (this.canExecute() && isDefined(source) && isDefined(family)) {
+      const envoy = this.createEnvoy(source);
 
       candidates = this.getPostedGenerals(target, family).filter((general) =>
         envoy.canApproach(general),
@@ -83,12 +92,17 @@ export class NegotiateCommand extends ProvinceCommand {
     const family = province?.family;
     const approach = this.approach;
 
-    if (province && family && approach) {
-      const envoy = new Envoy({ world: this.context.world, family });
+    if (
+      this.canExecute() &&
+      isDefined(province) &&
+      isDefined(family) &&
+      isDefined(approach)
+    ) {
+      const envoy = this.createEnvoy(family);
 
       if (approach.mission === 'defection') {
         this.sendForDefection(province, envoy, approach.general);
-      } else if (family.isHostileTo(approach.family)) {
+      } else if (envoy.canDemandSurrender(approach.family)) {
         this.sendForSurrender(province, envoy, approach.family);
       }
     }
@@ -103,11 +117,7 @@ export class NegotiateCommand extends ProvinceCommand {
     const rival = world.findFamilyOf(general);
     const governed = world.getRuledProvince(general);
 
-    if (
-      this.canSendForDefection &&
-      isDefined(rival) &&
-      envoy.canApproach(general)
-    ) {
+    if (isDefined(rival) && envoy.canApproach(general)) {
       const persuaded = envoy.persuade(general);
 
       this.publish(
@@ -151,5 +161,9 @@ export class NegotiateCommand extends ProvinceCommand {
     }
 
     this.complete(province);
+  }
+
+  private createEnvoy(family: Family): Envoy {
+    return new Envoy({ world: this.context.world, family });
   }
 }

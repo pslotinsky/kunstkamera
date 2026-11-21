@@ -4,12 +4,12 @@ import type { Family } from './Family';
 import type { General } from './General';
 import type { World } from './World';
 
-const ALLY_ODDS = 0.8;
-const ALLY_REFUSAL_RATIO = 2;
+const MAX_ALLIANCE_GEM_DIFFERENCE = 2;
 const UNSTAFFED_CHARISMA_DIVISOR = 2;
 const DEFECTION_CHANCES = [0.03, 0.15, 0.3, 0.5] as const;
-const SURRENDER_RATIO = 3;
-const SURRENDER_ODDS = 0.25;
+const MIN_SURRENDER_PROVINCE_LEAD = 10;
+const SURRENDER_PROVINCE_RATIO = 5;
+const MAX_SURRENDER_PROVINCES = 2;
 
 export interface EnvoyParams {
   readonly world: World;
@@ -29,14 +29,17 @@ export class Envoy {
     return (
       !this.family.royal &&
       !other.royal &&
-      !this.family.ally &&
-      !this.family.isEqual(other)
+      !this.family.isEqual(other) &&
+      !this.family.isAlliedWith(other) &&
+      this.world.families.all.includes(other)
     );
   }
 
   public proposeAlliance(other: Family): boolean {
     const accepted =
-      this.canAllyWith(other) && Math.random() < this.weighAlliance(other);
+      !other.isEqual(this.world.player) &&
+      this.canAllyWith(other) &&
+      this.meetsAllianceTerms(other);
 
     if (accepted) {
       this.family.formAlliance(other);
@@ -75,11 +78,19 @@ export class Envoy {
     return persuaded;
   }
 
+  public canDemandSurrender(rival: Family): boolean {
+    return (
+      !this.family.royal &&
+      !rival.royal &&
+      !rival.isEqual(this.world.player) &&
+      this.family.isHostileTo(rival) &&
+      this.world.families.all.includes(rival)
+    );
+  }
+
   public demandSurrender(rival: Family): boolean {
     const yielded =
-      this.family.isHostileTo(rival) &&
-      this.canForceSurrender(rival) &&
-      Math.random() < SURRENDER_ODDS;
+      this.canDemandSurrender(rival) && this.meetsSurrenderTerms(rival);
 
     if (yielded) {
       this.world.absorb(rival, this.family);
@@ -88,12 +99,13 @@ export class Envoy {
     return yielded;
   }
 
-  private weighAlliance(other: Family): number {
-    const ratio =
-      this.world.countProvinces(other) / this.world.countProvinces(this.family);
-    const share = (ALLY_REFUSAL_RATIO - ratio) / (ALLY_REFUSAL_RATIO - 1);
+  private meetsAllianceTerms(other: Family): boolean {
+    const gemDifference = Math.abs(this.family.gems.length - other.gems.length);
 
-    return ALLY_ODDS * Math.min(1, Math.max(0, share));
+    return (
+      this.family.ruler.stats.charisma >= other.ruler.stats.charisma &&
+      gemDifference <= MAX_ALLIANCE_GEM_DIFFERENCE
+    );
   }
 
   private isDefectionTarget(general: General, rival: Family): boolean {
@@ -114,10 +126,16 @@ export class Envoy {
     );
   }
 
-  private canForceSurrender(rival: Family): boolean {
+  private meetsSurrenderTerms(rival: Family): boolean {
+    const ours = this.world.countProvinces(this.family);
+    const theirs = this.world.countProvinces(rival);
+
     return (
-      this.world.countProvinces(this.family) >=
-      this.world.countProvinces(rival) * SURRENDER_RATIO
+      theirs > 0 &&
+      theirs <= MAX_SURRENDER_PROVINCES &&
+      ours - theirs >= MIN_SURRENDER_PROVINCE_LEAD &&
+      ours >= theirs * SURRENDER_PROVINCE_RATIO &&
+      this.family.ruler.stats.total >= rival.ruler.stats.total
     );
   }
 }

@@ -36,6 +36,7 @@ function setup() {
     return makeProvince({ number: index + 1, family, governor: family.ruler });
   });
   const context = makeWorld(provinces, player);
+  player.moveHome(provinces[0]!);
   const container = document.createElement('div');
   const reportContainer = document.createElement('div');
   const newsContainer = document.createElement('div');
@@ -194,7 +195,6 @@ describe('Campaign ending presentation', () => {
     const executor = new CommandExecutor(fixture);
 
     events.subscribe(BattleReportedEvent, (event) => reports.push(event));
-    vi.spyOn(Math, 'random').mockReturnValue(0);
     negotiate.demandSurrender(rival);
     executor.execute(negotiate);
     await Promise.resolve();

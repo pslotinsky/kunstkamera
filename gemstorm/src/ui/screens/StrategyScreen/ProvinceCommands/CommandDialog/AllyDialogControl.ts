@@ -24,8 +24,8 @@ export class AllyDialogControl extends CommandDialogControl<
     this.update();
   }
 
-  public override get targetPrompt(): string {
-    return 'Ally with which family?';
+  public override get targetPrompt(): string | undefined {
+    return this.command?.ally ? undefined : 'Ally with which family?';
   }
 
   public override pickTarget(province: Province): void {
@@ -45,12 +45,12 @@ export class AllyDialogControl extends CommandDialogControl<
     const ally = this.command?.ally;
     const { player } = this.world;
 
-    if (ally) {
-      this.view.showPact(player, ally);
-    } else if (this.family) {
-      const provinces = this.world.getFamilyProvinces(this.family);
+    if (this.family) {
+      this.view.showProposal(this.family, player);
+    } else if (ally) {
+      const canReplace = this.command?.requiresTarget ?? false;
 
-      this.view.showProposal(this.family, provinces.length, player);
+      this.view.showPact(player, ally, canReplace);
     } else {
       this.view.askForFamily();
     }

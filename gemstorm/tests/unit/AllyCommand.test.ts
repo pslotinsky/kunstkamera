@@ -11,10 +11,11 @@ import { MissionReportedEvent } from '@/core/events/MissionReportedEvent';
 
 import { advanceTo, makeFamily, makeProvince, makeWorld } from './factories';
 
-function setup() {
+function setup(withAlternate = false) {
   const alderwyn = makeFamily({ name: 'Alderwyn' });
   const stormmere = makeFamily({ name: 'Stormmere' });
   const varrengard = makeFamily({ name: 'Varrengard', royal: true });
+  const greyfen = makeFamily({ name: 'Greyfen' });
 
   const home = makeProvince({
     number: 1,
@@ -29,13 +30,15 @@ function setup() {
     family: stormmere,
   });
   const crown = makeProvince({ number: 4, neighbors: [1], family: varrengard });
+  const distant = makeProvince({ number: 5, family: greyfen });
 
   alderwyn.moveHome(home);
 
-  const { world, events } = makeWorld(
-    [home, outpost, pineward, crown],
-    alderwyn,
-  );
+  const provinces = [home, outpost, pineward, crown];
+  if (withAlternate) {
+    provinces.push(distant);
+  }
+  const { world, events } = makeWorld(provinces, alderwyn);
   const context = { world, events };
   const reports: MissionReportedEvent[] = [];
 
@@ -47,6 +50,7 @@ function setup() {
     context,
     alderwyn,
     stormmere,
+    greyfen,
     home,
     outpost,
     pineward,
@@ -67,19 +71,19 @@ describe('AllyCommand', () => {
     expect(command.selectableTargets).toEqual([]);
   });
 
-  it('offers every family but your own and the royal one, and none while allied', () => {
-    const { context, alderwyn, stormmere } = setup();
+  it('offers every other non-royal house except the current ally', () => {
+    const { context, alderwyn, stormmere } = setup(true);
     const command = new AllyCommand(context);
 
-    expect(command.selectableTargets).toEqual([3]);
+    expect(command.selectableTargets).toEqual([3, 5]);
 
     alderwyn.formAlliance(stormmere);
 
-    expect(command.selectableTargets).toEqual([]);
+    expect(command.selectableTargets).toEqual([5]);
   });
 
   it('breaks an alliance on both sides, and lets the two houses fight again', () => {
-    const { context, alderwyn, stormmere, reports } = setup();
+    const { context, alderwyn, stormmere, home, reports } = setup();
     const command = new AllyCommand(context);
 
     alderwyn.formAlliance(stormmere);
@@ -89,6 +93,32 @@ describe('AllyCommand', () => {
     expect(stormmere.ally).toBeUndefined();
     expect(reports[0]?.outcome).toEqual({ kind: 'break', family: stormmere });
     expect(new AttackCommand(context).selectableTargets).toContain(3);
+    expect(home.actionCount).toBe(1);
+    expect(home.goodwill).toBe(0);
+  });
+
+  it('replaces the current pact only when the new house accepts', () => {
+    const { context, alderwyn, stormmere, greyfen, reports } = setup(true);
+    const command = new AllyCommand(context);
+    alderwyn.formAlliance(stormmere);
+    greyfen.ruler.stats = alderwyn.ruler.stats.increase({ charisma: 1 });
+
+    command.proposeTo(greyfen);
+    command.execute();
+
+    expect(alderwyn.ally).toBe(stormmere);
+
+    greyfen.ruler.stats = alderwyn.ruler.stats;
+    command.proposeTo(greyfen);
+    command.execute();
+
+    expect(reports.map(({ outcome }) => outcome)).toEqual([
+      { kind: 'alliance', family: greyfen, accepted: false },
+      { kind: 'alliance', family: greyfen, accepted: true },
+    ]);
+    expect(stormmere.ally).toBeUndefined();
+    expect(greyfen.ally).toBe(alderwyn);
+    expect(alderwyn.ally).toBe(greyfen);
   });
 
   it('keeps every hostile order away from an ally', () => {
@@ -108,11 +138,14 @@ describe('AllyCommand', () => {
 });
 
 describe('A rival offering the player an alliance', () => {
-  function offer() {
-    const context = setup();
-    const { world, stormmere, pineward, alderwyn } = context;
+  function offer(withExistingPact = false) {
+    const context = setup(withExistingPact);
+    const { world, stormmere, pineward, alderwyn, greyfen } = context;
     const offers: AllianceOfferedEvent[] = [];
 
+    if (withExistingPact) {
+      alderwyn.formAlliance(greyfen);
+    }
     stormmere.homeProvince = pineward;
     context.context.events.subscribe(AllianceOfferedEvent, (event) =>
       offers.push(event),
@@ -136,8 +169,8 @@ describe('A rival offering the player an alliance', () => {
   });
 
   it('forms the alliance only when the player accepts', () => {
-    const accepted = offer();
-    const declined = offer();
+    const accepted = offer(true);
+    const declined = offer(true);
 
     for (const [each, answer] of [
       [accepted, true],
@@ -150,6 +183,7 @@ describe('A rival offering the player an alliance', () => {
     }
 
     expect(accepted.alderwyn.ally).toBe(accepted.stormmere);
-    expect(declined.alderwyn.ally).toBeUndefined();
+    expect(accepted.greyfen.ally).toBeUndefined();
+    expect(declined.alderwyn.ally).toBe(declined.greyfen);
   });
 });
