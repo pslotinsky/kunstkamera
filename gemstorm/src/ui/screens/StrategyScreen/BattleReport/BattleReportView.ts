@@ -120,7 +120,7 @@ export class BattleReportView extends View<BattleReportContext> {
     if (outcome && report.isTaken) {
       verdict = `${flight}${this.renderFall(report)} ${occupier} holds it${this.renderSurvivors(report, outcome)}.`;
     } else if (outcome) {
-      verdict = `${province} holds.${this.renderAttackerReturn(report, outcome)}`;
+      verdict = `${province} holds.${this.renderAttackerReturn(report)}`;
     } else if (report.answer === 'retreat') {
       verdict = `${flight}${this.renderFall(report)}`;
     }
@@ -134,7 +134,8 @@ export class BattleReportView extends View<BattleReportContext> {
 
     if (isDefined(destination)) {
       const leader = this.describeLeader(defender, 'The defending army');
-      const escort = this.renderEscort(report);
+      const troops = report.isFought ? report.recoveredTroops : defender.troops;
+      const escort = this.renderEscort(report, troops);
 
       flight = `${leader} flees to ${destination.name}${escort}. `;
     }
@@ -142,22 +143,22 @@ export class BattleReportView extends View<BattleReportContext> {
     return flight;
   }
 
-  private renderAttackerReturn(
-    report: InvasionReport,
-    outcome: BattleOutcome,
-  ): string {
+  private renderAttackerReturn(report: InvasionReport): string {
     const { attacker, source } = report;
     const destination = report.attackerRetreatDestination;
     let arrival = '';
 
     if (isDefined(destination)) {
       const leader = this.describeLeader(attacker, 'The attacking army');
-      const movement = destination.isEqual(source)
+      const returnsToOrigin = destination.isEqual(source);
+      const movement = returnsToOrigin
         ? 'goes home'
         : `flees to ${destination.name}`;
-      const survivors = this.renderSurvivors(report, outcome);
+      const escort = returnsToOrigin
+        ? this.renderEscort(report, report.recoveredTroops)
+        : '';
 
-      arrival = ` ${leader} ${movement}${survivors}.`;
+      arrival = ` ${leader} ${movement}${escort}.`;
     }
 
     return arrival;
@@ -195,11 +196,9 @@ export class BattleReportView extends View<BattleReportContext> {
       : `${captive.general.name} is taken by ${captive.captor.name}.`;
   }
 
-  private renderEscort(report: InvasionReport): string {
-    const { defender } = report;
-
-    return report.isRetreat && this.isPlayerSide(report) && defender.hasTroops
-      ? ` with ${defender.troops} troops`
+  private renderEscort(report: InvasionReport, troops: number): string {
+    return this.isPlayerSide(report) && troops > 0
+      ? ` with ${troops} troops`
       : '';
   }
 

@@ -214,17 +214,55 @@ describe('Invasion', () => {
     expect(target.belongsTo(mine)).toBe(true);
   });
 
-  it('hands the gold standing on a taken province to its new owner', () => {
+  it('destroys supplies and resets loyalty when the defender has no adjacent refuge', () => {
     const { invasion, target, mine } = setup({
       defenderGold: 90,
       defenderFood: 100,
     });
+    target.addDevelopment({ loyalty: 80, cultivation: 90, protection: 45 });
+    vi.spyOn(Math, 'random')
+      .mockReturnValue(0.99)
+      .mockReturnValueOnce(0)
+      .mockReturnValueOnce(0)
+      .mockReturnValueOnce(0);
 
     invasion.begin();
     invasion.conclude(makeOutcome({ winner: BattleSide.attacker }));
 
     expect(target.belongsTo(mine)).toBe(true);
-    expect(target.resources.gold).toBe(90);
+    expect(target.resources).toMatchObject({ gold: 63, food: 170, troops: 60 });
+    expect(target.development).toMatchObject({
+      loyalty: 0,
+      cultivation: 81,
+      protection: 40,
+    });
+  });
+
+  it('takes the beaten attacker’s remaining food and damages the defending province', () => {
+    const { invasion, target, source } = setup();
+    target.addDevelopment({ loyalty: 90, cultivation: 90, protection: 45 });
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
+
+    invasion.begin();
+    invasion.defender.food = 95;
+    invasion.attacker.food = 31;
+    const report = invasion.conclude(
+      makeOutcome({
+        winner: BattleSide.defender,
+        days: 3,
+        defenderSurvivors: 80,
+      }),
+    );
+
+    expect(target.resources).toMatchObject({ food: 126, troops: 80 });
+    expect(target.development).toMatchObject({
+      loyalty: 74,
+      cultivation: 76,
+      protection: 37,
+    });
+    expect(source.resources.troops).toBe(SOURCE_TROOPS - 100 + 30);
+    expect(source.resources.food).toBe(SOURCE_FOOD - 120);
+    expect(report.recoveredTroops).toBe(30);
   });
 
   it('settles the land on conclude', () => {
@@ -451,11 +489,12 @@ describe('Invasion answered by its defender', () => {
     expect(invasion.affected).toContain(neighbor);
   });
 
-  it('awards the neutral land bonus separately from an attacker’s defeat', () => {
-    const { invasion, neighbor } = setupRefuges();
-    const attacker = invasion.source.family!;
+  it('sends retreating leadership to its chosen refuge and returns recovered troops to the origin', () => {
+    const { invasion, neighbor, target } = setupRefuges();
+    const { source } = invasion;
+    const attacker = source.family!;
     neighbor.unclaim();
-    attacker.moveHome(invasion.source);
+    attacker.moveHome(source);
     attacker.loseFame(90);
     vi.spyOn(Math, 'random').mockReturnValue(0.99);
 
@@ -468,6 +507,9 @@ describe('Invasion answered by its defender', () => {
     expect(neighbor.family).toBe(attacker);
     expect(attacker.homeProvince).toBe(neighbor);
     expect(attacker.fame).toBe(12);
+    expect(neighbor.resources.troops).toBe(0);
+    expect(source.resources.troops).toBe(SOURCE_TROOPS - 100 + 30);
+    expect(target.resources.food).toBe(420);
     expect(invasion.affected).toContain(neighbor);
   });
 
@@ -510,11 +552,13 @@ describe('Invasion answered by its defender', () => {
     expect(neighbor.resources).toMatchObject({ troops: 200, gold: 0 });
   });
 
-  it('leads the survivors of a mid-battle withdrawal to the refuge', () => {
-    const { invasion, neighbor } = setupRefuges();
+  it('credits each rescued resource to the adjacent refuge after a mid-battle withdrawal', () => {
+    const { invasion, target, neighbor } = setupRefuges();
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
 
     invasion.begin();
     invasion.defender.takeCasualties(130);
+    invasion.defender.food = 210;
 
     const report = invasion.conclude(
       makeOutcome({
@@ -526,7 +570,29 @@ describe('Invasion answered by its defender', () => {
     );
 
     expect(report.refuge).toBe(neighbor);
-    expect(neighbor.resources.troops).toBe(70);
+    expect(report.recoveredTroops).toBe(35);
+    expect(neighbor.resources).toMatchObject({
+      gold: 40,
+      food: 105,
+      troops: 35,
+    });
+    expect(target.resources).toMatchObject({ gold: 40, food: 225, troops: 60 });
+  });
+
+  it('recovers less when the ruler commanded the defeated army remotely', () => {
+    const { invasion, target, neighbor, rival } = setupRefuges();
+    target.assignGovernor(rival.ruler);
+
+    invasion.begin();
+    const report = invasion.conclude(makeOutcome({ defenderSurvivors: 75 }));
+
+    expect(report.recoveredTroops).toBe(15);
+    expect(neighbor.resources).toMatchObject({
+      gold: 16,
+      food: 60,
+      troops: 15,
+    });
+    expect(invasion.affected).toContain(neighbor);
   });
 
   it.each([
@@ -561,10 +627,11 @@ describe('Invasion answered by its defender', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.99);
 
     invasion.begin();
-    const report = invasion.conclude(makeOutcome());
+    const report = invasion.conclude(makeOutcome({ defenderSurvivors: 80 }));
 
     expect(report.refuge).toBe(home);
     expect(home.governor).toBe(rival.ruler);
+    expect(home.resources).toMatchObject({ gold: 0, food: 0, troops: 0 });
     expect(world.getVassals(rival)).toContain(lord);
   });
 

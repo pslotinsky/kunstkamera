@@ -30,6 +30,7 @@ export class InvasionReport {
   public readonly refuge: Province | undefined;
 
   public captive: Captive | undefined;
+  public recoveredTroops = 0;
 
   public constructor(params: InvasionReportParams) {
     this.source = params.source;

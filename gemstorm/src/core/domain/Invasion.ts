@@ -2,6 +2,7 @@ import { isDefined } from '@/lib/value/isDefined';
 
 import { Army } from './Army';
 import { Battle } from './Battle';
+import { BattleAftermath } from './BattleAftermath';
 import { Battlefield } from './Battlefield';
 import type { BattleOutcome } from './BattleOutcome';
 import { BattleSide } from './BattleSide';
@@ -256,13 +257,16 @@ export class Invasion {
       this.world.hold(captive);
     }
 
+    const recoveredAt = isDefined(outcome)
+      ? new BattleAftermath(report, outcome).apply()
+      : undefined;
+
     this.displaced = report.isTaken
-      ? this.overrun(conquest, report)
+      ? this.overrun(conquest, report, recoveredAt)
       : this.returnArmy(report);
   }
 
   private settleBattle(report: InvasionReport, outcome: BattleOutcome): void {
-    this.applyLosses(report.defender);
     this.settleBattleFame(outcome);
     this.buryUnits(report);
     this.persistHiredUnitStrengths(report);
@@ -292,20 +296,18 @@ export class Invasion {
   private overrun(
     conquest: Conquest,
     report: InvasionReport,
+    recoveredAt: Province | undefined,
   ): readonly Province[] {
-    const refuge = this.retreatDefender(report);
+    const retreatDestination = this.retreatDefender(report);
+    const refuge = retreatDestination ?? recoveredAt;
 
     this.capture();
+    if (!report.isFought) {
+      this.garrison();
+    }
     conquest.endHouse(report.defending);
 
     return isDefined(refuge) ? [refuge] : [];
-  }
-
-  private applyLosses(defender: Army): void {
-    this.target.addResources({
-      troops: defender.troops - this.target.resources.troops,
-      food: defender.food - this.target.resources.food,
-    });
   }
 
   private buryUnits(report: InvasionReport): void {
@@ -419,7 +421,7 @@ export class Invasion {
 
   private evacuateDefender(report: InvasionReport, refuge: Province): boolean {
     const canEnterRefuge = !refuge.isNeutral() || !isDefined(report.captive);
-    const evacuates = report.isRetreat && canEnterRefuge;
+    const evacuates = report.answer === 'retreat' && canEnterRefuge;
 
     if (evacuates) {
       this.evacuate(refuge);
@@ -463,7 +465,6 @@ export class Invasion {
     this.target.claim(owner);
 
     this.attackingLeadership.occupy(this.target);
-    this.garrison();
     this.relocateUnit(this.target);
   }
 
@@ -493,14 +494,6 @@ export class Invasion {
       ? this.source
       : (report.refuge ?? this.source);
     const relocates = !refuge.isEqual(this.source);
-    const leavesSupplies = relocates && !this.target.isNeighbor(refuge);
-    const { troops, food } = this.attacker;
-    const carriedFood = leavesSupplies ? 0 : food;
-
-    refuge.addResources({ troops, food: carriedFood });
-    if (leavesSupplies) {
-      this.target.addResources({ food });
-    }
     if (relocates) {
       this.attackingLeadership.retreatTo(refuge);
       this.relocateUnit(refuge);

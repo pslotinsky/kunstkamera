@@ -297,9 +297,7 @@ describe('AttackCommand', () => {
     expect(enemy.belongsTo(rival)).toBe(true);
     expect(enemy.ruledBy(marven)).toBe(true);
     expect(enemy.resources.troops).toBe(outcome.defenderSurvivors);
-    expect(source.resources.troops).toBe(
-      SOURCE_TROOPS - 20 + outcome.attackerSurvivors,
-    );
+    expect(source.resources.troops).toBe(SOURCE_TROOPS - 20 + 10);
     expect(source.goodwill).toBe(-1);
   });
 
