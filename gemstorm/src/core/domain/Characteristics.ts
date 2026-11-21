@@ -1,9 +1,11 @@
 import { Stats, type StatsParams } from './Stats';
 
+const MAX_CHARACTERISTIC = 200;
+
 const CHARACTERISTICS_MAXES = {
-  intelligence: 100,
-  war: 100,
-  charisma: 100,
+  intelligence: MAX_CHARACTERISTIC,
+  war: MAX_CHARACTERISTIC,
+  charisma: MAX_CHARACTERISTIC,
 };
 
 export type CharacteristicsKey = keyof typeof CHARACTERISTICS_MAXES;

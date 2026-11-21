@@ -11,7 +11,7 @@ import { makeFamily, makeGeneral, makeProvince, makeWorld } from './factories';
 const APRIL = new CalendarDate(1186, 4);
 
 function setup(protection = 0) {
-  const lord = makeGeneral({ intelligence: 99, war: 50 });
+  const lord = makeGeneral({ intelligence: 199, war: 50 });
   const family = makeFamily({ ruler: lord });
   const province = makeProvince({
     number: 17,
@@ -136,13 +136,13 @@ describe('Province events', () => {
 
     expect(incident?.definition.image).toBe('unicorn');
     expect(incident?.recipient).toBe(lord.name);
-    expect(lord.stats.intelligence).toBe(100);
+    expect(lord.stats.intelligence).toBe(200);
     expect(lord.stats.war).toBe(53);
     expect(province.effectiveStats.war).toBe(26);
     expect(incident?.changes).toContainEqual({
       stat: 'intelligence',
-      before: 99,
-      after: 100,
+      before: 199,
+      after: 200,
     });
   });
 

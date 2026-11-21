@@ -1,6 +1,6 @@
 import { Stats, type StatsParams } from './Stats';
 
-const DEVELOPMENT_MAXES = {
+export const DEVELOPMENT_MAXES = {
   loyalty: 100,
   cultivation: 200,
   protection: 200,

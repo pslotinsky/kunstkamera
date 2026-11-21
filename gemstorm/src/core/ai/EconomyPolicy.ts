@@ -40,17 +40,19 @@ export class EconomyPolicy {
     const trade = new TradeCommand(this.context);
 
     if (food < supply) {
+      const budget = Math.max(gold - GOLD_RESERVE, 0);
+      const needed = this.market.toGold(supply - food);
+
       trade.direction = 'buy';
-      trade.food = Math.min(
-        supply - food,
-        this.market.toFood(Math.max(gold - GOLD_RESERVE, 0)),
-      );
+      trade.amount = Math.min(needed, budget, trade.getMaximumAmount('buy'));
     } else if (gold < DevelopCommand.COST && food > supply * SURPLUS_FACTOR) {
+      const surplus = food - supply * SURPLUS_FACTOR;
+
       trade.direction = 'sell';
-      trade.food = food - supply * SURPLUS_FACTOR;
+      trade.amount = Math.min(surplus, trade.getMaximumAmount('sell'));
     }
 
-    return trade.food > 0 ? trade : undefined;
+    return trade.canTrade(trade.direction, trade.amount) ? trade : undefined;
   }
 
   public chooseLords(province: Province): readonly ChangeLordCommand[] {
@@ -158,9 +160,17 @@ export class EconomyPolicy {
       return undefined;
     }
 
-    const gift = new GiveFoodCommand(this.context);
+    const budget = Math.ceil(surplus * FOOD_GIFT_SHARE);
+    const affordableAmounts = GiveFoodCommand.AMOUNTS.filter(
+      (amount) => amount <= budget,
+    );
+    const food = affordableAmounts.at(-1);
+    let gift: GiveFoodCommand | undefined;
 
-    gift.food = Math.ceil(surplus * FOOD_GIFT_SHARE);
+    if (isDefined(food)) {
+      gift = new GiveFoodCommand(this.context);
+      gift.food = food;
+    }
 
     return gift;
   }
