@@ -7,13 +7,18 @@ import { SCENARIOS } from '@/config/scenarios';
 const PROVINCE_COUNT = 30;
 const PLAYABLE_COUNT = 4;
 
-it('keeps each general’s recruit class across scenarios', () => {
-  const classes = new Map<string, number>();
+it('keeps each general’s recruit and defection classes across scenarios', () => {
+  const classes = new Map<
+    string,
+    { recruitClass: number; defectionClass: number }
+  >();
 
   for (const { generals } of SCENARIOS) {
-    for (const { name, recruitClass } of generals) {
-      expect(recruitClass, name).toBe(classes.get(name) ?? recruitClass);
-      classes.set(name, recruitClass);
+    for (const { name, recruitClass, defectionClass } of generals) {
+      const current = { recruitClass, defectionClass };
+
+      expect(current, name).toEqual(classes.get(name) ?? current);
+      classes.set(name, current);
     }
   }
 });

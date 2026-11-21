@@ -166,20 +166,27 @@ describe('LifecycleCommand', () => {
     expect(world.families.all).not.toContain(emberholt);
   });
 
-  it('disbands a family with no heir: each lord breaks away with his land, the best garrisoned takes the vassals and gems, the rest turns neutral', () => {
-    rollAt(0);
-
+  it('disbands an heirless house, draws breakaway names and Gem recipients, and offers its vassal to the smallest court', () => {
     const dovar = makeGeneral({ name: 'Dovar' });
     const {
       world,
       lifecycle,
       emberholt,
+      stormmere,
       halric,
       denric,
       cinderpeak,
       duskcrag,
       ironpass,
     } = setup({ garrisonedLord: dovar });
+    emberholt.gems = [...emberholt.gems, Gem.ofName('Asterion')];
+    vi.spyOn(Math, 'random')
+      .mockReturnValue(0)
+      .mockReturnValueOnce(0)
+      .mockReturnValueOnce(0.99)
+      .mockReturnValueOnce(0.99)
+      .mockReturnValueOnce(0)
+      .mockReturnValueOnce(0.99);
 
     lifecycle.execute();
 
@@ -188,14 +195,27 @@ describe('LifecycleCommand', () => {
 
     expect(world.families.all).not.toContain(emberholt);
     expect(cinderpeak.family).toBeUndefined();
+    expect(cinderpeak.governor).toBeUndefined();
     expect(weaker?.ruler).toBe(halric);
     expect(stronger?.ruler).toBe(dovar);
-    expect(stronger?.name).not.toBe(weaker?.name);
-    expect(stronger?.members).toContain(denric);
-    expect(weaker?.members).not.toContain(denric);
-    expect(stronger?.gems.map((gem) => gem.name)).toEqual(['Cindrath']);
+    expect(weaker?.name).toBe('Sunhallow');
+    expect(stronger?.name).toBe('Valecross');
+    expect(stormmere.gems.map((gem) => gem.name)).toEqual(['Cindrath']);
+    expect(stronger?.gems.map((gem) => gem.name)).toEqual(['Asterion']);
     expect(weaker?.fame).toBe(3);
     expect(stronger?.fame).toBe(3);
+    expect(world.wanderers.offer).toEqual({
+      general: denric,
+      court: stormmere,
+    });
+    expect(lifecycle.isComplete).toBe(false);
+
+    world.wanderers.answer(world.wanderers.offer!, false);
+    lifecycle.execute();
+
+    expect(weaker?.members).toContain(denric);
+    expect(world.wanderers.offer).toBeUndefined();
+    expect(lifecycle.isComplete).toBe(true);
   });
 
   it('decays development in every province and ages survivors only in January', () => {

@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ComputerPlayer } from '@/core/ai/ComputerPlayer';
 import { CommandExecutor } from '@/core/CommandExecutor';
+import { AnswerVassalOfferCommand } from '@/core/commands/AnswerVassalOfferCommand';
 import { CrownCommand } from '@/core/commands/CrownCommand';
 import { JudgeCaptiveCommand } from '@/core/commands/JudgeCaptiveCommand';
 import { LifecycleCommand } from '@/core/commands/LifecycleCommand';
@@ -169,7 +170,10 @@ describe('Campaign outcome', () => {
   });
 
   it('waits for the selected heir and continues the same house', () => {
-    const { world, player, events, source } = island();
+    const { world, player, events, source, provinces } = island();
+    const deposed = player.ruler;
+    const formerHome = player.homeProvince;
+    const heirProvince = provinces[10]!;
     const heirs = [
       makeGeneral({
         name: 'Rhovan',
@@ -184,14 +188,16 @@ describe('Campaign outcome', () => {
     for (const heir of heirs) {
       player.enlist(heir);
     }
-    world.bury(player.ruler);
+    heirProvince.assignGovernor(heirs[1]!);
+    world.bury(deposed);
     const succession = new Succession(world).replace(player);
 
     expect(succession).toBeInstanceOf(Coronation);
     expect(world.campaign.isAwaitingHeir).toBe(true);
     expect(world.campaign.assess()).toBeUndefined();
-    expect(player.ruler).toBe(heirs[0]);
-    expect(player.fame).toBe(49);
+    expect(player.ruler).toBe(deposed);
+    expect(player.fame).toBe(99);
+    expect(player.homeProvince).toBe(formerHome);
 
     const recruit = new RecruitCommand({ world, events });
     const troops = source.resources.troops;
@@ -210,6 +216,10 @@ describe('Campaign outcome', () => {
 
     expect(player.ruler).toBe(heirs[1]);
     expect(player.fame).toBe(99);
+    expect(player.homeProvince).toBe(heirProvince);
+    expect(formerHome.governor).toBe(heirs[1]);
+    expect(heirs[0]?.isKinOf(player)).toBe(true);
+    expect(heirs[1]?.isKinOf(player)).toBe(false);
     expect(world.campaign.isAwaitingHeir).toBe(false);
     expect(world.campaign.outcome).toBeUndefined();
 
@@ -227,6 +237,7 @@ describe('Campaign outcome', () => {
     source.assignGovernor(lord);
     player.gems = rival.gems;
     world.bury(deposed);
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
     new Succession(world).replace(player);
 
     expect(world.campaign.outcome).toBeUndefined();
@@ -560,6 +571,14 @@ describe('Campaign completion through game actions', () => {
     judge.judge(captive, 'release');
     execute(context, judge);
 
+    expect(world.campaign.isAwaitingDecision).toBe(true);
+    expect(world.campaign.outcome).toBeUndefined();
+    const answer = new AnswerVassalOfferCommand(context);
+
+    answer.answer(world.wanderers.offer!, false);
+    execute(context, answer);
+
+    expect(world.isExiled(captive.general)).toBe(true);
     expect(world.campaign.outcome?.isVictory).toBe(true);
     expect(order).toEqual(['battle', 'ending']);
   });

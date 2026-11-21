@@ -1,6 +1,8 @@
 import type { World } from '@/core/domain/World';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
+import { VassalOfferedEvent } from '@/core/events/VassalOfferedEvent';
 import type { EventBus } from '@/lib/EventBus';
+import { isDefined } from '@/lib/value/isDefined';
 
 import { Battle } from '../domain/Battle';
 import type { Invasion } from '../domain/Invasion';
@@ -75,6 +77,14 @@ export abstract class WorldCommand {
   protected publishUpdates(provinces: readonly Province[]): void {
     for (const province of provinces) {
       this.publish(new ProvinceUpdatedEvent(province));
+    }
+  }
+
+  protected publishVassalOffer(): void {
+    const { offer } = this.context.world.wanderers;
+
+    if (isDefined(offer)) {
+      this.publish(new VassalOfferedEvent(offer));
     }
   }
 }

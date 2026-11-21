@@ -1,4 +1,5 @@
 import { BREAKAWAY_NAMES } from '@/config/families';
+import { sample } from '@/lib/array/sample';
 import type { Collection } from '@/lib/Collection';
 import { isDefined } from '@/lib/value/isDefined';
 
@@ -12,6 +13,7 @@ import type { General, GeneralRank } from './General';
 import { Market } from './Market';
 import type { Province } from './Province';
 import { TurnQueue } from './TurnQueue';
+import { WanderingGenerals } from './WanderingGenerals';
 import type { WorldMap } from './WorldMap';
 
 const BREAKAWAY_FAME = 3;
@@ -31,6 +33,7 @@ export class World {
   public date: CalendarDate;
   public readonly market = new Market();
   public readonly campaign: Campaign;
+  public readonly wanderers: WanderingGenerals;
   public readonly turnQueue: TurnQueue;
   public readonly map: WorldMap;
   public readonly families: Collection<string, Family>;
@@ -48,6 +51,7 @@ export class World {
     this.player = params.player;
     this.turnQueue = new TurnQueue(this.map.provinces);
     this.campaign = new Campaign(this, params.advisor);
+    this.wanderers = new WanderingGenerals(this);
   }
 
   public hold(captive: Captive): void {
@@ -119,7 +123,10 @@ export class World {
   }
 
   public foundFamily(lord: General, province: Province): Family | undefined {
-    const name = BREAKAWAY_NAMES.find((free) => !this.families.has(free));
+    const openNames = BREAKAWAY_NAMES.filter(
+      (name) => !this.families.has(name),
+    );
+    const name = openNames.length > 0 ? sample(openNames) : undefined;
 
     if (!name) {
       return undefined;
@@ -134,6 +141,7 @@ export class World {
     });
 
     this.findFamilyOf(lord)?.discharge(lord);
+    lord.renounceHouse();
     this.families.add(name, founded);
     province.claim(founded);
 
@@ -143,6 +151,12 @@ export class World {
   public dissolve(family: Family, victor?: Family): void {
     if (victor) {
       family.surrenderTo(victor);
+    }
+
+    for (const member of family.members) {
+      if (member.isKinOf(family)) {
+        member.renounceHouse();
+      }
     }
 
     family.breakAlliance();
@@ -158,9 +172,6 @@ export class World {
     }
 
     for (const member of family.members) {
-      if (member.isKinOf(family)) {
-        member.renounceHouse();
-      }
       victor.enlist(member);
     }
 

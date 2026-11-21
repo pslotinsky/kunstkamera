@@ -1,8 +1,11 @@
 import { compact } from '@/lib/array/compact';
+import { sample } from '@/lib/array/sample';
+import { isDefined } from '@/lib/value/isDefined';
 
 import { Coronation } from './Coronation';
-import { Disbanding } from './Disbanding';
+import { Disbanding, type GemInheritance } from './Disbanding';
 import type { Family } from './Family';
+import type { Gem } from './Gem';
 import type { General } from './General';
 import type { Province } from './Province';
 import type { World } from './World';
@@ -35,13 +38,14 @@ export class Succession {
       family,
       deposed,
       heirs,
-      provinces: this.world
-        .getFamilyProvinces(family)
-        .filter((province) => province.ruledBy(deposed)),
+      provinces: this.world.getFamilyProvinces(family),
     });
 
-    coronation.crown(heir);
-    this.world.campaign.awaitHeir(coronation);
+    if (coronation.isChoiceFor(this.world.player)) {
+      this.world.campaign.awaitHeir(coronation);
+    } else {
+      coronation.crown(heir);
+    }
 
     return coronation;
   }
@@ -54,56 +58,58 @@ export class Succession {
     const breakaways = compact(
       provinces.map((province) => this.breakAway(province)),
     );
-    const strongest = this.findStrongest(breakaways);
-    const beneficiary = banisher ?? strongest;
+    const vassals = family.vassals.filter(
+      (vassal) => !this.world.isHeld(vassal),
+    );
 
-    this.resettle(family, strongest);
-    this.world.dissolve(family, beneficiary);
+    this.world.dissolve(family);
+    family.gems = [];
+    const inheritances = this.passGems(gems, banisher);
+    this.world.wanderers.resettle(vassals);
 
     return new Disbanding({
       family,
       deposed,
       provinces,
       breakaways,
-      gems,
-      beneficiary,
+      inheritances,
     });
   }
 
   private breakAway(province: Province): Family | undefined {
     const lord = province.hasLord ? province.governor : undefined;
-    const founded = lord && this.world.foundFamily(lord, province);
+    const canFoundHouse = isDefined(lord) && !this.world.isHeld(lord);
+    const founded = canFoundHouse
+      ? this.world.foundFamily(lord, province)
+      : undefined;
 
-    if (!founded) {
+    if (!isDefined(founded)) {
+      province.assignGovernor(undefined);
       province.unclaim();
     }
 
     return founded;
   }
 
-  private findStrongest(families: readonly Family[]): Family | undefined {
-    return families.reduce<Family | undefined>(
-      (strongest, family) =>
-        !strongest ||
-        family.homeProvince.resources.troops >
-          strongest.homeProvince.resources.troops
-          ? family
-          : strongest,
-      undefined,
-    );
-  }
-
-  private resettle(family: Family, refuge: Family | undefined): void {
-    const vassals = family.members.filter(
-      (member) => !family.isRuler(member) && !this.world.isHeld(member),
+  private passGems(
+    gems: readonly Gem[],
+    banisher?: Family,
+  ): readonly GemInheritance[] {
+    const survivors = this.world.families.all.filter(
+      (family) => this.world.countProvinces(family) > 0,
     );
 
-    for (const vassal of vassals) {
-      if (refuge) {
-        refuge.enlist(vassal);
-      } else {
-        this.world.exile(vassal);
-      }
-    }
+    return compact(
+      gems.map((gem) => {
+        const family =
+          banisher ?? (survivors.length > 0 ? sample(survivors) : undefined);
+
+        if (isDefined(family)) {
+          family.gems = [...family.gems, gem];
+        }
+
+        return isDefined(family) ? { gem, family } : undefined;
+      }),
+    );
   }
 }

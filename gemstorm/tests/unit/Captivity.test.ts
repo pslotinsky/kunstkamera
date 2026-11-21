@@ -181,14 +181,29 @@ describe('Captivity', () => {
   });
 
   it('dissolves a released ruler’s house when there is nowhere for him to go', () => {
-    const { captivity, hold, world, darian, rival, mine, pineward, ostgard } =
-      setup();
+    const {
+      captivity,
+      hold,
+      world,
+      darian,
+      rival,
+      mine,
+      pineward,
+      ostgard,
+      marven,
+    } = setup();
     pineward.claim(mine);
     ostgard.claim(mine);
 
     expect(captivity.release(hold(darian))).toBeUndefined();
     expect(world.families.all).not.toContain(rival);
     expect(mine.gems.map((gem) => gem.name)).toContain('Asterion');
+    expect(world.wanderers.offer).toEqual({ general: darian, court: mine });
+
+    world.wanderers.answer(world.wanderers.offer!, true);
+
+    expect(mine.members).toContain(darian);
+    expect(world.wanderers.offer).toEqual({ general: marven, court: mine });
   });
 
   it('puts a banished vassal out of the game for good', () => {

@@ -1,3 +1,5 @@
+import { isDefined } from '@/lib/value/isDefined';
+
 import type { Family } from './Family';
 import type { General } from './General';
 import type { Province } from './Province';
@@ -32,13 +34,33 @@ export class Coronation {
   }
 
   public crown(heir: General): void {
-    if (this.heirs.some((candidate) => candidate.isEqual(heir))) {
-      for (const province of this.provinces) {
-        province.assignGovernor(heir);
+    if (!isDefined(this.heir) && this.heirs.includes(heir)) {
+      const home = this.findHome(heir);
+
+      this.reassignProvinces(heir);
+      this.family.crown(heir, this.inheritedFame(heir));
+      heir.renounceHouse();
+      if (isDefined(home)) {
+        this.family.moveHome(home);
       }
 
-      this.family.crown(heir, this.inheritedFame(heir));
       this.heir = heir;
+    }
+  }
+
+  private findHome(heir: General): Province | undefined {
+    return (
+      this.provinces.find((province) => province.ruledBy(heir)) ??
+      this.provinces.find((province) => province.isHome) ??
+      this.provinces[0]
+    );
+  }
+
+  private reassignProvinces(heir: General): void {
+    for (const province of this.provinces) {
+      if (province.ruledBy(this.deposed)) {
+        province.assignGovernor(heir, { preserveEntrust: true });
+      }
     }
   }
 

@@ -53,6 +53,7 @@ export class JudgeCaptiveCommand extends WorldCommand {
         this.outcome = outcome;
         world.free(captive);
         this.publishUpdates(provinces);
+        this.publishVassalOffer();
       }
     }
   }

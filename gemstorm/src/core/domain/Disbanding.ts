@@ -3,13 +3,17 @@ import type { Gem } from './Gem';
 import type { General } from './General';
 import type { Province } from './Province';
 
+export interface GemInheritance {
+  readonly gem: Gem;
+  readonly family: Family;
+}
+
 export interface DisbandingParams {
   readonly family: Family;
   readonly deposed: General;
   readonly provinces: readonly Province[];
   readonly breakaways: readonly Family[];
-  readonly gems: readonly Gem[];
-  readonly beneficiary: Family | undefined;
+  readonly inheritances: readonly GemInheritance[];
 }
 
 export class Disbanding {
@@ -17,15 +21,13 @@ export class Disbanding {
   public readonly deposed: General;
   public readonly provinces: readonly Province[];
   public readonly breakaways: readonly Family[];
-  public readonly gems: readonly Gem[];
-  public readonly beneficiary: Family | undefined;
+  public readonly inheritances: readonly GemInheritance[];
 
   public constructor(params: DisbandingParams) {
     this.family = params.family;
     this.deposed = params.deposed;
     this.provinces = params.provinces;
     this.breakaways = params.breakaways;
-    this.gems = params.gems;
-    this.beneficiary = params.beneficiary;
+    this.inheritances = params.inheritances;
   }
 }

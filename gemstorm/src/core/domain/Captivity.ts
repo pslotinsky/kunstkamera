@@ -118,10 +118,20 @@ export class Captivity {
       house.moveHome(destination);
     } else {
       this.world.campaign.recordFall(house, 'last-province-lost', captor);
-      this.world.dissolve(house, captor);
+      this.disbandReleasedHouse(captive);
     }
 
     return destination;
+  }
+
+  private disbandReleasedHouse(captive: Captive): void {
+    const { general, house, captor } = captive;
+    const vassals = this.world
+      .getVassals(house)
+      .filter((vassal) => !this.world.isHeld(vassal));
+
+    this.world.dissolve(house, captor);
+    this.world.wanderers.resettle([general, ...vassals]);
   }
 
   private findReleaseDestination(captive: Captive): Province | undefined {

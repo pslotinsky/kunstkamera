@@ -49,7 +49,7 @@ export class LifecycleCommand extends WorldCommand {
       this.ageSurvivors(date);
     }
 
-    if (!campaign.isAwaitingHeir) {
+    if (!campaign.isAwaitingDecision) {
       this.processedYear = date.year;
       this.remaining = undefined;
     }
@@ -133,6 +133,7 @@ export class LifecycleCommand extends WorldCommand {
 
       this.publish(new SuccessionReportedEvent(outcome, 'death'));
       this.publishUpdates(outcome.provinces);
+      this.publishVassalOffer();
     } else {
       this.publish(new GeneralDiedEvent(general, family));
     }

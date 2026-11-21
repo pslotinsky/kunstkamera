@@ -4,11 +4,13 @@ import { RansomCommand } from '@/core/commands/RansomCommand';
 import type { Captive } from '@/core/domain/Captive';
 import type { Disposal } from '@/core/domain/Captivity';
 import type { RansomCurrency } from '@/core/domain/Ransom';
+import { TurnReleasedEvent } from '@/core/events/TurnReleasedEvent';
 import { Control } from '@/lib/Control';
 import { isDefined } from '@/lib/value/isDefined';
 import { BattleReportClosedEvent } from '@/ui/screens/StrategyScreen/BattleReport/BattleReportClosedEvent';
 import { TurnHold } from '@/ui/screens/StrategyScreen/TurnHold';
 
+import { CaptiveDialogToggledEvent } from './CaptiveDialogToggledEvent';
 import {
   type CaptiveDialogContext,
   CaptiveDialogView,
@@ -24,6 +26,7 @@ export class CaptiveDialogControl extends Control<CaptiveDialogView> {
   private readonly ransom: RansomCommand;
   private readonly turnHold: TurnHold;
   private captive: Captive | undefined;
+  private waitingForDecision = false;
 
   public constructor(context: CaptiveDialogContext) {
     super(CaptiveDialogView, context);
@@ -37,6 +40,11 @@ export class CaptiveDialogControl extends Control<CaptiveDialogView> {
     this.context.events.subscribe(
       BattleReportClosedEvent,
       () => this.open(),
+      this.signal,
+    );
+    this.context.events.subscribe(
+      TurnReleasedEvent,
+      () => this.resume(),
       this.signal,
     );
     this.subscribe(DisposalChosenEvent, (event) =>
@@ -55,13 +63,14 @@ export class CaptiveDialogControl extends Control<CaptiveDialogView> {
     const { world } = this.context;
     const { player } = world;
 
-    if (!world.campaign.isEnded && !isDefined(this.captive)) {
+    if (world.campaign.canProgress && !isDefined(this.captive)) {
       const captive =
         world.findRansomFor(player) ?? world.findCaptiveOf(player);
 
       if (isDefined(captive)) {
         this.captive = captive;
         this.turnHold.hold();
+        this.context.events.publish(new CaptiveDialogToggledEvent(true));
         this.showChoices(captive);
       }
     }
@@ -69,9 +78,18 @@ export class CaptiveDialogControl extends Control<CaptiveDialogView> {
 
   private close(): void {
     this.captive = undefined;
+    this.waitingForDecision = this.context.world.campaign.isAwaitingDecision;
     this.view.hide();
+    this.context.events.publish(new CaptiveDialogToggledEvent(false));
     this.turnHold.release();
     this.open();
+  }
+
+  private resume(): void {
+    if (this.waitingForDecision && this.context.world.campaign.canProgress) {
+      this.waitingForDecision = false;
+      this.open();
+    }
   }
 
   private dispose(disposal: Disposal): void {

@@ -42,7 +42,11 @@ export class Campaign {
   }
 
   public get canProgress(): boolean {
-    return !this.isEnded && !this.isAwaitingHeir;
+    return !this.isEnded && !this.isAwaitingDecision;
+  }
+
+  public get isAwaitingDecision(): boolean {
+    return this.isAwaitingHeir || isDefined(this.world.wanderers.offer);
   }
 
   public get hasUndiscoveredArtifacts(): boolean {
