@@ -127,7 +127,7 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
   }
 
   private stationedUnits(): readonly FifthUnit[] {
-    return this.world.turnQueue.current?.stationedUnits ?? [];
+    return this.world.turnQueue.current?.fifthUnits.units ?? [];
   }
 
   private carriedUnit(): FifthUnit | undefined {

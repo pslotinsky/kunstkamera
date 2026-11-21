@@ -114,7 +114,7 @@ describe('WarPolicy', () => {
   it('counts the Fifth Unit that would defend the target', () => {
     const { weak, attacked, play } = setup({ weakDefenders: 100 });
 
-    weak.addUnit(HiredUnit.ofName('Grimhides')!);
+    weak.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
     play();
 
     expect(attacked).toHaveLength(0);

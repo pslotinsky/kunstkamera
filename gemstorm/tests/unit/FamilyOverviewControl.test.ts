@@ -24,8 +24,8 @@ function setup() {
 
   mine.moveHome(myProvince);
   theirs.moveHome(theirProvince);
-  myProvince.addUnit(HiredUnit.ofName('Grimhides')!);
-  theirProvince.addUnit(HiredUnit.ofName('Warriors')!);
+  myProvince.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
+  theirProvince.fifthUnits.addUnit(HiredUnit.ofName('Warriors')!);
 
   const { world, events } = makeWorld([myProvince, theirProvince], mine);
   const control = new FamilyOverviewControl(ViewCommand.name, world);

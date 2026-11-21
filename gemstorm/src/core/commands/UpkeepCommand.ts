@@ -68,7 +68,7 @@ export class UpkeepCommand extends WorldCommand {
   }
 
   private maintainHiredUnits(province: Province): void {
-    for (const unit of province.hiredUnits) {
+    for (const unit of province.fifthUnits.hiredUnits) {
       if (province.resources.gold < unit.cost) {
         this.reportUnpaidDesertion(province, unit);
       } else {
@@ -78,7 +78,7 @@ export class UpkeepCommand extends WorldCommand {
   }
 
   private reportUnpaidDesertion(province: Province, unit: HiredUnit): void {
-    province.returnToHirePool(unit);
+    province.fifthUnits.dismissUnit(unit);
     this.publish(new UnitDesertedEvent(province, unit, 'unpaid'));
   }
 }

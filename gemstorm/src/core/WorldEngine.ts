@@ -2,8 +2,10 @@ import { ComputerPlayer } from '@/core/ai/ComputerPlayer';
 import { CommandExecutor } from '@/core/CommandExecutor';
 import { ConcludeBattleCommand } from '@/core/commands/ConcludeBattleCommand';
 import { LifecycleCommand } from '@/core/commands/LifecycleCommand';
+import { MigrateMercenariesCommand } from '@/core/commands/MigrateMercenariesCommand';
 import { RecoverHiredUnitsCommand } from '@/core/commands/RecoverHiredUnitsCommand';
 import { ResolveEventsCommand } from '@/core/commands/ResolveEventsCommand';
+import { RestockHirePoolsCommand } from '@/core/commands/RestockHirePoolsCommand';
 import { TaxAndHarvestCommand } from '@/core/commands/TaxAndHarvestCommand';
 import { UpkeepCommand } from '@/core/commands/UpkeepCommand';
 import type { BattleOutcome } from '@/core/domain/BattleOutcome';
@@ -29,6 +31,8 @@ export class WorldEngine {
   private readonly upkeep: UpkeepCommand;
   private readonly provinceEvents: ResolveEventsCommand;
   private readonly hiredUnitRecovery: RecoverHiredUnitsCommand;
+  private readonly restockHirePools: RestockHirePoolsCommand;
+  private readonly migrateMercenaries: MigrateMercenariesCommand;
   private readonly holders = new Set<object>();
   private readonly lifetime = new AbortController();
 
@@ -41,6 +45,7 @@ export class WorldEngine {
     | 'harvest'
     | 'recovery'
     | 'market'
+    | 'hire-pools'
     | 'waiting-turn'
     | 'reporting-turn'
     | 'ready-turn'
@@ -60,6 +65,8 @@ export class WorldEngine {
     this.upkeep = new UpkeepCommand({ world, events });
     this.provinceEvents = new ResolveEventsCommand({ world, events });
     this.hiredUnitRecovery = new RecoverHiredUnitsCommand({ world, events });
+    this.restockHirePools = new RestockHirePoolsCommand({ world, events });
+    this.migrateMercenaries = new MigrateMercenariesCommand({ world, events });
   }
 
   public start(): void {
@@ -128,6 +135,9 @@ export class WorldEngine {
         break;
       case 'market':
         this.updateMarket();
+        break;
+      case 'hire-pools':
+        this.refreshHirePools();
         break;
       case 'waiting-turn':
         this.startTurn();
@@ -212,6 +222,13 @@ export class WorldEngine {
 
   private updateMarket(): void {
     this.world.market.swing(this.world.date.month);
+    this.phase = 'hire-pools';
+    this.advance();
+  }
+
+  private refreshHirePools(): void {
+    this.executor.execute(this.restockHirePools);
+    this.executor.execute(this.migrateMercenaries);
     this.phase = 'waiting-turn';
     this.events.publish(new TurnScheduledEvent());
   }

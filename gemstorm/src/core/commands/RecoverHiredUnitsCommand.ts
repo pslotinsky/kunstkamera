@@ -19,7 +19,7 @@ export class RecoverHiredUnitsCommand extends WorldCommand {
   }
 
   private recoverProvinceUnits(province: Province): void {
-    const injured = province.hiredUnits.filter(
+    const injured = province.fifthUnits.hiredUnits.filter(
       (unit) => unit.strength < unit.maximumStrength,
     );
 

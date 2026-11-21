@@ -66,7 +66,7 @@ describe('Invasion', () => {
   it('lets an untrooped province defend with its stationed Nerith', () => {
     const { source, target, world } = setup({ defenders: 0 });
     const nerith = new Nerith();
-    target.addUnit(nerith);
+    target.fifthUnits.addUnit(nerith);
     const invasion = new Invasion({
       world,
       source,
@@ -90,11 +90,11 @@ describe('Invasion', () => {
       const attacking = new Nerith();
       const reserve = new Nerith();
       const defending = new Nerith();
-      source.addUnit(attacking);
-      source.addUnit(reserve);
-      target.addUnit(defending);
+      source.fifthUnits.addUnit(attacking);
+      source.fifthUnits.addUnit(reserve);
+      target.fifthUnits.addUnit(defending);
       const defensiveReserve = new Nerith();
-      target.addUnit(defensiveReserve);
+      target.fifthUnits.addUnit(defensiveReserve);
       const attacker = makeArmy({
         commander: source.governor!,
         unit: attacking,
@@ -104,8 +104,8 @@ describe('Invasion', () => {
       invasion.answer({ answer: 'fight', unit: defending });
       invasion.conclude(makeOutcome({ winner }));
 
-      expect(source.stationedUnits).toEqual([reserve]);
-      expect(target.stationedUnits).toEqual(
+      expect(source.fifthUnits.units).toEqual([reserve]);
+      expect(target.fifthUnits.units).toEqual(
         winner.isAttacker ? [] : [defensiveReserve],
       );
     },
@@ -114,20 +114,20 @@ describe('Invasion', () => {
   it('keeps an attacking Nerith after a concession', () => {
     const { source, target, world } = setup({ defenders: 0, defenderFood: 0 });
     const attacking = new Nerith();
-    source.addUnit(attacking);
+    source.fifthUnits.addUnit(attacking);
     const attacker = makeArmy({ commander: source.governor!, unit: attacking });
     const invasion = new Invasion({ world, source, target, attacker });
     invasion.muster();
     invasion.answer({ answer: 'surrender' });
 
-    expect(source.stationedUnits).toEqual([]);
-    expect(target.stationedUnits).toEqual([attacking]);
+    expect(source.fifthUnits.units).toEqual([]);
+    expect(target.fifthUnits.units).toEqual([attacking]);
   });
 
   it('spends Nerith even when its side retreats without losing the unit', () => {
     const { source, target, world } = setup();
     const nerith = new Nerith();
-    source.addUnit(nerith);
+    source.fifthUnits.addUnit(nerith);
     const attacker = makeArmy({ commander: source.governor!, unit: nerith });
     const invasion = new Invasion({ world, source, target, attacker });
     invasion.muster();
@@ -140,7 +140,7 @@ describe('Invasion', () => {
       }),
     );
 
-    expect(source.stationedUnits).toEqual([]);
+    expect(source.fifthUnits.units).toEqual([]);
   });
 
   it('charges the deployment cost and musters the defender on begin', () => {
@@ -227,7 +227,7 @@ describe('Invasion', () => {
     const { invasion, target, attacker } = setup();
     const grimhides = HiredUnit.ofName('Grimhides')!;
 
-    target.addUnit(grimhides);
+    target.fifthUnits.addUnit(grimhides);
     invasion.begin();
     invasion.conclude(
       new BattleOutcome({
@@ -240,14 +240,14 @@ describe('Invasion', () => {
       }),
     );
 
-    expect(target.hiredUnits).not.toContain(grimhides);
+    expect(target.fifthUnits.hiredUnits).not.toContain(grimhides);
   });
 
   it('keeps a surviving hired Fifth Unit at its remaining battle strength', () => {
     const { invasion, target } = setup();
     const grimhides = HiredUnit.ofName('Grimhides')!;
 
-    target.addUnit(grimhides);
+    target.fifthUnits.addUnit(grimhides);
     invasion.muster();
     const battle = invasion.answer({ answer: 'fight', unit: grimhides });
     expect(battle).toBeInstanceOf(Battle);
@@ -261,7 +261,7 @@ describe('Invasion', () => {
       invasion.conclude(battle.findOutcome()!);
     }
 
-    expect(target.hiredUnits).toContain(grimhides);
+    expect(target.fifthUnits.hiredUnits).toContain(grimhides);
     expect(grimhides.strength).toBe(74);
   });
 
@@ -402,7 +402,7 @@ describe('Invasion answered by its defender', () => {
     const ashwing = Gem.ofName('Ashwing')!;
 
     rival.gems = [ashwing];
-    target.addUnit(grimhides);
+    target.fifthUnits.addUnit(grimhides);
     invasion.muster();
 
     const battle = invasion.answer({

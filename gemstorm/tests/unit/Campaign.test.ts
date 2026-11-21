@@ -346,7 +346,7 @@ describe('Campaign completion through game actions', () => {
     const holder = {};
     let coronation: Coronation | undefined;
 
-    province.addUnit(unit);
+    province.fifthUnits.addUnit(unit);
     world.hold(captive);
     events.subscribe(SuccessionReportedEvent, (event) => {
       if (event.outcome instanceof Coronation) {

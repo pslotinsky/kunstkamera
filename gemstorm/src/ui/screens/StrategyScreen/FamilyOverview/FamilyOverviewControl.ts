@@ -104,11 +104,12 @@ export class FamilyOverviewControl extends CommandDialogControl<
 
   private buildFifthUnits(): FifthUnitRow[] {
     return this.viewsOwnHouse()
-      ? this.world
-          .getFamilyProvinces(this.viewed)
-          .flatMap((province) =>
-            province.stationedUnits.map((unit) => ({ unit, province })),
-          )
+      ? this.world.getFamilyProvinces(this.viewed).flatMap((province) =>
+          province.fifthUnits.units.map((unit) => ({
+            unit,
+            province,
+          })),
+        )
       : [];
   }
 }

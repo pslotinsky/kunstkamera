@@ -57,7 +57,7 @@ function setup(options: SetupOptions = {}) {
     governor: ruskarn,
   });
 
-  pineward.addUnit(HiredUnit.ofName('Warriors')!);
+  pineward.fifthUnits.addUnit(HiredUnit.ofName('Warriors')!);
 
   const { world } = makeWorld(
     [...ours, ...theirs, pineward, mossvale],
@@ -104,13 +104,14 @@ describe('Envoy', () => {
     rollAt(0);
 
     const { envoy, alderwyn, stormmere, marven, pineward } = setup();
+    const [warriors] = pineward.fifthUnits.hiredUnits;
 
     expect(envoy.persuade(marven)).toBe(true);
     expect(pineward.belongsTo(alderwyn)).toBe(true);
     expect(pineward.governor).toBe(marven);
     expect(pineward.resources.gold).toBe(136);
     expect(pineward.resources.troops).toBe(90);
-    expect(pineward.hasUnit('Warriors')).toBe(true);
+    expect(pineward.fifthUnits.hiredUnits).toContain(warriors);
     expect(alderwyn.members).toContain(marven);
     expect(stormmere.members).not.toContain(marven);
   });

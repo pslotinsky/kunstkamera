@@ -3,9 +3,8 @@ import { isDefined } from '@/lib/value/isDefined';
 import { Characteristics } from './Characteristics';
 import { Development, type DevelopmentGains } from './Development';
 import type { Family } from './Family';
-import type { FifthUnit } from './FifthUnit';
 import type { General } from './General';
-import { HiredUnit } from './HiredUnit';
+import { ProvinceFifthUnits } from './ProvinceFifthUnits';
 import { type ResourceGains, Resources } from './Resources';
 
 export type Landscape = 'snow' | 'woods' | 'river' | 'mountain';
@@ -40,14 +39,12 @@ export class Province {
   public readonly name: string;
   public readonly neighbors: readonly number[];
   public readonly landscape: Landscape;
+  public readonly fifthUnits: ProvinceFifthUnits;
   public resources: Resources;
   public development: Development;
   public goodwill = 0;
   public actionCount = 0;
   public governor?: General | undefined;
-  public stationedUnits: readonly FifthUnit[] = [];
-  private availableForHire: readonly string[];
-
   private house: Family | undefined;
   private entrusted = false;
 
@@ -60,7 +57,7 @@ export class Province {
     this.governor = params.governor;
     this.resources = params.resources ?? Resources.empty();
     this.development = params.development ?? Development.empty();
-    this.availableForHire = params.hirePool ?? [];
+    this.fifthUnits = new ProvinceFifthUnits(params.hirePool);
   }
 
   public get family(): Family | undefined {
@@ -103,38 +100,6 @@ export class Province {
 
   public cancelEntrust(): void {
     this.entrusted = false;
-  }
-
-  public get hirePool(): readonly string[] {
-    return this.availableForHire;
-  }
-
-  public returnToHirePool(unit: HiredUnit): void {
-    this.removeUnit(unit);
-
-    if (!this.availableForHire.includes(unit.name)) {
-      this.availableForHire = [...this.availableForHire, unit.name];
-    }
-  }
-
-  public get hiredUnits(): readonly HiredUnit[] {
-    return this.stationedUnits.filter(
-      (unit): unit is HiredUnit => unit instanceof HiredUnit,
-    );
-  }
-
-  public addUnit(unit: FifthUnit): void {
-    this.stationedUnits = [...this.stationedUnits, unit];
-  }
-
-  public removeUnit(unit: FifthUnit): void {
-    this.stationedUnits = this.stationedUnits.filter(
-      (stationed) => stationed !== unit,
-    );
-  }
-
-  public hasUnit(name: string): boolean {
-    return this.hiredUnits.some((unit) => unit.name === name);
   }
 
   public ruledBy(general: General | undefined): boolean {

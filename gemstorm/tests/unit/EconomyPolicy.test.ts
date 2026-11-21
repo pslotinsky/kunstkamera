@@ -114,7 +114,9 @@ describe('EconomyPolicy', () => {
 
     play(border);
 
-    expect(border.hiredUnits.map((unit) => unit.name)).toEqual(['Gargoyles']);
+    expect(border.fifthUnits.hiredUnits.map((unit) => unit.name)).toEqual([
+      'Gargoyles',
+    ]);
   });
 
   it('gives food where loyalty runs low', () => {

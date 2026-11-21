@@ -111,7 +111,7 @@ export class AdviceRule {
       this.getRivalNeighbors(province).some(
         (rival) => rival.resources.troops > troops,
       );
-    const isUnguarded = province.hiredUnits.length === 0;
+    const isUnguarded = province.fifthUnits.hiredUnits.length === 0;
 
     return this.pick([
       { meaning: 'enlarge-army', applies: isOutnumbered },
@@ -162,7 +162,7 @@ export class AdviceRule {
   }
 
   private measureGoldUpkeep(province: Province): number {
-    const unitUpkeep = province.hiredUnits.reduce(
+    const unitUpkeep = province.fifthUnits.hiredUnits.reduce(
       (total, unit) => total + unit.cost,
       0,
     );

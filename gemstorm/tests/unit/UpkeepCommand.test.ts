@@ -27,7 +27,7 @@ function createFixture(
   });
 
   for (const type of options.units ?? ['Grimhides', 'Bugbear']) {
-    province.addUnit(HiredUnit.ofName(type)!);
+    province.fifthUnits.addUnit(HiredUnit.ofName(type)!);
   }
 
   const { world, events } = makeWorld(
@@ -46,11 +46,11 @@ describe('UpkeepCommand', () => {
       units: ['Grimhides'],
     });
     const nerith = new Nerith();
-    province.addUnit(nerith);
+    province.fifthUnits.addUnit(nerith);
     command.execute();
 
     expect(province.resources.gold).toBe(0);
-    expect(province.stationedUnits).toEqual([nerith]);
+    expect(province.fifthUnits.units).toEqual([nerith]);
   });
 
   it('charges every stationed unit its cost on a quarter month', () => {
@@ -59,7 +59,7 @@ describe('UpkeepCommand', () => {
     command.execute();
 
     expect(province.resources.gold).toBe(100 - 20 - 30);
-    expect(province.hiredUnits).toHaveLength(2);
+    expect(province.fifthUnits.hiredUnits).toHaveLength(2);
   });
 
   it('charges nothing outside the quarter months', () => {
@@ -71,7 +71,7 @@ describe('UpkeepCommand', () => {
     command.execute();
 
     expect(province.resources.gold).toBe(100);
-    expect(province.hiredUnits).toHaveLength(2);
+    expect(province.fifthUnits.hiredUnits).toHaveLength(2);
   });
 
   it('deserts the units the province cannot pay for', () => {
@@ -80,7 +80,9 @@ describe('UpkeepCommand', () => {
     command.execute();
 
     expect(province.resources.gold).toBe(20);
-    expect(province.hiredUnits.map((unit) => unit.name)).toEqual(['Grimhides']);
+    expect(province.fifthUnits.hiredUnits.map((unit) => unit.name)).toEqual([
+      'Grimhides',
+    ]);
   });
 
   it('pays a mercenary even when the ruler has too little Fame to keep it', () => {
@@ -91,7 +93,7 @@ describe('UpkeepCommand', () => {
 
     command.execute();
 
-    expect(province.hiredUnits).toHaveLength(1);
+    expect(province.fifthUnits.hiredUnits).toHaveLength(1);
     expect(province.resources.gold).toBe(80);
   });
 
@@ -109,6 +111,8 @@ describe('UpkeepCommand', () => {
     command.execute();
 
     expect(desertions).toEqual([['Pikemen', 'unpaid']]);
-    expect(province.hirePool).toContain('Pikemen');
+    expect(province.fifthUnits.hirePool.map((unit) => unit.name)).toContain(
+      'Pikemen',
+    );
   });
 });

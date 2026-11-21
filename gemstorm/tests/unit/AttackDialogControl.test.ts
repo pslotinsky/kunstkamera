@@ -42,7 +42,7 @@ function setup(gold = 100) {
     troops: 60,
   });
 
-  source.addUnit(HiredUnit.ofName('Grimhides')!);
+  source.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
 
   const { world, events } = makeWorld([source, enemy], mine);
 

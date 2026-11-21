@@ -22,7 +22,6 @@ import type { Incident } from './Incident';
 import { IncidentBuilder } from './IncidentBuilder';
 
 const GOODWILL_EVENTS = [...GOOD_EVENTS, ...BAD_EVENTS];
-const MAX_STATIONED_FIFTH_UNITS = 3;
 const MAX_FAME = 100;
 const MAX_FAME_REWARD = 4;
 const RESOURCE_EVENT_RANGE = [25, 50] as const;
@@ -231,7 +230,7 @@ export class GoodwillEventResolver {
     if (this.canGrantNerith(province)) {
       const incidentBuilder = new IncidentBuilder(province);
 
-      province.addUnit(new Nerith());
+      province.fifthUnits.addUnit(new Nerith());
       incident = incidentBuilder.build(definition, this.world.date);
     }
 
@@ -239,15 +238,15 @@ export class GoodwillEventResolver {
   }
 
   private canGrantNerith(province: Province): boolean {
-    const hasMonster = province.hiredUnits.some(
+    const { fifthUnits, family } = province;
+
+    const hasMonster = fifthUnits.hiredUnits.some(
       (unit) => unit.category === 'monster',
     );
-    const hasNerith = province.stationedUnits.some(
-      (unit) => unit instanceof Nerith,
-    );
-    const hasRoom = province.stationedUnits.length < MAX_STATIONED_FIFTH_UNITS;
+    const hasNerith = fifthUnits.units.some((unit) => unit instanceof Nerith);
+    const hasRoom = fifthUnits.hasRoomForUnit;
 
-    return !province.family?.royal && !hasMonster && !hasNerith && hasRoom;
+    return !family?.royal && !hasMonster && !hasNerith && hasRoom;
   }
 
   private rollBetween(minimum: number, maximum: number): number {

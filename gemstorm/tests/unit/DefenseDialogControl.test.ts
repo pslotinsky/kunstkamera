@@ -53,7 +53,7 @@ function setup(params: SetupParams = {}) {
     food: 100,
   });
 
-  attacked.addUnit(HiredUnit.ofName('Grimhides')!);
+  attacked.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
   player.homeProvince = attacked;
 
   const { world, events } = makeWorld([source, attacked, ...refuges], player);

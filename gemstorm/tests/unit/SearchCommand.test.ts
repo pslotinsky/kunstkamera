@@ -25,8 +25,8 @@ function setup(options: { readonly gold?: number } = {}) {
   const neutral = makeProvince({ number: 3, name: 'Hollow' });
   const enemy = makeProvince({ number: 4, name: 'Anjou', family: rival });
 
-  enemy.addUnit(HiredUnit.ofName('Warriors')!);
-  enemy.addUnit(HiredUnit.ofName('Gargoyles')!);
+  enemy.fifthUnits.addUnit(HiredUnit.ofName('Warriors')!);
+  enemy.fifthUnits.addUnit(HiredUnit.ofName('Gargoyles')!);
 
   const { world, events } = makeWorld([source, owned, neutral, enemy], family);
   const command = new SearchCommand({ world, events });

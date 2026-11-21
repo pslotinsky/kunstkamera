@@ -18,7 +18,7 @@ export class MercenaryDesertionResolver {
     if (isDefined(candidate) && this.shouldDesert(candidate)) {
       const { province, unit } = candidate;
 
-      province.returnToHirePool(unit);
+      province.fifthUnits.dismissUnit(unit);
       desertion = candidate;
     }
 

@@ -160,11 +160,11 @@ describe('AttackCommand', () => {
   it('can attack with Nerith alone, but cannot summon a visit that has already departed', () => {
     const { source, attack, started } = setup();
     const nerith = new Nerith();
-    source.addUnit(nerith);
-    source.removeUnit(nerith);
+    source.fifthUnits.addUnit(nerith);
+    source.fifthUnits.removeUnit(nerith);
     attack({ troops: 0, unit: nerith });
     expect(started()).toBeUndefined();
-    source.addUnit(nerith);
+    source.fifthUnits.addUnit(nerith);
     attack({ troops: 0, unit: nerith });
     expect(started()?.battle.attacker.unit).toBe(nerith);
     expect(started()?.battle.getUnits(BattleSide.attacker)).toHaveLength(1);
@@ -270,13 +270,15 @@ describe('AttackCommand', () => {
 
   it('stations a marching hired unit in the province it took', () => {
     const { source, enemy, attack, finish } = setup();
-    source.addUnit(HiredUnit.ofName('Grimhides')!);
+    source.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
 
-    attack({ unit: source.hiredUnits[0] });
+    attack({ unit: source.fifthUnits.hiredUnits[0] });
     finish(BattleSide.attacker);
 
-    expect(enemy.hiredUnits.map((unit) => unit.name)).toEqual(['Grimhides']);
-    expect(source.hiredUnits).toHaveLength(0);
+    expect(enemy.fifthUnits.hiredUnits.map((unit) => unit.name)).toEqual([
+      'Grimhides',
+    ]);
+    expect(source.fifthUnits.hiredUnits).toHaveLength(0);
   });
 
   it('leaves a summoned guardian stationed nowhere', () => {
@@ -285,7 +287,7 @@ describe('AttackCommand', () => {
     attack({ unit: mine.guardians[0] });
     finish(BattleSide.attacker);
 
-    expect(enemy.hiredUnits).toHaveLength(0);
+    expect(enemy.fifthUnits.hiredUnits).toHaveLength(0);
     expect(mine.guardians.map((guardian) => guardian.name)).toEqual([
       'Voltryn',
     ]);

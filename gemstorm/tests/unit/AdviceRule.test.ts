@@ -66,7 +66,7 @@ function setup(situation: Situation = {}) {
   player.homeProvince = home;
 
   if (situation.isGuarded ?? true) {
-    home.addUnit(HiredUnit.ofName('Spearmen')!);
+    home.fifthUnits.addUnit(HiredUnit.ofName('Spearmen')!);
   }
 
   const { world } = makeWorld(

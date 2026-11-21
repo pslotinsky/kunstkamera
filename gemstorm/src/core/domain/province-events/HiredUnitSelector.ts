@@ -29,7 +29,7 @@ export class HiredUnitSelector {
     category: UnitCategory,
   ): readonly StationedHiredUnit[] {
     return provinces.flatMap((province) => {
-      const units = province.hiredUnits.filter(
+      const units = province.fifthUnits.hiredUnits.filter(
         (unit) => unit.category === category,
       );
 

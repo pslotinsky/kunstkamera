@@ -322,10 +322,10 @@ export class Invasion {
   }
 
   private dismiss(unit: FifthUnit | undefined, province: Province): void {
-    const stationed = province.stationedUnits.find((hired) => hired === unit);
+    const stationed = province.fifthUnits.units.find((hired) => hired === unit);
 
     if (stationed) {
-      province.removeUnit(stationed);
+      province.fifthUnits.removeUnit(stationed);
     }
   }
 
@@ -353,9 +353,7 @@ export class Invasion {
   private capture(): readonly Province[] {
     const owner = this.source.family!;
 
-    this.target.stationedUnits = this.target.stationedUnits.filter(
-      (unit) => !unit.isSpentAfterBattle,
-    );
+    this.target.fifthUnits.removeSpentUnits();
     this.target.claim(owner);
 
     const vacated = this.seat(this.attacker.commander, owner);
@@ -387,13 +385,13 @@ export class Invasion {
   }
 
   private relocateUnit(): void {
-    const marched = this.source.stationedUnits.find(
+    const marched = this.source.fifthUnits.units.find(
       (unit) => unit === this.attacker.unit,
     );
 
     if (marched) {
-      this.source.removeUnit(marched);
-      this.target.addUnit(marched);
+      this.source.fifthUnits.removeUnit(marched);
+      this.target.fifthUnits.addUnit(marched);
     }
   }
 

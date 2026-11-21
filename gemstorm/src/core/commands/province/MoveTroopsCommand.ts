@@ -3,6 +3,7 @@ import type { FifthUnit } from '@/core/domain/FifthUnit';
 import type { Province } from '@/core/domain/Province';
 import type { ResourceGains } from '@/core/domain/Resources';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
+import { isDefined } from '@/lib/value/isDefined';
 
 import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
@@ -80,8 +81,8 @@ export class MoveTroopsCommand extends ProvinceCommand {
 
   private relocateUnit(source: Province, target: Province): void {
     if (this.isCarrying(source)) {
-      source.removeUnit(this.carried!);
-      target.addUnit(this.carried!);
+      source.fifthUnits.removeUnit(this.carried!);
+      target.fifthUnits.addUnit(this.carried!);
     }
   }
 
@@ -107,8 +108,8 @@ export class MoveTroopsCommand extends ProvinceCommand {
   }
 
   private isCarrying(source: Province): boolean {
-    return (
-      this.carried !== undefined && source.stationedUnits.includes(this.carried)
-    );
+    const { carried } = this;
+
+    return isDefined(carried) && source.fifthUnits.hasUnit(carried);
   }
 }

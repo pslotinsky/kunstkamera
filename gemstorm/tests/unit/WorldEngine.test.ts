@@ -216,10 +216,10 @@ describe('WorldEngine', () => {
     });
     const spearmen = HiredUnit.ofName('Spearmen')!;
     spearmen.retainBattleStrength(90);
-    province.addUnit(spearmen);
+    province.fifthUnits.addUnit(spearmen);
     const monster = HiredUnit.ofName('Ogre')!;
     monster.retainBattleStrength(74);
-    province.addUnit(monster);
+    province.fifthUnits.addUnit(monster);
     const march = new CalendarDate(1186, 3);
     const { world, events } = makeWorld([province], family, march);
     const desertions: UnitDesertedEvent[] = [];
@@ -240,7 +240,7 @@ describe('WorldEngine', () => {
       new UnitDesertedEvent(province, monster, 'unpaid'),
     ]);
     expect(incidents).toEqual(['disaster']);
-    expect(province.hiredUnits).toEqual([spearmen]);
+    expect(province.fifthUnits.hiredUnits).toEqual([spearmen]);
     expect(strengthAtTurnStart).toEqual([115]);
     expect(monster.strength).toBe(74);
   });

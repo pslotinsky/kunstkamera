@@ -149,7 +149,7 @@ describe('Province events', () => {
   it('grants Nerith once and blocks a visit while a monster is stationed', () => {
     const { province } = setup();
     const guarded = setup().province;
-    guarded.addUnit(HiredUnit.ofName('Grimhides')!);
+    guarded.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
     const selectNerith = () =>
       vi.fn().mockReturnValueOnce(0).mockReturnValue(0.99);
 
@@ -175,7 +175,7 @@ describe('Province events', () => {
     expect(repeat).toEqual([]);
     expect(blocked).toEqual([]);
     expect(
-      province.stationedUnits.filter((unit) => unit instanceof Nerith),
+      province.fifthUnits.units.filter((unit) => unit instanceof Nerith),
     ).toHaveLength(1);
   });
 
@@ -284,9 +284,9 @@ describe('Province events', () => {
     });
     const monster = HiredUnit.ofName('Grimhides')!;
     monster.retainBattleStrength(74);
-    province.addUnit(monster);
-    province.addUnit(new Nerith());
-    otherProvince.addUnit(HiredUnit.ofName('Grimhides')!);
+    province.fifthUnits.addUnit(monster);
+    province.fifthUnits.addUnit(new Nerith());
+    otherProvince.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
     province.recordAction(1);
 
     const { incidents } = createResolver(
@@ -306,7 +306,7 @@ describe('Province events', () => {
     expect(otherProvince.development.cultivation).toBe(100);
     expect(province.actionCount).toBe(1);
     expect(monster.strength).toBe(74);
-    expect(province.hiredUnits).toContain(monster);
+    expect(province.fifthUnits.hiredUnits).toContain(monster);
   });
 
   it('checks only the selected mercenary against its Fame requirement', () => {
@@ -314,8 +314,8 @@ describe('Province events', () => {
     family.fame = 12;
     const spearmen = HiredUnit.ofName('Spearmen')!;
     const lancers = HiredUnit.ofName('Lancers')!;
-    province.addUnit(spearmen);
-    province.addUnit(lancers);
+    province.fifthUnits.addUnit(spearmen);
+    province.fifthUnits.addUnit(lancers);
 
     const safeRoll = createResolver([province], APRIL, () => 0).resolve();
 
@@ -328,8 +328,8 @@ describe('Province events', () => {
     ).resolve();
 
     expect(desertion).toEqual({ province, unit: lancers });
-    expect(province.hiredUnits).toEqual([spearmen]);
-    expect(province.hirePool).toContain(lancers.name);
+    expect(province.fifthUnits.hiredUnits).toEqual([spearmen]);
+    expect(province.fifthUnits.hirePool).toContain(lancers);
   });
 
   it('rolls the same harmful policy event for both protection levels', () => {

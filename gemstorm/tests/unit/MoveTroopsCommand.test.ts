@@ -66,16 +66,16 @@ describe('MoveTroopsCommand', () => {
     const { source, neutral, command } = setup();
     const carried = new Nerith();
     const reserve = new Nerith();
-    source.addUnit(carried);
-    source.addUnit(reserve);
+    source.fifthUnits.addUnit(carried);
+    source.fifthUnits.addUnit(reserve);
     command.moveTo(neutral, {});
     command.carry(carried);
     command.execute();
 
-    expect(source.stationedUnits).toEqual([reserve]);
-    expect(neutral.stationedUnits).toEqual([carried]);
+    expect(source.fifthUnits.units).toEqual([reserve]);
+    expect(neutral.fifthUnits.units).toEqual([carried]);
     expect(neutral.belongsTo(source.family!)).toBe(true);
-    expect(source.hiredUnits).toEqual([]);
+    expect(source.fifthUnits.hiredUnits).toEqual([]);
   });
 
   it('reinforces an adjacent province you own without changing its ownership', () => {
@@ -118,54 +118,62 @@ describe('MoveTroopsCommand', () => {
 
   it('carries a stationed unit to a province you own, leaving the rest', () => {
     const { source, owned, command } = setup();
-    source.addUnit(HiredUnit.ofName('Grimhides')!);
-    source.addUnit(HiredUnit.ofName('Bugbear')!);
+    source.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
+    source.fifthUnits.addUnit(HiredUnit.ofName('Bugbear')!);
 
     command.moveTo(owned, { troops: 10 });
-    command.carry(source.hiredUnits[0]);
+    command.carry(source.fifthUnits.hiredUnits[0]);
     command.execute();
 
-    expect(owned.hiredUnits.map((unit) => unit.name)).toEqual(['Grimhides']);
-    expect(source.hiredUnits.map((unit) => unit.name)).toEqual(['Bugbear']);
+    expect(owned.fifthUnits.hiredUnits.map((unit) => unit.name)).toEqual([
+      'Grimhides',
+    ]);
+    expect(source.fifthUnits.hiredUnits.map((unit) => unit.name)).toEqual([
+      'Bugbear',
+    ]);
   });
 
   it('relocates a carried unit even when no resources move', () => {
     const { source, owned, command } = setup();
-    source.addUnit(HiredUnit.ofName('Grimhides')!);
+    source.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
 
     command.moveTo(owned, {});
-    command.carry(source.hiredUnits[0]);
+    command.carry(source.fifthUnits.hiredUnits[0]);
     command.execute();
 
-    expect(owned.hiredUnits.map((unit) => unit.name)).toEqual(['Grimhides']);
-    expect(source.hiredUnits).toHaveLength(0);
+    expect(owned.fifthUnits.hiredUnits.map((unit) => unit.name)).toEqual([
+      'Grimhides',
+    ]);
+    expect(source.fifthUnits.hiredUnits).toHaveLength(0);
   });
 
   it('carries a unit into a freshly claimed neutral province', () => {
     const { family, neutral, source, command } = setup();
-    source.addUnit(HiredUnit.ofName('Grimhides')!);
+    source.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
 
     command.moveTo(neutral, { troops: 10 });
-    command.carry(source.hiredUnits[0]);
+    command.carry(source.fifthUnits.hiredUnits[0]);
     command.execute();
 
     expect(neutral.belongsTo(family)).toBe(true);
-    expect(neutral.hiredUnits.map((unit) => unit.name)).toEqual(['Grimhides']);
+    expect(neutral.fifthUnits.hiredUnits.map((unit) => unit.name)).toEqual([
+      'Grimhides',
+    ]);
   });
 
   it('allows a carried unit to join a destination already stationing its type', () => {
     const { source, owned, command } = setup();
-    source.addUnit(HiredUnit.ofName('Grimhides')!);
-    owned.addUnit(HiredUnit.ofName('Grimhides')!);
+    source.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
+    owned.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
 
     command.moveTo(owned, { troops: 10 });
-    command.carry(source.hiredUnits[0]);
+    command.carry(source.fifthUnits.hiredUnits[0]);
     command.execute();
 
-    expect(owned.hiredUnits.map((unit) => unit.name)).toEqual([
+    expect(owned.fifthUnits.hiredUnits.map((unit) => unit.name)).toEqual([
       'Grimhides',
       'Grimhides',
     ]);
-    expect(source.hiredUnits).toHaveLength(0);
+    expect(source.fifthUnits.hiredUnits).toHaveLength(0);
   });
 });

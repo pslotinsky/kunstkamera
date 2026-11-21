@@ -13,7 +13,7 @@ import { Army } from '@/core/domain/Army';
 import { BATTLE_DAY_LIMIT } from '@/core/domain/BattleClock';
 import type { Family } from '@/core/domain/Family';
 import type { General } from '@/core/domain/General';
-import { HiredUnit } from '@/core/domain/HiredUnit';
+import type { HiredUnit } from '@/core/domain/HiredUnit';
 import type { Market } from '@/core/domain/Market';
 import type { Province } from '@/core/domain/Province';
 import { RESOURCE_MAXES } from '@/core/domain/Resources';
@@ -139,7 +139,7 @@ export class EconomyPolicy {
     if (
       !unit ||
       !this.world.isBorder(province) ||
-      province.hiredUnits.length > 0
+      province.fifthUnits.hiredUnits.length > 0
     ) {
       return undefined;
     }
@@ -180,9 +180,7 @@ export class EconomyPolicy {
   ): HiredUnit | undefined {
     const spendable = province.resources.gold - GOLD_RESERVE;
 
-    return province.hirePool
-      .map((name) => HiredUnit.ofName(name))
-      .filter(isDefined)
+    return province.fifthUnits.hireableUnits
       .filter(
         (unit) => unit.cost <= spendable && unit.fameToKeep <= family.fame,
       )
