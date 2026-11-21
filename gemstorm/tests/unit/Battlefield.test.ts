@@ -83,6 +83,8 @@ describe('Battlefield', () => {
     const field = Battlefield.ofProvince(22);
     const flier = new TestUnit({
       name: 'Wyverns',
+      attack: 29,
+      defense: 30,
       move: 3,
       range: 'short',
       flying: true,

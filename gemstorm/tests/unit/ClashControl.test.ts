@@ -71,6 +71,8 @@ describe('ClashControl', () => {
   it('draws a Guardian alone however strong it is', () => {
     const voltryn = new FifthUnit({
       name: 'Voltryn',
+      attack: 28,
+      defense: 28,
       move: 3,
       range: 'circular',
       description: 'the guardian of the Alderwyn gem',

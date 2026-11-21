@@ -252,7 +252,7 @@ export class TacticalSearch {
     const fence = order.fence;
 
     if (target?.isStanding) {
-      battle.strike(unit, target);
+      battle.strike(unit, target, 'average');
     } else if (fence) {
       this.work(unit, fence, works);
     } else {

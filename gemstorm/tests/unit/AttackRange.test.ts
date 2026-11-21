@@ -16,6 +16,8 @@ const field = Battlefield.ofProvince(SKYREACH);
 function guardian(range: RangePattern): FifthUnit {
   return new FifthUnit({
     name: 'Asterion',
+    attack: 29,
+    defense: 29,
     move: 2,
     range,
     description: 'a guardian',

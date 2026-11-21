@@ -3,6 +3,7 @@ import { isDefined } from '@/lib/value/isDefined';
 import type { Army } from './Army';
 import { AttackRange } from './AttackRange';
 import { BattleClock } from './BattleClock';
+import type { MeleeRollMode } from './BattleDamage';
 import { BattleDeployment } from './BattleDeployment';
 import type { Battlefield } from './Battlefield';
 import { type BattleOutcome } from './BattleOutcome';
@@ -117,14 +118,18 @@ export class Battle {
     );
   }
 
-  public strike(unit: BattleUnit, target: BattleUnit): Clash {
+  public strike(
+    unit: BattleUnit,
+    target: BattleUnit,
+    meleeRoll: MeleeRollMode = 'random',
+  ): Clash {
     unit.turnTo(target.cell);
 
-    const clash = unit.strikeAt(target);
+    const clash = unit.strikeAt(target, meleeRoll);
 
     unit.finishTurn();
     this.chargeCasualties(clash.target, clash.losses);
-    this.chargeCasualties(clash.striker, clash.backlash);
+    this.chargeCasualties(clash.striker, clash.strikerLosses);
 
     return clash;
   }

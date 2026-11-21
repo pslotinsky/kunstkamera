@@ -405,10 +405,29 @@ describe('Battle', () => {
 
     expect(battle.findOutcome()!.hasLostUnit(BattleSide.attacker)).toBe(true);
   });
+
+  it('frees a withdrawn Guardian’s cell and counts the withdrawal as a defeat', () => {
+    const guardian = Gem.ofName('Voltryn').guardian;
+    const attacker = makeArmy({ troops: 0, unit: guardian });
+    const battle = makeShared({ attacker });
+    const summoned = battle.getUnits(BattleSide.attacker)[0]!;
+
+    summoned.takeLosses(guardian.maximumStrength - 14);
+
+    expect(summoned.strength).toBe(14);
+    expect(battle.getUnit(summoned.cell)).toBeUndefined();
+    expect(battle.findOutcome()).toMatchObject({
+      winner: BattleSide.defender,
+      reason: 'rout',
+      lostUnits: [BattleSide.attacker],
+    });
+  });
   it('has a Guardian stand alone where troops and hired bands are many', () => {
     const battle = makeBattle(156, 400, HiredUnit.ofName('Grimhides')!);
     const guardian = new FifthUnit({
       name: 'Voltryn',
+      attack: 28,
+      defense: 28,
       move: 3,
       range: 'circular',
       description: 'the guardian of the Alderwyn gem',

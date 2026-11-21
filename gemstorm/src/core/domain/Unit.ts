@@ -7,6 +7,8 @@ const CLEARED_BY_FLIGHT: readonly Terrain[] = ['woods', 'river', 'fence'];
 
 export interface UnitParams {
   readonly name: string;
+  readonly attack: number;
+  readonly defense: number;
   readonly move: number;
   readonly range: RangePattern;
   readonly flying?: boolean;
@@ -15,6 +17,8 @@ export interface UnitParams {
 
 export abstract class Unit {
   public readonly name: string;
+  public readonly attack: number;
+  public readonly defense: number;
   public readonly move: number;
   public readonly range: RangePattern;
   public readonly flying: boolean;
@@ -22,6 +26,8 @@ export abstract class Unit {
 
   public constructor(params: UnitParams) {
     this.name = params.name;
+    this.attack = params.attack;
+    this.defense = params.defense;
     this.move = params.move;
     this.range = params.range;
     this.flying = params.flying ?? false;
@@ -30,8 +36,12 @@ export abstract class Unit {
 
   public abstract get consumesFood(): boolean;
 
-  public get attackFatigue(): number {
-    return 0;
+  public get isSpecial(): boolean {
+    return false;
+  }
+
+  public get minimumActiveStrength(): number {
+    return 1;
   }
 
   public get hasLivery(): boolean {

@@ -34,8 +34,8 @@ export class HiredUnit extends FifthUnit {
     this.fameToKeep = params.fameToKeep ?? 0;
   }
 
-  public override get attackFatigue(): number {
-    return 0;
+  public override get isSpecial(): boolean {
+    return false;
   }
 
   public override get consumesFood(): boolean {

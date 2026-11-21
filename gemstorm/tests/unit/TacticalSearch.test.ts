@@ -62,14 +62,18 @@ describe('TacticalSearch', () => {
     expect(battle.units).toContain(order.target);
   });
 
-  it('rolls no dice while it is thinking', () => {
+  it('rolls no dice while it is considering a melee strike', () => {
     const battle = makeBattle();
     const enemy = new TacticalPolicy(BattleSide.defender);
     const knights = battle
       .getUnits(BattleSide.defender)
       .find((unit) => unit.canBuild)!;
+    station(battle, knights, 9, 4);
+    const target = battle.getUnits(BattleSide.attacker)[0]!;
+    station(battle, target, 9, 3);
     const rolled = vi.spyOn(Math, 'random');
 
+    expect(battle.getTargets(knights)).toContain(target);
     enemy.orderUnit(knights, battle);
 
     expect(rolled).not.toHaveBeenCalled();

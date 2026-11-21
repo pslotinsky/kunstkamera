@@ -2,6 +2,8 @@ import { Unit, type UnitParams } from './Unit';
 
 export type { RangePattern } from './Unit';
 
+const WITHDRAWAL_DIVISOR = 10;
+
 export interface FifthUnitParams extends UnitParams {
   readonly description: string;
   readonly strength: number;
@@ -24,8 +26,14 @@ export class FifthUnit extends Unit {
     return this.currentStrength;
   }
 
-  public override get attackFatigue(): number {
-    return 0.1;
+  public override get isSpecial(): boolean {
+    return true;
+  }
+
+  public override get minimumActiveStrength(): number {
+    return this.isSpecial
+      ? Math.ceil(this.maximumStrength / WITHDRAWAL_DIVISOR)
+      : super.minimumActiveStrength;
   }
 
   public get isSpentAfterBattle(): boolean {

@@ -4,6 +4,8 @@ export class Nerith extends FifthUnit {
   public constructor() {
     super({
       name: 'Nerith',
+      attack: 30,
+      defense: 29,
       description: 'Tide wyrm · one battle · no upkeep',
       strength: 160,
       move: 2,

@@ -1,3 +1,4 @@
+import { BattleDamage, type MeleeRollMode } from './BattleDamage';
 import { BattleSide } from './BattleSide';
 import type { Cell } from './Cell';
 import { Clash } from './Clash';
@@ -6,33 +7,10 @@ import type { RangePattern, Unit } from './Unit';
 
 export type Approach = 'front' | 'flank' | 'rear';
 
-const WAR_LEVERAGE = 0.5;
-const MAX_WAR = 100;
 const FENCE_ODDS_BASE = 0.4;
 const FENCE_ODDS_PER_STRENGTH = 0.005;
 const FENCE_ODDS_FLOOR = 0.3;
 const FENCE_ODDS_CEILING = 0.9;
-const BLOW_RATE = 0.25;
-const BACKLASH_RATE = 0.2;
-
-export const BLOW_WEIGHT: Readonly<Record<Approach, number>> = {
-  front: 1,
-  flank: 1.4,
-  rear: 2,
-};
-
-export const RETALIATION: Readonly<Record<Approach, number>> = {
-  front: 1,
-  flank: 0.6,
-  rear: 0.3,
-};
-
-const RANGE_WEIGHT: Readonly<Record<RangePattern, number>> = {
-  short: 1,
-  long: 0.6,
-  circular: 1,
-  largest: 1,
-};
 
 export interface BattleUnitParams {
   readonly unit: Unit;
@@ -46,7 +24,7 @@ export interface BattleUnitParams {
 export class BattleUnit {
   public readonly unit: Unit;
   public readonly side: BattleSide;
-  private readonly commanderWar: number;
+  public readonly commanderWar: number;
   public readonly committedStrength: number;
 
   public strength: number;
@@ -123,7 +101,7 @@ export class BattleUnit {
   }
 
   public get isStanding(): boolean {
-    return this.strength > 0;
+    return this.strength >= this.unit.minimumActiveStrength;
   }
 
   public get canBuild(): boolean {
@@ -138,10 +116,6 @@ export class BattleUnit {
     const odds = FENCE_ODDS_BASE + this.strength * FENCE_ODDS_PER_STRENGTH;
 
     return Math.min(Math.max(odds, FENCE_ODDS_FLOOR), FENCE_ODDS_CEILING);
-  }
-
-  public get sharpness(): number {
-    return 1 + (this.commanderWar / MAX_WAR) * WAR_LEVERAGE;
   }
 
   public canEnter(cell: Cell): boolean {
@@ -189,20 +163,38 @@ export class BattleUnit {
     this.facing = Facing.toward(this.cell, cell);
   }
 
-  public strikeAt(target: BattleUnit): Clash {
+  public strikeAt(
+    target: BattleUnit,
+    meleeRoll: MeleeRollMode = 'random',
+  ): Clash {
     const approach = target.getApproach(this.cell);
-    const losses = this.measureLosses(target, approach);
-    const backlash = this.measureBacklash(target, approach, losses);
+    const damage = new BattleDamage({
+      striker: this,
+      target,
+      approach,
+      meleeRoll,
+    }).measure();
+    const losses = target.takeLosses(damage.targetLosses);
+    const backlash = this.takeLosses(damage.strikerLosses);
+    const fatigue = this.takeLosses(damage.fatigue);
 
-    target.takeLosses(losses);
-    this.takeLosses(backlash);
-    this.takeLosses(Math.floor(this.strength * this.unit.attackFatigue));
-
-    return new Clash({ striker: this, target, approach, losses, backlash });
+    return new Clash({
+      striker: this,
+      target,
+      approach,
+      losses,
+      backlash,
+      fatigue,
+    });
   }
 
-  public takeLosses(losses: number): void {
-    this.strength = Math.max(this.strength - losses, 0);
+  public takeLosses(losses: number): number {
+    const previous = this.strength;
+    const minimum = this.unit.isSpecial && previous > 0 ? 1 : 0;
+
+    this.strength = Math.max(previous - losses, minimum);
+
+    return previous - this.strength;
   }
 
   public wait(): void {
@@ -217,37 +209,5 @@ export class BattleUnit {
   public refresh(): void {
     this.stepsTaken = 0;
     this.hasActed = false;
-  }
-
-  private measureLosses(target: BattleUnit, approach: Approach): number {
-    const weight = BLOW_WEIGHT[approach] * RANGE_WEIGHT[this.range];
-    const dealt =
-      BLOW_RATE * weight * this.strength * this.leverageAgainst(target);
-
-    return this.countCasualties(dealt, target.strength);
-  }
-
-  private measureBacklash(
-    target: BattleUnit,
-    approach: Approach,
-    losses: number,
-  ): number {
-    const surviving = target.strength - losses;
-    const answers = this.isNextTo(target.cell) && surviving > 0;
-    const taken =
-      BACKLASH_RATE *
-      RETALIATION[approach] *
-      surviving *
-      target.leverageAgainst(this);
-
-    return answers ? this.countCasualties(taken, this.strength) : 0;
-  }
-
-  private countCasualties(dealt: number, left: number): number {
-    return Math.min(Math.max(Math.round(dealt), 1), left);
-  }
-
-  private leverageAgainst(other: BattleUnit): number {
-    return this.sharpness / other.sharpness;
   }
 }
