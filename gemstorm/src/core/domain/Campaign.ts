@@ -1,4 +1,9 @@
+import { ARTIFACTS } from '@/config/artifacts';
+import { sample } from '@/lib/array/sample';
+import { isDefined } from '@/lib/value/isDefined';
+
 import type { Advisor } from './Advisor';
+import { Artifact } from './Artifact';
 import { CampaignOutcome, type DefeatReason } from './CampaignOutcome';
 import type { Coronation } from './Coronation';
 import type { Family } from './Family';
@@ -10,6 +15,7 @@ export class Campaign {
   public readonly advisor: Advisor | undefined;
 
   private readonly world: World;
+  private undiscoveredArtifacts = ARTIFACTS;
   private concluded: CampaignOutcome | undefined;
   private fallen: CampaignOutcome | undefined;
   private succession: Coronation | undefined;
@@ -33,6 +39,24 @@ export class Campaign {
 
   public get canProgress(): boolean {
     return !this.isEnded && !this.isAwaitingHeir;
+  }
+
+  public get hasUndiscoveredArtifacts(): boolean {
+    return this.undiscoveredArtifacts.length > 0;
+  }
+
+  public discoverArtifact(): Artifact | undefined {
+    const discovery = this.hasUndiscoveredArtifacts
+      ? sample(this.undiscoveredArtifacts)
+      : undefined;
+
+    if (isDefined(discovery)) {
+      this.undiscoveredArtifacts = this.undiscoveredArtifacts.filter(
+        (artifact) => artifact !== discovery,
+      );
+    }
+
+    return isDefined(discovery) ? new Artifact(discovery) : undefined;
   }
 
   public awaitHeir(succession: Coronation): void {

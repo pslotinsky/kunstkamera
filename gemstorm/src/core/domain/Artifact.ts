@@ -1,6 +1,3 @@
-import { ARTIFACTS } from '@/config/artifacts';
-import { sample } from '@/lib/array/sample';
-
 import type { CharacteristicsKey } from './Characteristics';
 
 export interface ArtifactParams {
@@ -16,10 +13,6 @@ const CHARACTERISTIC_LABELS: Record<CharacteristicsKey, string> = {
 };
 
 export class Artifact {
-  public static createRandom(): Artifact {
-    return new Artifact(sample(ARTIFACTS));
-  }
-
   public readonly name: string;
   public readonly characteristic: CharacteristicsKey;
   public readonly bonus: number;
