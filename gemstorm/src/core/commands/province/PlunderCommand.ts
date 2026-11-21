@@ -10,10 +10,20 @@ export class PlunderCommand extends InfiltrationCommand {
     super('Plunder', context);
   }
 
+  protected override canTarget(source: Province, target: Province): boolean {
+    return (
+      super.canTarget(source, target) &&
+      source.isNeighbor(target) &&
+      !target.belongsTo(this.context.world.player)
+    );
+  }
+
   protected infiltrate(
     infiltration: Infiltration,
     target: Province,
   ): MissionOutcome {
-    return { kind: 'plunder', target, loot: infiltration.plunder() };
+    const loot = infiltration.plunder();
+
+    return { kind: 'plunder', target, loot };
   }
 }

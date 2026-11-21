@@ -1,4 +1,5 @@
 import { AllyCommand } from '@/core/commands/province/AllyCommand';
+import type { InfiltrationCommand } from '@/core/commands/province/InfiltrationCommand';
 import { NegotiateCommand } from '@/core/commands/province/NegotiateCommand';
 import { PlunderCommand } from '@/core/commands/province/PlunderCommand';
 import { SabotageCommand } from '@/core/commands/province/SabotageCommand';
@@ -10,20 +11,13 @@ import { Envoy } from '@/core/domain/Envoy';
 import type { Family } from '@/core/domain/Family';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
+import { compact } from '@/lib/array/compact';
 import { sample } from '@/lib/array/sample';
 import { isDefined } from '@/lib/value/isDefined';
 
 const BREAK_ODDS = 0.1;
 const PROPOSAL_ODDS = 0.25;
 const COVERT_ODDS = 0.15;
-
-type CovertOrder = 'plunder' | 'sabotage' | 'defection';
-
-const COVERT_ORDERS: readonly CovertOrder[] = [
-  'plunder',
-  'sabotage',
-  'defection',
-];
 
 export class DiplomacyPolicy {
   private readonly context: WorldCommandContext;
@@ -87,38 +81,34 @@ export class DiplomacyPolicy {
   }
 
   private chooseCovertOrder(home: Province): WorldCommand | undefined {
-    const targets = this.world.getHostileNeighbors(home);
+    const plunder = this.chooseInfiltration(new PlunderCommand(this.context));
+    const sabotage = this.chooseInfiltration(new SabotageCommand(this.context));
     const defection = this.chooseDefection(home);
+    const orders = compact([plunder, sabotage, defection]);
+    let choice: WorldCommand | undefined;
 
-    if (
-      (targets.length === 0 && !isDefined(defection)) ||
-      Math.random() >= COVERT_ODDS
-    ) {
-      return undefined;
+    if (orders.length > 0 && Math.random() < COVERT_ODDS) {
+      choice = orders.length === 1 ? orders[0] : sample(orders);
     }
 
-    const order = targets.length > 0 ? sample(COVERT_ORDERS) : 'defection';
-
-    return order === 'defection'
-      ? defection
-      : this.chooseInfiltration(order, targets);
+    return choice;
   }
 
   private chooseInfiltration(
-    order: CovertOrder,
-    targets: readonly Province[],
-  ): WorldCommand {
-    const richest = [...targets].sort(
+    command: InfiltrationCommand,
+  ): InfiltrationCommand | undefined {
+    const targets = command.selectableTargets.map((number) =>
+      this.world.map.getProvince(number),
+    );
+    const [richest] = targets.sort(
       (left, right) => right.resources.gold - left.resources.gold,
-    )[0]!;
-    const infiltration =
-      order === 'plunder'
-        ? new PlunderCommand(this.context)
-        : new SabotageCommand(this.context);
+    );
 
-    infiltration.aimAt(richest);
+    if (isDefined(richest)) {
+      command.aimAt(richest);
+    }
 
-    return infiltration;
+    return isDefined(richest) ? command : undefined;
   }
 
   private chooseDefection(home: Province): WorldCommand | undefined {

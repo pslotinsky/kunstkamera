@@ -12,7 +12,7 @@ import {
   makeWorld,
 } from './factories';
 
-function setup(adjacent = true) {
+function setup({ adjacent = true, hasPlunderTarget = false } = {}) {
   const darian = makeGeneral({ name: 'Darian', charisma: 70 });
   const rival = makeFamily({ name: 'Stormmere', ruler: darian });
   const avar = makeGeneral({ name: 'Avar' });
@@ -23,9 +23,14 @@ function setup(adjacent = true) {
     members: [avar, rhovan],
   });
 
+  const neighbors = adjacent ? [2, 3] : [];
+  const shore = makeProvince({ number: 6, family: makeFamily(), gold: 100 });
+  if (hasPlunderTarget) {
+    neighbors.push(shore.number);
+  }
   const home = makeProvince({
     number: 1,
-    neighbors: adjacent ? [2, 3] : [],
+    neighbors,
     family: rival,
     governor: darian,
     gold: 100,
@@ -57,10 +62,11 @@ function setup(adjacent = true) {
   rival.homeProvince = home;
   player.homeProvince = poor;
 
-  const { world, events } = makeWorld(
-    [home, outpost, rich, poor, extra],
-    player,
-  );
+  const provinces = [home, outpost, rich, poor, extra];
+  if (hasPlunderTarget) {
+    provinces.push(shore);
+  }
+  const { world, events } = makeWorld(provinces, player);
   const policy = new DiplomacyPolicy({ world, events });
   const offers: AllianceOfferedEvent[] = [];
   const missions: MissionReportedEvent[] = [];
@@ -86,6 +92,7 @@ function setup(adjacent = true) {
     rival,
     player,
     rich,
+    shore,
     rhovan,
     offers,
     missions,
@@ -125,14 +132,14 @@ describe('DiplomacyPolicy', () => {
     expect(offers.map((offer) => offer.proposer)).toEqual([rival]);
   });
 
-  it('plunders the richest hostile neighbour on the covert roll', () => {
-    const { missions, rich, play } = setup();
+  it('plunders computer land even when the player owns the richer neighbour', () => {
+    const { missions, shore, play } = setup({ hasPlunderTarget: true });
 
-    play([0.9, 0.1, 0]);
+    play([0.9, 0.1, 0, 0]);
 
     expect(missions[0]?.outcome).toMatchObject({
       kind: 'plunder',
-      target: rich,
+      target: shore,
     });
   });
 
@@ -149,14 +156,26 @@ describe('DiplomacyPolicy', () => {
   });
 
   it('can send a defection offer beyond the borders of its capital', () => {
-    const { missions, rhovan, play } = setup(false);
+    const { missions, rhovan, play } = setup({ adjacent: false });
 
-    play([0.9, 0.1, 0]);
+    play([0.9, 0.1, 0.99, 0]);
 
     expect(missions[0]?.outcome).toMatchObject({
       kind: 'defection',
       general: rhovan,
       persuaded: true,
+    });
+  });
+
+  it('can send a sabotage order to a distant enemy province', () => {
+    const { missions, rich, play } = setup({ adjacent: false });
+
+    play([0.9, 0.1, 0, 0, 0.5]);
+
+    expect(missions[0]?.outcome).toMatchObject({
+      kind: 'sabotage',
+      target: rich,
+      damage: 'cultivation',
     });
   });
 });

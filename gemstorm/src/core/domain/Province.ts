@@ -151,13 +151,15 @@ export class Province {
   }
 
   public get governorUpkeep(): number {
-    const hasResidentGovernor =
-      isDefined(this.governor) && !this.isRemotelyRuled;
     const { cultivation } = this.development;
 
-    return hasResidentGovernor
+    return isDefined(this.residentGovernor)
       ? Math.floor(cultivation / CULTIVATION_PER_GOVERNOR_GOLD)
       : 0;
+  }
+
+  public get residentGovernor(): General | undefined {
+    return this.isRemotelyRuled ? undefined : this.governor;
   }
 
   public get troopFoodUpkeep(): number {

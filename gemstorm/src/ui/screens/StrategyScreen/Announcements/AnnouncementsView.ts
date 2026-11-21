@@ -47,6 +47,7 @@ const DESERTION_REASONS: Record<DesertionReason, string> = {
 const SABOTAGE_DAMAGES: Record<SabotageDamage, string> = {
   troops: 'cut down the troops of',
   loyalty: 'turned the people against the lord of',
+  cultivation: 'destroyed crops in',
   protection: 'burned the walls of',
 };
 
