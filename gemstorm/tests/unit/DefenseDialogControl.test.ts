@@ -92,7 +92,7 @@ describe('DefenseDialogControl', () => {
 
     expect(button('[data-answer="fight"]').disabled).toBe(true);
     expect(button('[data-answer="retreat"]').disabled).toBe(false);
-    expect(button('[data-answer="surrender"]').disabled).toBe(true);
+    expect(button('[data-answer="surrender"]').disabled).toBe(false);
   });
 
   it('fights with the Fifth Unit standing in the province', () => {

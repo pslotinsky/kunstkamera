@@ -531,7 +531,7 @@ describe('Invasion answered by its defender', () => {
     expect(battle.defender.unit).toBe(grimhides);
   });
 
-  it('flees to the chosen distant capital and leaves supplies behind', () => {
+  it('flees to the chosen distant capital and abandons soldiers and supplies', () => {
     const { invasion, target, home } = setupRefuges();
 
     invasion.muster();
@@ -539,8 +539,62 @@ describe('Invasion answered by its defender', () => {
     const report = invasion.answer({ answer: 'retreat', refuge: home });
 
     expect((report as InvasionReport).refuge).toBe(home);
-    expect(home.resources).toMatchObject({ troops: 200, food: 0, gold: 0 });
-    expect(target.resources.gold).toBe(80);
+    expect(home.resources).toMatchObject({ troops: 0, food: 0, gold: 0 });
+    expect(target.resources).toMatchObject({ troops: 100, gold: 80 });
+  });
+
+  it('gives a defender nowhere to retreat when every way out is taken', () => {
+    const { invasion, neighbor, home } = setupRefuges();
+    neighbor.claim(invasion.source.family!);
+    home.claim(invasion.source.family!);
+
+    expect(invasion.getRetreatProvinces(BattleSide.defender)).toEqual([]);
+    expect(invasion.getRetreatProvinces(BattleSide.attacker)).toContain(
+      invasion.source,
+    );
+  });
+
+  it('takes the first answer it may still give when the chosen one is no longer allowed', () => {
+    const { invasion } = setupRefuges();
+
+    invasion.muster();
+
+    expect(invasion.answer({ answer: 'surrender' })).toBeInstanceOf(Battle);
+  });
+
+  it('lets a computer defender leave its Guardian out against a small army', () => {
+    const { world, target, rival } = setupRefuges();
+    rival.gems = [Gem.ofName('Ashwing')];
+    const invasion = new Invasion({
+      world,
+      source: world.map.getProvince(1),
+      target,
+      attacker: makeArmy({ troops: 19 }),
+    });
+
+    const started = invasion.begin();
+
+    expect((started as Battle).defender.unit).toBeUndefined();
+    expect(rival.getReadyGuardians(world.date)).toHaveLength(1);
+  });
+
+  it('sends a computer defender to the strongest own neighbour', () => {
+    const { world, target, neighbor, home } = setupRefuges();
+    target.reduceResources({ troops: 150 });
+    neighbor.addResources({ troops: 40 });
+    home.addResources({ troops: 900 });
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const invasion = new Invasion({
+      world,
+      source: world.map.getProvince(1),
+      target,
+      attacker: makeArmy({ troops: 250 }),
+    });
+
+    const report = invasion.begin() as InvasionReport;
+
+    expect(report.answer).toBe('retreat');
+    expect(report.refuge).toBe(neighbor);
   });
 
   it('leaves the gold behind when fleeing to a neighbour', () => {

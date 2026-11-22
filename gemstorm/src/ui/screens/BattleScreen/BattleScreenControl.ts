@@ -329,7 +329,7 @@ export class BattleScreenControl extends Control<
   private offerRefuges(preferred: Province | undefined): void {
     this.controls.refuge.setOptions(toProvinceOptions(this.refuges));
     this.controls.refuge.setValue(preferred ? String(preferred.number) : '');
-    this.view.allowRetreat(this.side.isAttacker || this.refuges.length > 0);
+    this.view.allowRetreat(this.refuges.length > 0);
   }
 
   private findChosenRefuge(): Province | undefined {

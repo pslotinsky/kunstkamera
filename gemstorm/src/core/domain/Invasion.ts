@@ -104,9 +104,10 @@ export class Invasion {
   public begin(): Battle | InvasionReport {
     this.muster();
 
-    return this.answer({
-      answer: this.policy.decide(this.target),
-    });
+    const answer = this.policy.decide(this.target, this.attacker);
+    const unit = this.policy.chooseUnit(this.target, this.attacker);
+
+    return this.resolve({ answer, unit });
   }
 
   public muster(): void {
@@ -115,9 +116,20 @@ export class Invasion {
   }
 
   public answer(choice: DefenseChoice): Battle | InvasionReport {
-    const answer = this.answers.includes(choice.answer)
-      ? choice.answer
-      : this.policy.decide(this.target);
+    const { answers } = this;
+    const answer = answers.includes(choice.answer) ? choice.answer : answers[0];
+    const chosen = this.defendingUnits.find((ready) => ready === choice.unit);
+    const unit = chosen ?? this.defender.unit;
+
+    return this.resolve({
+      answer: answer ?? 'surrender',
+      refuge: choice.refuge,
+      unit,
+    });
+  }
+
+  private resolve(choice: DefenseChoice): Battle | InvasionReport {
+    const { answer } = choice;
 
     this.answered = answer;
 
@@ -171,11 +183,7 @@ export class Invasion {
   }
 
   private fight(unit: FifthUnit | undefined): Battle {
-    const chosen = this.defendingUnits.find((ready) => ready === unit);
-
-    if (chosen) {
-      this.mustered = this.raiseDefense(chosen);
-    }
+    this.mustered = this.raiseDefense(unit);
 
     const field = Battlefield.ofProvince(this.target.number);
 
@@ -445,16 +453,16 @@ export class Invasion {
 
   private evacuate(refuge: Province): void {
     const { troops, food, gold } = this.target.resources;
-    const carriesSupplies = this.target.isNeighbor(refuge);
-    const carriedFood = carriesSupplies ? food : 0;
-    const carriedGold = carriesSupplies && refuge.isHome ? gold : 0;
+    const isAdjacent = this.target.isNeighbor(refuge);
     const carried = {
-      troops,
-      food: carriedFood,
-      gold: carriedGold,
+      troops: isAdjacent ? troops : 0,
+      food: isAdjacent ? food : 0,
+      gold: isAdjacent && refuge.isHome ? gold : 0,
     };
 
-    this.target.reduceResources(carried);
+    const leaving = { ...carried, troops };
+
+    this.target.reduceResources(leaving);
     refuge.addResources(carried);
   }
 
