@@ -19,7 +19,7 @@ import { WorldMap } from '@/core/domain/WorldMap';
 import { Collection } from '@/lib/Collection';
 
 const START_MONTH = 1;
-const MONTHS_PER_YEAR = 12;
+const BIRTH_MONTH = 1;
 
 // TODO: replaced by the family chosen at new-game setup (feature 16)
 const DEFAULT_PLAYER_FAMILY = 'Alderwyn';
@@ -96,7 +96,7 @@ export class WorldFactory {
     const generals = new Map<string, General>();
 
     for (const definition of scenario.generals) {
-      const birth = new CalendarDate(definition.birth, this.randomMonth());
+      const birth = new CalendarDate(definition.birth, BIRTH_MONTH);
 
       generals.set(
         definition.name,
@@ -113,10 +113,6 @@ export class WorldFactory {
     }
 
     return new Collection(generals, 'general');
-  }
-
-  private randomMonth(): number {
-    return Math.floor(Math.random() * MONTHS_PER_YEAR) + 1;
   }
 
   private createProvinces(scenario: Scenario): Collection<number, Province> {

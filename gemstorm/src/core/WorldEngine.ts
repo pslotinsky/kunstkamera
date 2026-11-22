@@ -252,7 +252,9 @@ export class WorldEngine {
   private startTurn(): void {
     const { current, turnNumber } = this.world.turnQueue;
 
-    if (current) {
+    if (current?.isNeutral()) {
+      this.nextTurn();
+    } else if (current) {
       this.started = turnNumber;
       this.phase = 'reporting-turn';
       this.events.publish(new TurnStartedEvent(turnNumber, current));

@@ -1,7 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { SCENARIOS } from '@/config/scenarios';
+import { WorldEngine } from '@/core/WorldEngine';
 import { WorldFactory } from '@/core/WorldFactory';
+import { EventBus } from '@/lib/EventBus';
 
 describe.each(SCENARIOS)('WorldFactory: $name', (scenario) => {
   const world = new WorldFactory().create({
@@ -32,6 +34,14 @@ describe.each(SCENARIOS)('WorldFactory: $name', (scenario) => {
         definition.name,
       ).toEqual([...definition.gems]);
     }
+  });
+
+  it('gives every general a birthday in the same month', () => {
+    const months = new Set(
+      world.generals.all.map((general) => general.birth.month),
+    );
+
+    expect([...months]).toEqual([1]);
   });
 
   it('starts in January of the scenario year with the chosen house', () => {
@@ -75,5 +85,37 @@ describe('WorldFactory', () => {
     });
 
     expect(world.campaign.advisor?.isEqual(advisor!)).toBe(true);
+  });
+});
+
+describe('WorldFactory starting a campaign', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  const scenario = SCENARIOS[0]!;
+  const DUNMOOR = 1;
+  const AUTHORED_CULTIVATION = 31;
+  const CULTIVATION_AFTER_ONE_JANUARY = 29;
+
+  it('runs the January processing once before the first turn', () => {
+    const world = new WorldFactory().create({
+      scenario,
+      family: scenario.playableFamilies[0]!,
+    });
+    const engine = new WorldEngine(world, new EventBus());
+    const dunmoor = world.map.getProvince(DUNMOOR);
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
+
+    engine.start();
+
+    expect(dunmoor.development.cultivation).toBe(CULTIVATION_AFTER_ONE_JANUARY);
+    expect(world.date.month).toBe(1);
+  });
+
+  it('draws the preview map without any monthly processing', () => {
+    const map = new WorldFactory().createMap(scenario);
+
+    const dunmoor = map.getProvince(DUNMOOR);
+
+    expect(dunmoor.development.cultivation).toBe(AUTHORED_CULTIVATION);
   });
 });

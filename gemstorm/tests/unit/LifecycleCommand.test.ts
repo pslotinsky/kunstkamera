@@ -4,6 +4,7 @@ import { LifecycleCommand } from '@/core/commands/LifecycleCommand';
 import { CalendarDate } from '@/core/domain/CalendarDate';
 import { Gem } from '@/core/domain/Gem';
 import type { General } from '@/core/domain/General';
+import { CampaignEndedEvent } from '@/core/events/CampaignEndedEvent';
 
 import {
   makeCaptive,
@@ -259,5 +260,42 @@ describe('LifecycleCommand', () => {
       cultivation: 9,
       protection: 0,
     });
+  });
+});
+
+describe('LifecycleCommand when the January deaths take everyone', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('ends the campaign once through the heirless fall when no general survives', () => {
+    const ruler = makeGeneral({ name: 'Avar', birth: OLD_BIRTH });
+    const kin = makeGeneral({
+      name: 'Nemer',
+      birth: OLD_BIRTH,
+      lineage: 'Alderwyn',
+    });
+    const rivalRuler = makeGeneral({ name: 'Darian', birth: OLD_BIRTH });
+    const player = makeFamily({
+      name: 'Alderwyn',
+      ruler,
+      members: [ruler, kin],
+    });
+    const rival = makeFamily({ name: 'Stormmere', ruler: rivalRuler });
+    const home = makeProvince({ number: 1, family: player, governor: ruler });
+    const rivalHome = makeProvince({
+      number: 2,
+      family: rival,
+      governor: rivalRuler,
+    });
+    player.moveHome(home);
+    rival.moveHome(rivalHome);
+    const { world, events } = makeWorld([home, rivalHome], player, JANUARY);
+    const endings: CampaignEndedEvent[] = [];
+    events.subscribe(CampaignEndedEvent, (event) => endings.push(event));
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
+    new LifecycleCommand({ world, events }).execute();
+
+    expect(world.campaign.isEnded).toBe(true);
+    expect(endings).toHaveLength(1);
   });
 });

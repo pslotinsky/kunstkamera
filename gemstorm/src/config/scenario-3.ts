@@ -836,7 +836,7 @@ export const SCENARIO_3: Scenario = {
     {
       number: 29,
       family: 'Valecross',
-      governor: 'Dornic',
+      governor: 'Halric',
       gold: 141,
       food: 150,
       troops: 108,

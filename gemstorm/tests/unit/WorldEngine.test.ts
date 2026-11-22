@@ -84,8 +84,46 @@ function drainMonth(fixture: Fixture): void {
   }
 }
 
+const MAY = 5;
+
 describe('WorldEngine', () => {
   afterEach(() => vi.restoreAllMocks());
+
+  it('gives no turn to an unowned province', () => {
+    const fixture = createFixture(new CalendarDate(1186, 4));
+    const started: number[] = [];
+
+    fixture.events.subscribe(TurnStartedEvent, (event) =>
+      started.push(event.province.number),
+    );
+    drainMonth(fixture);
+    drainMonth(fixture);
+
+    expect(started).not.toContain(4);
+    expect(started).toContain(3);
+  });
+
+  it('gives a province claimed before its slot one turn for its new owner', () => {
+    const fixture = createFixture(new CalendarDate(1186, 4));
+    const { world, events } = fixture;
+    const mauseio = world.map.getProvince(4);
+    const hertzog = world.map.getProvince(3);
+    const claimant = hertzog.family!;
+    const turns: { month: number; province: number }[] = [];
+
+    events.subscribe(TurnStartedEvent, (event) =>
+      turns.push({ month: world.date.month, province: event.province.number }),
+    );
+    mauseio.claim(claimant);
+    drainMonth(fixture);
+    drainMonth(fixture);
+
+    const mayTurns = turns.filter(
+      (turn) => turn.month === MAY && turn.province === mauseio.number,
+    );
+
+    expect(mayTurns).toHaveLength(1);
+  });
 
   it('gets an AI ransom demand ready for the player when the battle is reported', () => {
     const { world, events } = createFixture(new CalendarDate(1186, 4));
@@ -363,6 +401,6 @@ describe('WorldEngine', () => {
     events.publish(new TurnReleasedEvent(holder));
     await Promise.resolve();
 
-    expect(started[0]).toBe(ended + 1);
+    expect(started[0]).toBeGreaterThan(ended);
   });
 });
