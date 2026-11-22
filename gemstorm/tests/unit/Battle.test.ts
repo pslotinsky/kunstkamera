@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { Battle } from '@/core/domain/Battle';
+import { Battlefield } from '@/core/domain/Battlefield';
 import { BattleSide } from '@/core/domain/BattleSide';
 import type { BattleUnit } from '@/core/domain/BattleUnit';
 import { Facing } from '@/core/domain/Facing';
@@ -400,6 +402,21 @@ describe('Battle', () => {
     }
 
     expect(battle.attacker.hasTroops).toBe(true);
+    expect(battle.findOutcome()).toBeUndefined();
+  });
+
+  it('refuses a retreat to a side with nowhere to go', () => {
+    const battle = new Battle({
+      attacker: makeArmy(),
+      defender: makeArmy(),
+      field: Battlefield.ofProvince(SKYREACH),
+      retreats: [BattleSide.attacker],
+    });
+
+    battle.retreat(BattleSide.defender);
+
+    expect(battle.canRetreat(BattleSide.defender)).toBe(false);
+    expect(battle.canRetreat(BattleSide.attacker)).toBe(true);
     expect(battle.findOutcome()).toBeUndefined();
   });
 

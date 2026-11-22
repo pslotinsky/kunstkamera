@@ -186,10 +186,15 @@ export class Invasion {
 
     const field = Battlefield.ofProvince(this.target.number);
 
+    const retreats = BattleSide.all.filter(
+      (side) => this.getRetreatProvinces(side).length > 0,
+    );
+
     return new Battle({
       attacker: this.attacker,
       defender: this.defender,
       field,
+      retreats,
     });
   }
 

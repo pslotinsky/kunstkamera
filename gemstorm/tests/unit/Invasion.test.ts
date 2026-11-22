@@ -572,6 +572,17 @@ describe('Invasion answered by its defender', () => {
     expect(target.resources).toMatchObject({ troops: 100, gold: 80 });
   });
 
+  it('starts a battle the cornered defender cannot leave', () => {
+    const { invasion, neighbor, home } = setupRefuges();
+    neighbor.claim(invasion.source.family!);
+    home.claim(invasion.source.family!);
+
+    const battle = invasion.begin() as Battle;
+
+    expect(battle.canRetreat(BattleSide.defender)).toBe(false);
+    expect(battle.canRetreat(BattleSide.attacker)).toBe(true);
+  });
+
   it('gives a defender nowhere to retreat when every way out is taken', () => {
     const { invasion, neighbor, home } = setupRefuges();
     neighbor.claim(invasion.source.family!);

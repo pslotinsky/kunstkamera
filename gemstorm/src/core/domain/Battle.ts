@@ -22,6 +22,7 @@ export interface BattleParams {
   readonly defender: Army;
   readonly field: Battlefield;
   readonly units?: readonly BattleUnit[] | undefined;
+  readonly retreats?: readonly BattleSide[] | undefined;
 }
 
 interface BattleState {
@@ -36,6 +37,7 @@ export class Battle {
   public readonly defender: Army;
   public readonly field: Battlefield;
   public readonly units: readonly BattleUnit[];
+  public readonly retreats: readonly BattleSide[];
 
   public clock: BattleClock;
   public turn: BattleSide;
@@ -48,6 +50,7 @@ export class Battle {
     this.defender = params.defender;
     this.field = params.field;
     this.units = params.units ?? this.deploy(params.field);
+    this.retreats = params.retreats ?? BattleSide.all;
     this.clock = state?.clock ?? new BattleClock();
     this.turn = state?.turn ?? ROUND_OPENING_SIDE;
     this.abandonedBy = state?.abandonedBy;
@@ -68,6 +71,7 @@ export class Battle {
       defender: this.defender.clone(),
       field,
       units,
+      retreats: this.retreats,
     };
     const { clock, turn, abandonedBy, starvedSide } = this;
 
@@ -173,8 +177,14 @@ export class Battle {
     );
   }
 
+  public canRetreat(side: BattleSide): boolean {
+    return this.retreats.some((open) => open.isEqual(side));
+  }
+
   public retreat(side: BattleSide): void {
-    this.abandonedBy = side;
+    if (this.canRetreat(side)) {
+      this.abandonedBy = side;
+    }
   }
 
   public endTurn(): void {

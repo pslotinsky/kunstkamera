@@ -80,7 +80,7 @@ describe('Battlefield', () => {
     expect(place(knights, bridge).canEnter(bridge)).toBe(true);
   });
 
-  it('lets a flier clear woods, water and fences but not stone or wall', () => {
+  it('lets a flier clear woods, water, fences and boulders but not a wall', () => {
     const field = Battlefield.ofProvince(22);
     const flier = new TestUnit({
       name: 'Wyverns',
@@ -103,5 +103,12 @@ describe('Battlefield', () => {
     const wall = field.allCells.find((cell) => cell.terrain === 'wall')!;
 
     expect(place(flier, wall).canEnter(wall)).toBe(false);
+
+    const rocky = BATTLEFIELDS.map((layout) =>
+      Battlefield.ofProvince(layout.province),
+    ).find((each) => each.allCells.some((cell) => cell.terrain === 'boulder'))!;
+    const boulder = rocky.allCells.find((cell) => cell.terrain === 'boulder')!;
+
+    expect(place(flier, boulder).canEnter(boulder)).toBe(true);
   });
 });

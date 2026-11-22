@@ -19,7 +19,7 @@ It also carries the stage's one piece of theatre. The original interrupts the fi
 | Order | What a unit is told to do on its turn: a cell to end on, and — when something of theirs stands in its pattern from there — a unit to strike. Intent rather than history, which is why one is written the same way whether the player clicked it or the enemy's policy chose it. |
 | Landscape | What kind of country a province is: northern snow, woods, wetland or volcanic rock. A fact about the place, recorded on the province beside its name and its neighbours — not something inferred from the field it is fought over. |
 | Rout | A side with nothing left standing on the field. Distinct from starvation and from an emptied treasury of troops: an army whose four bodies of troops are gone but whose Guardian still stands has not routed. |
-| Retreat | Abandoning the field mid-battle. Ends the battle in the enemy's favour; the side picks a refuge for its leadership, and only the share of its survivors its commander's WAR saves is kept (§9.15). Not the same as the defender's pre-battle flight, which 8.1 already answers before a field is ever drawn. |
+| Retreat | Abandoning the field mid-battle. Ends the battle in the enemy's favour, and only a side with somewhere to go may do it, the computer included; the side picks a refuge for its leadership, and only the share of its survivors its commander's WAR saves is kept (§9.15). Not the same as the defender's pre-battle flight, which 8.1 already answers before a field is ever drawn. |
 
 ## Functionality
 

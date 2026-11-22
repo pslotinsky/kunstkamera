@@ -3,7 +3,12 @@ import type { Terrain } from './Cell';
 export type RangePattern = 'short' | 'long' | 'circular' | 'largest';
 
 const OPEN_GROUND: readonly Terrain[] = ['plains', 'bridge'];
-const CLEARED_BY_FLIGHT: readonly Terrain[] = ['woods', 'river', 'fence'];
+const CLEARED_BY_FLIGHT: readonly Terrain[] = [
+  'woods',
+  'river',
+  'fence',
+  'boulder',
+];
 
 export interface UnitParams {
   readonly name: string;
