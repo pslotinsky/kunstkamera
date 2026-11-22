@@ -183,6 +183,10 @@ export class BattleScreenControl extends Control<
   }
 
   private select(battle: Battle, unit: BattleUnit): void {
+    if (this.selected && !this.selected.isEqual(unit)) {
+      this.selected.commitMove();
+    }
+
     const range = unit.stepsLeft > 0 ? battle.getMoveRange(unit) : undefined;
 
     this.selected = unit;
@@ -283,7 +287,15 @@ export class BattleScreenControl extends Control<
       this.view.askForUnit();
     } else if (this.asking === 'site' && battle && unit) {
       this.select(battle, unit);
+    } else if (battle && unit?.canTakeBackMove) {
+      this.takeBackMove(battle, unit);
     }
+  }
+
+  private takeBackMove(battle: Battle, unit: BattleUnit): void {
+    unit.takeBackMove();
+    this.controls.board.place(unit);
+    this.select(battle, unit);
   }
 
   private askToHandOver(): void {
@@ -360,6 +372,7 @@ export class BattleScreenControl extends Control<
   }
 
   private clearOrder(): void {
+    this.selected?.commitMove();
     this.selected = undefined;
     this.clearMarks();
   }

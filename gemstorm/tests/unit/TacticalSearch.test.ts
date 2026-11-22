@@ -94,6 +94,8 @@ describe('TacticalSearch', () => {
     const battle = makeBattle();
     const enemy = new TacticalPolicy(BattleSide.defender);
     const flag = battle.field.attackerFlag;
+    const homeGuard = battle.getUnit(flag)!;
+    station(battle, homeGuard, flag.column + 1, flag.row - 2);
     const rider = station(
       battle,
       battle.getUnits(BattleSide.defender)[0]!,

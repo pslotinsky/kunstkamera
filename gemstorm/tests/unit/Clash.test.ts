@@ -59,6 +59,7 @@ function place(
   return new BattleUnit({
     unit,
     side: BattleSide.attacker,
+    slot: 0,
     commanderWar: war,
     strength,
     cell: field.getCell(column, row)!,

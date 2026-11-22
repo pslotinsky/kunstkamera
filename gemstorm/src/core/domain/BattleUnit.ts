@@ -1,8 +1,11 @@
+import { isDefined } from '@/lib/value/isDefined';
+
 import { BattleDamage, type MeleeRollMode } from './BattleDamage';
 import { BattleSide } from './BattleSide';
 import type { Cell } from './Cell';
 import { Clash } from './Clash';
 import { Facing } from './Facing';
+import { Stance } from './Stance';
 import type { RangePattern, Unit } from './Unit';
 
 export type Approach = 'front' | 'flank' | 'rear';
@@ -15,6 +18,7 @@ const PERCENT = 100;
 export interface BattleUnitParams {
   readonly unit: Unit;
   readonly side: BattleSide;
+  readonly slot: number;
   readonly commanderWar: number;
   readonly strength: number;
   readonly cell: Cell;
@@ -24,6 +28,7 @@ export interface BattleUnitParams {
 export class BattleUnit {
   public readonly unit: Unit;
   public readonly side: BattleSide;
+  public readonly slot: number;
   public readonly commanderWar: number;
   public readonly committedStrength: number;
 
@@ -33,9 +38,12 @@ export class BattleUnit {
   public stepsTaken = 0;
   public hasActed = false;
 
+  private stanceBeforeMove?: Stance | undefined;
+
   public constructor(params: BattleUnitParams) {
     this.unit = params.unit;
     this.side = params.side;
+    this.slot = params.slot;
     this.commanderWar = params.commanderWar;
     this.committedStrength = params.strength;
     this.strength = params.strength;
@@ -47,6 +55,7 @@ export class BattleUnit {
     const copy = new BattleUnit({
       unit: this.unit,
       side: this.side,
+      slot: this.slot,
       commanderWar: this.commanderWar,
       strength: this.committedStrength,
       cell,
@@ -154,6 +163,12 @@ export class BattleUnit {
   }
 
   public moveAlong(path: readonly Cell[]): void {
+    this.stanceBeforeMove ??= new Stance({
+      cell: this.cell,
+      facing: this.facing,
+      stepsTaken: this.stepsTaken,
+    });
+
     const route = [this.cell, ...path];
     const departure = route.at(-2);
     const arrival = route.at(-1);
@@ -208,12 +223,37 @@ export class BattleUnit {
     this.finishTurn();
   }
 
+  public isEqual(other: BattleUnit): boolean {
+    return this.side.isEqual(other.side) && this.slot === other.slot;
+  }
+
+  public get canTakeBackMove(): boolean {
+    return isDefined(this.stanceBeforeMove);
+  }
+
+  public takeBackMove(): void {
+    const stance = this.stanceBeforeMove;
+
+    if (stance) {
+      this.cell = stance.cell;
+      this.facing = stance.facing;
+      this.stepsTaken = stance.stepsTaken;
+      this.stanceBeforeMove = undefined;
+    }
+  }
+
+  public commitMove(): void {
+    this.stanceBeforeMove = undefined;
+  }
+
   public finishTurn(): void {
+    this.commitMove();
     this.stepsTaken = this.move;
     this.hasActed = true;
   }
 
   public refresh(): void {
+    this.commitMove();
     this.stepsTaken = 0;
     this.hasActed = false;
   }

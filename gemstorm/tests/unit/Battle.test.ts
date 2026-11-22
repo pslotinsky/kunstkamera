@@ -64,7 +64,7 @@ describe('Battle', () => {
     expect(mine.at(-1)!.strength).toBe(100);
   });
 
-  it('forms each side up on its own edge around its own flag', () => {
+  it('forms each side up on its own edge, standing on its own flag', () => {
     const battle = makeBattle();
     const mine = battle
       .getUnits(BattleSide.attacker)
@@ -75,7 +75,7 @@ describe('Battle', () => {
 
     expect(mine.every((name) => name.startsWith('A'))).toBe(true);
     expect(theirs.every((name) => name.startsWith('J'))).toBe(true);
-    expect(mine).not.toContain('A4');
+    expect(mine).toContain('A4');
 
     const facings = battle.units.map((unit) => unit.facing);
     const attackers = battle.getUnits(BattleSide.attacker);

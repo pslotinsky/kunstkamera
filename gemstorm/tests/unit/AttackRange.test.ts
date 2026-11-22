@@ -29,6 +29,7 @@ function station(unit: Unit, column: number, row: number): BattleUnit {
   return new BattleUnit({
     unit,
     side: BattleSide.attacker,
+    slot: 0,
     commanderWar: 50,
     strength: 40,
     cell: field.getCell(column, row)!,

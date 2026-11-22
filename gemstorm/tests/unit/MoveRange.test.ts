@@ -15,6 +15,7 @@ function place(unit: Unit, cell: Cell): BattleUnit {
   return new BattleUnit({
     unit,
     side: BattleSide.attacker,
+    slot: 0,
     commanderWar: 50,
     strength: 10,
     cell,

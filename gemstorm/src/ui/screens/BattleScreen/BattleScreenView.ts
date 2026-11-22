@@ -221,19 +221,25 @@ export class BattleScreenView extends View<
 
     this.ask(
       `${unit.name} at ${unit.cell.name} — ${asked}`,
-      builds ? BUILDING : ORDERING,
+      this.listOrders(unit, builds),
     );
   }
 
   public askForStrike(unit: BattleUnit, builds: boolean): void {
     this.ask(
       `${unit.name} at ${unit.cell.name} — strike whom?`,
-      builds ? BUILDING : ORDERING,
+      this.listOrders(unit, builds),
     );
   }
 
   public askForSite(unit: BattleUnit): void {
     this.ask(`${unit.name} at ${unit.cell.name} — fence where?`, SITING);
+  }
+
+  private listOrders(unit: BattleUnit, builds: boolean): readonly Order[] {
+    const orders = builds ? BUILDING : ORDERING;
+
+    return unit.canTakeBackMove ? [...orders, 'cancel'] : orders;
   }
 
   public showWork(unit: BattleUnit, done: boolean, watching = false): void {

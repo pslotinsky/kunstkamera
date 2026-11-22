@@ -17,6 +17,7 @@ function muster(unit: Unit, strength: number, side: BattleSide) {
   return new BattleUnit({
     unit,
     side,
+    slot: 0,
     commanderWar: 50,
     strength,
     cell: new Cell(side.isAttacker ? 0 : 1, 0, 'plains'),
