@@ -15,6 +15,8 @@ import type { Clash } from './Clash';
 import { Facing } from './Facing';
 import { MoveRange } from './MoveRange';
 
+const ROUND_OPENING_SIDE = BattleSide.defender;
+
 export interface BattleParams {
   readonly attacker: Army;
   readonly defender: Army;
@@ -47,7 +49,7 @@ export class Battle {
     this.field = params.field;
     this.units = params.units ?? this.deploy(params.field);
     this.clock = state?.clock ?? new BattleClock();
-    this.turn = state?.turn ?? BattleSide.attacker;
+    this.turn = state?.turn ?? ROUND_OPENING_SIDE;
     this.abandonedBy = state?.abandonedBy;
     this.starvedSide = state?.starvedSide;
 
@@ -178,7 +180,7 @@ export class Battle {
   public endTurn(): void {
     this.turn = this.turn.opposite;
 
-    if (this.turn.isAttacker) {
+    if (this.turn.isEqual(ROUND_OPENING_SIDE)) {
       this.turnClock();
     }
 

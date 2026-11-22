@@ -26,6 +26,8 @@ function makeBattle(unit?: HiredUnit, war = 50) {
     guard.cell = battle.field.getCell(9, 7)!;
   }
 
+  battle.endTurn();
+
   return battle;
 }
 

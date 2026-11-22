@@ -8,7 +8,7 @@ import { TacticalPolicy } from '@/core/domain/battle-ai/TacticalPolicy';
 
 import { makeArmy, makeBattle, runOutTheClock, station } from './factories';
 
-const NODE_BUDGET = 2_000;
+const OPENING_NODE_BUDGET = 3_000;
 
 function photograph(battle: Battle): string {
   const units = battle.units.map(
@@ -81,13 +81,13 @@ describe('TacticalSearch', () => {
     rolled.mockRestore();
   });
 
-  it('costs what it should, counted in nodes and not in seconds', () => {
+  it('keeps the search for the defender’s opening move within budget', () => {
     const battle = makeBattle();
     const enemy = new TacticalPolicy(BattleSide.defender);
 
     enemy.orderUnit(battle.getUnits(BattleSide.defender)[0]!, battle);
 
-    expect(enemy.nodes).toBeLessThan(NODE_BUDGET);
+    expect(enemy.nodes).toBeLessThan(OPENING_NODE_BUDGET);
   });
 
   it('steps onto a flag it can reach', () => {

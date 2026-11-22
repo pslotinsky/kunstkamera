@@ -123,7 +123,7 @@ describe('Battle', () => {
     const battle = makeBattle();
 
     expect(battle.clock.phase).toBe('sunrise');
-    expect(battle.turn).toBe(BattleSide.attacker);
+    expect(battle.turn).toBe(BattleSide.defender);
     expect(battle.attacker.food).toBe(384);
     expect(battle.defender.food).toBe(379);
 
@@ -133,6 +133,29 @@ describe('Battle', () => {
     expect(battle.clock.phase).toBe('sunrise');
     expect(battle.attacker.food).toBe(368);
     expect(battle.defender.food).toBe(358);
+  });
+
+  it('opens each round with the defender and advances the clock after the attacker', () => {
+    const battle = makeBattle();
+    const phases = ['sunrise', 'noon', 'sunset', 'midnight'];
+
+    for (const phase of phases) {
+      expect(battle.turn).toBe(BattleSide.defender);
+      expect(battle.clock.phase).toBe(phase);
+      expect(battle.clock.day).toBe(1);
+
+      battle.endTurn();
+
+      expect(battle.turn).toBe(BattleSide.attacker);
+      expect(battle.clock.phase).toBe(phase);
+      expect(battle.clock.day).toBe(1);
+
+      battle.endTurn();
+    }
+
+    expect(battle.turn).toBe(BattleSide.defender);
+    expect(battle.clock.phase).toBe('sunrise');
+    expect(battle.clock.day).toBe(2);
   });
 
   it('charges for the remaining strength of a hired Fifth Unit', () => {
@@ -161,7 +184,7 @@ describe('Battle', () => {
 
   it('frees a unit to act again only on its own next turn', () => {
     const battle = makeBattle();
-    const rider = battle.getUnits(BattleSide.attacker)[0]!;
+    const rider = battle.getUnits(BattleSide.defender)[0]!;
 
     rider.wait();
     expect(rider.hasActed).toBe(true);
