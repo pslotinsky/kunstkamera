@@ -54,7 +54,7 @@ Quit to the title from the in-game Menu at any time, or after a campaign ends, a
 - Changing scenario resets the family choice to that scenario's first playable family. Backtracking within the same scenario retains valid choices. Each step opens with a choice already made (the first scenario, the first playable family, the first advisor), so Next and Begin campaign are always enabled.
 - Offer Orraven the Chronicler, Brannoc the Marshal, Vesha the Seer, and Quillon the Jester. Display a portrait, name, and short sample of their voice.
 - The final advisor screen also summarizes the scenario and family. Begin campaign commits all three choices once; repeated clicks cannot create multiple campaigns.
-- Start an independent campaign in the scenario's January, following the [monthly turn sequence](./02-the-monthly-turn.md); earlier rival turns may run before the first player turn. Browsing setup does not advance time or change the starting situation.
+- Start an independent campaign in the scenario's January, following the [monthly turn sequence](./02-the-monthly-turn.md). The January processing — yearly decay, old-age deaths, and aging — runs once before the first turn, as the [spec's start date](../spec/12-scenarios.md#start-date) requires; earlier rival turns may run before the first player turn. Browsing setup does not advance time or change the starting situation.
 - After an ending, retain Inspect map and add New Game, which returns to the title. The previous campaign cannot affect subsequent play.
 - A victory ends with the advisor once more: their portrait and one closing line in their voice. A defeat has no advisor line.
 
@@ -106,7 +106,7 @@ The rule follows the original game. It is separate from the computer houses' own
 
 Within War, the attack line takes precedence over the unclaimed-neighbour line. Within Army and within Domestic, when several lines apply the advisor picks one at random.
 
-Allied neighbours count as rivals here: the advisor may urge an attack the alliance forbids.
+Allied neighbours do not count as rivals here: the advisor never urges an attack on an ally, and an allied neighbour does not block the unclaimed-neighbour line or count toward Enlarge the army.
 
 The advisor reads rival soldier counts. Nothing it uses is hidden from the player: any province can be viewed at any time without spending a turn.
 
@@ -137,7 +137,7 @@ In June a province has Loyalty 60 and Cultivation 50, and can pay its upkeep. Do
 
 ### Advice the province cannot follow
 
-In March a province with 500 soldiers borders an allied house's province holding 200. Brannoc urges attacking it. The alliance forbids the attack, and the advisor does not notice; the player gives a different order.
+In March a province with 500 soldiers borders a rival province holding 200. It can pay its upkeep, but not the cost of deploying its army. Brannoc urges attacking it. The province cannot pay to deploy, and the advisor does not notice; the player gives a different order.
 
 ### Advice changes with the season
 
@@ -267,7 +267,7 @@ The selection rule is the original's: the shortage check, the seasonal rotation,
 
 We also keep what the original leaves out. It never checks whether the advised order is affordable or legal, never executes it, and never advises diplomacy, trade, or transport. An earlier draft reused the computer houses' judgement and offered a one-click Follow advice; both were dropped to match the original, where the advisor is a hint and the two rule sets are independent.
 
-The shortage check reads the same quantities the original charges as quarterly upkeep. Gemstorm's upkeep currently charges only hired units, but the check keeps the original's quantities, so Gold for Cultivation and Food for soldiers are still warned about.
+The shortage check reads the same quantities the quarterly upkeep charges: Cultivation ÷ 5 Gold for a resident general, the hired units' costs, and soldiers ÷ 10 Food.
 
 ### Scenario data
 
@@ -355,7 +355,7 @@ When [Save / load](../ROADMAP.md#17-save--load) is available, retain the scenari
 - Backtracking retains valid choices; changing scenario clears the family choice. No turns or reports occur during setup, and repeated Begin campaign activation starts only one campaign.
 - A province short of its upkeep is told so before anything else: both, Gold only, and Food only each give their own line.
 - With no shortage, the same province gets War, Domestic, or Army counsel first according to the month, and the season's fallback line when no topic applies.
-- Attack advice names the neighbouring rival with the fewest soldiers and appears only below two thirds of the province's own; the unclaimed-neighbour line appears only when no neighbour is a rival.
+- Attack advice names the neighbouring rival with the fewest soldiers and appears only below two thirds of the province's own, and never names an ally; the unclaimed-neighbour line appears only when no neighbour is a rival.
 - Thresholds hold at their edges: 299 and 300 soldiers; 74 and 75 Loyalty, Cultivation, and Protection.
 - When several Army or Domestic lines apply, repeated consultation eventually gives each of them and never a line that does not apply.
 - Every advisor gives advice of the same meaning, and the same target where one is named, for the same situation and the same roll; only the wording differs. All fourteen lines exist for all four advisors.

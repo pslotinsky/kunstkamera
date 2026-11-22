@@ -94,15 +94,15 @@ Six hundred battles, every approach against every other on both sides of all thi
 
 **Ship depth four.** Over 120 battles it beats depth two 83 to 37 and no lookahead 75 to 45. Above four nothing separates: three is 57–63, five 7–5, six 6–6. So lookahead earns its place and more of it does not. Four rather than three because the two cannot be told apart directly but can against a weaker opponent — four demolishes depth two where three only edges it. A human has since beaten the shipped depth after a real fight, which is the target.
 
-**Feature 12 should resolve its own battles at three.** Three costs a third as much and plays a battle out in half the time — worth nothing when a human is watching inside a 420ms pace, and a great deal when several rival houses fight in one monthly turn with nobody watching. `TacticalPolicy` takes a depth, so this costs an argument rather than a change.
+**Unwatched battles run shallower.** A battle between two computer houses is played by `AutoBattle` at depth one. Depth is worth nothing to a battle nobody watches and costs a great deal when several rival houses fight in one monthly turn. `TacticalPolicy` takes a depth, so this cost an argument rather than a change.
 
 **Units activate in the order they stand in.** Letting the search choose which unit goes next is most of what sequencing means, and costs about a whole extra ply of thinking. Measured twice over thirty maps: 32–28, then 33–27 — sixty-five battles to fifty-five, under one standard deviation. Built, measured, and removed twice rather than kept as an untested knob.
 
-**Candidates are capped per kind, and that matters.** Every reachable cell paired with everything doable from it is more than the tree can take. Blows, fence work and walks are each ranked and capped _separately_: pooled into one ranking, a blow scores a point or two while a walk scores minus its distance, so every blow outranks every walk and a unit near a couple of them is offered no way to march at all. Ranking reuses `BLOW_WEIGHT` and `RETALIATION` rather than inventing a second opinion about a blow.
+**Candidates are capped per kind, and that matters.** Every reachable cell paired with everything doable from it is more than the tree can take. Blows, fence work and walks are each ranked and capped _separately_: pooled into one ranking, a blow scores a point or two while a walk scores minus its distance, so every blow outranks every walk and a unit near a couple of them is offered no way to march at all. Ranking weighs a blow by its approach and by whether it is exposed to backlash, with weights of its own in `OrderCandidates`. That is only a shortlist heuristic; the search judges each blow by the real damage.
 
 ### What the evaluation counts
 
-`BattleScore` is built for a side, and every term is that side's point of view. The weights live in `config/battle.ts`:
+`BattleScore` is built for a side, and every term is that side's point of view. The weights are constants in `BattleScore`:
 
 | Term     | Measured as                                                                                 |      Weight |
 | -------- | ------------------------------------------------------------------------------------------- | ----------: |
@@ -127,7 +127,7 @@ Closing follows the flag a side is _contesting_ — the enemy's while it can aff
 
 **What a clone has to get right.** Since 8.4 made terrain mutable the cells must be copied and each unit's `cell` rewired to the copy. `Battle`'s ordinary constructor deploys an army into formation, so cloning needs a path of its own. The clock comes along free — `BattleClock` is immutable — but it must come along: `isSpent` is the defender's endurance win and `isDayEnd` is what feeds both armies.
 
-**A trial fence branches, it does not roll.** `Battle.build` and `breakDown` roll against `fenceOdds`, so calling them in the tree would score a whole subtree on one random sample — and a clone rolls its own dice just as badly. The search changes the clone's ground directly and scores the candidate as the odds-weighted blend of fence-up and fence-not-up, the unit's turn being spent either way. Strikes need none of this: `measureLosses` is arithmetic. The real roll happens once, when the screen performs the chosen order.
+**A trial fence branches, it does not roll.** `Battle.build` and `breakDown` roll against `fenceOdds`, so calling them in the tree would score a whole subtree on one random sample — and a clone rolls its own dice just as badly. The search changes the clone's ground directly and scores the candidate as the odds-weighted blend of fence-up and fence-not-up, the unit's turn being spent either way. Strikes need less: a trial strike fixes the melee roll at its average (`'average'`), so no dice are rolled in the tree. The real roll happens once, when the screen performs the chosen order.
 
 **Fences come free to the evaluation.** The Race term floods over ground a unit can actually walk, so a fence across an approach genuinely lengthens the enemy's road and the evaluation discovers fence-building without being told fences are for defence. A fence is judged a _delay_, not a wall — either side can pull one down — because judging it a wall made a single fence worth more than an army and set two units of the same side building and breaking the same cell.
 
@@ -135,9 +135,9 @@ Closing follows the flag a side is _contesting_ — the enemy's while it can aff
 
 **Retreat is the one decision the battle cannot value on its own**, because its whole point is what happens after: an army that walks away still exists, garrisons a province and fights again, and none of that is visible from inside the field. Scored purely tactically it is simply a loss, so a search would never choose it, and §9.16 says the original does.
 
-So it is scored as a defeat softened by the _share_ of the army that comes home — a fraction of the loss, never a multiple of raw strength. Written the second way it grew without limit: at five hundred troops leaving scored zero, which beat playing on in a dead-even position, and any large army withdrew before a blow was struck. §9.15 also says retreat preserves only part of an army and the commander may still be captured, so what leaving truly costs is feature 9's business; today's weight prices the troops alone.
+So it is scored as a defeat softened by the _share_ of the army that comes home — a fraction of the loss, never a multiple of raw strength. Written the second way it grew without limit: at five hundred troops leaving scored zero, which beat playing on in a dead-even position, and any large army withdrew before a blow was struck. §9.15 also says retreat preserves only part of an army and the commander may still be captured. Both now happen in the settlement, but the weight prices the troops alone and leaves the capture risk out.
 
-**It does not fit an order**, being the army's act and not a unit's, so the policy is asked a second question once as a side's turn opens — the same shape `DefensePolicy.chooseRetreat` has on the strategic side. It answers by searching, and answers no outright for a battle already decided, where the best line _is_ the loss and any salvage would beat it.
+**It does not fit an order**, being the army's act and not a unit's, so the policy is asked a second question once as a side's turn opens — the same shape as the defender's choice before battle on the strategic side (`DefensePolicy.decide`). It answers by searching, and answers no outright for a battle already decided, where the best line _is_ the loss and any salvage would beat it.
 
 **Leaving must beat the best of staying, not merely beat losing.** A losing side can still win by supply, and a side down to a remnant has nothing to save — so the softening carries a floor, below which leaving is worth no more than fighting on.
 
@@ -147,7 +147,7 @@ So it is scored as a defeat softened by the _share_ of the army that comes home 
 
 **Auto needs no second formula.** With blows resolved per unit since 8.3, handing the player's army to the same search plays the same game at speed. `AutoResolver` was deleted in 8.2 so that nothing could quietly disagree with the visible combat, and nothing here brings it back.
 
-**It is already a battle with nobody ordering either side**, which is what feature 12 needs when two rival houses fight out of the player's sight. Nothing extra need be built: everything the AI touches is domain, and a headless resolution is a loop over those calls with the animation left out. The screen may own when things happen, never what happens.
+**It is already a battle with nobody ordering either side**, which is what feature 12 needs when two rival houses fight out of the player's sight. Little had to be built: everything the AI touches is domain, and `AutoBattle` is a loop over those calls with the animation left out, used whenever two computer houses fight. The screen may own when things happen, never what happens.
 
 ## Overview
 
@@ -196,6 +196,10 @@ classDiagram
     +isAttacking
     +isWorking
   }
+  class AutoBattle {
+    +fight() BattleOutcome
+  }
+  AutoBattle --> TacticalPolicy : plays both sides with
   TacticalPolicy --> TacticalSearch : asks
   TacticalSearch --> OrderCandidates : shortlists with
   TacticalSearch --> BattleScore : judges by

@@ -18,7 +18,8 @@ A campaign ends in victory when the player's house unifies Aureth, or in defeat 
 
 - win by owning all 30 provinces with no independent rival house remaining, following the [victory condition](../spec/01-high-concept.md#16-victory-conditions) shared by [all scenarios](../spec/12-scenarios.md#122-shared-map-and-victory-condition);
 - count only the player's own land toward victory; alliances and Gem ownership do not satisfy or add to the requirement;
-- lose when the player's house loses its last province, is absorbed, or disbands;
+- lose when the player's house has no province left and its ruler is not held captive, is absorbed, or disbands;
+- let a ruler who flees or is released with no province of the house left claim an unowned neighbouring province and carry on, following [the spec](../spec/03-turn-structure.md#detailed-rules-victory-and-defeat);
 - continue under an eligible heir after the ruler's death or banishment;
 - assess the outcome after each event that changes territory or a house's existence;
 - stop orders and campaign time once the decisive event has settled;
@@ -40,7 +41,9 @@ The player's house is the only one left and owns 29 provinces. An eligible movem
 
 ### Lose the final province
 
-A rival takes the player's last province through battle or a conceded defence. The conquest completes and the campaign ends in defeat, even if the player's ruler survives. This also applies when the province was entrusted and its defence resolved automatically.
+A rival takes the player's last province through battle or a conceded defence. The conquest completes and the campaign ends in defeat, even if the player's ruler escapes. This also applies when the province was entrusted and its defence resolved automatically.
+
+Two cases keep the house alive. A ruler who retreats into an unowned neighbour claims it, so the house still owns land. A captured ruler keeps the landless house in being until his fate is settled: if he is released, the house claims a random unowned neighbour of the lost province and plays on; if there is none, the house falls and the campaign ends in defeat.
 
 ### Lose the house through absorption
 
@@ -110,7 +113,7 @@ sequenceDiagram
   end
   Houses-->>Campaign: Battles, transfers, and succession complete
 
-  alt Chosen house has ended or lost all land
+  alt Chosen house has ended, or lost all land with its ruler not captive
     Campaign->>Campaign: Defeat
   else Chosen house owns all 30 provinces and no rival remains
     Campaign->>Campaign: Victory
@@ -135,8 +138,8 @@ sequenceDiagram
 
 - **Victory conditions:** Owning 29 provinces does not win, even with every Gem. Taking the thirtieth with no rival remaining wins even if a Gem is out of play. Unclaimed and allied provinces do not count as the player's land.
 - **Final transfers:** Conquest, conceded defence, surrender, ruler recruitment, defection, and claiming unowned land each trigger victory when they complete unification.
-- **Loss of territory:** Losing the last province ends the campaign in both player-led and automatically resolved defence, even if the ruler survives.
-- **Capture and absorption:** Capture alone does not defeat a house that retains land; absorption does.
+- **Loss of territory:** Losing the last province ends the campaign in both player-led and automatically resolved defence when the ruler escapes. A ruler who retreats into an unowned neighbour claims it and the campaign continues.
+- **Capture and absorption:** Capture alone does not defeat a house, even one with no land left; absorption does. A released ruler of a landless house claims an unowned neighbour of the lost province, or the house falls when there is none.
 - **Succession:** An eligible heir preserves the campaign. Heirless disbanding ends it even when breakaway houses receive the old territory or reuse its name.
 - **Event completion:** A final conquest retains all losses, spoils, and transfers. An heirless rival's removal does not trigger victory before its breakaway houses and unclaimed provinces are settled.
 - **Finality:** Pending player and rival orders cannot change an ended campaign. Acknowledging the ending or revisiting the map neither resumes play nor produces another ending.
