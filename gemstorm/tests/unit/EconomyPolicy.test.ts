@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { EconomyPolicy } from '@/core/ai/EconomyPolicy';
+import type { WorldCommand } from '@/core/commands/WorldCommand';
 import type { Province } from '@/core/domain/Province';
 
 import {
@@ -73,94 +74,156 @@ function setup(params: SetupParams = {}) {
     player,
   );
   const policy = new EconomyPolicy({ world, events });
-  const play = (province: Province) => {
+  const act = (
+    province: Province,
+    choose: (target: Province) => WorldCommand | undefined,
+  ) => {
     advanceTo(world, province);
-    policy.chooseCommand(province)?.execute();
-  };
-  const trade = (province: Province) => {
-    advanceTo(world, province);
-    policy.chooseTrade(province)?.execute();
+    const command = choose(province);
+    command?.execute();
+
+    return command;
   };
 
-  return { world, interior, middle, border, idle, policy, play, trade };
+  return {
+    world,
+    rival,
+    player,
+    interior,
+    middle,
+    border,
+    enemy,
+    idle,
+    policy,
+    act,
+  };
 }
 
-describe('EconomyPolicy', () => {
-  it('recruits on a border short of its threat, keeping a gold reserve', () => {
-    const threatened = setup({ gold: 100, troops: 50, threat: 200 });
-    const safe = setup({ gold: 100, troops: 50, threat: 40 });
+afterEach(() => vi.restoreAllMocks());
 
-    threatened.play(threatened.border);
-    safe.play(safe.border);
+describe('EconomyPolicy free preparations', () => {
+  it('sells half its Food when short of Gold only', () => {
+    const { border, policy, act } = setup({ gold: 10, food: 500 });
 
-    expect(threatened.border.resources).toMatchObject({ troops: 85, gold: 30 });
-    expect(safe.border.resources.troops).toBe(50);
+    act(border, (province) => policy.chooseTrade(province));
+
+    expect(border.resources.food).toBe(250);
   });
 
-  it('sends interior troops one step toward the border', () => {
-    const { interior, middle, play } = setup();
+  it('spends half its Gold when short of Food only', () => {
+    const { border, policy, act } = setup({ gold: 100, food: 20 });
 
-    play(interior);
+    act(border, (province) => policy.chooseTrade(province));
 
-    expect(middle.resources.troops).toBe(60);
-    expect(interior.resources.troops).toBe(30);
+    expect(border.resources.gold).toBe(50);
   });
 
-  it('hires the strongest unit it can afford for a border without one', () => {
-    const { border, play } = setup({
-      gold: 80,
-      hirePool: ['Grimhides', 'Gargoyles', 'Warriors'],
+  it('does not trade when short of both or of neither', () => {
+    const both = setup({ gold: 10, food: 20 });
+    const neither = setup({ gold: 100, food: 500 });
+
+    expect(both.policy.chooseTrade(both.border)).toBeUndefined();
+    expect(neither.policy.chooseTrade(neither.border)).toBeUndefined();
+  });
+
+  it('draws a quarter of the richest own province’s Gold and Food when short of both', () => {
+    const { interior, border, policy, act } = setup({ gold: 10, food: 20 });
+    interior.addResources({ gold: 400, food: 200 });
+
+    act(border, (province) => policy.chooseSubsidy(province));
+
+    expect(border.resources).toMatchObject({ gold: 110, food: 70 });
+    expect(interior.resources).toMatchObject({ gold: 300, food: 150 });
+  });
+
+  it('gives no subsidy to an entrusted province', () => {
+    const { border, enemy, player, policy } = setup({ gold: 10, food: 20 });
+    enemy.addResources({ gold: 400, food: 200 });
+    border.claim(player);
+    border.entrust();
+
+    expect(policy.chooseSubsidy(border)).toBeUndefined();
+  });
+
+  it('sends one court vassal to a province with no lord, from the ruler’s province', () => {
+    const { interior, middle, border, idle, policy, act } = setup();
+
+    expect(policy.chooseLord(border)).toBeUndefined();
+
+    act(interior, (province) => policy.chooseLord(province));
+
+    expect(middle.governor).toBe(idle);
+  });
+});
+
+describe('EconomyPolicy develop', () => {
+  it.each([
+    [{ cultivation: 40, loyalty: 40, protection: 40 }, 'cultivation'],
+    [{ cultivation: 50, loyalty: 40, protection: 40 }, 'loyalty'],
+    [{ cultivation: 50, loyalty: 50, protection: 40 }, 'protection'],
+  ] as const)('raises the lowest of %j: %s', (stats, raised) => {
+    const { border, policy, act } = setup(stats);
+
+    act(border, (province) => policy.chooseDevelopment(province));
+
+    expect(border.development[raised]).toBeGreaterThan(stats[raised]);
+  });
+
+  it('raises Loyalty with the smallest gift of Food', () => {
+    const { border, policy, act } = setup({ loyalty: 10, food: 500 });
+
+    act(border, (province) => policy.chooseDevelopment(province));
+
+    expect(border.resources.food).toBe(480);
+  });
+
+  it('gives up rather than develop something else when it cannot afford the lowest', () => {
+    const { border, policy } = setup({ loyalty: 10, food: 19 });
+
+    expect(policy.chooseDevelopment(border)).toBeUndefined();
+  });
+});
+
+describe('EconomyPolicy build-up', () => {
+  it('reinforces the own border neighbour with half its soldiers', () => {
+    const { middle, border, policy, act } = setup({ troops: 50 });
+    middle.addResources({ troops: 81 });
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
+    act(middle, (province) => policy.chooseBuildUp(province));
+
+    expect(middle.resources.troops).toBe(41);
+    expect(border.resources.troops).toBe(90);
+  });
+
+  it('recruits an eighth of its Gold in soldiers for a quarter of it', () => {
+    const { border, policy, act } = setup({ gold: 100, troops: 50 });
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+
+    act(border, (province) => policy.chooseBuildUp(province));
+
+    expect(border.resources).toMatchObject({ troops: 62, gold: 76 });
+  });
+
+  it('hires the first offered unit it can afford and control when the chosen build-up fails', () => {
+    const { border, policy, act } = setup({
+      gold: 45,
+      hirePool: ['Lancers', 'Gunners', 'Bugbear'],
     });
+    vi.spyOn(Math, 'random').mockReturnValue(0);
 
-    play(border);
+    act(border, (province) => policy.chooseBuildUp(province));
 
     expect(border.fifthUnits.hiredUnits.map((unit) => unit.name)).toEqual([
-      'Gargoyles',
+      'Gunners',
     ]);
   });
 
-  it('gives food where loyalty runs low', () => {
-    const { border, play } = setup({ gold: 0, loyalty: 10 });
+  it('hires nothing while it already keeps a hired unit', () => {
+    const { border, policy } = setup({ gold: 5, hirePool: ['Bugbear'] });
+    border.fifthUnits.hireUnit(border.fifthUnits.hirePool[0]!);
+    vi.spyOn(Math, 'random').mockReturnValue(0);
 
-    play(border);
-
-    expect(border.development.loyalty).toBeGreaterThan(10);
-  });
-
-  it('develops whichever of cultivation and protection is lower', () => {
-    const { border, play } = setup({
-      gold: 20,
-      cultivation: 80,
-      protection: 30,
-    });
-
-    play(border);
-
-    expect(border.development.protection).toBeGreaterThan(30);
-    expect(border.development.cultivation).toBe(80);
-  });
-
-  it('buys food when short of supply and sells surplus when short of gold', () => {
-    const hungry = setup({ gold: 200, food: 0, troops: 200 });
-    const broke = setup({ gold: 0, food: 900, troops: 50 });
-
-    hungry.trade(hungry.border);
-    broke.trade(broke.border);
-
-    expect(hungry.border.resources.food).toBe(105);
-    expect(broke.border.resources.food).toBe(60);
-    expect(broke.border.resources.gold).toBeGreaterThan(0);
-  });
-
-  it('seats its free vassals in lordless provinces from the home province', () => {
-    const { interior, middle, idle, policy, world } = setup();
-
-    advanceTo(world, interior);
-
-    for (const appointment of policy.chooseLords(interior)) {
-      appointment.execute();
-    }
-
-    expect(middle.governor).toBe(idle);
+    expect(policy.chooseBuildUp(border)).toBeUndefined();
   });
 });

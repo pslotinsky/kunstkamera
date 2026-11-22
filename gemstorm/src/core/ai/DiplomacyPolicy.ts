@@ -1,23 +1,23 @@
 import { AllyCommand } from '@/core/commands/province/AllyCommand';
-import type { InfiltrationCommand } from '@/core/commands/province/InfiltrationCommand';
+import { FakeRaidCommand } from '@/core/commands/province/FakeRaidCommand';
 import { NegotiateCommand } from '@/core/commands/province/NegotiateCommand';
-import { PlunderCommand } from '@/core/commands/province/PlunderCommand';
-import { SabotageCommand } from '@/core/commands/province/SabotageCommand';
 import type {
   WorldCommand,
   WorldCommandContext,
 } from '@/core/commands/WorldCommand';
-import { Envoy } from '@/core/domain/Envoy';
 import type { Family } from '@/core/domain/Family';
+import type { General } from '@/core/domain/General';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
-import { compact } from '@/lib/array/compact';
 import { sample } from '@/lib/array/sample';
 import { isDefined } from '@/lib/value/isDefined';
 
-const BREAK_ODDS = 0.1;
-const PROPOSAL_ODDS = 0.25;
-const COVERT_ODDS = 0.15;
+const ALLIANCE_PROVINCE_LIMIT = 10;
+const BREAK_PROVINCE_MARGIN = 6;
+const MINIMUM_NEIGHBOR_FAMILIES = 2;
+const PERCENT = 100;
+const CHARISMA_PER_PERCENT = 2;
+const FAKE_RAID_ODDS = 1 / 9;
 
 export class DiplomacyPolicy {
   private readonly context: WorldCommandContext;
@@ -27,111 +27,130 @@ export class DiplomacyPolicy {
   }
 
   public chooseCommand(province: Province): WorldCommand | undefined {
-    const family = province.family;
+    const { family } = province;
+    let command: WorldCommand | undefined;
 
-    if (!family || !province.isHome) {
-      return undefined;
+    if (isDefined(family) && province.isHome) {
+      command =
+        this.chooseAllianceMove(province, family) ??
+        this.chooseDefection(family);
     }
 
-    return this.chooseAllianceMove(family) ?? this.chooseCovertOrder(province);
+    return command;
   }
 
-  private chooseAllianceMove(family: Family): WorldCommand | undefined {
-    const ally = new AllyCommand(this.context);
+  public chooseFakeRaid(province: Province): WorldCommand | undefined {
+    const isRaiding = Math.random() < FAKE_RAID_ODDS;
 
-    if (family.ally) {
-      return Math.random() < BREAK_ODDS ? ally : undefined;
-    }
-
-    const partner = this.findPartner(family);
-
-    if (!partner || Math.random() >= PROPOSAL_ODDS) {
-      return undefined;
-    }
-
-    ally.proposeTo(partner);
-
-    return ally;
+    return isRaiding && !province.isEntrusted
+      ? new FakeRaidCommand(this.context)
+      : undefined;
   }
 
-  private findPartner(family: Family): Family | undefined {
-    const envoy = new Envoy({ world: this.world, family });
-    const ownCount = this.world.countProvinces(family);
+  private chooseAllianceMove(
+    province: Province,
+    family: Family,
+  ): WorldCommand | undefined {
+    const strongest = this.findStrongestNeighbor(province);
 
-    return this.findNeighborFamilies(family)
-      .filter(
-        (rival) =>
-          envoy.canAllyWith(rival) &&
-          this.world.countProvinces(rival) > ownCount,
-      )
+    return isDefined(family.ally)
+      ? this.chooseBreak(family, family.ally, strongest)
+      : this.chooseProposal(family, strongest);
+  }
+
+  private chooseProposal(
+    family: Family,
+    strongest: Family | undefined,
+  ): WorldCommand | undefined {
+    const isSmall =
+      this.world.countProvinces(family) <= ALLIANCE_PROVINCE_LIMIT;
+    const canPropose = isSmall && isDefined(strongest);
+    const proposal = new AllyCommand(this.context);
+
+    if (canPropose) {
+      proposal.proposeTo(strongest);
+    }
+
+    return canPropose && proposal.canExecute() ? proposal : undefined;
+  }
+
+  private chooseBreak(
+    family: Family,
+    ally: Family,
+    strongest: Family | undefined,
+  ): WorldCommand | undefined {
+    const owned = this.world.countProvinces(family);
+    const allyOwned = this.world.countProvinces(ally);
+    const hasOutgrown =
+      owned > ALLIANCE_PROVINCE_LIMIT &&
+      owned >= allyOwned + BREAK_PROVINCE_MARGIN;
+    const isStillStrongest = isDefined(strongest) && strongest.isEqual(ally);
+
+    return hasOutgrown || !isStillStrongest
+      ? new AllyCommand(this.context)
+      : undefined;
+  }
+
+  private findStrongestNeighbor(province: Province): Family | undefined {
+    const families = this.findNeighborFamilies(province);
+    const candidates = families
+      .filter((family) => !family.royal)
       .sort(
         (left, right) =>
           this.world.countProvinces(right) - this.world.countProvinces(left),
-      )[0];
+      );
+    const hasEnoughNeighbors = families.length >= MINIMUM_NEIGHBOR_FAMILIES;
+
+    return hasEnoughNeighbors ? candidates[0] : undefined;
   }
 
-  private findNeighborFamilies(family: Family): readonly Family[] {
-    const neighbors = this.world
-      .getFamilyProvinces(family)
-      .flatMap((owned) => this.world.getHostileNeighbors(owned))
+  private findNeighborFamilies(province: Province): readonly Family[] {
+    const { family } = province;
+    const neighbors = this.world.map
+      .getNeighbors(province)
       .map((neighbor) => neighbor.family)
       .filter(isDefined);
+    const others = isDefined(family)
+      ? neighbors.filter((neighbor) => !neighbor.isEqual(family))
+      : [];
 
-    return [...new Map(neighbors.map((rival) => [rival.name, rival])).values()];
+    return this.removeRepeats(others);
   }
 
-  private chooseCovertOrder(home: Province): WorldCommand | undefined {
-    const plunder = this.chooseInfiltration(new PlunderCommand(this.context));
-    const sabotage = this.chooseInfiltration(new SabotageCommand(this.context));
-    const defection = this.chooseDefection(home);
-    const orders = compact([plunder, sabotage, defection]);
-    let choice: WorldCommand | undefined;
+  private removeRepeats(families: readonly Family[]): readonly Family[] {
+    const byName = new Map(families.map((family) => [family.name, family]));
 
-    if (orders.length > 0 && Math.random() < COVERT_ODDS) {
-      choice = orders.length === 1 ? orders[0] : sample(orders);
+    return [...byName.values()];
+  }
+
+  private chooseDefection(family: Family): WorldCommand | undefined {
+    const isTrying = this.rollDefection(family);
+    const command = new NegotiateCommand(this.context);
+    const candidates = isTrying ? this.findDefectionCandidates(command) : [];
+    const hasCandidate = candidates.length > 0;
+
+    if (hasCandidate) {
+      command.persuade(sample(candidates));
     }
 
-    return choice;
+    return hasCandidate ? command : undefined;
   }
 
-  private chooseInfiltration(
-    command: InfiltrationCommand,
-  ): InfiltrationCommand | undefined {
+  private rollDefection(family: Family): boolean {
+    const { charisma } = family.ruler.stats;
+    const chance = charisma / CHARISMA_PER_PERCENT;
+
+    return Math.random() * PERCENT < chance;
+  }
+
+  private findDefectionCandidates(
+    command: NegotiateCommand,
+  ): readonly General[] {
     const targets = command.selectableTargets.map((number) =>
       this.world.map.getProvince(number),
     );
-    const [richest] = targets.sort(
-      (left, right) => right.resources.gold - left.resources.gold,
-    );
 
-    if (isDefined(richest)) {
-      command.aimAt(richest);
-    }
-
-    return isDefined(richest) ? command : undefined;
-  }
-
-  private chooseDefection(home: Province): WorldCommand | undefined {
-    const { family } = home;
-    let defection: NegotiateCommand | undefined;
-
-    if (isDefined(family)) {
-      const envoy = new Envoy({ world: this.world, family });
-      const command = new NegotiateCommand(this.context);
-      const targets = this.world.map.provinces
-        .filter((target) => family.isHostileTo(target.family))
-        .sort((left, right) => right.resources.troops - left.resources.troops);
-      const candidate = targets
-        .flatMap((target) => command.getCandidates(target))
-        .find((general) => envoy.canPersuade(general));
-
-      if (isDefined(candidate)) {
-        command.persuade(candidate);
-        defection = command;
-      }
-    }
-
-    return defection;
+    return targets.flatMap((target) => command.getCandidates(target));
   }
 
   private get world(): World {

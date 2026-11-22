@@ -5,26 +5,39 @@ import { HireMonsterCommand } from '@/core/commands/province/HireMonsterCommand'
 import { MoveTroopsCommand } from '@/core/commands/province/MoveTroopsCommand';
 import { RecruitCommand } from '@/core/commands/province/RecruitCommand';
 import { TradeCommand } from '@/core/commands/province/TradeCommand';
+import { SubsidyCommand } from '@/core/commands/SubsidyCommand';
 import type {
   WorldCommand,
   WorldCommandContext,
 } from '@/core/commands/WorldCommand';
-import { Army } from '@/core/domain/Army';
-import { BATTLE_DAY_LIMIT } from '@/core/domain/BattleClock';
 import type { Family } from '@/core/domain/Family';
 import type { General } from '@/core/domain/General';
 import type { HiredUnit } from '@/core/domain/HiredUnit';
-import type { Market } from '@/core/domain/Market';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
 import { isDefined } from '@/lib/value/isDefined';
 
-import { countSendable } from './garrison';
+interface Reserve {
+  readonly soldiersPerUnit: number;
+  readonly base: number;
+}
 
-const GOLD_RESERVE = 30;
-const LOW_LOYALTY = 40;
-const FOOD_GIFT_SHARE = 0.5;
-const SURPLUS_FACTOR = 2;
+const RESERVES: Record<'gold' | 'food', Reserve> = {
+  gold: { soldiersPerUnit: 8, base: 20 },
+  food: { soldiersPerUnit: 10, base: 30 },
+};
+
+const HALF = 2;
+const REINFORCE_ODDS = 0.5;
+const GOLD_PER_RECRUIT = 8;
+
+type DevelopmentStat = 'cultivation' | 'loyalty' | 'protection';
+
+const DEVELOPMENT_ORDER: readonly DevelopmentStat[] = [
+  'cultivation',
+  'loyalty',
+  'protection',
+];
 
 export class EconomyPolicy {
   private readonly context: WorldCommandContext;
@@ -34,76 +47,188 @@ export class EconomyPolicy {
   }
 
   public chooseTrade(province: Province): TradeCommand | undefined {
-    const supply = this.measureSupply(province);
-    const { food, gold } = province.resources;
-    const trade = new TradeCommand(this.context);
+    const lacksGold = this.isShortOf(province, 'gold');
+    const lacksFood = this.isShortOf(province, 'food');
+    const isShortOfOne = lacksGold !== lacksFood;
+    let trade: TradeCommand | undefined;
 
-    if (food < supply) {
-      const budget = Math.max(gold - GOLD_RESERVE, 0);
-      const needed = this.market.toGold(supply - food);
-
-      trade.direction = 'buy';
-      trade.amount = Math.min(needed, budget, trade.getMaximumAmount('buy'));
-    } else if (gold < DevelopCommand.COST && food > supply * SURPLUS_FACTOR) {
-      const surplus = food - supply * SURPLUS_FACTOR;
-
-      trade.direction = 'sell';
-      trade.amount = Math.min(surplus, trade.getMaximumAmount('sell'));
+    if (isShortOfOne) {
+      trade = new TradeCommand(this.context);
+      trade.direction = lacksGold ? 'sell' : 'buy';
+      trade.amount = this.measureTradeAmount(province, trade);
     }
 
-    return trade.canTrade(trade.direction, trade.amount) ? trade : undefined;
+    const isTradeable = trade?.canTrade(trade.direction, trade.amount);
+
+    return isTradeable ? trade : undefined;
   }
 
-  public chooseLords(province: Province): readonly ChangeLordCommand[] {
-    const family = province.family;
+  public chooseSubsidy(province: Province): SubsidyCommand | undefined {
+    const lacksGold = this.isShortOf(province, 'gold');
+    const lacksFood = this.isShortOf(province, 'food');
+    const isComputerHouse = this.isComputerHouse(province);
+    const donor = this.findRichestProvince(province);
+    let subsidy: SubsidyCommand | undefined;
 
-    if (!family || !province.isHome) {
-      return [];
+    if (lacksGold && lacksFood && isComputerHouse && isDefined(donor)) {
+      subsidy = new SubsidyCommand(this.context);
+      subsidy.grant(donor, province);
     }
 
-    const vassals = [...this.world.getVassals(family)].sort(
-      (left, right) => right.stats.total - left.stats.total,
-    );
-    const lordless = this.world
-      .getFamilyProvinces(family)
-      .filter((owned) => !owned.isHome && !owned.hasLord);
-
-    return lordless
-      .map((owned, index) => this.appoint(owned, vassals[index]))
-      .filter(isDefined);
+    return subsidy;
   }
 
-  public chooseCommand(province: Province): WorldCommand | undefined {
-    return (
-      this.chooseRecruit(province) ??
-      this.chooseReinforcement(province) ??
-      this.chooseHire(province) ??
-      this.chooseGift(province) ??
-      this.chooseDevelopment(province)
-    );
-  }
+  public chooseLord(province: Province): ChangeLordCommand | undefined {
+    const vassal = this.findCourtVassal(province);
+    const lordless = this.findLordlessProvince(province);
+    let change: ChangeLordCommand | undefined;
 
-  private appoint(
-    province: Province,
-    vassal: General | undefined,
-  ): ChangeLordCommand | undefined {
-    if (!vassal) {
-      return undefined;
+    if (province.isHome && isDefined(vassal) && isDefined(lordless)) {
+      change = new ChangeLordCommand(this.context);
+      change.assignLord(lordless, vassal);
     }
-
-    const change = new ChangeLordCommand(this.context);
-
-    change.assignLord(province, vassal);
 
     return change;
   }
 
+  public chooseDevelopment(province: Province): WorldCommand | undefined {
+    const lowest = this.findLowestDevelopment(province);
+
+    return lowest === 'loyalty'
+      ? this.chooseGift(province)
+      : this.chooseImprovement(lowest);
+  }
+
+  public chooseBuildUp(province: Province): WorldCommand | undefined {
+    const reinforces = Math.random() < REINFORCE_ODDS;
+    const chosen = reinforces
+      ? this.chooseReinforcement(province)
+      : this.chooseRecruit(province);
+
+    return chosen ?? this.chooseHire(province);
+  }
+
+  private isShortOf(province: Province, resource: 'gold' | 'food'): boolean {
+    const { troops } = province.resources;
+    const { soldiersPerUnit, base } = RESERVES[resource];
+    const reserve = Math.floor(troops / soldiersPerUnit) + base;
+
+    return province.resources[resource] < reserve;
+  }
+
+  private measureTradeAmount(province: Province, trade: TradeCommand): number {
+    const { gold, food } = province.resources;
+    const offered = trade.direction === 'sell' ? food : gold;
+    const half = Math.floor(offered / HALF);
+    const maximum = trade.getMaximumAmount(trade.direction);
+
+    return Math.min(half, maximum);
+  }
+
+  private isComputerHouse(province: Province): boolean {
+    const { family } = province;
+
+    return isDefined(family) && !family.isEqual(this.world.player);
+  }
+
+  private findRichestProvince(recipient: Province): Province | undefined {
+    const others = this.getHouseProvinces(recipient).filter(
+      (owned) => !owned.isEqual(recipient),
+    );
+    const [richest] = [...others].sort(
+      (left, right) => this.measureWealth(right) - this.measureWealth(left),
+    );
+
+    return richest;
+  }
+
+  private measureWealth(province: Province): number {
+    const { gold, food } = province.resources;
+
+    return gold + food;
+  }
+
+  private findCourtVassal(province: Province): General | undefined {
+    const { family } = province;
+    const vassals = isDefined(family) ? this.world.getVassals(family) : [];
+
+    return vassals[0];
+  }
+
+  private findLordlessProvince(province: Province): Province | undefined {
+    const owned = this.getHouseProvinces(province);
+
+    return owned.find((candidate) => !candidate.isHome && !candidate.hasLord);
+  }
+
+  private getHouseProvinces(province: Province): readonly Province[] {
+    const { family } = province;
+
+    return isDefined(family) ? this.world.getFamilyProvinces(family) : [];
+  }
+
+  private findLowestDevelopment(province: Province): DevelopmentStat {
+    const { development } = province;
+
+    return DEVELOPMENT_ORDER.reduce((lowest, stat) =>
+      development[stat] < development[lowest] ? stat : lowest,
+    );
+  }
+
+  private chooseGift(province: Province): WorldCommand | undefined {
+    const gift = new GiveFoodCommand(this.context);
+    const [smallest] = GiveFoodCommand.AMOUNTS;
+
+    gift.food = smallest ?? 0;
+
+    return province.resources.food >= gift.food ? gift : undefined;
+  }
+
+  private chooseImprovement(
+    target: Exclude<DevelopmentStat, 'loyalty'>,
+  ): WorldCommand | undefined {
+    const develop = new DevelopCommand(this.context);
+
+    develop.target = target;
+
+    return develop.canDevelop(target) ? develop : undefined;
+  }
+
+  private chooseReinforcement(province: Province): WorldCommand | undefined {
+    const isInterior = !this.world.isBorder(province);
+    const front = this.findWeakestFront(province);
+    const troops = Math.floor(province.resources.troops / HALF);
+    const move = new MoveTroopsCommand(this.context);
+
+    if (isInterior && isDefined(front)) {
+      move.moveTo(front, { troops });
+    }
+
+    return move.isReady ? move : undefined;
+  }
+
+  private findWeakestFront(province: Province): Province | undefined {
+    const { family } = province;
+    const fronts = this.world.map
+      .getNeighbors(province)
+      .filter(
+        (neighbor) =>
+          isDefined(family) &&
+          neighbor.belongsTo(family) &&
+          this.world.isBorder(neighbor),
+      );
+    const [weakest] = [...fronts].sort(
+      (left, right) => left.resources.troops - right.resources.troops,
+    );
+
+    return weakest;
+  }
+
   private chooseRecruit(province: Province): WorldCommand | undefined {
     const recruits = this.countAffordableRecruits(province);
-    const isOutnumbered = this.isOutnumbered(province);
     let recruit: RecruitCommand | undefined;
 
-    if (isOutnumbered && recruits > 0) {
+    if (recruits > 0) {
       recruit = new RecruitCommand(this.context);
       recruit.recruit(recruits);
     }
@@ -112,160 +237,37 @@ export class EconomyPolicy {
   }
 
   private countAffordableRecruits(province: Province): number {
-    const spendable = province.resources.gold - GOLD_RESERVE;
-    const affordable = Math.floor(spendable / RecruitCommand.GOLD_PER_TROOP);
+    const affordable = Math.floor(province.resources.gold / GOLD_PER_RECRUIT);
     const room = province.getRoom('troops');
 
     return Math.min(affordable, room);
   }
 
-  private isOutnumbered(province: Province): boolean {
-    const isBorder = this.world.isBorder(province);
-    const threat = this.world.getThreat(province);
-
-    return isBorder && province.resources.troops < threat;
-  }
-
-  private chooseReinforcement(province: Province): WorldCommand | undefined {
-    const front = this.findStepToBorder(province);
-    const sent = countSendable(province);
-
-    if (this.world.isBorder(province) || !front || sent <= 0) {
-      return undefined;
-    }
-
-    const move = new MoveTroopsCommand(this.context);
-
-    move.moveTo(front, { troops: sent });
-
-    return move;
-  }
-
   private chooseHire(province: Province): WorldCommand | undefined {
-    const family = province.family;
-    const unit = family && this.findAffordableUnit(province, family);
+    const { family } = province;
+    const isUnguarded = province.fifthUnits.hiredUnits.length === 0;
+    const unit = isDefined(family)
+      ? this.findAffordableUnit(province, family)
+      : undefined;
+    let hire: HireMonsterCommand | undefined;
 
-    if (
-      !unit ||
-      !this.world.isBorder(province) ||
-      province.fifthUnits.hiredUnits.length > 0
-    ) {
-      return undefined;
+    if (isUnguarded && isDefined(unit)) {
+      hire = new HireMonsterCommand(this.context);
+      hire.hire(unit.name);
     }
-
-    const hire = new HireMonsterCommand(this.context);
-
-    hire.hire(unit.name);
 
     return hire;
-  }
-
-  private chooseGift(province: Province): WorldCommand | undefined {
-    const surplus = province.resources.food - this.measureSupply(province);
-
-    if (province.development.loyalty >= LOW_LOYALTY || surplus <= 0) {
-      return undefined;
-    }
-
-    const budget = Math.ceil(surplus * FOOD_GIFT_SHARE);
-    const affordableAmounts = GiveFoodCommand.AMOUNTS.filter(
-      (amount) => amount <= budget,
-    );
-    const food = affordableAmounts.at(-1);
-    let gift: GiveFoodCommand | undefined;
-
-    if (isDefined(food)) {
-      gift = new GiveFoodCommand(this.context);
-      gift.food = food;
-    }
-
-    return gift;
-  }
-
-  private chooseDevelopment(province: Province): WorldCommand | undefined {
-    const develop = new DevelopCommand(this.context);
-    const { cultivation, protection } = province.development;
-
-    develop.target = protection < cultivation ? 'protection' : 'cultivation';
-
-    return develop.canDevelop(develop.target) ? develop : undefined;
   }
 
   private findAffordableUnit(
     province: Province,
     family: Family,
   ): HiredUnit | undefined {
-    const spendable = province.resources.gold - GOLD_RESERVE;
+    const { gold } = province.resources;
 
-    return province.fifthUnits.hireableUnits
-      .filter(
-        (unit) => unit.cost <= spendable && unit.fameToKeep <= family.fame,
-      )
-      .sort((left, right) => right.strength - left.strength)[0];
-  }
-
-  private findStepToBorder(province: Province): Province | undefined {
-    const family = province.family;
-
-    if (!family) {
-      return undefined;
-    }
-
-    const distances = this.measureBorderDistances(family);
-    const owned = this.world.map
-      .getNeighbors(province)
-      .filter((neighbor) => distances.has(neighbor.number));
-
-    return owned.sort(
-      (left, right) =>
-        distances.get(left.number)! - distances.get(right.number)!,
-    )[0];
-  }
-
-  private measureBorderDistances(family: Family): Map<number, number> {
-    const owned = this.world.getFamilyProvinces(family);
-    let frontier = owned.filter((province) => this.world.isBorder(province));
-    const distances = new Map(
-      frontier.map((province): [number, number] => [province.number, 0]),
+    return province.fifthUnits.hireableUnits.find(
+      (unit) => unit.cost <= gold && !unit.needsMoreFame(family.fame),
     );
-    let steps = 0;
-
-    while (frontier.length > 0) {
-      steps += 1;
-      frontier = this.stepInward(frontier, family, distances);
-
-      for (const province of frontier) {
-        distances.set(province.number, steps);
-      }
-    }
-
-    return distances;
-  }
-
-  private stepInward(
-    frontier: readonly Province[],
-    family: Family,
-    distances: Map<number, number>,
-  ): Province[] {
-    const reached = new Map<number, Province>();
-
-    for (const province of frontier) {
-      for (const neighbor of this.world.map.getNeighbors(province)) {
-        if (neighbor.belongsTo(family) && !distances.has(neighbor.number)) {
-          reached.set(neighbor.number, neighbor);
-        }
-      }
-    }
-
-    return [...reached.values()];
-  }
-
-  private measureSupply(province: Province): number {
-    return Army.measureDailyFood(province.resources.troops) * BATTLE_DAY_LIMIT;
-  }
-
-  private get market(): Market {
-    return this.world.market;
   }
 
   private get world(): World {

@@ -144,14 +144,7 @@ export class AdviceRule {
   }
 
   private getRivalNeighbors(province: Province): readonly Province[] {
-    const { family } = province;
-
-    return this.world.map
-      .getNeighbors(province)
-      .filter(
-        (neighbor) =>
-          neighbor.hasOwner() && !(family && neighbor.belongsTo(family)),
-      );
+    return this.world.getHostileNeighbors(province);
   }
 
   private isWeakEnoughToAttack(rival: Province, province: Province): boolean {

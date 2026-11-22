@@ -35,6 +35,12 @@ export class MoveTroopsCommand extends ProvinceCommand {
       : 0;
   }
 
+  public get isReady(): boolean {
+    const shipment = this.prepareShipment();
+
+    return isDefined(shipment) && this.canMove(shipment);
+  }
+
   public override canExecute(): boolean {
     return this.requiresTarget;
   }
@@ -56,16 +62,21 @@ export class MoveTroopsCommand extends ProvinceCommand {
   }
 
   public execute(): void {
+    const owner = this.currentProvince?.family;
+    const shipment = this.prepareShipment();
+
+    if (isDefined(owner) && isDefined(shipment) && this.canMove(shipment)) {
+      this.march(shipment, owner);
+    }
+  }
+
+  private prepareShipment(): Shipment | undefined {
     const source = this.currentProvince;
     const { target } = this;
 
-    if (isDefined(source?.family) && isDefined(target)) {
-      const shipment = new Shipment({ source, target, cargo: this.cargo });
-
-      if (this.canMove(shipment)) {
-        this.march(shipment, source.family);
-      }
-    }
+    return isDefined(source) && isDefined(target)
+      ? new Shipment({ source, target, cargo: this.cargo })
+      : undefined;
   }
 
   private march(shipment: Shipment, owner: Family): void {

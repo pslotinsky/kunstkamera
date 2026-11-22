@@ -334,6 +334,7 @@ describe('WorldEngine', () => {
 
     const { world, events } = makeWorld([home, entrusted], alderwyn);
 
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
     new WorldEngine(world, events).start();
 
     expect(world.turnQueue.current).toBe(home);

@@ -163,12 +163,12 @@ describe('AdviceRule', () => {
     expect(advise({ rivals: [334] }).meaning).toBe('praise');
   });
 
-  it('urges an attack on an ally as readily as on a rival', () => {
+  it('never urges an attack on an ally', () => {
     const { rule, home, player, rival } = setup({ rivals: [200] });
 
     player.formAlliance(rival);
 
-    expect(rule.advise(home).meaning).toBe('attack');
+    expect(rule.advise(home).meaning).not.toBe('attack');
   });
 
   it('points at an unclaimed neighbour only when no rival borders', () => {
