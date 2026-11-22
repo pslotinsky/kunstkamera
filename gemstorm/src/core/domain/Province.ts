@@ -27,6 +27,7 @@ const REMOTE_PENALTY = 0.5;
 const CULTIVATION_PER_GOVERNOR_GOLD = 5;
 const TROOPS_PER_FOOD = 10;
 const UNOWNED_PROVINCE_FAME = 3;
+const ABANDONED_SUPPLY_DIVISOR = 2;
 
 export type ProvinceStatus =
   | 'capital'
@@ -82,9 +83,20 @@ export class Province {
   }
 
   public unclaim(): void {
+    const { gold, food } = this.resources;
+    const { loyalty } = this.development;
+
     this.resetActionCycle();
     this.house = undefined;
+    this.assignGovernor(undefined);
     this.entrusted = false;
+    this.resources = Resources.from({
+      gold: Math.floor(gold / ABANDONED_SUPPLY_DIVISOR),
+      food: Math.floor(food / ABANDONED_SUPPLY_DIVISOR),
+      troops: 0,
+    });
+    this.reduceDevelopment({ loyalty });
+    this.fifthUnits.releaseUnits();
   }
 
   public assignGovernor(

@@ -3,6 +3,7 @@ import { Unit, type UnitParams } from './Unit';
 export type { RangePattern } from './Unit';
 
 const WITHDRAWAL_DIVISOR = 10;
+const STRENGTH_PER_WAR_LOSS = 50;
 
 export interface FifthUnitParams extends UnitParams {
   readonly description: string;
@@ -34,6 +35,10 @@ export class FifthUnit extends Unit {
     return this.isSpecial
       ? Math.ceil(this.maximumStrength / WITHDRAWAL_DIVISOR)
       : super.minimumActiveStrength;
+  }
+
+  public get warPenalty(): number {
+    return Math.floor(this.maximumStrength / STRENGTH_PER_WAR_LOSS);
   }
 
   public get isSpentAfterBattle(): boolean {

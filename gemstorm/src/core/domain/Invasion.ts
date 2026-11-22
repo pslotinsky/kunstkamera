@@ -18,7 +18,6 @@ import type { Province } from './Province';
 import type { World } from './World';
 
 const GEM_REST_MONTHS = 3;
-const GEM_REST_MONTHS_DEFEATED = 5;
 const ATTACK_VICTORY_FAME = 3;
 const DEFENSE_VICTORY_FAME = 1;
 const DESTROYED_UNIT_FAME_LOSS = 1;
@@ -276,6 +275,12 @@ export class Invasion {
 
   private settleBattle(report: InvasionReport, outcome: BattleOutcome): void {
     this.settleBattleFame(outcome);
+    if (outcome.hasLostUnit(BattleSide.attacker)) {
+      this.mournUnit(report.attacker, this.source.family);
+    }
+    if (outcome.hasLostUnit(BattleSide.defender)) {
+      this.mournUnit(report.defender, this.target.family);
+    }
     this.buryUnits(report);
     this.persistHiredUnitStrengths(report);
     this.restGems(report);
@@ -290,15 +295,17 @@ export class Invasion {
     const winner = outcome.winner.isAttacker ? attacking : defending;
     const loser = outcome.winner.isAttacker ? defending : attacking;
 
-    if (outcome.hasLostUnit(BattleSide.attacker)) {
-      attacking?.loseFame(DESTROYED_UNIT_FAME_LOSS);
-    }
-    if (outcome.hasLostUnit(BattleSide.defender)) {
-      defending?.loseFame(DESTROYED_UNIT_FAME_LOSS);
-    }
-
     winner?.gainFame(victoryFame);
     loser?.loseFame(victoryFame);
+  }
+
+  private mournUnit(army: Army, family: Family | undefined): void {
+    const { unit, commander } = army;
+
+    if (isDefined(unit)) {
+      family?.loseFame(DESTROYED_UNIT_FAME_LOSS);
+      commander.loseWar(unit.warPenalty);
+    }
   }
 
   private overrun(
@@ -309,6 +316,7 @@ export class Invasion {
     const retreatDestination = this.retreatDefender(report);
     const refuge = retreatDestination ?? recoveredAt;
 
+    this.evacuateUnits(report, refuge);
     this.capture();
     if (!report.isFought) {
       this.garrison();
@@ -322,10 +330,10 @@ export class Invasion {
     const outcome = report.outcome!;
 
     if (
-      this.attacker.unit?.isSpentAfterBattle ||
+      report.attacker.unit?.isSpentAfterBattle ||
       outcome.hasLostUnit(BattleSide.attacker)
     ) {
-      this.dismiss(this.attacker.unit, this.source);
+      this.dismiss(report.attacker.unit, this.source);
     }
 
     if (
@@ -370,36 +378,18 @@ export class Invasion {
   }
 
   private restGems(report: InvasionReport): void {
-    const outcome = report.outcome!;
-
-    this.restGem(
-      this.source.family,
-      this.attacker.unit,
-      outcome,
-      BattleSide.attacker,
-    );
-    this.restGem(
-      this.target.family,
-      report.defender.unit,
-      outcome,
-      BattleSide.defender,
-    );
+    this.restGem(this.source.family, report.attacker.unit);
+    this.restGem(this.target.family, report.defender.unit);
   }
 
   private restGem(
     family: Family | undefined,
     unit: FifthUnit | undefined,
-    outcome: BattleOutcome,
-    side: BattleSide,
   ): void {
     const gem = unit && family?.findGem(unit);
 
     if (gem) {
-      const months = outcome.hasLostUnit(side)
-        ? GEM_REST_MONTHS_DEFEATED
-        : GEM_REST_MONTHS;
-
-      gem.rest(this.world.date, months);
+      gem.rest(this.world.date, GEM_REST_MONTHS);
     }
   }
 
@@ -466,10 +456,27 @@ export class Invasion {
     refuge.addResources(carried);
   }
 
+  private evacuateUnits(
+    report: InvasionReport,
+    refuge: Province | undefined,
+  ): void {
+    const units = this.target.fifthUnits;
+    const survivor = report.isFought ? report.defender.unit : undefined;
+    const canShelter =
+      isDefined(refuge) &&
+      isDefined(report.defending) &&
+      refuge.belongsTo(report.defending);
+
+    if (isDefined(survivor) && canShelter) {
+      units.transfer(survivor, refuge.fifthUnits);
+    }
+
+    units.releaseUnits();
+  }
+
   private capture(): void {
     const owner = this.source.family!;
 
-    this.target.fifthUnits.removeSpentUnits();
     this.target.claim(owner);
 
     this.attackingLeadership.occupy(this.target);
@@ -486,13 +493,10 @@ export class Invasion {
   }
 
   private relocateUnit(destination: Province): void {
-    const marched = this.source.fifthUnits.units.find(
-      (unit) => unit === this.attacker.unit,
-    );
+    const { unit } = this.attacker;
 
-    if (marched) {
-      this.source.fifthUnits.removeUnit(marched);
-      destination.fifthUnits.addUnit(marched);
+    if (isDefined(unit)) {
+      this.source.fifthUnits.transfer(unit, destination.fifthUnits);
     }
   }
 
@@ -502,9 +506,9 @@ export class Invasion {
       ? this.source
       : (report.refuge ?? this.source);
     const relocates = !refuge.isEqual(this.source);
+
     if (relocates) {
       this.attackingLeadership.retreatTo(refuge);
-      this.relocateUnit(refuge);
     } else {
       this.attackingLeadership.returnToOrigin(isDefined(captive));
     }

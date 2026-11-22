@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Battle } from '@/core/domain/Battle';
 import { BattleOutcome } from '@/core/domain/BattleOutcome';
 import { BattleSide } from '@/core/domain/BattleSide';
+import { CalendarDate } from '@/core/domain/CalendarDate';
 import { Gem } from '@/core/domain/Gem';
 import { HiredUnit } from '@/core/domain/HiredUnit';
 import { Invasion } from '@/core/domain/Invasion';
@@ -85,17 +86,17 @@ describe('Invasion', () => {
   });
 
   it.each([
-    [BattleSide.attacker, 22, 16],
-    [BattleSide.defender, 18, 20],
+    [BattleSide.attacker, 23, 17],
+    [BattleSide.defender, 19, 21],
   ])(
-    'applies victory, defeat, and Fifth Unit Fame changes when %s wins',
+    'applies victory and defeat Fame changes when %s wins',
     (winner, attackingFame, defendingFame) => {
       const { invasion, mine, rival } = setup();
       mine.loseFame(80);
       rival.loseFame(80);
 
       invasion.begin();
-      invasion.conclude(makeOutcome({ winner, lostUnits: BattleSide.all }));
+      invasion.conclude(makeOutcome({ winner }));
 
       expect(mine.fame).toBe(attackingFame);
       expect(rival.fame).toBe(defendingFame);
@@ -320,6 +321,27 @@ describe('Invasion', () => {
     expect(target.fifthUnits.hiredUnits).not.toContain(grimhides);
   });
 
+  it('takes WAR from the commander whose Fifth Unit was destroyed', () => {
+    const { invasion, target, rival } = setup();
+    const lancers = HiredUnit.ofName('Lancers')!;
+    const marven = target.governor!;
+    const warBefore = marven.stats.war;
+    const fameBefore = rival.fame;
+
+    target.fifthUnits.addUnit(lancers);
+    invasion.muster();
+    invasion.answer({ answer: 'fight', unit: lancers });
+    invasion.conclude(
+      makeOutcome({
+        winner: BattleSide.attacker,
+        lostUnits: [BattleSide.defender],
+      }),
+    );
+
+    expect(marven.stats.war).toBe(warBefore - 3);
+    expect(rival.fame).toBe(fameBefore - 1 - 3);
+  });
+
   it('keeps a surviving hired Fifth Unit at its remaining battle strength', () => {
     const { invasion, target } = setup();
     const grimhides = HiredUnit.ofName('Grimhides')!;
@@ -363,11 +385,15 @@ describe('Invasion', () => {
     expect(gem.countMonthsLeft(world.date)).toBe(3);
   });
 
-  it('rests it longer when the Guardian was destroyed', () => {
-    const { invasion, rival, attacker, world } = setup();
+  it('rests a withdrawn Guardian three months and takes no Fame or WAR for it', () => {
+    const { invasion, rival, target, attacker, world } = setup();
     const gem = Gem.ofName('Asterion');
+    const marven = target.governor!;
+    const warBefore = marven.stats.war;
+    const fameBefore = rival.fame;
 
     rival.gems = [gem];
+    world.date = new CalendarDate(1186, 11);
 
     invasion.begin();
     invasion.conclude(
@@ -377,11 +403,14 @@ describe('Invasion', () => {
         days: 2,
         attackerSurvivors: attacker.troops,
         defenderSurvivors: 0,
-        lostUnits: [BattleSide.defender],
+        lostUnits: [],
       }),
     );
 
-    expect(gem.countMonthsLeft(world.date)).toBe(5);
+    expect(gem.isReadyOn(new CalendarDate(1187, 1))).toBe(false);
+    expect(gem.isReadyOn(new CalendarDate(1187, 2))).toBe(true);
+    expect(marven.stats.war).toBe(warBefore);
+    expect(rival.fame).toBe(fameBefore - 3);
   });
 
   it('does not muster a Guardian whose gem is resting', () => {
@@ -719,5 +748,118 @@ describe('Invasion answered by its defender', () => {
     expect(neighbor.governor).toBe(rival.ruler);
     expect(neighbor.isEntrusted).toBe(false);
     expect(world.getVassals(rival)).toContain(lord);
+  });
+});
+
+describe('Invasion settling Fifth Units', () => {
+  function hire(name: string): HiredUnit {
+    return HiredUnit.ofName(name)!;
+  }
+
+  function attackWith(unit: HiredUnit) {
+    const fixture = setupRefuges();
+    const source = fixture.world.map.getProvince(1);
+    source.fifthUnits.addUnit(unit);
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
+    const invasion = new Invasion({
+      world: fixture.world,
+      source,
+      target: fixture.target,
+      attacker: makeArmy({ commander: source.governor!, unit }),
+    });
+
+    return { ...fixture, source, invasion };
+  }
+
+  function defendWith(unit: HiredUnit) {
+    const fixture = setupRefuges();
+    fixture.target.fifthUnits.addUnit(unit);
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
+    fixture.invasion.muster();
+    fixture.invasion.answer({ answer: 'fight', unit });
+
+    return fixture;
+  }
+
+  it('sends the defender’s surviving hire with its owner to the refuge', () => {
+    const grimhides = hire('Grimhides');
+    const { invasion, target, neighbor } = defendWith(grimhides);
+
+    invasion.conclude(makeOutcome({ winner: BattleSide.attacker }));
+
+    expect(neighbor.fifthUnits.units).toEqual([grimhides]);
+    expect(target.fifthUnits.units).toEqual([]);
+    expect(target.fifthUnits.hirePool).toEqual([]);
+  });
+
+  it('leaves the defender’s surviving hire for hire on the field when the refuge is full', () => {
+    const grimhides = hire('Grimhides');
+    const { invasion, target, neighbor } = defendWith(grimhides);
+    const garrison = [hire('Ogre'), hire('Bugbear'), hire('Fachan')];
+    for (const unit of garrison) {
+      neighbor.fifthUnits.addUnit(unit);
+    }
+
+    invasion.conclude(makeOutcome({ winner: BattleSide.attacker }));
+
+    expect(neighbor.fifthUnits.units).toEqual(garrison);
+    expect(target.fifthUnits.hirePool).toEqual([grimhides]);
+  });
+
+  it('puts every other hire left in the captured province up for hire', () => {
+    const grimhides = hire('Grimhides');
+    const reserve = hire('Ogre');
+    const nerith = new Nerith();
+    const { invasion, target } = defendWith(grimhides);
+    target.fifthUnits.addUnit(reserve);
+    target.fifthUnits.addUnit(nerith);
+
+    invasion.conclude(makeOutcome({ winner: BattleSide.attacker }));
+
+    expect(target.fifthUnits.units).toEqual([]);
+    expect(target.fifthUnits.hirePool).toEqual([reserve]);
+  });
+
+  it('puts the hires up for hire when the defender gives up without a fight', () => {
+    const { invasion, target } = setupRefuges();
+    const reserve = hire('Ogre');
+    target.fifthUnits.addUnit(reserve);
+
+    invasion.muster();
+    invasion.answer({ answer: 'retreat' });
+
+    expect(target.fifthUnits.units).toEqual([]);
+    expect(target.fifthUnits.hirePool).toEqual([reserve]);
+  });
+
+  it('keeps the attacker’s surviving hire at home when the captured province has no slot', () => {
+    const lancers = hire('Lancers');
+    const { invasion, source, target } = attackWith(lancers);
+    const offers = ['Ogre', 'Bugbear', 'Fachan', 'Gunners', 'Spearmen'];
+    for (const name of offers) {
+      target.fifthUnits.addHireOffer(hire(name));
+    }
+
+    invasion.begin();
+    invasion.conclude(makeOutcome({ winner: BattleSide.attacker }));
+
+    expect(source.fifthUnits.units).toEqual([lancers]);
+    expect(target.fifthUnits.units).toEqual([]);
+  });
+
+  it('brings the attacker’s surviving hire back to its origin after a retreat elsewhere', () => {
+    const lancers = hire('Lancers');
+    const { invasion, source, neighbor } = attackWith(lancers);
+    neighbor.unclaim();
+
+    invasion.begin();
+    invasion.conclude(
+      makeOutcome({ winner: BattleSide.defender, reason: 'retreat' }),
+      neighbor,
+    );
+
+    expect(neighbor.belongsTo(source.family!)).toBe(true);
+    expect(neighbor.fifthUnits.units).toEqual([]);
+    expect(source.fifthUnits.units).toEqual([lancers]);
   });
 });

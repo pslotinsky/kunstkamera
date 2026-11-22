@@ -84,7 +84,6 @@ export class Succession {
       : undefined;
 
     if (!isDefined(founded)) {
-      province.assignGovernor(undefined);
       province.unclaim();
     }
 

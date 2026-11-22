@@ -176,7 +176,7 @@ After being used in battle, a Gem becomes unavailable for a period of time.
 
 ### Cooldown Rules
 
-A Gem enters cooldown for 3 months after being used in battle, or 5 months after being defeated.
+A Gem enters cooldown for 3 months when its Guardian joins a battle, however the battle goes for it. An older summary gave 5 months after a defeat; the [detailed rule](#detailed-rules-gems) has a single 3-month rest.
 
 ---
 
@@ -186,16 +186,11 @@ A Gem enters cooldown for 3 months after being used in battle, or 5 months after
 flowchart TD
     Available["Gem Available"]
     Battle["Used in Battle"]
-    Defeated{"Gem Guardian Defeated?"}
     Cooldown3["3-Month Cooldown"]
-    Cooldown5["5-Month Cooldown"]
 
     Available --> Battle
-    Battle --> Defeated
-    Defeated -->|No| Cooldown3
-    Defeated -->|Yes| Cooldown5
+    Battle --> Cooldown3
     Cooldown3 --> Available
-    Cooldown5 --> Available
 ```
 
 ---
@@ -236,7 +231,7 @@ A Gem Guardian loses 10% Strength per attack (this applies when it attacks), eve
 
 A Gem Guardian cannot permanently die.
 
-If defeated, it enters the longer cooldown instead of being destroyed.
+If beaten down, it withdraws from the field instead of being destroyed, and rests the same 3 months as any Guardian that fought.
 
 ---
 
@@ -398,8 +393,7 @@ Gem Guardians are powerful but limited by:
 
 - cooldown;
 - Strength loss from attacking;
-- the single Fifth Unit slot;
-- risk of a longer cooldown if defeated.
+- the single Fifth Unit slot.
 
 The player must decide:
 
@@ -424,11 +418,7 @@ flowchart TD
     Battle --> Used["Gem Used"]
     Used --> Cooldown["3-Month Cooldown"]
 
-    Battle --> Defeated["Guardian Defeated"]
-    Defeated --> LongCooldown["5-Month Cooldown"]
-
     Cooldown --> Gem
-    LongCooldown --> Gem
 
     House --> Collapse["Family Absorbed / Disbanded"]
     Collapse --> Transfer["Gem Transfers to Victor"]

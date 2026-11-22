@@ -36,6 +36,10 @@ export class ProvinceFifthUnits {
     return this.stationed.length < MAX_STATIONED_FIFTH_UNITS;
   }
 
+  public get canStation(): boolean {
+    return this.hasRoomForUnit && this.hasFreeSlot;
+  }
+
   public get hireableUnits(): readonly HiredUnit[] {
     const unavailableNames = new Set(this.hiredUnits.map((unit) => unit.name));
     const hireable: HiredUnit[] = [];
@@ -78,8 +82,16 @@ export class ProvinceFifthUnits {
     this.stationed = this.stationed.filter((stationed) => stationed !== unit);
   }
 
-  public removeSpentUnits(): void {
-    this.stationed = this.stationed.filter((unit) => !unit.isSpentAfterBattle);
+  public transfer(unit: FifthUnit, destination: ProvinceFifthUnits): void {
+    if (this.hasUnit(unit) && destination.canStation) {
+      this.removeUnit(unit);
+      destination.addUnit(unit);
+    }
+  }
+
+  public releaseUnits(): void {
+    this.available = [...this.available, ...this.hiredUnits];
+    this.stationed = [];
   }
 
   public hasUnit(unit: FifthUnit): boolean {

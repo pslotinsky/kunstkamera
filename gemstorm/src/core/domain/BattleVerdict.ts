@@ -74,7 +74,7 @@ export class BattleVerdict {
     return BattleSide.all.filter((side) =>
       this.battle.units.some(
         (unit) =>
-          unit.side.isEqual(side) && unit.isFifthUnit && !unit.isStanding,
+          unit.side.isEqual(side) && unit.isFifthUnit && unit.isDestroyed,
       ),
     );
   }

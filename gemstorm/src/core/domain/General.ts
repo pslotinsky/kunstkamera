@@ -70,6 +70,10 @@ export class General {
     });
   }
 
+  public loseWar(amount: number): void {
+    this.stats = this.stats.decrease({ war: amount });
+  }
+
   public getAgeAt(date: CalendarDate): number {
     return date.year - this.birth.year;
   }

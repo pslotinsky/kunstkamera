@@ -429,7 +429,7 @@ describe('Battle', () => {
     expect(battle.findOutcome()!.hasLostUnit(BattleSide.attacker)).toBe(true);
   });
 
-  it('frees a withdrawn Guardian’s cell and counts the withdrawal as a defeat', () => {
+  it('frees a withdrawn Guardian’s cell and loses the battle without losing the Guardian', () => {
     const guardian = Gem.ofName('Voltryn').guardian;
     const attacker = makeArmy({ troops: 0, unit: guardian });
     const battle = makeShared({ attacker });
@@ -442,7 +442,7 @@ describe('Battle', () => {
     expect(battle.findOutcome()).toMatchObject({
       winner: BattleSide.defender,
       reason: 'rout',
-      lostUnits: [BattleSide.attacker],
+      lostUnits: [],
     });
   });
   it('has a Guardian stand alone where troops and hired bands are many', () => {

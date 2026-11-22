@@ -104,6 +104,10 @@ export class BattleUnit {
     return this.strength >= this.unit.minimumActiveStrength;
   }
 
+  public get isDestroyed(): boolean {
+    return this.strength === 0;
+  }
+
   public get canBuild(): boolean {
     return this.unit.buildsFences;
   }
