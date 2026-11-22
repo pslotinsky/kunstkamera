@@ -1,4 +1,4 @@
-import { html, type TemplateResult } from 'lit-html';
+import { html, nothing, type TemplateResult } from 'lit-html';
 
 import { View } from '@/lib/View';
 import { getPublicAssetUrl } from '@/ui/common/art/getPublicAssetUrl';
@@ -78,7 +78,18 @@ export class SceneView extends View {
       <div class=${styles.layer} data-depth=${layer.depth}>
         <img class=${styles.painting} src=${getPublicAssetUrl(`title/${layer.name}.webp`)}
           alt="" draggable="false" />
+        ${layer.hasRiver ? this.renderRiver() : nothing}
         ${layer.flags.map((flag, index) => this.renderFlag(flag, index))}
+      </div>
+    `;
+  }
+
+  private renderRiver(): TemplateResult {
+    return html`
+      <div class=${styles.river}>
+        <div class=${styles.riverFrame}></div>
+        <div class=${styles.riverFrame}></div>
+        <div class=${styles.riverFrame}></div>
       </div>
     `;
   }

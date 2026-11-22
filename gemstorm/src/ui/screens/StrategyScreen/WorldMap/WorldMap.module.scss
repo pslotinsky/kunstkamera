@@ -13,20 +13,20 @@
 }
 
 .root :global(.province.selectable) {
-  fill: rgba(120, 220, 160, 0.12);
-  stroke: rgba(120, 220, 160, 0.55);
-  stroke-width: 1;
+  fill: rgba(255, 248, 230, 0.18);
+  stroke: rgba(255, 248, 230, 0.7);
+  stroke-width: 1.5;
   cursor: pointer;
 }
 
 .root :global(.province.selectable:hover) {
-  fill: rgba(120, 220, 160, 0.28);
+  fill: rgba(255, 248, 230, 0.3);
 }
 
 .root :global(.province.selected) {
-  fill: rgba(120, 220, 160, 0.45);
-  stroke: rgba(120, 220, 160, 0.9);
-  stroke-width: 1;
+  fill: rgba(255, 248, 230, 0.42);
+  stroke: rgba(255, 248, 230, 0.95);
+  stroke-width: 2;
 }
 
 .root :global(.province-entrusted) {

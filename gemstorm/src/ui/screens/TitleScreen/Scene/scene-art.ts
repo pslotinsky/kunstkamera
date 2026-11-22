@@ -8,6 +8,7 @@ export interface SceneLayer {
   readonly name: string;
   readonly depth: number;
   readonly flags: readonly FlagPlacement[];
+  readonly hasRiver: boolean;
 }
 
 export interface CloudDrift {
@@ -32,8 +33,8 @@ const CASTLE_FLAGS: readonly FlagPlacement[] = [
 ];
 
 export const LAYERS: readonly SceneLayer[] = [
-  { name: 'landscape', depth: 10, flags: CASTLE_FLAGS },
-  { name: 'foliage', depth: 18, flags: [] },
+  { name: 'landscape', depth: 10, flags: CASTLE_FLAGS, hasRiver: true },
+  { name: 'foliage', depth: 18, flags: [], hasRiver: false },
 ];
 
 export const CLOUDS: readonly CloudDrift[] = [
