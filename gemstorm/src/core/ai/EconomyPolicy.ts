@@ -16,7 +16,6 @@ import type { General } from '@/core/domain/General';
 import type { HiredUnit } from '@/core/domain/HiredUnit';
 import type { Market } from '@/core/domain/Market';
 import type { Province } from '@/core/domain/Province';
-import { RESOURCE_MAXES } from '@/core/domain/Resources';
 import type { World } from '@/core/domain/World';
 import { isDefined } from '@/lib/value/isDefined';
 
@@ -100,23 +99,31 @@ export class EconomyPolicy {
   }
 
   private chooseRecruit(province: Province): WorldCommand | undefined {
-    const { troops, gold } = province.resources;
-    const affordable = Math.floor(
-      (gold - GOLD_RESERVE) / RecruitCommand.GOLD_PER_TROOP,
-    );
-    const recruits = Math.min(affordable, RESOURCE_MAXES.troops - troops);
-    const isShort =
-      this.world.isBorder(province) && troops < this.world.getThreat(province);
+    const recruits = this.countAffordableRecruits(province);
+    const isOutnumbered = this.isOutnumbered(province);
+    let recruit: RecruitCommand | undefined;
 
-    if (!isShort || recruits <= 0) {
-      return undefined;
+    if (isOutnumbered && recruits > 0) {
+      recruit = new RecruitCommand(this.context);
+      recruit.recruit(recruits);
     }
 
-    const recruit = new RecruitCommand(this.context);
-
-    recruit.recruit(recruits);
-
     return recruit;
+  }
+
+  private countAffordableRecruits(province: Province): number {
+    const spendable = province.resources.gold - GOLD_RESERVE;
+    const affordable = Math.floor(spendable / RecruitCommand.GOLD_PER_TROOP);
+    const room = province.getRoom('troops');
+
+    return Math.min(affordable, room);
+  }
+
+  private isOutnumbered(province: Province): boolean {
+    const isBorder = this.world.isBorder(province);
+    const threat = this.world.getThreat(province);
+
+    return isBorder && province.resources.troops < threat;
   }
 
   private chooseReinforcement(province: Province): WorldCommand | undefined {

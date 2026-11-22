@@ -45,40 +45,56 @@ describe('Province entrustment', () => {
     return { ruler, lord, family, home, lorded };
   }
 
-  it('is handed only to a lord, never at the capital or a manor', () => {
+  it('may be set anywhere but the province the ruler is in', () => {
     const { ruler, home, lorded } = setup();
     const manor = makeProvince({
       number: 3,
       family: home.family,
       governor: ruler,
     });
+    const empty = makeProvince({ number: 4, family: home.family });
 
     home.entrust();
     manor.entrust();
     lorded.entrust();
+    empty.entrust();
 
     expect(home.isEntrusted).toBe(false);
-    expect(manor.isEntrusted).toBe(false);
+    expect(manor.status).toBe('entrusted');
     expect(lorded.status).toBe('entrusted');
+    expect(empty.status).toBe('entrusted');
   });
 
-  it('lapses when the lord leaves or the province changes hands', () => {
-    const { ruler, lord, lorded } = setup();
-    const rival = makeFamily({ name: 'Stormmere' });
+  it('survives losing or replacing its lord', () => {
+    const { ruler, lorded } = setup();
 
     lorded.entrust();
-    lorded.assignGovernor(lord);
+    lorded.assignGovernor(makeGeneral());
 
     expect(lorded.isEntrusted).toBe(true);
 
     lorded.assignGovernor(ruler);
 
-    expect(lorded.isEntrusted).toBe(false);
+    expect(lorded.isEntrusted).toBe(true);
 
-    lorded.assignGovernor(lord);
+    lorded.assignGovernor(undefined);
+
+    expect(lorded.isEntrusted).toBe(true);
+  });
+
+  it('lapses when the province changes hands or the ruler moves in', () => {
+    const { family, lorded } = setup();
+    const rival = makeFamily({ name: 'Stormmere' });
+
     lorded.entrust();
-    lorded.claim(rival);
+    family.moveHome(lorded);
 
     expect(lorded.isEntrusted).toBe(false);
+
+    const other = makeProvince({ number: 5, family });
+    other.entrust();
+    other.claim(rival);
+
+    expect(other.isEntrusted).toBe(false);
   });
 });

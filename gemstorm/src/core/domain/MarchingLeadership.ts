@@ -15,7 +15,7 @@ export class MarchingLeadership {
       !this.army.remotelyCommanded &&
       this.origin.ruledBy(this.army.commander)
     ) {
-      this.origin.assignGovernor(undefined, { preserveEntrust: true });
+      this.origin.assignGovernor(undefined);
     }
   }
 
@@ -52,7 +52,7 @@ export class MarchingLeadership {
 
     if (!remotelyCommanded) {
       if (!captured) {
-        this.origin.assignGovernor(commander, { preserveEntrust: true });
+        this.origin.assignGovernor(commander);
       } else if (!family.isRuler(commander)) {
         this.leaveUnderDirectRule();
       }
@@ -71,9 +71,7 @@ export class MarchingLeadership {
 
   private leaveUnderDirectRule(): void {
     if (!this.army.remotelyCommanded) {
-      this.origin.assignGovernor(this.origin.family?.ruler, {
-        preserveEntrust: true,
-      });
+      this.origin.assignGovernor(this.origin.family?.ruler);
     }
   }
 }

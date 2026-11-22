@@ -1,6 +1,5 @@
 import type { Market } from '@/core/domain/Market';
 import type { Province } from '@/core/domain/Province';
-import { RESOURCE_MAXES } from '@/core/domain/Resources';
 import { isDefined } from '@/lib/value/isDefined';
 
 import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
@@ -53,8 +52,8 @@ export class TradeCommand extends ProvinceCommand {
     direction: TradeDirection,
   ): number {
     const { gold, food } = province.resources;
-    const foodRoom = RESOURCE_MAXES.food - food;
-    const goldRoom = RESOURCE_MAXES.gold - gold;
+    const foodRoom = province.getRoom('food');
+    const goldRoom = province.getRoom('gold');
 
     return direction === 'buy'
       ? Math.min(gold, this.market.toGold(foodRoom))

@@ -125,7 +125,7 @@ export class ChangeLordCommand extends ProvinceCommand {
     const { world } = this.context;
 
     if (world.getVassals(family).includes(lord) && !world.isHeld(lord)) {
-      target.assignGovernor(lord, { preserveEntrust: true });
+      target.assignGovernor(lord);
       this.complete(target);
     }
   }
@@ -154,8 +154,8 @@ export class ChangeLordCommand extends ProvinceCommand {
       source.assignGovernor(displaced);
       this.recordAction();
     } else {
-      target.assignGovernor(incoming, { preserveEntrust: true });
-      source.assignGovernor(displaced, { preserveEntrust: true });
+      target.assignGovernor(incoming);
+      source.assignGovernor(displaced);
     }
 
     this.publish(new ProvinceUpdatedEvent(source));

@@ -1,9 +1,11 @@
 import type {
   TransportCommand,
   TransportDirection,
+  TransportedResource,
 } from '@/core/commands/province/TransportCommand';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
+import { isDefined } from '@/lib/value/isDefined';
 
 import { AmountFieldControl } from '../AmountField/AmountFieldControl';
 import { CommandDialogControl } from './CommandDialogControl';
@@ -13,11 +15,7 @@ import {
   type TransportTarget,
 } from './TransportDialogView';
 
-const RESOURCE_CEILING = 999;
-
-type Resource = 'gold' | 'food';
-
-const RESOURCES: readonly Resource[] = ['gold', 'food'];
+const RESOURCES: readonly TransportedResource[] = ['gold', 'food'];
 
 const DIRECTIONS: readonly { value: TransportDirection; label: string }[] = [
   { value: 'send', label: 'Send' },
@@ -85,6 +83,7 @@ export class TransportDialogControl extends CommandDialogControl<
         gold: province.resources.gold,
         food: province.resources.food,
       };
+      this.aimCommand();
       this.update();
     }
   }
@@ -97,6 +96,7 @@ export class TransportDialogControl extends CommandDialogControl<
 
   protected override selectChoice(value: string): void {
     this.direction = value as TransportDirection;
+    this.aimCommand();
     this.update();
   }
 
@@ -106,6 +106,13 @@ export class TransportDialogControl extends CommandDialogControl<
       command.destination = this.target.number;
       command.gold = this.controls.gold.value;
       command.food = this.controls.food.value;
+    }
+  }
+
+  private aimCommand(): void {
+    if (isDefined(this.command)) {
+      this.command.direction = this.direction ?? 'send';
+      this.command.destination = this.target?.number;
     }
   }
 
@@ -125,18 +132,7 @@ export class TransportDialogControl extends CommandDialogControl<
     );
   }
 
-  private getMax(resource: Resource): number {
-    const current = this.world.turnQueue.current;
-
-    if (!this.target || !this.direction || !current) {
-      return 0;
-    }
-
-    const balance = current.resources[resource];
-    const onTarget = this.target[resource];
-
-    return this.direction === 'send'
-      ? Math.min(balance, RESOURCE_CEILING - onTarget)
-      : Math.min(onTarget, RESOURCE_CEILING - balance);
+  private getMax(resource: TransportedResource): number {
+    return this.command?.getMaximum(resource) ?? 0;
   }
 }

@@ -183,4 +183,63 @@ describe('MoveTroopsCommand', () => {
     ]);
     expect(source.fifthUnits.hiredUnits).toHaveLength(0);
   });
+
+  it('caps each amount by what the source holds and the target has room for', () => {
+    const { owned, command } = setup();
+    owned.addResources({ troops: 950 });
+    command.moveTo(owned, {});
+
+    expect(command.getMaximum('troops')).toBe(49);
+    expect(command.getMaximum('gold')).toBe(SOURCE_GOLD);
+  });
+
+  it.each([
+    ['more soldiers than the target has room for', { troops: 50 }],
+    ['a negative amount', { gold: 10, food: -5 }],
+    ['a fractional amount', { troops: 2.5 }],
+    ['more Gold than the source holds', { gold: SOURCE_GOLD + 1 }],
+  ])('refuses %s and changes nothing', (_case, cargo) => {
+    const { source, owned, command } = setup();
+    owned.addResources({ troops: 950 });
+
+    command.moveTo(owned, cargo);
+    command.execute();
+
+    expect(source.resources).toMatchObject({
+      gold: SOURCE_GOLD,
+      food: SOURCE_FOOD,
+      troops: SOURCE_TROOPS,
+    });
+    expect(owned.resources).toMatchObject({ gold: 0, food: 0, troops: 950 });
+    expect(source.actionCount).toBe(0);
+  });
+
+  it('moves an exact fit', () => {
+    const { source, owned, command } = setup();
+    owned.addResources({ troops: 950 });
+
+    command.moveTo(owned, { troops: 49 });
+    command.execute();
+
+    expect(owned.resources.troops).toBe(999);
+    expect(source.resources.troops).toBe(SOURCE_TROOPS - 49);
+    expect(source.actionCount).toBe(1);
+  });
+
+  it('refuses to carry a unit into a province with no room to station it', () => {
+    const { source, owned, command } = setup();
+    const carried = HiredUnit.ofName('Grimhides')!;
+    source.fifthUnits.addUnit(carried);
+    for (const name of ['Ogre', 'Bugbear', 'Fachan']) {
+      owned.fifthUnits.addUnit(HiredUnit.ofName(name)!);
+    }
+
+    command.moveTo(owned, { troops: 10 });
+    command.carry(carried);
+    command.execute();
+
+    expect(source.fifthUnits.units).toEqual([carried]);
+    expect(owned.resources.troops).toBe(0);
+    expect(source.actionCount).toBe(0);
+  });
 });

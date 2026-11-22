@@ -59,7 +59,7 @@ export class Coronation {
   private reassignProvinces(heir: General): void {
     for (const province of this.provinces) {
       if (province.ruledBy(this.deposed)) {
-        province.assignGovernor(heir, { preserveEntrust: true });
+        province.assignGovernor(heir);
       }
     }
   }

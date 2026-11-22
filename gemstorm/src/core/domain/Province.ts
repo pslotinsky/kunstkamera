@@ -5,7 +5,12 @@ import { Development, type DevelopmentGains } from './Development';
 import type { Family } from './Family';
 import type { General } from './General';
 import { ProvinceFifthUnits } from './ProvinceFifthUnits';
-import { type ResourceGains, Resources } from './Resources';
+import {
+  RESOURCE_MAXES,
+  type ResourceGains,
+  type ResourceKey,
+  Resources,
+} from './Resources';
 
 export type Landscape = 'snow' | 'woods' | 'river' | 'mountain';
 
@@ -99,14 +104,7 @@ export class Province {
     this.fifthUnits.releaseUnits();
   }
 
-  public assignGovernor(
-    governor: General | undefined,
-    options: { readonly preserveEntrust?: boolean } = {},
-  ): void {
-    if (!options.preserveEntrust && !this.ruledBy(governor)) {
-      this.entrusted = false;
-    }
-
+  public assignGovernor(governor?: General): void {
     this.governor = governor;
   }
 
@@ -115,7 +113,7 @@ export class Province {
   }
 
   public canEntrust(): boolean {
-    return this.hasLord && !this.isHome;
+    return this.hasOwner() && !this.isHome;
   }
 
   public entrust(): void {
@@ -151,10 +149,10 @@ export class Province {
 
     if (this.isHome) {
       status = 'capital';
-    } else if (this.isRemotelyRuled) {
-      status = 'remote';
     } else if (this.isEntrusted) {
       status = 'entrusted';
+    } else if (this.isRemotelyRuled) {
+      status = 'remote';
     } else if (this.hasLord) {
       status = 'lorded';
     }
@@ -182,6 +180,10 @@ export class Province {
     const stats = this.governor?.stats ?? Characteristics.empty();
 
     return this.isRemotelyRuled ? stats.multiplyAll(REMOTE_PENALTY) : stats;
+  }
+
+  public getRoom(resource: ResourceKey): number {
+    return RESOURCE_MAXES[resource] - this.resources[resource];
   }
 
   public addResources(gains: ResourceGains): void {

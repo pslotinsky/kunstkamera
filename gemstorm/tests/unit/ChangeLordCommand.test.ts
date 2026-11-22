@@ -100,15 +100,17 @@ describe('ChangeLordCommand', () => {
     expect(byBeran.isEntrusted).toBe(true);
   });
 
-  it('replaces a lord with a vassal and returns the displaced lord to court', () => {
+  it('replaces a lord with a vassal, keeps Entrust, and returns the displaced lord to court', () => {
     const { beran, nemer, family, byBeran, byNemer, world, command } = setup();
     command.ruleDirectly(byBeran);
     command.execute();
+    byNemer.entrust();
 
     command.assignLord(byNemer, beran);
     command.execute();
 
     expect(byNemer.governor).toBe(beran);
+    expect(byNemer.isEntrusted).toBe(true);
     expect(world.getVassals(family)).toEqual([nemer]);
   });
 
