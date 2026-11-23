@@ -1,24 +1,22 @@
 // biome-ignore-all lint/correctness/noUnknownPseudoClass: :global is CSS-modules syntax; this partial is only included from *.module.scss files.
+@use "./ambience/ambience";
+
 @mixin map-art {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
   background: linear-gradient(180deg, var(--ocean-top), var(--ocean-bottom));
   container-type: size;
 
   svg {
     display: block;
-    width: min(100cqw, 100cqh * 1448 / 1086);
+    width: 100cqw;
     height: auto;
-    mask-image:
-      linear-gradient(to right, transparent, #000 4%, #000 96%, transparent),
-      linear-gradient(to bottom, transparent, #000 4%, #000 96%, transparent);
-    mask-composite: intersect;
   }
 
   :global(.province) {
     fill: transparent;
   }
+
+  @include ambience.ambience;
 
   :global(.province-markers) {
     pointer-events: none;

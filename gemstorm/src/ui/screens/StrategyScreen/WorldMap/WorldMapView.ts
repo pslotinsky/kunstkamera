@@ -7,6 +7,7 @@ import type { InvasionReport } from '@/core/domain/InvasionReport';
 import type { Province } from '@/core/domain/Province';
 import { View } from '@/lib/View';
 
+import { MapAmbience } from './ambience/MapAmbience';
 import { ProvinceMarkers } from './ProvinceMarkers';
 import { ProvinceSelectedEvent } from './ProvinceSelectedEvent';
 import type { WorldMapContext } from './types';
@@ -83,6 +84,7 @@ export class WorldMapView extends View<WorldMapContext> {
       return;
     }
 
+    new MapAmbience(svg).play(this.lifetime.signal);
     this.markers = new ProvinceMarkers(svg);
 
     for (const province of this.context.map.provinces) {

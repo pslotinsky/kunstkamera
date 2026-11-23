@@ -1,0 +1,93 @@
+// biome-ignore-all lint/correctness/noUnknownPseudoClass: :global is CSS-modules syntax; this partial is only included from *.module.scss files.
+@use "sass:math";
+
+$volcano-smoke-loop: 8s;
+$volcano-smoke-frame: math.div($volcano-smoke-loop, 8);
+
+@mixin ambience {
+  @keyframes volcano-smoke {
+    0%,
+    25%,
+    100% {
+      opacity: 0;
+    }
+    12.5% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes volcano-flicker {
+    0% {
+      opacity: 0.18;
+      transform: scale(0.93, 0.9);
+    }
+    30% {
+      opacity: 0.4;
+      transform: scale(1.03, 1.08);
+    }
+    55% {
+      opacity: 0.25;
+      transform: scale(0.98, 0.98);
+    }
+    80% {
+      opacity: 0.45;
+      transform: scale(1.05, 1.12);
+    }
+    100% {
+      opacity: 0.22;
+      transform: scale(0.95, 0.95);
+    }
+  }
+
+  :global(.map-canvas) {
+    pointer-events: none;
+  }
+
+  :global(.map-canvas canvas) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  :global(.volcano) {
+    pointer-events: none;
+  }
+
+  :global(.volcano-flame) {
+    mix-blend-mode: screen;
+    transform-box: fill-box;
+    transform-origin: 50% 85%;
+    animation: volcano-flicker 1.3s ease-in-out infinite alternate;
+
+    &:nth-of-type(2) {
+      animation-duration: 0.7s;
+      animation-delay: -0.3s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+      opacity: 0.25;
+    }
+  }
+
+  :global(.volcano-smoke div) {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    background: url("@/assets/ambience/volcano-smoke.webp") 0 0 / 100% 800%
+      no-repeat;
+    animation: volcano-smoke $volcano-smoke-loop linear infinite;
+
+    @for $frame from 0 through 7 {
+      &:nth-child(#{$frame + 1}) {
+        background-position-y: math.percentage(math.div($frame, 7));
+        animation-delay: ($frame - 1) * $volcano-smoke-frame -
+          $volcano-smoke-loop;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+}
