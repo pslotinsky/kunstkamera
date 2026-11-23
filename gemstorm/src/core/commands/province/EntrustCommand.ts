@@ -23,7 +23,7 @@ export class EntrustCommand extends ProvinceCommand {
   }
 
   public override canExecute(): boolean {
-    return this.currentProvince?.isHome ?? false;
+    return this.currentProvince?.hasOwner() ?? false;
   }
 
   public override consumesTurn(): boolean {

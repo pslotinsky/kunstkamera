@@ -24,11 +24,18 @@ export class TradeDialogView extends CommandDialogView<
     this.title.textContent = direction ? TITLES[direction] : '';
   }
 
-  public setRange(direction: TradeDirection | undefined, max: number): void {
-    const verb = direction === 'sell' ? 'Sell' : 'Buy';
+  public setRange(
+    direction: TradeDirection | undefined,
+    minimum: number,
+    maximum: number,
+  ): void {
+    const prompt =
+      direction === 'sell' ? 'Sell how much Food' : 'Spend how much Gold';
 
     this.range.textContent =
-      max > 0 ? `${verb} how much (1-${max})?` : `${verb} how much?`;
+      maximum >= minimum && maximum > 0
+        ? `${prompt} (${minimum}–${maximum})?`
+        : 'No trade available';
   }
 
   public enableConfirm(enabled: boolean): void {

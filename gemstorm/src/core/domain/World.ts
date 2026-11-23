@@ -1,5 +1,7 @@
 import { BREAKAWAY_NAMES } from '@/config/families';
+import { sample } from '@/lib/array/sample';
 import type { Collection } from '@/lib/Collection';
+import { isDefined } from '@/lib/value/isDefined';
 
 import type { Advisor } from './Advisor';
 import type { CalendarDate } from './CalendarDate';
@@ -11,7 +13,12 @@ import type { General, GeneralRank } from './General';
 import { Market } from './Market';
 import type { Province } from './Province';
 import { TurnQueue } from './TurnQueue';
+import { WanderingGenerals } from './WanderingGenerals';
 import type { WorldMap } from './WorldMap';
+
+const BREAKAWAY_FAME = 3;
+const ABSORBED_PROVINCE_FAME = 3;
+const DEFECTING_LORD_FAME = 3;
 
 export interface WorldParams {
   readonly date: CalendarDate;
@@ -26,6 +33,7 @@ export class World {
   public date: CalendarDate;
   public readonly market = new Market();
   public readonly campaign: Campaign;
+  public readonly wanderers: WanderingGenerals;
   public readonly turnQueue: TurnQueue;
   public readonly map: WorldMap;
   public readonly families: Collection<string, Family>;
@@ -43,6 +51,7 @@ export class World {
     this.player = params.player;
     this.turnQueue = new TurnQueue(this.map.provinces);
     this.campaign = new Campaign(this, params.advisor);
+    this.wanderers = new WanderingGenerals(this);
   }
 
   public hold(captive: Captive): void {
@@ -61,6 +70,12 @@ export class World {
     return this.held.filter((captive) => captive.captor.isEqual(captor));
   }
 
+  public findRansomFor(house: Family): Captive | undefined {
+    return this.held.find(
+      (captive) => captive.house.isEqual(house) && isDefined(captive.demand),
+    );
+  }
+
   public exile(general: General): void {
     this.exiled = [...this.exiled, general];
     this.generals.remove(general.name);
@@ -72,6 +87,10 @@ export class World {
 
   public isHeld(general: General): boolean {
     return this.held.some((captive) => captive.general.isEqual(general));
+  }
+
+  public hasCaptive(captive: Captive): boolean {
+    return this.held.includes(captive);
   }
 
   public bury(general: General): void {
@@ -104,7 +123,10 @@ export class World {
   }
 
   public foundFamily(lord: General, province: Province): Family | undefined {
-    const name = BREAKAWAY_NAMES.find((free) => !this.families.has(free));
+    const openNames = BREAKAWAY_NAMES.filter(
+      (name) => !this.families.has(name),
+    );
+    const name = openNames.length > 0 ? sample(openNames) : undefined;
 
     if (!name) {
       return undefined;
@@ -115,9 +137,11 @@ export class World {
       ruler: lord,
       members: [lord],
       homeProvince: province,
+      fame: BREAKAWAY_FAME,
     });
 
     this.findFamilyOf(lord)?.discharge(lord);
+    lord.renounceHouse();
     this.families.add(name, founded);
     province.claim(founded);
 
@@ -129,14 +153,21 @@ export class World {
       family.surrenderTo(victor);
     }
 
+    for (const member of family.members) {
+      if (member.isKinOf(family)) {
+        member.renounceHouse();
+      }
+    }
+
     family.breakAlliance();
     this.families.remove(family.name);
   }
 
   public absorb(family: Family, victor: Family): void {
     this.campaign.recordFall(family, 'absorption', victor);
+    const provinces = this.getFamilyProvinces(family);
 
-    for (const province of this.getFamilyProvinces(family)) {
+    for (const province of provinces) {
       province.claim(victor);
     }
 
@@ -144,6 +175,7 @@ export class World {
       victor.enlist(member);
     }
 
+    victor.gainFame(provinces.length * ABSORBED_PROVINCE_FAME);
     this.dissolve(family, victor);
   }
 
@@ -154,7 +186,11 @@ export class World {
 
     former?.discharge(general);
     to.enlist(general);
-    province?.claim(to);
+    if (former && province?.belongsTo(former) && !former.isEqual(to)) {
+      province.claim(to);
+      former.loseFame(DEFECTING_LORD_FAME);
+      to.gainFame(DEFECTING_LORD_FAME);
+    }
 
     if (former && this.countProvinces(former) === 0) {
       this.campaign.recordFall(former, 'last-province-lost', to);
@@ -240,7 +276,7 @@ export class World {
   public getFifthUnits(province: Province): readonly FifthUnit[] {
     const guardians = province.family?.getReadyGuardians(this.date) ?? [];
 
-    return [...province.stationedUnits, ...guardians].sort(
+    return [...province.fifthUnits.units, ...guardians].sort(
       (left, right) => right.strength - left.strength,
     );
   }

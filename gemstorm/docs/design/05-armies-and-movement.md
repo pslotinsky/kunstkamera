@@ -10,7 +10,7 @@ In scope: recruit troops with gold; move gold, food, and troops into an adjacent
 
 There is no separate "review army strength" screen — you review a force by setting the gold, food, and troops it carries in the action's own dialog (Move here, Attack later); the spec keeps troops as one abstract province value, so a force is just those resource amounts.
 
-Out of scope: attacking an enemy province and the battle it triggers (feature 8 — so Move never targets an enemy); choosing a commander and assembling an army (that selection lives in the Attack flow, feature 8 — recruiting here only raises the troops an army is later built from); Fifth Units (6); Gem Guardians (7); in-field food consumption and deployment cost (battle); and the tactical split of troops into Horsemen/Knights/Archers (battle).
+Out of scope: attacking an enemy province and the battle it triggers (feature 8 — so Move never targets an enemy); choosing a commander and assembling an army (that selection lives in the Attack flow, feature 8 — recruiting here only raises the troops an army is later built from); hiring Fifth Units (6 — Move only carries one); Gem Guardians (7); in-field food consumption and deployment cost (battle); and the tactical split of troops into Horsemen/Knights/Archers (battle).
 
 ## Glossary
 
@@ -18,14 +18,14 @@ Out of scope: attacking an enemy province and the battle it triggers (feature 8 
 | ----------- | ---------------------------------------------------------------------------------------------------------------- |
 | Troops      | A province's military value (`Resources.troops`, 0–999). One abstract pool; unit types exist only in battle.     |
 | Recruit     | Spend gold to raise a province's troops. Turn-consuming, goodwill −1.                                            |
-| Move Troops | Send gold, food, and troops into an adjacent province you own, or into an adjacent neutral to claim it. Turn, goodwill 0. |
-| Claim       | Taking an unowned (neutral) adjacent province by moving into it: it joins your family, ruled remotely.           |
+| Move Troops | Send gold, food, troops, and optionally one hired Fifth Unit into an adjacent province you own, or into an adjacent neutral to claim it. Turn, goodwill 0. |
+| Claim       | Taking an unowned (neutral) adjacent province by moving into it: it joins your family, ruled remotely, and the ruler gains 3 Fame. |
 
 ## Functionality
 
 - Recruit: at a province you control, convert gold to troops at 2 gold per troop, capped by gold on hand and the 999 ceiling. Ends the province's turn; goodwill −1.
-- Move troops: pick an adjacent province you own, set the gold, food, and troops to send (≤ what the source holds, ≤ the destination's headroom to 999); the amounts leave the source and arrive at the destination. Ends the turn; goodwill 0.
-- Claim a neutral: Move Troops into an adjacent neutral province transfers it to your family — ruled remotely by the ruler (half strength, per feature 4) — seeded with the gold, food, and troops you sent. Install a resident lord afterward with Change Lord.
+- Move troops: pick an adjacent province you own, set the gold, food, and troops to send (≤ what the source holds, ≤ the destination's headroom to 999); the amounts leave the source and arrive at the destination. Optionally take along one hired Fifth Unit, never a Gem Guardian, if the destination has a free slot for it. A move must carry something. Ends the turn; goodwill 0. See [War Costs and Free Movement](../spec/06-military-system.md#detailed-rules-war-costs-and-free-movement).
+- Claim a neutral: Move Troops into an adjacent neutral province transfers it to your family — ruled remotely by the ruler (half strength, per feature 4) — seeded with what you sent, and raises the ruler's Fame by 3 (cap 100). Install a resident lord afterward with Change Lord.
 
 ## Use cases
 
@@ -59,9 +59,9 @@ Every order here is the standard command-dialog model already used by Give Food 
 
 **Recruit costs 2 gold per troop.** This is canonical (spec §4.3, §4.5); there is no confirmed population or food cost, so gold is the only limiter. The dialog caps troops at min(⌊gold / 2⌋, 999 − troops). Turn-consuming with goodwill −1 (appendix-d §D.2, §D.5).
 
-**Move Troops stays separate from Transport.** Appendix-d lists "Transport / Move" as one logistics command, but the manual and codebase split them: Transport (Domestic; gold + food; any province you own, however distant) and Move Troops (Military; gold + food + troops; adjacent only). Both carry gold and food (manual §281, §305), but Move Troops also carries troops, reaches only adjacent provinces, and is the only way to claim a neutral — whereas Transport "differs from MOVE TROOPS in that you can send goods to distant provinces." An enemy neighbor is an Attack (feature 8) and is not offered here. Turn-consuming, goodwill 0.
+**Move Troops stays separate from Transport.** Appendix-d lists "Transport / Move" as one logistics command, but the manual and codebase split them: Transport (Domestic; gold + food, sent to or received from any province you own, however distant) and Move Troops (Military; gold + food + troops + one Fifth Unit; adjacent only). Both carry gold and food (manual §281, §305), but Move Troops also carries troops and a Fifth Unit, reaches only adjacent provinces, and is the only way to claim a neutral — whereas Transport "differs from MOVE TROOPS in that you can send goods to distant provinces." An enemy neighbor is an Attack (feature 8) and is not offered here. Turn-consuming, goodwill 0.
 
-**Claiming is part of Move.** Entering a neutral province sets its `family` to the player and its `governor` to the ruler — which is feature 4's "ruled remotely" (half-strength) state, so Move writes those two fields and needs no new ownership machinery. A claimed province needs a governor, and the remote ruler is the default; installing a resident lord is a separate, later Change Lord order. Move itself never picks a commander.
+**Claiming is part of Move.** Entering a neutral province calls `Province.claimUnowned(family)`: it sets the province's `family` to the mover and its `governor` to the ruler — feature 4's "ruled remotely" (half-strength) state — clears its policy counters, and raises the ruler's Fame by 3 ([Fame](../spec/05-characters.md#detailed-rules-fame)). No new ownership machinery is needed. A claimed province needs a governor, and the remote ruler is the default; installing a resident lord is a separate, later Change Lord order. Move itself never picks a commander.
 
 ## Domain model
 
@@ -72,19 +72,32 @@ classDiagram
     +General governor
     +Family family
     +number[] neighbors
+    +ProvinceFifthUnits fifthUnits
     +addResources(gains) void
-    +assignGovernor(general) void
+    +reduceResources(losses) void
+    +claimUnowned(family) void
+  }
+  class Shipment {
+    +Province source
+    +Province target
+    +ResourceGains cargo
+    +isDeliverable bool
+    +deliver() void
   }
   class RecruitCommand {
+    +recruit(troops) void
     +execute() void
   }
   class MoveTroopsCommand {
     +selectableTargets number[]
+    +moveTo(target, cargo) void
+    +carry(unit) void
     +execute() void
   }
   ProvinceCommand <|-- RecruitCommand
   ProvinceCommand <|-- MoveTroopsCommand
-  MoveTroopsCommand --> Province : moves gold+food+troops, may claim
+  MoveTroopsCommand --> Shipment : delivers cargo
+  MoveTroopsCommand --> Province : moves a Fifth Unit, may claim
   RecruitCommand --> Province : gold -> troops
 ```
 
@@ -97,9 +110,9 @@ sequenceDiagram
   participant Source as Source province
   participant Dest as Destination province
   Player->>Move: target = neutral, gold = 40, food = 30, troops = 60
-  Move->>Source: addResources(gold -40, food -30, troops -60)
-  Move->>Dest: addResources(gold +40, food +30, troops +60)
-  Move->>Dest: if neutral, family = player, governor = ruler
+  Move->>Source: Shipment.deliver(): reduceResources(gold 40, food 30, troops 60)
+  Move->>Dest: addResources(gold 40, food 30, troops 60), plus the carried Fifth Unit
+  Move->>Dest: claimUnowned(player): family = player, governor = ruler, Fame +3
   Move->>Source: publish ProvinceUpdated (source & dest), recordAction(0)
 ```
 
@@ -110,6 +123,5 @@ Nothing new to persist: troops are already part of `Province.resources`, and a c
 ## Tests
 
 - **Recruit (unit):** spends 2 gold per troop, capped by gold on hand; refuses what the province can't afford.
-- **Move troops (unit):** into an adjacent province you own, debits the source and credits the destination with the moved gold, food, and troops, ownership unchanged; into an adjacent neutral, claims it for the player — ruled remotely by the ruler — seeded with the moved gold, food, and troops.
+- **Move troops (unit):** into an adjacent province you own, debits the source and credits the destination with the moved gold, food, and troops, ownership unchanged; into an adjacent neutral, claims it for the player — ruled remotely by the ruler — seeded with the moved gold, food, and troops, and raises the ruler's Fame by 3. A carried Fifth Unit moves to the destination's slots only if one is free; an empty move is refused.
 - **Selectable targets (unit):** adjacent provinces you own or that are neutral; enemy and non-adjacent provinces are excluded.
-```

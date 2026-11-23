@@ -1,8 +1,8 @@
 import type { ProvinceEventDefinition } from '@/config/province-events';
 
-import type { CalendarDate } from './CalendarDate';
-import type { Family } from './Family';
-import type { Province } from './Province';
+import type { CalendarDate } from '../CalendarDate';
+import type { Family } from '../Family';
+import type { Province } from '../Province';
 
 export interface IncidentChange {
   readonly stat: string;

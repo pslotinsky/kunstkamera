@@ -6,6 +6,7 @@ export interface ClashParams {
   readonly approach: Approach;
   readonly losses: number;
   readonly backlash: number;
+  readonly fatigue?: number;
 }
 
 export class Clash {
@@ -14,6 +15,7 @@ export class Clash {
   public readonly approach: Approach;
   public readonly losses: number;
   public readonly backlash: number;
+  public readonly fatigue: number;
   public readonly strikerLeft: number;
   public readonly targetLeft: number;
 
@@ -23,12 +25,17 @@ export class Clash {
     this.approach = params.approach;
     this.losses = params.losses;
     this.backlash = params.backlash;
+    this.fatigue = params.fatigue ?? 0;
     this.strikerLeft = params.striker.strength;
     this.targetLeft = params.target.strength;
   }
 
   public get isFatal(): boolean {
     return this.targetLeft === 0;
+  }
+
+  public get strikerLosses(): number {
+    return this.backlash + this.fatigue;
   }
 
   public get isReturned(): boolean {

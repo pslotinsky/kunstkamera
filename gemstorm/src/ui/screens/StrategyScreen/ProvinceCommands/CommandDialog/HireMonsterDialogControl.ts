@@ -2,7 +2,7 @@ import type {
   HireMode,
   HireMonsterCommand,
 } from '@/core/commands/province/HireMonsterCommand';
-import { HiredUnit } from '@/core/domain/HiredUnit';
+import type { HiredUnit } from '@/core/domain/HiredUnit';
 import type { World } from '@/core/domain/World';
 import { capitalize } from '@/lib/string/capitalize';
 
@@ -70,14 +70,12 @@ export class HireMonsterDialogControl extends CommandDialogControl<
   private units(): readonly HiredUnit[] {
     return this.mode === 'dismiss'
       ? (this.command?.stationedUnits ?? [])
-      : (this.command?.hireableNames ?? [])
-          .map((name) => HiredUnit.ofName(name))
-          .filter((unit) => unit !== undefined);
+      : (this.command?.hireableUnits ?? []);
   }
 
   private buildDetail(name: string): UnitDetail | undefined {
     const province = this.world.turnQueue.current;
-    const unit = HiredUnit.ofName(name);
+    const unit = this.units().find((candidate) => candidate.name === name);
 
     return province && unit
       ? {

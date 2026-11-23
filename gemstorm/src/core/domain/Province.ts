@@ -3,10 +3,14 @@ import { isDefined } from '@/lib/value/isDefined';
 import { Characteristics } from './Characteristics';
 import { Development, type DevelopmentGains } from './Development';
 import type { Family } from './Family';
-import type { FifthUnit } from './FifthUnit';
 import type { General } from './General';
-import { HiredUnit } from './HiredUnit';
-import { type ResourceGains, Resources } from './Resources';
+import { ProvinceFifthUnits } from './ProvinceFifthUnits';
+import {
+  RESOURCE_MAXES,
+  type ResourceGains,
+  type ResourceKey,
+  Resources,
+} from './Resources';
 
 export type Landscape = 'snow' | 'woods' | 'river' | 'mountain';
 
@@ -25,6 +29,10 @@ export interface ProvinceParams {
 const MAX_GOODWILL = 15;
 const ACTIONS_PER_CYCLE = 3;
 const REMOTE_PENALTY = 0.5;
+const CULTIVATION_PER_GOVERNOR_GOLD = 5;
+const TROOPS_PER_FOOD = 10;
+const UNOWNED_PROVINCE_FAME = 3;
+const ABANDONED_SUPPLY_DIVISOR = 2;
 
 export type ProvinceStatus =
   | 'capital'
@@ -38,14 +46,12 @@ export class Province {
   public readonly name: string;
   public readonly neighbors: readonly number[];
   public readonly landscape: Landscape;
+  public readonly fifthUnits: ProvinceFifthUnits;
   public resources: Resources;
   public development: Development;
   public goodwill = 0;
   public actionCount = 0;
   public governor?: General | undefined;
-  public stationedUnits: readonly FifthUnit[] = [];
-  public readonly hirePool: readonly string[];
-
   private house: Family | undefined;
   private entrusted = false;
 
@@ -58,7 +64,7 @@ export class Province {
     this.governor = params.governor;
     this.resources = params.resources ?? Resources.empty();
     this.development = params.development ?? Development.empty();
-    this.hirePool = params.hirePool ?? [];
+    this.fifthUnits = new ProvinceFifthUnits(params.hirePool);
   }
 
   public get family(): Family | undefined {
@@ -73,17 +79,32 @@ export class Province {
     this.entrusted = false;
   }
 
-  public unclaim(): void {
-    this.resetActionCycle();
-    this.house = undefined;
-    this.entrusted = false;
+  public claimUnowned(family: Family, governor = family.ruler): void {
+    if (this.isNeutral()) {
+      this.claim(family);
+      this.assignGovernor(governor);
+      family.gainFame(UNOWNED_PROVINCE_FAME);
+    }
   }
 
-  public assignGovernor(governor: General | undefined): void {
-    if (!this.ruledBy(governor)) {
-      this.entrusted = false;
-    }
+  public unclaim(): void {
+    const { gold, food } = this.resources;
+    const { loyalty } = this.development;
 
+    this.resetActionCycle();
+    this.house = undefined;
+    this.assignGovernor(undefined);
+    this.entrusted = false;
+    this.resources = Resources.from({
+      gold: Math.floor(gold / ABANDONED_SUPPLY_DIVISOR),
+      food: Math.floor(food / ABANDONED_SUPPLY_DIVISOR),
+      troops: 0,
+    });
+    this.reduceDevelopment({ loyalty });
+    this.fifthUnits.releaseUnits();
+  }
+
+  public assignGovernor(governor?: General): void {
     this.governor = governor;
   }
 
@@ -92,7 +113,7 @@ export class Province {
   }
 
   public canEntrust(): boolean {
-    return this.hasLord && !this.isHome;
+    return this.hasOwner() && !this.isHome;
   }
 
   public entrust(): void {
@@ -101,26 +122,6 @@ export class Province {
 
   public cancelEntrust(): void {
     this.entrusted = false;
-  }
-
-  public get hiredUnits(): readonly HiredUnit[] {
-    return this.stationedUnits.filter(
-      (unit): unit is HiredUnit => unit instanceof HiredUnit,
-    );
-  }
-
-  public addUnit(unit: FifthUnit): void {
-    this.stationedUnits = [...this.stationedUnits, unit];
-  }
-
-  public removeUnit(unit: FifthUnit): void {
-    this.stationedUnits = this.stationedUnits.filter(
-      (stationed) => stationed !== unit,
-    );
-  }
-
-  public hasUnit(name: string): boolean {
-    return this.hiredUnits.some((unit) => unit.name === name);
   }
 
   public ruledBy(general: General | undefined): boolean {
@@ -148,15 +149,31 @@ export class Province {
 
     if (this.isHome) {
       status = 'capital';
-    } else if (this.isRemotelyRuled) {
-      status = 'remote';
     } else if (this.isEntrusted) {
       status = 'entrusted';
+    } else if (this.isRemotelyRuled) {
+      status = 'remote';
     } else if (this.hasLord) {
       status = 'lorded';
     }
 
     return status;
+  }
+
+  public get governorUpkeep(): number {
+    const { cultivation } = this.development;
+
+    return isDefined(this.residentGovernor)
+      ? Math.floor(cultivation / CULTIVATION_PER_GOVERNOR_GOLD)
+      : 0;
+  }
+
+  public get residentGovernor(): General | undefined {
+    return this.isRemotelyRuled ? undefined : this.governor;
+  }
+
+  public get troopFoodUpkeep(): number {
+    return Math.floor(this.resources.troops / TROOPS_PER_FOOD);
   }
 
   public get effectiveStats(): Characteristics {
@@ -165,12 +182,24 @@ export class Province {
     return this.isRemotelyRuled ? stats.multiplyAll(REMOTE_PENALTY) : stats;
   }
 
+  public getRoom(resource: ResourceKey): number {
+    return RESOURCE_MAXES[resource] - this.resources[resource];
+  }
+
   public addResources(gains: ResourceGains): void {
     this.resources = this.resources.increase(gains);
   }
 
+  public reduceResources(losses: ResourceGains): void {
+    this.resources = this.resources.decrease(losses);
+  }
+
   public addDevelopment(gains: DevelopmentGains): void {
     this.development = this.development.increase(gains);
+  }
+
+  public reduceDevelopment(losses: DevelopmentGains): void {
+    this.development = this.development.decrease(losses);
   }
 
   public recordAction(goodwill: number): void {

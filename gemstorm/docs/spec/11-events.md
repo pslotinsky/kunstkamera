@@ -534,18 +534,130 @@ flowchart TD
 
 ---
 
-## Open Questions
+---
 
-The following event-system details remain unresolved:
+## Detailed rules: Policy Events
 
-1. Exact probabilities for good / bad event checks.
-2. Exact thresholds for event levels.
-3. Exact numerical effects of each event.
-4. Full province-by-province regional disaster mapping.
-5. Exact formula for Protection impact on bad event frequency and severity.
-6. Whether ruler Fame affects some event outcomes.
-7. Whether all versions use the same event list and effects.
-8. Exact handling of Hired Fifth Unit rampage and related triggers.
+This is the mechanism behind the good and bad events. Each province keeps a command counter and a signed policy sum.
+
+| Command                                   | Counter | Sum |
+| ----------------------------------------- | ------- | --- |
+| Develop, Give Food, Ally / Break alliance | +1      | +1  |
+| Attack, Recruit, Plunder, Sabotage        | +1      | −1  |
+| Move, Transport, Search, other diplomacy  | +1      | 0   |
+| Trade, View, Hire, Dismiss (player)       | —       | —   |
+
+These are the goodwill values listed in Appendix D §D.5.
+
+At the start of each month, if the counter is **exactly 3**:
+
+- 40% chance an event fires, chosen by the sum;
+- the counter and sum reset either way.
+
+A sum of 0 never fires an event. Both values are also cleared when a province becomes unowned.
+
+Events apply to every family. Only human owners see the message.
+
+**Protection does not affect these events**, in frequency or severity.
+
+| Sum | Event (each option equally likely)                                                                 |
+| --- | -------------------------------------------------------------------------------------------------- |
+| +1  | Loyalty (Elvish troubadour), Cultivation (Redcaps), or Protection (Airial) rises by 2–7.           |
+| +2  | Food (Far Gorta), Gold (Leprechaun), or Soldiers (fairy) rises by 25–50.                           |
+| +3  | Pastha, unicorn, or Gwraig — see below.                                                            |
+| −1  | Loyalty (Black Annis), Cultivation (pixies), or Protection (Durahan) falls by 2–7.                 |
+| −2  | Food (Aughiskies) or Gold (hobgoblin) falls by 25–50.                                              |
+| −3  | Soldiers fall by 25–50 (Shrieker), or a death (Banshee) — see below.                               |
+
+**Sum +3:**
+
+- 1 in 3: a **Pastha** joins the province for free. Blocked if a monster or Pastha is already hired there, three units are hired, no slot is free, or the family is Lankshire.
+- Otherwise, equal chance:
+  - **Unicorn:** the lord gains 3–8 INT and 3–8 WAR.
+  - **Gwraig:** the lord gains 3–8 CHA and the family ruler gains 0–4 Fame.
+
+"The lord" is the first general in the province, or the family ruler if none is present.
+
+**Banshee (sum −3):** only if the family ruler is the lord of this province and has other generals with him. One of them, chosen at random, dies. Otherwise nothing happens.
+
+---
+
+---
+
+## Detailed rules: Upkeep, Rampage, Desertion, and Disasters
+
+### Quarterly upkeep
+
+Start of March, June, September, and December, per owned province, in this order:
+
+```text
+1. If a general is present: cost = Cultivation ÷ 5
+     enough Gold → Gold −= cost
+     otherwise   → Gold = 0, Loyalty −= Loyalty ÷ 5
+
+2. need = Soldiers ÷ 10
+     enough Food → Food −= need
+     otherwise   → Soldiers −= (need − Food), Food = 0
+
+3. For each hired Fifth Unit that is not a Gem Guardian or Pastha: cost = hire cost
+     enough Gold → Gold −= cost
+     otherwise   → the unit deserts (returns to the hire pool)
+```
+
+There is **no monthly food consumption**. Soldiers eat once a quarter.
+
+In September the harvest is added before upkeep is taken.
+
+### Monster rampage
+
+Every month:
+
+```text
+if any monster-class unit is hired anywhere, 50% chance:
+    pick one such unit at random
+    if its control requirement > its ruler's Fame:
+        Gold −= 10–30, Food −= 10–30
+        Loyalty −= Strength ÷ 25, Cultivation −= Strength ÷ 25
+```
+
+The monster stays. One rampage at most per month across the whole map.
+
+### Mercenary desertion
+
+Every month, the same check for mercenary-class units: 50% chance, one random hired mercenary, and if its control requirement exceeds its ruler's Fame it deserts to the hire pool.
+
+So desertion is a **hard threshold with a random draw of which unit is tested**, not a probability that softens as Fame rises.
+
+### Fifth Unit recovery
+
+Every month each hired unit below full Strength regains one sixth of its maximum.
+
+### Plague
+
+Every quarter, each province independently has a 5% chance: Loyalty, Cultivation, Soldiers, and Protection each lose one fifth. Protection does not reduce it.
+
+### Regional disasters
+
+Each applies only to its listed provinces (1–30 numbering), each rolling independently.
+
+| Disaster   | Month     | Provinces                          | Chance per province     | Loses                                                         |
+| ---------- | --------- | ---------------------------------- | ----------------------- | ------------------------------------------------------------- |
+| Earthquake | March     | 24, 25, 26, 27                     | 10%                     | one quarter of Soldiers, Loyalty, Cultivation, Protection     |
+| Flood      | June      | 17, 18, 19, 20, 21, 22, 28, 29     | 15%                     | one fifth of Gold, Food, Soldiers, Loyalty, Cultivation, Protection |
+| Fire       | September | 7, 9, 10, 13, 14, 15               | (100 − Loyalty) ÷ 4 %   | same as flood                                                 |
+| Snow       | December  | 1, 2, 3, 4, 5                      | 30%                     | one tenth of Loyalty and Cultivation                          |
+
+**Protection mitigation** (earthquake, flood, fire only):
+
+```text
+loss = (stat ÷ divisor) × (100 − Protection) ÷ 100
+```
+
+At Protection 100 these three do nothing. Snow and plague ignore Protection.
+
+Fire is the only disaster whose chance depends on a stat: a fully loyal province never burns.
+
+---
 
 ---
 

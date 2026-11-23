@@ -1,6 +1,7 @@
 import type { MoveTroopsCommand } from '@/core/commands/province/MoveTroopsCommand';
 import type { FifthUnit } from '@/core/domain/FifthUnit';
 import type { Province } from '@/core/domain/Province';
+import type { ResourceKey } from '@/core/domain/Resources';
 import type { World } from '@/core/domain/World';
 import { isDefined } from '@/lib/value/isDefined';
 import { getFifthUnitPortraitUrl } from '@/ui/common/art/getFifthUnitPortraitUrl';
@@ -11,11 +12,7 @@ import { AmountFieldControl } from '../AmountField/AmountFieldControl';
 import { CommandDialogControl } from './CommandDialogControl';
 import { MoveTroopsDialogView } from './MoveTroopsDialogView';
 
-const RESOURCE_CEILING = 999;
-
-type Resource = 'gold' | 'food' | 'troops';
-
-const RESOURCES: readonly Resource[] = ['troops', 'food', 'gold'];
+const RESOURCES: readonly ResourceKey[] = ['troops', 'food', 'gold'];
 
 type MoveTroopsControls = {
   readonly troops: AmountFieldControl;
@@ -65,6 +62,7 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
   public override pickTarget(province: Province): void {
     if (this.command?.selectableTargets.includes(province.number)) {
       this.target = province;
+      this.command.moveTo(province, {});
       this.update();
     }
   }
@@ -111,7 +109,9 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
   }
 
   private carriableUnits(): readonly FifthUnit[] {
-    return this.target ? this.stationedUnits() : [];
+    const canStation = this.target?.fifthUnits.canStation ?? false;
+
+    return canStation ? this.stationedUnits() : [];
   }
 
   private carryOptions(units: readonly FifthUnit[]): DropdownOption[] {
@@ -127,7 +127,7 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
   }
 
   private stationedUnits(): readonly FifthUnit[] {
-    return this.world.turnQueue.current?.stationedUnits ?? [];
+    return this.world.turnQueue.current?.fifthUnits.units ?? [];
   }
 
   private carriedUnit(): FifthUnit | undefined {
@@ -143,18 +143,7 @@ export class MoveTroopsDialogControl extends CommandDialogControl<
     );
   }
 
-  private getMax(resource: Resource): number {
-    const source = this.world.turnQueue.current;
-
-    let max = 0;
-
-    if (this.target && source) {
-      max = Math.min(
-        source.resources[resource],
-        RESOURCE_CEILING - this.target.resources[resource],
-      );
-    }
-
-    return max;
+  private getMax(resource: ResourceKey): number {
+    return this.command?.getMaximum(resource) ?? 0;
   }
 }

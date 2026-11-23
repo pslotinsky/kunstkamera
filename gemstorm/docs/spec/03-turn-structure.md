@@ -301,13 +301,97 @@ The result is a compact but demanding strategic system where local decisions acc
 
 ---
 
-## Open Questions
+---
 
-The following turn-structure details remain unresolved:
+## Detailed rules: The Month
 
-1. Exact internal province activation order.
-2. Whether activation order is fixed, randomized, province-number based, or scenario-dependent.
-3. Exact timing of event checks relative to end-of-month processing.
-4. Exact order of harvest, disasters, upkeep, cooldowns, and victory checks.
-5. Whether any rare cases allow a province to act more than once in the same month.
-6. Version differences in command action costs.
+### Start-of-month processing
+
+All periodic processing happens at the **start** of a month, before any province acts, in this order. 1. Advance the month. After December the year and every character's age advance.
+2. **September only:** harvest ([September Harvest](./04-economy-system.md#detailed-rules-september-harvest)).
+3. **January only:** yearly decay, deaths from old age, yearly stat change ([January: Decay, Ageing, Death](./05-characters.md#detailed-rules-january-decay-ageing-death)).
+4. **March, June, September, December:** quarterly upkeep, then plague, then that season's regional disaster ([Upkeep, Rampage, Desertion, and Disasters](./11-events.md#detailed-rules-upkeep-rampage-desertion-and-disasters)).
+5. **Every month:** monster rampage, mercenary desertion, the policy event check ([Policy Events](./11-events.md#detailed-rules-policy-events)), Fifth Unit recovery, Gem rest counters.
+6. **February, May, August, November:** market rate change ([Trade](./04-economy-system.md#detailed-rules-trade)).
+7. **February, August:** hire pool restock. **March, September:** hire pool migration ([Recruit, Hire, and the Hire Pool](./08-monsters.md#detailed-rules-recruit-hire-and-the-hire-pool)).
+8. Roll the province order for the month.
+
+### Province order
+
+The order is **per province, not per family**, and is re-rolled every month. ```text
+for province 0 … 29:
+    position = rand(30)
+    while position is taken: position = (position + 1) mod 30
+    order[position] = province
+```
+
+Because a taken position is resolved by stepping forward, this is not a uniform shuffle.
+
+### Province turns
+
+- Provinces act in the rolled order. Unowned provinces are skipped.
+- A province gets **exactly one** turn-ending command. It never appears twice in the order.
+- Trade, View, save, and options do not end the turn and may be repeated.
+- An attack is resolved immediately, before the next province acts.
+- Ownership is read when a province's position comes up. A province captured earlier in the month still acts, under its new owner, if its position is later. (Likely — this follows from the loop and is not handled specially.)
+- The unification check runs after every province turn: one family owning all 30 provinces ends the game.
+
+---
+
+---
+
+## Detailed rules: Victory and Defeat
+
+- **Unification:** checked after every province turn. One family owning all 30 provinces ends the game. A human winner sees the ending; a computer winner ends the game as a loss.
+- **Losing the ruler's province:** the family moves to another of its provinces at random. If it has none, it claims an empty neighbouring province. If there is none, the family is destroyed.
+- **No successor:** a human family whose ruler dies with no successor is out of the game.
+- **Everyone dead:** if the January deaths leave no living general anywhere, the game ends.
+- The game continues while at least one human family remains.
+
+---
+
+---
+
+## Detailed rules: Change Lord and Entrust
+
+### Change Lord
+
+Issued from the ruler's home province. The target is any **other** province of the family; adjacency is not required, and it may or may not already have a lord.
+
+There is no stored "home province". Home is wherever the ruler is.
+
+| Choice | Effect |
+| ------ | ------ |
+| **You** | The target's lord is recalled to the ruler's court as a vassal. The target is left without a general, ruled directly. Its Entrust setting is cleared. The ruler does not move. |
+| **Lord** | A second own province is chosen, and the two provinces **swap** whoever leads them. Either may be empty, so this also moves a lord into a province without one. |
+| **Vassal** | A court vassal becomes lord of the target. The target's old lord, if any, takes that vassal's place at court. |
+
+**Moving the ruler** is the Lord choice with the home province as the second province. The ruler's whole court moves with him; the old home receives the target's former lord, or is left without a general. The game asks "OK to move yourself?" first.
+
+**Turn cost:**
+
+- Moving the ruler ends the turn. It counts as a command with a policy value of 0.
+- **Every other reassignment is free.** The command returns to the province prompt, so any number of lords can be reassigned in one visit.
+
+There are no stat, Fame, Loyalty, or resource effects, and no randomness.
+
+A province ruled directly uses half the ruler's stats for every command and for battle, so recalling a lord has a real cost.
+
+### Entrust
+
+- May be set or cleared on any own province **except the one the ruler is in**. A province without a general can be entrusted.
+- Can be issued from any province of the family.
+- Free: it never ends the turn, and several provinces can be toggled in one visit.
+- Cleared automatically, and only, in these cases:
+  - the province changes owner or becomes unowned;
+  - the ruler arrives in it (Change Lord, a retreat, a return from a failed attack, a release from captivity, or an heir succeeding there);
+  - the **You** choice of Change Lord recalls its lord;
+  - the player retires from the game, which clears it for the whole family.
+- Otherwise it persists. Losing its lord does not clear it.
+
+
+
+---
+
+---
+

@@ -66,10 +66,10 @@ export class BattleScreenControl extends Control<
 
     this.side = defends ? BattleSide.defender : BattleSide.attacker;
     this.enemy = new TacticalPolicy(this.side.opposite);
-    this.refuges = defends ? invasion!.refuges : [];
+    this.refuges = invasion?.getRetreatProvinces(this.side) ?? [];
     this.battle = battle;
     this.auto = undefined;
-    this.offerRefuges(invasion?.chooseRefuge());
+    this.offerRefuges(invasion?.chooseRefuge(this.side));
     this.skipping = false;
     this.clearOrder();
 
@@ -183,6 +183,10 @@ export class BattleScreenControl extends Control<
   }
 
   private select(battle: Battle, unit: BattleUnit): void {
+    if (this.selected && !this.selected.isEqual(unit)) {
+      this.selected.commitMove();
+    }
+
     const range = unit.stepsLeft > 0 ? battle.getMoveRange(unit) : undefined;
 
     this.selected = unit;
@@ -283,7 +287,15 @@ export class BattleScreenControl extends Control<
       this.view.askForUnit();
     } else if (this.asking === 'site' && battle && unit) {
       this.select(battle, unit);
+    } else if (battle && unit?.canTakeBackMove) {
+      this.takeBackMove(battle, unit);
     }
+  }
+
+  private takeBackMove(battle: Battle, unit: BattleUnit): void {
+    unit.takeBackMove();
+    this.controls.board.place(unit);
+    this.select(battle, unit);
   }
 
   private askToHandOver(): void {
@@ -318,7 +330,7 @@ export class BattleScreenControl extends Control<
     if (this.battle?.turn.isEqual(this.side)) {
       this.asking = 'retreat';
 
-      if (this.side.isAttacker) {
+      if (this.side.isAttacker && this.refuges.length <= 1) {
         this.view.askToRetreat();
       } else {
         this.view.askToFlee();
@@ -329,7 +341,7 @@ export class BattleScreenControl extends Control<
   private offerRefuges(preferred: Province | undefined): void {
     this.controls.refuge.setOptions(toProvinceOptions(this.refuges));
     this.controls.refuge.setValue(preferred ? String(preferred.number) : '');
-    this.view.allowRetreat(this.side.isAttacker || this.refuges.length > 0);
+    this.view.allowRetreat(this.refuges.length > 0);
   }
 
   private findChosenRefuge(): Province | undefined {
@@ -360,6 +372,7 @@ export class BattleScreenControl extends Control<
   }
 
   private clearOrder(): void {
+    this.selected?.commitMove();
     this.selected = undefined;
     this.clearMarks();
   }
@@ -368,9 +381,8 @@ export class BattleScreenControl extends Control<
     const battle = this.battle;
 
     if (battle && !this.busy && battle.turn.isEqual(this.side)) {
-      battle.endTurn();
       this.clearOrder();
-      this.startEnemyTurn(battle);
+      this.advanceTurn(battle);
     }
   }
 
@@ -417,12 +429,16 @@ export class BattleScreenControl extends Control<
     if (next) {
       this.orderNext(battle, side, next);
     } else {
-      battle.endTurn();
-      this.settleOrEnd(battle);
+      this.advanceTurn(battle);
+    }
+  }
 
-      if (this.battle === battle) {
-        this.openTurn(battle);
-      }
+  private advanceTurn(battle: Battle): void {
+    battle.endTurn();
+    this.settleOrEnd(battle);
+
+    if (this.battle === battle) {
+      this.openTurn(battle);
     }
   }
 
@@ -602,9 +618,11 @@ export class BattleScreenControl extends Control<
     if (outcome) {
       this.stopOrdering();
       this.battle = undefined;
-      this.context.events.publish(
-        new BattleEndedEvent(outcome, this.findChosenRefuge()),
-      );
+      const refuge = outcome.isWithdrawnBy(this.side)
+        ? this.findChosenRefuge()
+        : undefined;
+
+      this.context.events.publish(new BattleEndedEvent(outcome, refuge));
     }
   }
 }

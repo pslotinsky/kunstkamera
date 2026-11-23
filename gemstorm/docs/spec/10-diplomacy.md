@@ -595,19 +595,99 @@ flowchart TD
 
 ---
 
-## Open Questions
+---
 
-The following diplomacy details remain unresolved:
+## Detailed rules: Diplomacy
 
-1. Exact Defection success formula.
-2. Exact Surrender success formula.
-3. Exact Alliance success formula.
-4. Whether Protection defends against Sabotage and Plunder.
-5. Whether governor INT / Domestic defends against Sabotage and Plunder.
-6. Whether breaking an alliance has a hidden penalty.
-7. Full targeting rules for Sabotage.
-8. Exact Fame gain and loss from diplomatic actions.
-9. Version differences in diplomacy command effects.
+Diplomacy commands other than Plunder may target any province on the map; **adjacency is required only for Plunder**. Ally, Defection, and Surrender must be issued from the ruler's home province.
+
+There is **no relations or goodwill value between families**. The only state between two families is the alliance.
+
+Lankshire is outside diplomacy: it cannot be asked for an alliance, never proposes one, cannot attempt defections, cannot be made to surrender, and never receives wandering vassals.
+
+### Ally
+
+- A family has **at most one ally**. Accepting a new alliance drops the old one.
+- An alliance has no duration. It lasts until one side breaks it or a family is destroyed.
+- Allies cannot attack each other.
+- **Breaking an alliance has no penalty** of any kind.
+
+A computer family's answer has no randomness:
+
+```text
+accept if  proposer's ruler CHA ≥ its own ruler CHA
+       and the two families' Gem counts differ by at most 2
+```
+
+A human family is asked to accept or refuse.
+
+### Defection
+
+"Recruit from which territory?" is this command. There is no separate Recruit negotiation.
+
+**Target:** the lord of a province, or a vassal at a ruler's court. A ruler can never be targeted.
+
+```text
+C = acting lord's CHA      (ruler CHA ÷ 2 if no general is present)
+
+fails unless all of:
+    C > target's CHA
+    own ruler's INT + WAR + CHA > target's ruler's INT + WAR + CHA
+    the target is not a member of his ruler's own house
+then succeeds with a fixed chance set by the target's loyalty class:
+
+    class 0: 3%     class 1: 15%     class 2: 30%     class 3: 50%
+```
+
+Gold is not involved and nothing is spent. Failure costs nothing.
+
+On success a vassal joins the new ruler's court. A **lord brings his whole province with him**; his old ruler loses 3 Fame and the new ruler gains 3.
+
+### Surrender
+
+No randomness. The target family surrenders only if **all** hold:
+
+```text
+own ruler's INT + WAR + CHA ≥ target ruler's
+own provinces − target provinces ≥ 10
+own provinces ≥ 5 × target provinces
+target provinces ≤ 2
+the target family is computer-controlled and is not Lankshire
+```
+
+In practice: a family of one or two provinces, facing a family of at least 11 or 12.
+
+On success every general, province, and Gem of the target passes to the demander, whose ruler gains 3 Fame per province. Failure costs nothing.
+
+### Sabotage
+
+```text
+attack  = acting lord's INT + WAR                    (halved if no general present)
+defence = target lord's INT + WAR, +10 if allied     (halved if no general present)
+
+success if  defence × (75 … 125) ÷ 100 < attack
+```
+
+- **Protection does not defend against Sabotage.**
+- Success: one of Soldiers, Loyalty, Cultivation, or Protection (equal chance) loses one fifth.
+- Failure: nothing is lost. With a general present there is a 90% chance the acting lord gains +1 INT or +1 WAR.
+
+### Plunder
+
+The target must be an adjacent enemy province.
+
+```text
+success if  the target's owner is computer-controlled
+        and acting lord's INT + WAR ≥ target lord's INT + WAR
+        and the target has any Gold or Food
+```
+
+- No randomness. **A human-owned province can never be plundered.**
+- Protection does not defend against Plunder.
+- Success: one fifth of the target's Gold and one fifth of its Food move to the acting province. The acting ruler loses 0–2 Fame.
+- Failure: the defending lord gains 0–2 WAR.
+
+---
 
 ---
 

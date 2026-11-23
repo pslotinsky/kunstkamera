@@ -2,14 +2,19 @@ import { ComputerPlayer } from '@/core/ai/ComputerPlayer';
 import { CommandExecutor } from '@/core/CommandExecutor';
 import { ConcludeBattleCommand } from '@/core/commands/ConcludeBattleCommand';
 import { LifecycleCommand } from '@/core/commands/LifecycleCommand';
+import { MigrateMercenariesCommand } from '@/core/commands/MigrateMercenariesCommand';
+import { RecoverHiredUnitsCommand } from '@/core/commands/RecoverHiredUnitsCommand';
 import { ResolveEventsCommand } from '@/core/commands/ResolveEventsCommand';
+import { RestockHirePoolsCommand } from '@/core/commands/RestockHirePoolsCommand';
 import { TaxAndHarvestCommand } from '@/core/commands/TaxAndHarvestCommand';
 import { UpkeepCommand } from '@/core/commands/UpkeepCommand';
 import type { BattleOutcome } from '@/core/domain/BattleOutcome';
 import type { Invasion } from '@/core/domain/Invasion';
+import type { InvasionReport } from '@/core/domain/InvasionReport';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
 import { BattleEndedEvent } from '@/core/events/BattleEndedEvent';
+import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
 import { BattleStartedEvent } from '@/core/events/BattleStartedEvent';
 import { MonthEndedEvent } from '@/core/events/MonthEndedEvent';
 import { MonthStartedEvent } from '@/core/events/MonthStartedEvent';
@@ -18,6 +23,7 @@ import { TurnHeldEvent } from '@/core/events/TurnHeldEvent';
 import { TurnReleasedEvent } from '@/core/events/TurnReleasedEvent';
 import { TurnScheduledEvent } from '@/core/events/TurnScheduledEvent';
 import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
+import { WarReportedEvent } from '@/core/events/WarReportedEvent';
 import type { EventBus, EventClass } from '@/lib/EventBus';
 
 export class WorldEngine {
@@ -27,6 +33,9 @@ export class WorldEngine {
   private readonly taxAndHarvest: TaxAndHarvestCommand;
   private readonly upkeep: UpkeepCommand;
   private readonly provinceEvents: ResolveEventsCommand;
+  private readonly hiredUnitRecovery: RecoverHiredUnitsCommand;
+  private readonly restockHirePools: RestockHirePoolsCommand;
+  private readonly migrateMercenaries: MigrateMercenariesCommand;
   private readonly holders = new Set<object>();
   private readonly lifetime = new AbortController();
 
@@ -36,7 +45,10 @@ export class WorldEngine {
     | 'start-month'
     | 'lifecycle'
     | 'events'
-    | 'tax'
+    | 'harvest'
+    | 'recovery'
+    | 'market'
+    | 'hire-pools'
     | 'waiting-turn'
     | 'reporting-turn'
     | 'ready-turn'
@@ -55,6 +67,9 @@ export class WorldEngine {
     this.taxAndHarvest = new TaxAndHarvestCommand({ world, events });
     this.upkeep = new UpkeepCommand({ world, events });
     this.provinceEvents = new ResolveEventsCommand({ world, events });
+    this.hiredUnitRecovery = new RecoverHiredUnitsCommand({ world, events });
+    this.restockHirePools = new RestockHirePoolsCommand({ world, events });
+    this.migrateMercenaries = new MigrateMercenariesCommand({ world, events });
   }
 
   public start(): void {
@@ -62,7 +77,7 @@ export class WorldEngine {
       this.handleTurnEnd(event.turnNumber),
     );
     this.listen(MonthStartedEvent, () => {
-      if (this.phase === 'lifecycle') {
+      if (this.phase === 'harvest') {
         this.advance();
       }
     });
@@ -74,6 +89,10 @@ export class WorldEngine {
     this.listen(BattleStartedEvent, (event) => {
       this.fought = event.invasion;
     });
+    this.listen(BattleReportedEvent, ({ report }) =>
+      this.requestRansom(report),
+    );
+    this.listen(WarReportedEvent, ({ report }) => this.requestRansom(report));
     this.listen(TurnScheduledEvent, () => {
       if (this.phase === 'waiting-turn') {
         this.advance();
@@ -96,6 +115,12 @@ export class WorldEngine {
     this.lifetime.abort();
   }
 
+  private requestRansom({ captive }: InvasionReport): void {
+    if (captive) {
+      this.computer.demandRansom(captive);
+    }
+  }
+
   private advance(): void {
     if (
       this.lifetime.signal.aborted ||
@@ -115,8 +140,17 @@ export class WorldEngine {
       case 'events':
         this.resolveEvents();
         break;
-      case 'tax':
+      case 'harvest':
         this.collectTaxAndHarvest();
+        break;
+      case 'recovery':
+        this.recoverHiredUnits();
+        break;
+      case 'market':
+        this.updateMarket();
+        break;
+      case 'hire-pools':
+        this.refreshHirePools();
         break;
       case 'waiting-turn':
         this.startTurn();
@@ -147,27 +181,30 @@ export class WorldEngine {
 
     if (invasion) {
       this.fought = undefined;
+      const { turnNumber } = this.world.turnQueue;
       const command = new ConcludeBattleCommand(
         { world: this.world, events: this.events },
         { invasion, outcome, refuge },
       );
 
       this.executor.execute(command);
-      this.events.publish(new TurnEndedEvent(this.world.turnQueue.turnNumber));
+      this.events.afterDispatch(() =>
+        this.events.publish(new TurnEndedEvent(turnNumber)),
+      );
     }
   }
 
   private handleTurnEnd(turnNumber: number): void {
     if (this.phase === 'taking-turn' && turnNumber === this.started) {
       this.started = undefined;
-      this.phase = 'upkeep';
+      this.phase = 'next-turn';
       this.advance();
     }
   }
 
   private startMonth(): void {
     this.world.turnQueue.reset();
-    this.phase = 'lifecycle';
+    this.phase = 'harvest';
     this.events.publish(new MonthStartedEvent(this.world.date));
   }
 
@@ -175,21 +212,39 @@ export class WorldEngine {
     this.executor.execute(this.lifecycle);
 
     if (this.lifecycle.isComplete) {
-      this.phase = 'events';
+      this.phase = 'upkeep';
     }
 
     this.events.afterDispatch(() => this.advance());
   }
 
   private resolveEvents(): void {
-    this.phase = 'tax';
+    this.phase = 'recovery';
     this.executor.execute(this.provinceEvents);
     this.events.afterDispatch(() => this.advance());
   }
 
+  private recoverHiredUnits(): void {
+    this.phase = 'market';
+    this.executor.execute(this.hiredUnitRecovery);
+    this.events.afterDispatch(() => this.advance());
+  }
+
   private collectTaxAndHarvest(): void {
-    this.world.market.swing(this.world.date.month);
+    this.phase = 'lifecycle';
     this.executor.execute(this.taxAndHarvest);
+    this.events.afterDispatch(() => this.advance());
+  }
+
+  private updateMarket(): void {
+    this.world.market.swing(this.world.date.month);
+    this.phase = 'hire-pools';
+    this.advance();
+  }
+
+  private refreshHirePools(): void {
+    this.executor.execute(this.restockHirePools);
+    this.executor.execute(this.migrateMercenaries);
     this.phase = 'waiting-turn';
     this.events.publish(new TurnScheduledEvent());
   }
@@ -197,7 +252,9 @@ export class WorldEngine {
   private startTurn(): void {
     const { current, turnNumber } = this.world.turnQueue;
 
-    if (current) {
+    if (current?.isNeutral()) {
+      this.nextTurn();
+    } else if (current) {
       this.started = turnNumber;
       this.phase = 'reporting-turn';
       this.events.publish(new TurnStartedEvent(turnNumber, current));
@@ -231,9 +288,9 @@ export class WorldEngine {
   }
 
   private chargeUpkeep(): void {
-    this.phase = 'next-turn';
+    this.phase = 'events';
     this.executor.execute(this.upkeep);
-    this.advance();
+    this.events.afterDispatch(() => this.advance());
   }
 
   private nextTurn(): void {

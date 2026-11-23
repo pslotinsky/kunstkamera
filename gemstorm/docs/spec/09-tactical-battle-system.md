@@ -221,7 +221,7 @@ An attack requires Gold to deploy; the deployment cost is set on the strategic s
 
 ### Food Requirement
 
-Food determines how many days the army can remain in battle; the daily consumption rate is set on the strategic side (military chapter §6), and Gem Guardians do not count toward it.
+The attack dialog estimates supply days from the amount of Food the player enters. During battle the daily ration uses the surviving troops and the remaining strength of the ordinary Fifth Unit.
 
 ---
 
@@ -687,6 +687,24 @@ The victory system creates several valid battle plans:
 
 ---
 
+### Resources saved after a defender loses
+
+If the defender has an adjacent province to fall back to, the force saves Gold and Food according to the commander's INT and soldiers according to WAR:
+
+```text
+rate(stat) = min(10, stat ÷ 10)
+             (or min(10, ruler stat ÷ 20) if no commander is present)
+rescued Gold = Gold × rate(INT) ÷ 10
+rescued Food = Food × rate(INT) ÷ 10
+rescued soldiers = Soldiers × rate(WAR) ÷ 10
+```
+
+All division rounds down. Add each rescued resource to the corresponding resource in the fallback province.
+
+If there is no adjacent fallback province, all defending soldiers are lost and the province loses 30–50% of its Gold and Food. After an attacker wins, its remaining Food is added to the province, its survivors become the province's soldiers, and the province's Loyalty becomes 0.
+
+---
+
 ## 9.15 Retreat
 
 ### Overview
@@ -760,19 +778,324 @@ flowchart TD
 
 ---
 
-## Open Questions
+---
 
-The following tactical battle details remain unresolved:
+## Detailed rules: Tactical Battle
 
-1. Exact damage formulas.
-2. (Resolved) Tile patterns for all four ranges are in Appendix C §C.6.
-3. Exact terrain modifiers, if any.
-4. Exact retreat availability rules.
-5. Exact build / break fence formula.
-6. Exact rounding for deployment cost and Food per day.
-7. Exact influence of commander WAR on damage and casualties.
-8. (Resolved) All thirty battlefield layouts are in `data/battlefields.json`; see §9.2.
-9. Exact tactical AI decision rules.
+The battle code never reads a difficulty or scenario setting.
+
+### Sides and units
+
+Side WAR is one number for the whole army: the commander's WAR, where the commander is the first general in the province. With no general present it is the family ruler's WAR ÷ 2.
+
+There is **no commander unit** on the field.
+
+The pooled soldier count is split when the battle starts:
+
+```text
+quarter = soldiers × 25 ÷ 100
+Knights = Archers = Knights = quarter
+Horsemen = soldiers − 3 × quarter
+```
+
+| Unit           | Move | Range     | Attack | Defence | Builds fences |
+| -------------- | ---- | --------- | ------ | ------- | ------------- |
+| Horsemen       | 3    | Adjacent  | 21     | 20      | No            |
+| Knights (two)  | 2    | Adjacent  | 20     | 19      | Yes           |
+| Archers        | 2    | Straight 2 | 18    | 18      | No            |
+
+Fifth Unit values:
+
+| Unit      | Strength | Attack | Defence | Move | Range      |
+| --------- | -------- | ------ | ------- | ---- | ---------- |
+| Ogre      | 100      | 26     | 27      | 2    | Adjacent   |
+| Orks      | 100      | 20     | 20      | 3    | Adjacent   |
+| Olog-hais | 110      | 21     | 18      | 2    | Adjacent   |
+| Gargoyles | 120      | 23     | 25      | 3    | Adjacent (flies) |
+| Lizards   | 110      | 27     | 28      | 3    | Adjacent   |
+| Skeletons | 100      | 18     | 19      | 2    | Adjacent   |
+| Bugbear   | 100      | 20     | 24      | 3    | Adjacent   |
+| Fachan    | 100      | 26     | 23      | 3    | All within 2 |
+| Wyvern    | 150      | 29     | 30      | 3    | Adjacent (flies) |
+| Gunners   | 150      | 27     | 21      | 3    | Straight 2 |
+| Shooters  | 150      | 24     | 22      | 3    | Straight 2 |
+| Spearmen  | 150      | 22     | 21      | 3    | Straight 2 |
+| Pikemen   | 150      | 25     | 26      | 3    | Adjacent   |
+| Lancers   | 180      | 27     | 26      | 3    | Adjacent   |
+| Warriors  | 180      | 28     | 27      | 3    | Adjacent   |
+| Pluvius   | 160      | 29     | 29      | 2    | Ring at 2  |
+| Zendor    | 150      | 28     | 28      | 3    | Ring at 2  |
+| Skulryk   | 110      | 22     | 22      | 3    | Ring at 2  |
+| Empyron   | 140      | 25     | 25      | 2    | Adjacent   |
+| Scylla    | 130      | 24     | 24      | 2    | Adjacent   |
+| Chylla    | 120      | 22     | 23      | 3    | Adjacent   |
+| Pastha    | 160      | 30     | 29      | 2    | Adjacent   |
+| Dragon    | 160      | 30     | 30      | 2    | All within 2 |
+
+"Special units" below means the six Gem Guardians, Pastha, and the Dragon.
+
+Range shapes, with no line-of-sight check:
+
+- **Adjacent:** the 4 orthogonal neighbours.
+- **Straight 2:** exactly 2 tiles away in a straight line. Cannot hit an adjacent tile.
+- **Ring at 2:** the 16 tiles at distance 2 (diagonals count as 1).
+- **All within 2:** all 24 tiles within distance 2.
+
+### Turn structure
+
+- A battle lasts at most **5 days of 4 turns each**. In each turn the defender moves first.
+- Each unit may move, then give one command: Attack, Build fence, Break fence, or Done.
+- Cancelling the command menu takes the move back.
+
+### Movement and terrain
+
+- Every step costs 1 Move point. Steps are orthogonal.
+- **Terrain never changes damage.** It only blocks movement.
+- A tile holding any unit is blocked.
+- Obstacles and fences block ground units. Gargoyles and Wyvern fly over them. Some obstacles block everyone.
+
+### Facing
+
+A unit faces the direction of its last step, or toward its target when it attacks. A defender never turns to meet an attack.
+
+| Attack from | Damage to target | Melee attacker's own losses |
+| ----------- | ---------------- | --------------------------- |
+| Front       | ×1.0             | ×1.0                        |
+| Flank       | ×1.5             | ×0.9                        |
+| Rear        | ×2.0             | ×0.7                        |
+
+Front means the two units face each other; rear means they face the same way.
+
+### Melee
+
+Used when an ordinary unit with Adjacent range attacks. Both sides take losses in one step; there is no separate counter-attack.
+
+```text
+power(u) = WAR(u's side) × Strength(u) ÷ 50 + 1
+
+PD = ((power(D) + 10) ÷ 10) × Defence(D)
+PA = ((power(A) + 10) ÷ 10) × Attack(A)
+
+R = PD × 100 ÷ (PD + PA), clamped to 1 … 99      (defender's share)
+Q = 100 − R
+S = R² + Q²
+
+lossD = Q ÷ R + (Strength(D) × (90 + rand(21)) ÷ 100 × Q² ÷ S) ÷ 3 + 1
+lossD = lossD × facing(target) ÷ 10
+
+lossA = R ÷ Q + (Strength(A) × (90 + rand(21)) ÷ 100 × R² ÷ S) ÷ 3 + 1
+lossA = lossA × facing(attacker) ÷ 10
+```
+
+Both losses use the Strengths from before the exchange. The defender's roll comes first.
+
+Roughly: an evenly matched exchange costs each side about one sixth of its Strength; a one-sided one costs the weaker side up to a third.
+
+### Ranged
+
+Used when an ordinary unit with any other range attacks. No randomness, and the attacker takes no losses.
+
+```text
+d = (WAR ÷ 8) × (Strength(A) ÷ 10 + 1) ÷ 9 + 1
+d = d × Attack(A) ÷ 15
+d = d × facing(target) ÷ 10
+d = d × (50 − Defence(D)) ÷ 32
+```
+
+### Special-unit attack
+
+Used when a special unit attacks, whatever its range. WAR is not used, and there is no randomness.
+
+```text
+d = (Strength(A) ÷ 10 + 1) × Attack(A) ÷ 13
+d = d × facing(target) ÷ 10
+d = d × (50 − Defence(D)) ÷ 32
+
+Strength(A) −= Strength(A) ÷ 10        (the attacker tires by 10% per attack)
+```
+
+The attack hits one target. There is no area effect, and no per-battle limit on its use.
+
+### Removal
+
+- Ordinary units are removed at Strength 0.
+- A special unit cannot be reduced below 1 by damage, but **withdraws once its Strength is below one tenth of its maximum**. Its own 10% tiring counts toward this.
+
+### Fences
+
+One formula covers both building and breaking:
+
+```text
+chance % = min(100, (Strength ÷ 6) × 6 + 6 + WAR ÷ 20)
+```
+
+- Build: only the two Knights units, on an empty plain tile next to them.
+- Break: any unit, on an adjacent fence.
+- A fence has no durability. One success removes it.
+- A unit with Strength 96 or more never fails.
+- Either attempt uses the unit's command for the turn.
+
+### Food
+
+```text
+consumption = (soldiers left + ordinary Fifth Unit Strength) ÷ 10 + 1
+```
+
+Taken at the start of every day, including the first. Special units eat nothing.
+
+At the end of each day: if the attacker has no food the defender wins; otherwise if the defender has none the attacker wins.
+
+### Victory
+
+Checked after every unit action:
+
+1. A unit standing on the enemy base wins.
+2. A side with no soldiers and no Fifth Unit loses.
+3. A side that retreats loses.
+4. Food, at the end of the day.
+5. After day 5 the **defender** wins.
+
+### Retreat
+
+- Allowed if the ruler's home province is somewhere other than the battlefield, or the battlefield borders one of the family's own provinces.
+- Destination: Home, or an adjoining own province.
+- Retreating to a non-adjacent Home leaves supplies behind.
+- There is no surrender inside a battle. Surrender is offered before it, and only to a defender who cannot fight (no food, or no soldiers and no usable Fifth Unit).
+
+### Aftermath
+
+"Day" is the day the battle ended on. `rate(stat) = min(10, stat ÷ 10)` for the loser's commander, or `min(10, ruler stat ÷ 20)` if there was none.
+
+**Attacker won:**
+
+```text
+if the defender has an adjacent province to fall back to:
+    it takes  Gold × rate(INT) ÷ 10,  Food × rate(INT) ÷ 10,  Soldiers × rate(WAR) ÷ 10
+else:
+    all defending soldiers are lost
+    the province loses 30–50% of its Gold and of its Food
+
+province Food += attacker's remaining food
+province Soldiers = attacker's survivors
+province Loyalty = 0
+```
+
+Add the rescued Food amount to the fallback province’s Food.
+
+**Defender won:**
+
+```text
+if the attacker's origin is adjacent:  origin Soldiers += survivors × rate(WAR) ÷ 10
+else:                                  all attacking soldiers are lost
+province Food += attacker's remaining food
+province Loyalty = Loyalty × (90 + rand(6) − 4 × Day) ÷ 100
+```
+
+**Either way**, the battlefield province loses:
+
+```text
+Cultivation −= Cultivation × 2 × Day ÷ 45 + rand(2) + 1
+Protection  −= Protection  × 2 × Day ÷ 45 + rand(2) + 1
+```
+
+**Fame**: the winning family's ruler gains 3 if attacking or 1 if defending; the losing ruler loses the same amount.
+
+### Capture of the losing commander
+
+```text
+no province to flee to, or the defender surrendered → captured
+otherwise chance % = max(0, 115 − WAR)   if the attacker won
+                     max(0, 110 − WAR)   if the defender won
+```
+
+One character (general number 30, Eselred) can never be captured this way.
+
+**Ransom** offered for a prisoner:
+
+```text
+s = INT + WAR
+Gold = s ÷ 5 + 10
+Food = (s ÷ 5) × 2 + 10
+```
+
+Both are multiplied by 1.5 for a member of the losing ruler's own house. (Likely.)
+
+---
+
+---
+
+## Detailed rules: Auto-Resolved Battles
+
+Used when neither side is human-controlled, except in demo mode. Up to 5 rounds:
+
+```text
+each side: food −= soldiers ÷ 10 + ordinary Fifth Unit Strength ÷ 10 + 1
+
+power = (WAR + soldiers) ÷ 2 + 1
+if the side has a Fifth Unit: power += min(150, (WAR + soldiers) ÷ 5)
+
+R = defender's share of total power, clamped 1 … 99;  Q = 100 − R;  S = R² + Q²
+
+defender loses  Q ÷ R + (soldiers × (80 + rand(41)) ÷ 100 × Q² ÷ S) ÷ 3 + 3
+attacker loses  R ÷ Q + (soldiers × (80 + rand(41)) ÷ 100 × R² ÷ S) ÷ 3 + 3
+a side's Fifth Unit loses  that side's loss ÷ (2 … 5)
+
+attacker wiped out or out of food → defender wins
+defender wiped out or out of food → attacker wins
+```
+
+After 5 rounds without a result the defender wins. Only the presence of a Fifth Unit matters, not its kind. The normal battle aftermath then applies, with the round number as the day.
+
+---
+
+---
+
+## Detailed rules: Battlefields
+
+### Selection
+
+- There are 30 battlefields, **one per province**. A battle uses the battlefield of the province being fought over.
+- Nothing else affects the choice: not the attacking province, the direction of attack, the season, or the scenario.
+- The board is never mirrored. The attacker is always on the left, the defender on the right.
+
+The 30 battlefields are listed in `data/battlefields.json`.
+
+### Terrain
+
+| Terrain            | Blocks                     | Notes                                         |
+| ------------------ | -------------------------- | --------------------------------------------- |
+| Plains             | Nothing                    | The only tile a fence can be built on.        |
+| Bridge             | Nothing                    | Crosses a north–south river.                  |
+| Base (each side)   | Nothing                    | Exactly one per side.                         |
+| Woods              | Ground units               |                                               |
+| Boulder            | Ground units               |                                               |
+| Fence              | Ground units               | Breakable; pre-placed on some boards.         |
+| River (four shapes) | Ground units              | Crossed only by bridge or by flying.          |
+| Castle wall (four shapes) | **Every unit, flyers too** | Cannot be broken.                        |
+
+Flyers are Gargoyles and Wyvern.
+
+No terrain changes movement cost, damage, or range. Woods, boulders, and rivers do not stop ranged attacks. (Likely for the absence of any other effect — the battle code compares no other terrain value.)
+
+### Bases and start positions
+
+- The attacker's base is always in the leftmost column, on one of the attacker's start tiles.
+- The defender's base is 1 to 4 columns in from the right edge on most boards, so the defender starts **behind** it only loosely; on three boards (Norwood, Erewood, Rodale) it is in the rightmost column.
+- Units start in the outer column of their side, rows 3 to 7 of 8, one per row.
+
+### Fences
+
+- Pre-placed fences and fences built in battle are the same thing and equally breakable.
+- A fence can be built only on plains: not on a bridge, a base, or an occupied tile.
+- A broken fence becomes plains. There is no "broken fence" terrain.
+
+### What changes during a battle
+
+Only fences. No terrain is destroyed, nothing is placed at random, and rivers never freeze.
+
+The four turns of each day are tinted as times of day. This is purely visual.
+
+---
 
 ---
 

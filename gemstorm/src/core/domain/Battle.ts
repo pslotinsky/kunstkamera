@@ -1,6 +1,9 @@
+import { isDefined } from '@/lib/value/isDefined';
+
 import type { Army } from './Army';
 import { AttackRange } from './AttackRange';
 import { BattleClock } from './BattleClock';
+import type { MeleeRollMode } from './BattleDamage';
 import { BattleDeployment } from './BattleDeployment';
 import type { Battlefield } from './Battlefield';
 import { type BattleOutcome } from './BattleOutcome';
@@ -12,11 +15,21 @@ import type { Clash } from './Clash';
 import { Facing } from './Facing';
 import { MoveRange } from './MoveRange';
 
+const ROUND_OPENING_SIDE = BattleSide.defender;
+
 export interface BattleParams {
   readonly attacker: Army;
   readonly defender: Army;
   readonly field: Battlefield;
   readonly units?: readonly BattleUnit[] | undefined;
+  readonly retreats?: readonly BattleSide[] | undefined;
+}
+
+interface BattleState {
+  readonly clock: BattleClock;
+  readonly turn: BattleSide;
+  readonly abandonedBy: BattleSide | undefined;
+  readonly starvedSide: BattleSide | undefined;
 }
 
 export class Battle {
@@ -24,36 +37,45 @@ export class Battle {
   public readonly defender: Army;
   public readonly field: Battlefield;
   public readonly units: readonly BattleUnit[];
+  public readonly retreats: readonly BattleSide[];
 
-  public clock = new BattleClock();
-  public turn: BattleSide = BattleSide.attacker;
+  public clock: BattleClock;
+  public turn: BattleSide;
 
-  private abandonedBy?: BattleSide | undefined;
+  private abandonedBy: BattleSide | undefined;
+  private starvedSide: BattleSide | undefined;
 
-  public constructor(params: BattleParams) {
+  public constructor(params: BattleParams, state?: BattleState) {
     this.attacker = params.attacker;
     this.defender = params.defender;
     this.field = params.field;
-
     this.units = params.units ?? this.deploy(params.field);
+    this.retreats = params.retreats ?? BattleSide.all;
+    this.clock = state?.clock ?? new BattleClock();
+    this.turn = state?.turn ?? ROUND_OPENING_SIDE;
+    this.abandonedBy = state?.abandonedBy;
+    this.starvedSide = state?.starvedSide;
+
+    if (!isDefined(state)) {
+      this.feedArmies();
+    }
   }
 
   public clone(): Battle {
     const field = this.field.clone();
-    const copy = new Battle({
+    const units = this.units.map((unit) =>
+      unit.clone(field.getCell(unit.cell.column, unit.cell.row) ?? unit.cell),
+    );
+    const params = {
       attacker: this.attacker.clone(),
       defender: this.defender.clone(),
       field,
-      units: this.units.map((unit) =>
-        unit.clone(field.getCell(unit.cell.column, unit.cell.row) ?? unit.cell),
-      ),
-    });
+      units,
+      retreats: this.retreats,
+    };
+    const { clock, turn, abandonedBy, starvedSide } = this;
 
-    copy.clock = this.clock;
-    copy.turn = this.turn;
-    copy.abandonedBy = this.abandonedBy;
-
-    return copy;
+    return new Battle(params, { clock, turn, abandonedBy, starvedSide });
   }
 
   public get isOver(): boolean {
@@ -102,14 +124,18 @@ export class Battle {
     );
   }
 
-  public strike(unit: BattleUnit, target: BattleUnit): Clash {
+  public strike(
+    unit: BattleUnit,
+    target: BattleUnit,
+    meleeRoll: MeleeRollMode = 'random',
+  ): Clash {
     unit.turnTo(target.cell);
 
-    const clash = unit.strikeAt(target);
+    const clash = unit.strikeAt(target, meleeRoll);
 
     unit.finishTurn();
     this.chargeCasualties(clash.target, clash.losses);
-    this.chargeCasualties(clash.striker, clash.backlash);
+    this.chargeCasualties(clash.striker, clash.strikerLosses);
 
     return clash;
   }
@@ -118,12 +144,18 @@ export class Battle {
     unit: BattleUnit,
     from: Cell = unit.cell,
   ): readonly Cell[] {
-    return this.findBeside(from).filter(
-      (cell) =>
-        cell.terrain === 'plains' &&
-        !this.isFlag(cell) &&
-        this.getUnit(cell) === undefined,
-    );
+    let sites: readonly Cell[] = [];
+
+    if (unit.canBuild) {
+      sites = this.findBeside(from).filter(
+        (cell) =>
+          cell.terrain === 'plains' &&
+          !this.isFlag(cell) &&
+          !isDefined(this.getUnit(cell)),
+      );
+    }
+
+    return sites;
   }
 
   public getBreakable(
@@ -134,25 +166,31 @@ export class Battle {
   }
 
   public build(unit: BattleUnit, cell: Cell): boolean {
-    return this.work(unit, cell, this.getBuildSites(unit), () =>
-      cell.raiseFence(),
+    return this.work(unit, cell, this.getBuildSites(unit), (site) =>
+      site.raiseFence(),
     );
   }
 
   public breakDown(unit: BattleUnit, cell: Cell): boolean {
-    return this.work(unit, cell, this.getBreakable(unit), () =>
-      cell.breakFence(),
+    return this.work(unit, cell, this.getBreakable(unit), (site) =>
+      site.breakFence(),
     );
   }
 
+  public canRetreat(side: BattleSide): boolean {
+    return this.retreats.some((open) => open.isEqual(side));
+  }
+
   public retreat(side: BattleSide): void {
-    this.abandonedBy = side;
+    if (this.canRetreat(side)) {
+      this.abandonedBy = side;
+    }
   }
 
   public endTurn(): void {
     this.turn = this.turn.opposite;
 
-    if (this.turn.isAttacker) {
+    if (this.turn.isEqual(ROUND_OPENING_SIDE)) {
       this.turnClock();
     }
 
@@ -162,7 +200,7 @@ export class Battle {
   }
 
   public findOutcome(): BattleOutcome | undefined {
-    return new BattleVerdict(this, this.abandonedBy).find();
+    return new BattleVerdict(this, this.abandonedBy, this.starvedSide).find();
   }
 
   private deploy(field: Battlefield): readonly BattleUnit[] {
@@ -193,21 +231,31 @@ export class Battle {
     unit: BattleUnit,
     cell: Cell,
     allowed: readonly Cell[],
-    change: () => void,
+    change: (site: Cell) => void,
   ): boolean {
-    if (!allowed.some((open) => open.isEqual(cell))) {
-      return false;
+    const site = allowed.find((open) => open.isEqual(cell));
+    let succeeded = false;
+
+    if (isDefined(site) && this.canWork(unit)) {
+      succeeded = Math.random() < unit.fenceOdds;
+
+      if (succeeded) {
+        change(site);
+      }
+
+      unit.finishTurn();
     }
 
-    const done = Math.random() < unit.fenceOdds;
+    return succeeded;
+  }
 
-    if (done) {
-      change();
-    }
-
-    unit.finishTurn();
-
-    return done;
+  private canWork(unit: BattleUnit): boolean {
+    return (
+      unit.isStanding &&
+      !unit.hasActed &&
+      unit.side.isEqual(this.turn) &&
+      this.units.includes(unit)
+    );
   }
 
   private chargeCasualties(unit: BattleUnit, losses: number): void {
@@ -217,13 +265,33 @@ export class Battle {
   }
 
   private turnClock(): void {
-    const opensNewDay = this.clock.isDayEnd;
+    if (this.clock.isDayEnd) {
+      this.finishDay();
+    } else {
+      this.clock = this.clock.next();
+    }
+  }
 
-    this.clock = this.clock.next();
+  private finishDay(): void {
+    this.starvedSide = BattleSide.all.find(
+      (side) => this.getArmy(side).isStarving,
+    );
 
-    if (opensNewDay) {
-      this.attacker.eat();
-      this.defender.eat();
+    if (!isDefined(this.starvedSide)) {
+      this.clock = this.clock.next();
+
+      if (!this.clock.isSpent) {
+        this.feedArmies();
+      }
+    }
+  }
+
+  private feedArmies(): void {
+    for (const side of BattleSide.all) {
+      const fifthUnit = this.getUnits(side).find((unit) => unit.isFifthUnit);
+      const fifthUnitStrength = fifthUnit?.strength ?? 0;
+
+      this.getArmy(side).eat(fifthUnitStrength);
     }
   }
 }

@@ -1,19 +1,25 @@
 import { CommandExecutor } from '@/core/CommandExecutor';
 import type { CalendarDate } from '@/core/domain/CalendarDate';
+import { DEVELOPMENT_MAXES } from '@/core/domain/Development';
 import type { General } from '@/core/domain/General';
+import type { Province } from '@/core/domain/Province';
 import { Succession } from '@/core/domain/Succession';
 import { GeneralDiedEvent } from '@/core/events/GeneralDiedEvent';
 import { SuccessionReportedEvent } from '@/core/events/SuccessionReportedEvent';
+import { isDefined } from '@/lib/value/isDefined';
 
 import { WorldCommand, type WorldCommandContext } from './WorldCommand';
 
 const JANUARY = 1;
-const GROWTH_ODDS = 1 / 3;
+const DEVELOPMENT_DECAY_DIVISOR = 20;
+const LOYALTY_DEFICIT_DIVISOR = 35;
+const BASE_DEVELOPMENT_DECAY = 1;
 
 export class LifecycleCommand extends WorldCommand {
   private readonly executor: CommandExecutor;
   private readonly succession: Succession;
   private remaining: General[] | undefined;
+  private processedYear: number | undefined;
 
   public constructor(context: WorldCommandContext) {
     super('Lifecycle', context);
@@ -22,26 +28,62 @@ export class LifecycleCommand extends WorldCommand {
   }
 
   public get isComplete(): boolean {
-    return this.remaining === undefined;
+    return !isDefined(this.remaining);
   }
 
   public execute(): void {
-    this.remaining ??= this.prepareMonth();
+    const { date } = this.context.world;
+
+    if (date.isMonth(JANUARY) && this.processedYear !== date.year) {
+      this.processJanuary(date);
+    }
+  }
+
+  private processJanuary(date: CalendarDate): void {
+    const { campaign } = this.context.world;
+
+    this.remaining ??= this.beginYear(date);
     this.processDeaths(this.remaining);
 
-    if (!this.context.world.campaign.isAwaitingHeir) {
+    if (campaign.canProgress) {
+      this.ageSurvivors(date);
+    }
+
+    if (!campaign.isAwaitingDecision) {
+      this.processedYear = date.year;
       this.remaining = undefined;
     }
   }
 
-  private prepareMonth(): General[] {
-    const { date } = this.context.world;
+  private beginYear(date: CalendarDate): General[] {
+    const { provinces } = this.context.world.map;
 
-    if (date.isMonth(JANUARY)) {
-      this.turnYear(date);
+    for (const province of provinces) {
+      this.decayDevelopment(province);
     }
+    this.publishUpdates(provinces);
 
-    return [...this.chooseTheDead(date)];
+    return this.chooseTheDead(date);
+  }
+
+  private decayDevelopment(province: Province): void {
+    const { loyalty, cultivation, protection } = province.development;
+    const loyaltyDeficit = DEVELOPMENT_MAXES.loyalty - loyalty;
+    const loyaltyLoss =
+      Math.floor(loyalty / DEVELOPMENT_DECAY_DIVISOR) +
+      Math.floor(loyaltyDeficit / LOYALTY_DEFICIT_DIVISOR);
+    const cultivationLoss =
+      Math.floor(cultivation / DEVELOPMENT_DECAY_DIVISOR) +
+      BASE_DEVELOPMENT_DECAY;
+    const protectionLoss =
+      Math.floor(protection / DEVELOPMENT_DECAY_DIVISOR) +
+      BASE_DEVELOPMENT_DECAY;
+
+    province.reduceDevelopment({
+      loyalty: loyaltyLoss,
+      cultivation: cultivationLoss,
+      protection: protectionLoss,
+    });
   }
 
   private processDeaths(remaining: General[]): void {
@@ -58,20 +100,25 @@ export class LifecycleCommand extends WorldCommand {
     }
   }
 
-  private turnYear(date: CalendarDate): void {
+  private ageSurvivors(date: CalendarDate): void {
     const { world } = this.context;
 
     for (const general of world.generals.all) {
-      if (Math.random() < GROWTH_ODDS) {
-        general.age(general.getYearlyChange(date, world.isRuler(general)));
-      }
+      const family = world.findFamilyOf(general);
+      const rank = isDefined(family)
+        ? world.getGeneralRank(family, general)
+        : 'vassal';
+
+      general.ageYear(date, rank);
     }
   }
 
-  private chooseTheDead(date: CalendarDate): readonly General[] {
-    return this.context.world.generals.all.filter(
-      (general) => Math.random() < general.getDeathRisk(date),
-    );
+  private chooseTheDead(date: CalendarDate): General[] {
+    return this.context.world.generals.all.filter((general) => {
+      const risk = general.getDeathRisk(date);
+
+      return risk > 0 && Math.random() < risk;
+    });
   }
 
   private mourn(general: General): void {
@@ -86,6 +133,7 @@ export class LifecycleCommand extends WorldCommand {
 
       this.publish(new SuccessionReportedEvent(outcome, 'death'));
       this.publishUpdates(outcome.provinces);
+      this.publishVassalOffer();
     } else {
       this.publish(new GeneralDiedEvent(general, family));
     }

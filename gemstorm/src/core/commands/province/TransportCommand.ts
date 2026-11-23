@@ -1,9 +1,14 @@
 import type { Province } from '@/core/domain/Province';
+import type { ResourceKey } from '@/core/domain/Resources';
+import { Shipment } from '@/core/domain/Shipment';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
+import { isDefined } from '@/lib/value/isDefined';
 
 import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
 export type TransportDirection = 'send' | 'receive';
+
+export type TransportedResource = Exclude<ResourceKey, 'troops'>;
 
 export class TransportCommand extends ProvinceCommand {
   public direction: TransportDirection = 'send';
@@ -30,17 +35,29 @@ export class TransportCommand extends ProvinceCommand {
       : [];
   }
 
-  public execute(): void {
-    if (
-      this.source &&
-      this.target &&
-      this.canTransport(this.source, this.target)
-    ) {
-      this.source.addResources({ gold: -this.gold, food: -this.food });
-      this.target.addResources({ gold: this.gold, food: this.food });
+  public getMaximum(resource: TransportedResource): number {
+    const { source, target } = this;
 
-      this.publish(new ProvinceUpdatedEvent(this.other!));
-      this.complete(this.currentProvince!);
+    return isDefined(source) && isDefined(target)
+      ? Shipment.getMaximum(source, target, resource)
+      : 0;
+  }
+
+  public execute(): void {
+    const { source, target } = this;
+
+    if (isDefined(source) && isDefined(target)) {
+      const shipment = new Shipment({
+        source,
+        target,
+        cargo: { gold: this.gold, food: this.food },
+      });
+
+      if (this.canTransport(shipment)) {
+        shipment.deliver();
+        this.publish(new ProvinceUpdatedEvent(this.other!));
+        this.complete(this.currentProvince!);
+      }
     }
   }
 
@@ -58,16 +75,11 @@ export class TransportCommand extends ProvinceCommand {
     return this.destination ? map.getProvince(this.destination) : undefined;
   }
 
-  private canTransport(source: Province, target: Province): boolean {
-    const isValueSelected = this.gold > 0 || this.food > 0;
-    const hasEnoughGold = source.resources.gold >= this.gold;
-    const hasEnoughFood = source.resources.food >= this.food;
-
+  private canTransport(shipment: Shipment): boolean {
     return (
-      this.isValidSelection(source, target) &&
-      isValueSelected &&
-      hasEnoughGold &&
-      hasEnoughFood
+      this.isValidSelection(shipment.source, shipment.target) &&
+      !shipment.isEmpty &&
+      shipment.isDeliverable
     );
   }
 

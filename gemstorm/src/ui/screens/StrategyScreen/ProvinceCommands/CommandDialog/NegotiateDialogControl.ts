@@ -61,8 +61,10 @@ export class NegotiateDialogControl extends CommandDialogControl<
   protected override setupCommand(command: NegotiateCommand): void {
     const family = this.target?.family;
 
-    if (this.mission === 'surrender' && family) {
-      command.demandSurrender(family);
+    if (this.mission === 'surrender') {
+      if (isDefined(family) && command.canDemandSurrender(family)) {
+        command.demandSurrender(family);
+      }
     } else if (isDefined(this.choice)) {
       command.persuade(this.world.generals.getOrFail(this.choice));
     }
@@ -71,9 +73,18 @@ export class NegotiateDialogControl extends CommandDialogControl<
   private update(): void {
     const target = this.target;
     const family = target?.family;
+    const canDemandSurrender =
+      isDefined(family) && this.command?.canDemandSurrender(family) === true;
+
+    if (!canDemandSurrender && this.mission === 'surrender') {
+      this.mission = 'defection';
+    }
 
     this.view.showTarget(target);
-    this.view.showMission(target ? this.mission : undefined);
+    this.view.showMission(
+      target ? this.mission : undefined,
+      canDemandSurrender,
+    );
 
     if (target && family && this.mission === 'surrender') {
       this.view.showDemand(family, this.world.player);

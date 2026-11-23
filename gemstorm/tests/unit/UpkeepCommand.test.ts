@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { UpkeepCommand } from '@/core/commands/UpkeepCommand';
 import { CalendarDate } from '@/core/domain/CalendarDate';
@@ -27,7 +27,7 @@ function createFixture(
   });
 
   for (const type of options.units ?? ['Grimhides', 'Bugbear']) {
-    province.addUnit(HiredUnit.ofName(type)!);
+    province.fifthUnits.addUnit(HiredUnit.ofName(type)!);
   }
 
   const { world, events } = makeWorld(
@@ -39,10 +39,6 @@ function createFixture(
   return { province, events, command: new UpkeepCommand({ world, events }) };
 }
 
-function rollAt(roll: number): void {
-  vi.spyOn(Math, 'random').mockReturnValue(roll);
-}
-
 describe('UpkeepCommand', () => {
   it('keeps Nerith without pay or desertion even when hired units cannot be maintained', () => {
     const { province, command } = createFixture({
@@ -50,14 +46,12 @@ describe('UpkeepCommand', () => {
       units: ['Grimhides'],
     });
     const nerith = new Nerith();
-    province.addUnit(nerith);
+    province.fifthUnits.addUnit(nerith);
     command.execute();
 
     expect(province.resources.gold).toBe(0);
-    expect(province.stationedUnits).toEqual([nerith]);
+    expect(province.fifthUnits.units).toEqual([nerith]);
   });
-
-  afterEach(() => vi.restoreAllMocks());
 
   it('charges every stationed unit its cost on a quarter month', () => {
     const { province, command } = createFixture({ gold: 100 });
@@ -65,7 +59,7 @@ describe('UpkeepCommand', () => {
     command.execute();
 
     expect(province.resources.gold).toBe(100 - 20 - 30);
-    expect(province.hiredUnits).toHaveLength(2);
+    expect(province.fifthUnits.hiredUnits).toHaveLength(2);
   });
 
   it('charges nothing outside the quarter months', () => {
@@ -77,7 +71,7 @@ describe('UpkeepCommand', () => {
     command.execute();
 
     expect(province.resources.gold).toBe(100);
-    expect(province.hiredUnits).toHaveLength(2);
+    expect(province.fifthUnits.hiredUnits).toHaveLength(2);
   });
 
   it('deserts the units the province cannot pay for', () => {
@@ -86,56 +80,26 @@ describe('UpkeepCommand', () => {
     command.execute();
 
     expect(province.resources.gold).toBe(20);
-    expect(province.hiredUnits.map((unit) => unit.name)).toEqual(['Grimhides']);
+    expect(province.fifthUnits.hiredUnits.map((unit) => unit.name)).toEqual([
+      'Grimhides',
+    ]);
   });
 
-  it('risks a mercenary in proportion to the fame it still wants', () => {
-    const unknown = createFixture({ units: ['Spearmen'], fame: 0 });
-
-    unknown.command.execute();
-
-    expect(unknown.province.hiredUnits).toHaveLength(0);
-    expect(unknown.province.resources.gold).toBe(100);
-
-    const famous = createFixture({ units: ['Spearmen'], fame: 20 });
-
-    famous.command.execute();
-
-    expect(famous.province.hiredUnits).toHaveLength(1);
-    expect(famous.province.resources.gold).toBe(80);
-
-    rollAt(0.49);
-    const unlucky = createFixture({ units: ['Spearmen'], fame: 10 });
-
-    unlucky.command.execute();
-
-    expect(unlucky.province.hiredUnits).toHaveLength(0);
-
-    rollAt(0.51);
-    const lucky = createFixture({ units: ['Spearmen'], fame: 10 });
-
-    lucky.command.execute();
-
-    expect(lucky.province.hiredUnits).toHaveLength(1);
-  });
-
-  it('keeps monsters serving a family with no fame at all', () => {
-    rollAt(0);
+  it('pays a mercenary even when the ruler has too little Fame to keep it', () => {
     const { province, command } = createFixture({
-      units: ['Grimhides'],
+      units: ['Spearmen'],
       fame: 0,
-      gold: 100,
     });
 
     command.execute();
 
-    expect(province.hiredUnits).toHaveLength(1);
+    expect(province.fifthUnits.hiredUnits).toHaveLength(1);
     expect(province.resources.gold).toBe(80);
   });
 
-  it('reports each desertion with the reason the unit left', () => {
+  it('reports unpaid desertion and returns the unit to the hire pool', () => {
     const desertions: [string, string][] = [];
-    const { command, events } = createFixture({
+    const { command, events, province } = createFixture({
       units: ['Spearmen', 'Pikemen'],
       fame: 0,
       gold: 20,
@@ -146,9 +110,9 @@ describe('UpkeepCommand', () => {
     );
     command.execute();
 
-    expect(desertions).toEqual([
-      ['Spearmen', 'faithless'],
-      ['Pikemen', 'unpaid'],
-    ]);
+    expect(desertions).toEqual([['Pikemen', 'unpaid']]);
+    expect(province.fifthUnits.hirePool.map((unit) => unit.name)).toContain(
+      'Pikemen',
+    );
   });
 });

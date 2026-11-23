@@ -48,8 +48,10 @@ export class ChangeLordDialogControl extends CommandDialogControl<
   }
 
   public override refresh(): void {
+    this.target = undefined;
     this.resetSelection();
     this.update();
+    this.requestTarget();
   }
 
   protected override onMount(): void {
@@ -66,14 +68,46 @@ export class ChangeLordDialogControl extends CommandDialogControl<
   }
 
   protected override setupCommand(command: ChangeLordCommand): void {
-    if (this.target && isDefined(this.choice)) {
-      const general = this.world.generals.getOrFail(this.choice);
+    const { target, choice } = this;
 
-      if (this.world.player.isRuler(general)) {
-        command.ruleDirectly(this.target);
-      } else {
-        command.assignLord(this.target, general);
+    if (isDefined(target) && isDefined(choice)) {
+      switch (this.mode) {
+        case 'you':
+          command.ruleDirectly(target);
+          break;
+        case 'vassals':
+          this.chooseVassal(command, target, choice);
+          break;
+        case 'lords':
+          this.chooseSwapProvince(command, target, choice);
+          break;
       }
+    }
+  }
+
+  private chooseVassal(
+    command: ChangeLordCommand,
+    target: Province,
+    name: string,
+  ): void {
+    const vassal = this.findVassals().find((general) => general.name === name);
+
+    if (isDefined(vassal)) {
+      command.assignLord(target, vassal);
+    }
+  }
+
+  private chooseSwapProvince(
+    command: ChangeLordCommand,
+    target: Province,
+    provinceNumber: string,
+  ): void {
+    const source = this.findSwapProvinces(target).find(
+      (province) => String(province.number) === provinceNumber,
+    );
+
+    if (isDefined(source)) {
+      command.swapGovernors(target, source);
     }
   }
 
@@ -92,6 +126,7 @@ export class ChangeLordDialogControl extends CommandDialogControl<
     }
 
     this.view.enableConfirm(isDefined(this.choice));
+    this.view.askAboutMovingRuler(this.isMovingRuler());
   }
 
   private showMode(target: Province): void {
@@ -111,27 +146,46 @@ export class ChangeLordDialogControl extends CommandDialogControl<
   private buildRuler(target: Province): LordItem | undefined {
     const { ruler } = this.world.player;
 
-    return target.ruledBy(ruler)
-      ? undefined
-      : { name: ruler.name, selected: this.isSelected(ruler.name) };
+    return target.hasLord
+      ? { name: ruler.name, selected: this.isSelected(ruler.name) }
+      : undefined;
   }
 
   private buildVassals(): LordItem[] {
-    return this.world.getVassals(this.world.player).map((vassal) => ({
+    return this.findVassals().map((vassal) => ({
       name: vassal.name,
       selected: this.isSelected(vassal.name),
     }));
   }
 
+  private findVassals() {
+    return this.world
+      .getVassals(this.world.player)
+      .filter((general) => !this.world.isHeld(general));
+  }
+
   private buildLords(target: Province): MovableLord[] {
+    return this.findSwapProvinces(target).map((province) => ({
+      provinceNumber: province.number,
+      name:
+        province.isHome || province.hasLord
+          ? (province.governor?.name ?? 'No lord')
+          : 'No lord',
+      from: province.name,
+      selected: this.isSelected(String(province.number)),
+    }));
+  }
+
+  private findSwapProvinces(target: Province): readonly Province[] {
     return this.world
       .getFamilyProvinces(this.world.player)
-      .filter((province) => province.hasLord && !province.isEqual(target))
-      .map((province) => ({
-        name: province.governor!.name,
-        from: province.name,
-        selected: this.isSelected(province.governor!.name),
-      }));
+      .filter((province) => !province.isEqual(target));
+  }
+
+  private isMovingRuler(): boolean {
+    const home = this.world.player.homeProvince;
+
+    return this.mode === 'lords' && this.isSelected(String(home.number));
   }
 
   private isSelected(name: string): boolean {

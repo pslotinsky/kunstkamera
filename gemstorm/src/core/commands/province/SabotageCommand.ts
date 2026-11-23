@@ -14,6 +14,8 @@ export class SabotageCommand extends InfiltrationCommand {
     infiltration: Infiltration,
     target: Province,
   ): MissionOutcome {
-    return { kind: 'sabotage', target, damage: infiltration.sabotage() };
+    const damage = infiltration.sabotage();
+
+    return { kind: 'sabotage', target, damage };
   }
 }

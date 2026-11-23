@@ -2,7 +2,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AttackCommand } from '@/core/commands/province/AttackCommand';
-import { Army } from '@/core/domain/Army';
 import { Battle } from '@/core/domain/Battle';
 import { BATTLE_DAY_LIMIT, BattleClock } from '@/core/domain/BattleClock';
 import { BattleSide } from '@/core/domain/BattleSide';
@@ -25,12 +24,14 @@ import {
 
 const SKYREACH = 22;
 
-function makeBattle(attacker = makeArmy({ troops: 156 })): Battle {
-  return makeShared({
+function makeBattleOnAttackerTurn(): Battle {
+  const battle = makeShared({
     province: SKYREACH,
-    attacker,
-    defender: makeArmy(),
+    attacker: makeArmy({ troops: 156 }),
   });
+  battle.endTurn();
+
+  return battle;
 }
 
 function orderButton(root: HTMLElement, order: string): HTMLButtonElement {
@@ -86,7 +87,7 @@ describe('BattleScreenControl', () => {
 
     expect(root.classList.contains(styles.hidden!)).toBe(true);
 
-    control.play(makeBattle());
+    control.play(makeShared());
 
     expect(root.classList.contains(styles.hidden!)).toBe(false);
     expect(root.querySelectorAll('[data-column]')).toHaveLength(80);
@@ -99,7 +100,7 @@ describe('BattleScreenControl', () => {
 
   it('reports the outcome when a unit reaches the enemy flag', () => {
     const { control, events, root } = mountScreen();
-    const battle = makeBattle();
+    const battle = makeBattleOnAttackerTurn();
 
     let ended: BattleEndedEvent | undefined;
     events.subscribe(BattleEndedEvent, (event) => {
@@ -165,10 +166,7 @@ describe('BattleScreenControl', () => {
 
     expect(command.suspendsTurn()).toBe(false);
 
-    command.attackAt(
-      target,
-      new Army({ commander: avar, troops: 100, food: 120 }),
-    );
+    command.attackAt(target, { troops: 100, food: 55 });
     command.execute();
 
     expect(started).toBeDefined();
@@ -176,7 +174,7 @@ describe('BattleScreenControl', () => {
   });
   it('strikes what it can reach without a command in between', () => {
     const { control, root } = mountScreen();
-    const battle = makeBattle();
+    const battle = makeBattleOnAttackerTurn();
     const rider = battle.getUnits(BattleSide.attacker)[0]!;
     const knight = battle.getUnits(BattleSide.defender)[0]!;
 
@@ -199,7 +197,7 @@ describe('BattleScreenControl', () => {
 
   it('finishes a unit that walks somewhere with nothing to strike', () => {
     const { control, root } = mountScreen();
-    const battle = makeBattle();
+    const battle = makeBattleOnAttackerTurn();
     const rider = battle.getUnits(BattleSide.attacker)[0]!;
 
     rider.cell = battle.field.getCell(0, 1)!;
@@ -218,7 +216,7 @@ describe('BattleScreenControl', () => {
 
   it('lets another unit be picked up after the first has moved', () => {
     const { control, root } = mountScreen();
-    const battle = makeBattle();
+    const battle = makeBattleOnAttackerTurn();
     const [rider, knight] = battle.getUnits(BattleSide.attacker);
     const enemy = battle.getUnits(BattleSide.defender)[0]!;
 
@@ -245,7 +243,7 @@ describe('BattleScreenControl', () => {
 
   it('walks the rest of the way after a short first move', () => {
     const { control, root } = mountScreen();
-    const battle = makeBattle();
+    const battle = makeBattleOnAttackerTurn();
     const rider = battle.getUnits(BattleSide.attacker)[0]!;
 
     parkDefenders(battle);
@@ -270,7 +268,7 @@ describe('BattleScreenControl', () => {
 
   it('breaks a fence it has walked up to', () => {
     const { control, root } = mountScreen();
-    const battle = makeBattle();
+    const battle = makeBattleOnAttackerTurn();
     const rider = battle.getUnits(BattleSide.attacker)[0]!;
     const fence = battle.field.getCell(8, 3)!;
 
@@ -295,7 +293,7 @@ describe('BattleScreenControl', () => {
 
   it('builds a fence after walking, when the unit is a Knights', () => {
     const { control, root } = mountScreen();
-    const battle = makeBattle();
+    const battle = makeBattleOnAttackerTurn();
     const knights = battle.getUnits(BattleSide.attacker)[1]!;
 
     parkDefenders(battle);
@@ -321,7 +319,7 @@ describe('BattleScreenControl', () => {
 
   it('asks before it abandons the field, and stays when told to', () => {
     const { control, events, root } = mountScreen();
-    const battle = makeBattle();
+    const battle = makeBattleOnAttackerTurn();
 
     let ended: BattleEndedEvent | undefined;
     events.subscribe(BattleEndedEvent, (event) => {
@@ -344,9 +342,9 @@ describe('BattleScreenControl', () => {
     expect(ended?.outcome.reason).toBe('retreat');
     expect(ended?.outcome.isWonBy(BattleSide.defender)).toBe(true);
   });
-  it('hands the turn over and lets the enemy take its own orders', () => {
+  it('lets the defending enemy act before the player each round', () => {
     const { control, root } = mountScreen();
-    const battle = makeBattle();
+    const battle = makeShared();
 
     control.play(battle);
 
@@ -355,7 +353,10 @@ describe('BattleScreenControl', () => {
       .map((unit) => `${unit.name}${unit.cell.name}`)
       .join('|');
 
-    orderButton(root, 'done').click();
+    expect(battle.turn).toBe(BattleSide.defender);
+    expect(root.querySelector('[data-prompt]')!.textContent).toBe(
+      'The enemy is moving…',
+    );
 
     vi.runAllTimers();
 
@@ -366,14 +367,21 @@ describe('BattleScreenControl', () => {
 
     expect(after).not.toBe(before);
     expect(battle.turn).toBe(BattleSide.attacker);
+    expect(battle.clock.phase).toBe('sunrise');
     expect(
       battle.getUnits(BattleSide.attacker).every((unit) => !unit.hasActed),
     ).toBe(true);
+
+    orderButton(root, 'done').click();
+    vi.runAllTimers();
+
+    expect(battle.turn).toBe(BattleSide.attacker);
+    expect(battle.clock.phase).toBe('noon');
   });
 
   it('has the enemy strike when its order names a target', () => {
     const { control, root } = mountScreen();
-    const battle = makeBattle();
+    const battle = makeBattleOnAttackerTurn();
     const rider = battle.getUnits(BattleSide.attacker)[0]!;
     const guard = battle.getUnits(BattleSide.defender)[0]!;
 
@@ -393,7 +401,7 @@ describe('BattleScreenControl', () => {
   });
   it('reports a battle that runs out exactly once, and as endurance', () => {
     const { control, events, root } = mountScreen();
-    const battle = makeBattle();
+    const battle = makeBattleOnAttackerTurn();
     const endings: BattleEndedEvent[] = [];
 
     battle.clock = new BattleClock(BATTLE_DAY_LIMIT, 'midnight');
@@ -412,9 +420,31 @@ describe('BattleScreenControl', () => {
     expect(endings[0]?.outcome.reason).toBe('endurance');
   });
 
+  it('reports starvation when the player closes the day as attacker', () => {
+    const { control, events, root } = mountScreen();
+    const battle = makeShared({
+      attacker: makeArmy({ troops: 156, food: 16 }),
+    });
+    battle.endTurn();
+    const endings: BattleEndedEvent[] = [];
+
+    battle.clock = new BattleClock(1, 'midnight');
+    events.subscribe(BattleEndedEvent, (event) => endings.push(event));
+    control.play(battle);
+
+    orderButton(root, 'done').click();
+
+    expect(endings).toHaveLength(1);
+    expect(endings[0]?.outcome).toMatchObject({
+      reason: 'starvation',
+      winner: BattleSide.defender,
+      days: 1,
+    });
+  });
+
   it('offers Auto beside Retreat, and asks before it fires', () => {
     const { control, root } = mountScreen();
-    const battle = makeBattle();
+    const battle = makeBattleOnAttackerTurn();
 
     control.play(battle);
 
@@ -433,7 +463,7 @@ describe('BattleScreenControl', () => {
 
   it("plays the player's own side once it is handed over", () => {
     const { control, root } = mountScreen();
-    const battle = makeBattle();
+    const battle = makeBattleOnAttackerTurn();
 
     control.play(battle);
 
@@ -461,6 +491,7 @@ describe('BattleScreenControl', () => {
       attacker: makeArmy({ troops: 3, food: 1 }),
       defender: makeArmy({ troops: 3 }),
     });
+    battle.endTurn();
     let ended: BattleEndedEvent | undefined;
 
     battle.clock = new BattleClock(1, 'midnight');
@@ -485,7 +516,7 @@ describe('BattleScreenControl', () => {
 
   it('breaks a fence beside a unit with one click, no command between', () => {
     const { control, root } = mountScreen();
-    const battle = makeBattle();
+    const battle = makeBattleOnAttackerTurn();
     const rider = battle.getUnits(BattleSide.attacker)[0]!;
     const fence = battle.field.getCell(8, 3)!;
 
@@ -504,7 +535,7 @@ describe('BattleScreenControl', () => {
 
   it('offers Fence only to a Knights, and sites it behind the button', () => {
     const { control, root } = mountScreen();
-    const battle = makeBattle();
+    const battle = makeBattleOnAttackerTurn();
     const rider = battle.getUnits(BattleSide.attacker)[0]!;
     const knights = battle.getUnits(BattleSide.attacker)[1]!;
 
@@ -529,7 +560,7 @@ describe('BattleScreenControl', () => {
 
   it('leaves siting without spending the turn', () => {
     const { control, root } = mountScreen();
-    const battle = makeBattle();
+    const battle = makeBattleOnAttackerTurn();
     const knights = battle.getUnits(BattleSide.attacker)[1]!;
 
     knights.cell = battle.field.getCell(6, 1)!;
@@ -547,7 +578,7 @@ describe('BattleScreenControl', () => {
     expect(isOffered(root, 'fence')).toBe(true);
   });
 
-  it('lets the attacker move first when the player defends', () => {
+  it('opens on the player’s turn when they defend', () => {
     const { control, root } = mountScreen();
     const invasion = makeInvasion();
 
@@ -557,10 +588,17 @@ describe('BattleScreenControl', () => {
 
     control.play(battle, invasion);
 
-    expect(battle.turn.isAttacker).toBe(true);
+    expect(battle.turn).toBe(BattleSide.defender);
+    expect(root.querySelector('[data-prompt]')!.textContent).toBe(
+      'Choose a unit to order.',
+    );
+
+    orderButton(root, 'done').click();
+
+    expect(battle.turn).toBe(BattleSide.attacker);
+    expect(battle.clock.phase).toBe('sunrise');
     expect(root.querySelector('[data-prompt]')!.textContent).toBe(
       'The enemy is moving…',
     );
-    expect(isOffered(root, 'retreat')).toBe(false);
   });
 });

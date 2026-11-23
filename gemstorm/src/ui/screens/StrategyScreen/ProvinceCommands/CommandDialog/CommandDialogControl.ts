@@ -78,6 +78,11 @@ export abstract class CommandDialogControl<
 
   protected setupCommand(_command: TCommand): void {}
 
+  protected requestTarget(): void {
+    this.hasTarget = false;
+    this.view.hide();
+  }
+
   protected submit(): void {
     if (this.command && this.submitHandler) {
       this.setupCommand(this.command);

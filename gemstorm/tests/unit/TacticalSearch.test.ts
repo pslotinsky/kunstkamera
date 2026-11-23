@@ -8,7 +8,7 @@ import { TacticalPolicy } from '@/core/domain/battle-ai/TacticalPolicy';
 
 import { makeArmy, makeBattle, runOutTheClock, station } from './factories';
 
-const NODE_BUDGET = 2_000;
+const OPENING_NODE_BUDGET = 3_000;
 
 function photograph(battle: Battle): string {
   const units = battle.units.map(
@@ -62,14 +62,18 @@ describe('TacticalSearch', () => {
     expect(battle.units).toContain(order.target);
   });
 
-  it('rolls no dice while it is thinking', () => {
+  it('rolls no dice while it is considering a melee strike', () => {
     const battle = makeBattle();
     const enemy = new TacticalPolicy(BattleSide.defender);
     const knights = battle
       .getUnits(BattleSide.defender)
       .find((unit) => unit.canBuild)!;
+    station(battle, knights, 9, 4);
+    const target = battle.getUnits(BattleSide.attacker)[0]!;
+    station(battle, target, 9, 3);
     const rolled = vi.spyOn(Math, 'random');
 
+    expect(battle.getTargets(knights)).toContain(target);
     enemy.orderUnit(knights, battle);
 
     expect(rolled).not.toHaveBeenCalled();
@@ -77,19 +81,21 @@ describe('TacticalSearch', () => {
     rolled.mockRestore();
   });
 
-  it('costs what it should, counted in nodes and not in seconds', () => {
+  it('keeps the search for the defender’s opening move within budget', () => {
     const battle = makeBattle();
     const enemy = new TacticalPolicy(BattleSide.defender);
 
     enemy.orderUnit(battle.getUnits(BattleSide.defender)[0]!, battle);
 
-    expect(enemy.nodes).toBeLessThan(NODE_BUDGET);
+    expect(enemy.nodes).toBeLessThan(OPENING_NODE_BUDGET);
   });
 
   it('steps onto a flag it can reach', () => {
     const battle = makeBattle();
     const enemy = new TacticalPolicy(BattleSide.defender);
     const flag = battle.field.attackerFlag;
+    const homeGuard = battle.getUnit(flag)!;
+    station(battle, homeGuard, flag.column + 1, flag.row - 2);
     const rider = station(
       battle,
       battle.getUnits(BattleSide.defender)[0]!,

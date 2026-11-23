@@ -6,20 +6,27 @@ import { BattleSide } from '@/core/domain/BattleSide';
 import type { BattleUnit } from '@/core/domain/BattleUnit';
 import { HiredUnit } from '@/core/domain/HiredUnit';
 
-import { makeArmy, makeBattle as makeShared, station } from './factories';
+import {
+  makeArmy,
+  makeGeneral,
+  makeBattle as makeShared,
+  station,
+} from './factories';
 
 const SKYREACH = 22;
 
-function makeBattle(unit?: HiredUnit) {
+function makeBattle(unit?: HiredUnit, war = 50) {
   const battle = makeShared({
     province: SKYREACH,
-    attacker: makeArmy({ troops: 160, unit }),
+    attacker: makeArmy({ commander: makeGeneral({ war }), troops: 160, unit }),
     defender: makeArmy({ troops: 1 }),
   });
 
   for (const guard of battle.getUnits(BattleSide.defender)) {
     guard.cell = battle.field.getCell(9, 7)!;
   }
+
+  battle.endTurn();
 
   return battle;
 }
@@ -41,11 +48,18 @@ describe('fences', () => {
 
   it('lets only Knights build', () => {
     const battle = makeBattle(HiredUnit.ofName('Grimhides')!);
+    const site = battle.field.getCell(9, 4)!;
 
-    expect(findKind(battle, 'Knights').canBuild).toBe(true);
-    expect(findKind(battle, 'Horsemen').canBuild).toBe(false);
-    expect(findKind(battle, 'Archers').canBuild).toBe(false);
-    expect(findKind(battle, 'Grimhides').canBuild).toBe(false);
+    luck(0);
+    for (const name of ['Horsemen', 'Archers', 'Grimhides']) {
+      const unit = station(battle, findKind(battle, name), 9, 3);
+
+      expect(battle.getBuildSites(unit)).toEqual([]);
+      expect(battle.build(unit, site)).toBe(false);
+      expect(unit.hasActed).toBe(false);
+    }
+
+    expect(site.terrain).toBe('plains');
   });
 
   it('offers open ground beside the builder and nothing else', () => {
@@ -104,6 +118,11 @@ describe('fences', () => {
     expect(battle.build(knights, site)).toBe(false);
     expect(site.terrain).toBe('plains');
     expect(knights.hasActed).toBe(true);
+
+    const fence = battle.field.getCell(8, 3)!;
+    luck(0);
+    expect(battle.breakDown(knights, fence)).toBe(false);
+    expect(fence.terrain).toBe('fence');
   });
 
   it('breaks a fence into passable wreckage', () => {
@@ -122,16 +141,36 @@ describe('fences', () => {
     expect(battle.getMoveRange(rider).includes(fence)).toBe(true);
   });
 
-  it('raises the odds with the strength doing the work', () => {
-    const battle = makeBattle();
+  it.each([
+    [1, 0, 0.06],
+    [40, 50, 0.44],
+    [40, 100, 0.47],
+    [95, 0, 0.96],
+    [96, 0, 1],
+  ])('gives Strength %s and WAR %s fence odds of %s', (strength, war, odds) => {
+    const battle = makeBattle(undefined, war);
     const knights = findKind(battle, 'Knights');
-    const whole = knights.fenceOdds;
 
-    knights.takeLosses(knights.strength - 1);
+    knights.strength = strength;
 
-    expect(knights.fenceOdds).toBeLessThan(whole);
-    expect(knights.fenceOdds).toBeGreaterThanOrEqual(0.3);
-    expect(whole).toBeLessThanOrEqual(0.9);
+    expect(knights.fenceOdds).toBe(odds);
+  });
+
+  it('uses the same odds for breaking and spends the action on a failed break', () => {
+    const battle = makeBattle(undefined, 0);
+    const rider = station(battle, findKind(battle, 'Horsemen'), 9, 3);
+    const fence = battle.field.getCell(8, 3)!;
+
+    luck(0.99);
+    rider.strength = 95;
+    expect(battle.breakDown(rider, fence)).toBe(false);
+    expect(fence.terrain).toBe('fence');
+    expect(rider.hasActed).toBe(true);
+
+    rider.refresh();
+    rider.strength = 96;
+    expect(battle.breakDown(rider, fence)).toBe(true);
+    expect(fence.terrain).toBe('plains');
   });
 
   it('never changes the ground of another battle on the same province', () => {

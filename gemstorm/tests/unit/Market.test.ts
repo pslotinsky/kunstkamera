@@ -21,25 +21,15 @@ describe('MarketRate', () => {
 });
 
 describe('Market.swing', () => {
-  it('lands on the only rate a fixed-season month allows', () => {
+  it('changes to another rate only in the four market months', () => {
     const market = new Market();
+    const marketMonths = [2, 5, 8, 11];
 
-    for (let attempt = 0; attempt < 20; attempt++) {
-      market.swing(7);
-      expect(market.rate).toBe(MarketRate.LOW);
+    for (let month = 1; month <= 12; month++) {
+      const previous = market.rate;
+      market.swing(month);
 
-      market.swing(3);
-      expect(market.rate).toBe(MarketRate.HIGH);
-    }
-  });
-
-  it('only ever lands on a rate the month allows', () => {
-    const market = new Market();
-    const allowedInSeptember = [MarketRate.LOW, MarketRate.AVERAGE];
-
-    for (let attempt = 0; attempt < 50; attempt++) {
-      market.swing(9);
-      expect(allowedInSeptember).toContain(market.rate);
+      expect(market.rate === previous).toBe(!marketMonths.includes(month));
     }
   });
 });

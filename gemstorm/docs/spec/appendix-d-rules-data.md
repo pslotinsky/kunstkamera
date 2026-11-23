@@ -221,33 +221,6 @@ Each turn-based province command applies the following goodwill modifier; this t
 
 ---
 
-## D.6 Unknown Formula Register
-
-The following formulas remain unresolved:
-
-1. Exact tax formula.
-2. Exact harvest formula and whether Protection always contributes.
-3. Exact market rate timing.
-4. Exact Defection formula.
-5. Exact Surrender formula.
-6. Exact Alliance success formula.
-7. Exact General Loyalty scale.
-8. Exact battle damage formula.
-9. Exact WAR contribution to combat.
-10. Exact flank / rear numeric modifiers.
-11. Exact fence build / break formula.
-12. Exact terrain modifiers.
-13. Exact Protection mitigation formula.
-14. Exact Hired Fifth Unit destruction threshold.
-15. Exact rampage / loss-of-faith formula.
-16. Exact Search success formula.
-17. Exact AI attack decision formula.
-18. Exact auto-combat formula.
-19. Exact Entrust AI priority order.
-20. Resolved — range tile diagrams (Short / Long / Circular / Largest) are in Appendix C §C.6; "Outer" is not a distinct range.
-
----
-
 ## D.7 Data Confidence Notes
 
 ### Confidence Levels
@@ -295,3 +268,16 @@ It holds:
 - the data confidence legend.
 
 Detailed mechanics and formulas live inline in their owning chapters; this appendix carries only the command-level data and the registers above.
+
+---
+
+## Detailed rules: Notes on Coverage
+
+
+The opening cinematic consumes random numbers but changes no game state.
+
+---
+
+
+
+---

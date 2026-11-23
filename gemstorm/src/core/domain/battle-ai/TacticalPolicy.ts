@@ -29,7 +29,9 @@ export class TacticalPolicy {
   }
 
   public chooseRetreat(battle: Battle): boolean {
-    if (battle.isOver || this.isFlagThreatened(battle)) {
+    const isStuck = !battle.canRetreat(this.side);
+
+    if (battle.isOver || isStuck || this.isFlagThreatened(battle)) {
       return false;
     }
 

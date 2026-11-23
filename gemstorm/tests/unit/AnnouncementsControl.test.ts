@@ -4,8 +4,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { BAD_EVENTS, GOOD_EVENTS, RAMPAGE } from '@/config/province-events';
 import { Artifact } from '@/core/domain/Artifact';
 import { HiredUnit } from '@/core/domain/HiredUnit';
-import { Incident } from '@/core/domain/Incident';
 import type { Province } from '@/core/domain/Province';
+import { Incident } from '@/core/domain/province-events/Incident';
 import { Resources } from '@/core/domain/Resources';
 import { Succession } from '@/core/domain/Succession';
 import { AllianceOfferedEvent } from '@/core/events/AllianceOfferedEvent';
@@ -15,8 +15,10 @@ import { MissionReportedEvent } from '@/core/events/MissionReportedEvent';
 import { SuccessionReportedEvent } from '@/core/events/SuccessionReportedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { UnitDesertedEvent } from '@/core/events/UnitDesertedEvent';
+import { VassalOfferedEvent } from '@/core/events/VassalOfferedEvent';
 import styles from '@/ui/screens/StrategyScreen/Announcements/Announcements.module.scss';
 import { AnnouncementsControl } from '@/ui/screens/StrategyScreen/Announcements/AnnouncementsControl';
+import { CaptiveDialogToggledEvent } from '@/ui/screens/StrategyScreen/CaptiveDialog/CaptiveDialogToggledEvent';
 
 import { makeFamily, makeGeneral, makeProvince, makeWorld } from './factories';
 
@@ -47,6 +49,7 @@ function setup() {
     family: theirs,
   });
   const { world, events } = makeWorld([myProvince, theirProvince], mine);
+  mine.moveHome(myProvince);
   const container = document.createElement('div');
 
   document.body.append(container);
@@ -84,6 +87,7 @@ function setup() {
       ),
     continue: () => click('[data-continue]'),
     confirm: () => click('[data-choose]'),
+    reject: () => click('[data-decline]'),
     choose: (name: string) => click(`[data-value="${name}"]`),
     asks: () =>
       !root.querySelector('[data-ask]')!.classList.contains(styles.hidden!),
@@ -93,6 +97,7 @@ function setup() {
         .classList.contains(styles.hidden!),
     shown: () => !root.classList.contains(styles.hidden!),
     text: () => root.querySelector('[data-text]')!.textContent,
+    detail: () => root.querySelector('[data-detail]')!.textContent,
     pending: () => root.querySelector('[data-pending]')!.textContent,
   };
 }
@@ -198,13 +203,43 @@ describe('AnnouncementsControl', () => {
 
     expect(screen.asks()).toBe(true);
     expect(screen.offers('Rhovan')).toBe(false);
-    expect(screen.mine.ruler).toBe(beran);
+    expect(screen.mine.ruler).toBe(screen.ruler);
 
     screen.choose('Nemer');
     screen.confirm();
 
     expect(screen.mine.ruler).toBe(nemer);
     expect(screen.myProvince.governor).toBe(nemer);
+  });
+
+  it('queues a displaced general’s offer until the prisoner dialog closes', () => {
+    const screen = setup();
+    const first = makeGeneral({ name: 'Halric', defectionClass: 0 });
+    const second = makeGeneral({ name: 'Marven', defectionClass: 3 });
+    screen.theirs.enlist(makeGeneral());
+    screen.theirs.enlist(makeGeneral());
+
+    screen.world.wanderers.resettle([first, second]);
+    screen.events.publish(new CaptiveDialogToggledEvent(true));
+    screen.events.publish(
+      new VassalOfferedEvent(screen.world.wanderers.offer!),
+    );
+
+    expect(screen.shown()).toBe(false);
+    screen.events.publish(new CaptiveDialogToggledEvent(false));
+
+    expect(screen.text()).toBe('Halric offers to join your court.');
+    const firstRequest = screen.detail();
+    screen.reject();
+
+    expect(screen.theirs.members).toContain(first);
+    expect(screen.text()).toBe('Marven offers to join your court.');
+    expect(screen.detail()).not.toBe(firstRequest);
+    screen.confirm();
+
+    expect(screen.mine.members).toContain(second);
+    expect(screen.world.campaign.canProgress).toBe(true);
+    expect(screen.shown()).toBe(false);
   });
 
   it('tells you what a rival did to your land, in its words', () => {

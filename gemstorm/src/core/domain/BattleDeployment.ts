@@ -1,3 +1,5 @@
+import { isDefined } from '@/lib/value/isDefined';
+
 import type { Army } from './Army';
 import type { Battlefield } from './Battlefield';
 import { BattleSide } from './BattleSide';
@@ -10,6 +12,15 @@ import type { Unit } from './Unit';
 const STANDARD_SHARES = ['Knights', 'Knights', 'Archers'] as const;
 const REMAINDER_UNIT = 'Horsemen';
 const PARTS = STANDARD_SHARES.length + 1;
+const FIRST_STARTING_ROW = 2;
+
+interface Placement {
+  readonly body: Body;
+  readonly army: Army;
+  readonly side: BattleSide;
+  readonly slot: number;
+  readonly cell: Cell;
+}
 
 interface Body {
   readonly unit: Unit;
@@ -21,12 +32,12 @@ export class BattleDeployment {
 
   public form(army: Army, side: BattleSide): readonly BattleUnit[] {
     const roster = this.splitTroops(army);
-    const cells = this.findGround(side, roster.length);
 
-    return roster.flatMap((body, index) => {
-      const cell = cells[index];
+    return roster.flatMap((body, slot) => {
+      const cell = this.findStartingCell(side, slot);
+      const isPresent = body.strength > 0 && isDefined(cell);
 
-      return cell ? [this.station(body, army, side, cell)] : [];
+      return isPresent ? [this.station({ body, army, side, slot, cell })] : [];
     });
   }
 
@@ -49,7 +60,7 @@ export class BattleDeployment {
       roster.push({ unit: army.unit, strength: army.unit.strength });
     }
 
-    return roster.filter((body) => body.strength > 0);
+    return roster;
   }
 
   private findKind(kinds: readonly StandardUnit[], name: string): StandardUnit {
@@ -62,58 +73,24 @@ export class BattleDeployment {
     return kind;
   }
 
-  private station(
-    body: Body,
-    army: Army,
-    side: BattleSide,
-    cell: Cell,
-  ): BattleUnit {
+  private station(placement: Placement): BattleUnit {
+    const { body, army, side, slot, cell } = placement;
+    const commanderWar = army.commanderWar;
+
     return new BattleUnit({
       unit: body.unit,
       side,
-      commander: army.commander,
+      slot,
+      commanderWar,
       strength: body.strength,
       cell,
       facing: Facing.towardEnemy(side),
     });
   }
 
-  private findGround(side: BattleSide, count: number): readonly Cell[] {
-    const flag = this.field.getFlag(side);
-    const inward = [...Array(this.field.columns).keys()];
-    const columns = side.isAttacker ? inward : inward.reverse();
-    const chosen: Cell[] = [];
+  private findStartingCell(side: BattleSide, slot: number): Cell | undefined {
+    const column = side.isAttacker ? 0 : this.field.columns - 1;
 
-    for (const column of columns) {
-      if (chosen.length < count) {
-        const open = this.findOpenColumn(column, flag, count - chosen.length);
-
-        chosen.push(...open);
-      }
-    }
-
-    return chosen;
-  }
-
-  private findOpenColumn(
-    column: number,
-    flag: Cell,
-    wanted: number,
-  ): readonly Cell[] {
-    const cells = [...Array(this.field.rows).keys()]
-      .map((row) => this.field.getCell(column, row))
-      .filter(
-        (cell): cell is Cell =>
-          cell !== undefined &&
-          cell.terrain === 'plains' &&
-          !cell.isEqual(flag),
-      );
-
-    cells.sort(
-      (left, right) =>
-        Math.abs(left.row - flag.row) - Math.abs(right.row - flag.row),
-    );
-
-    return cells.slice(0, wanted);
+    return this.field.getCell(column, FIRST_STARTING_ROW + slot);
   }
 }

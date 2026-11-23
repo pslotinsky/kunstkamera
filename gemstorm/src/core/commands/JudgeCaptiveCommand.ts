@@ -6,6 +6,7 @@ import {
 } from '@/core/domain/Captivity';
 import { CaptiveJudgedEvent } from '@/core/events/CaptiveJudgedEvent';
 import { SuccessionReportedEvent } from '@/core/events/SuccessionReportedEvent';
+import { isDefined } from '@/lib/value/isDefined';
 
 import { WorldCommand, type WorldCommandContext } from './WorldCommand';
 
@@ -25,6 +26,11 @@ export class JudgeCaptiveCommand extends WorldCommand {
   public judge(captive: Captive, disposal: Disposal): void {
     this.captive = captive;
     this.disposal = disposal;
+    this.outcome = undefined;
+  }
+
+  public canRecruit(captive: Captive): boolean {
+    return this.captivity.canRecruit(captive);
   }
 
   public override consumesTurn(): boolean {
@@ -33,43 +39,58 @@ export class JudgeCaptiveCommand extends WorldCommand {
 
   public execute(): void {
     const captive = this.captive;
+    const { world } = this.context;
 
-    if (captive) {
-      const provinces = this.context.world.getFamilyProvinces(captive.house);
+    if (
+      isDefined(captive) &&
+      world.hasCaptive(captive) &&
+      !isDefined(captive.ransom)
+    ) {
+      const provinces = world.getFamilyProvinces(captive.house);
       const outcome = this.carryOut(captive);
 
-      this.outcome = outcome;
-      this.context.world.free(captive);
-      this.publishUpdates(provinces);
+      if (isDefined(outcome)) {
+        this.outcome = outcome;
+        world.free(captive);
+        this.publishUpdates(provinces);
+        this.publishVassalOffer();
+      }
     }
   }
 
-  private carryOut(captive: Captive): DisposalOutcome {
-    if (this.disposal === 'recruit') {
-      return this.recruit(captive);
+  private carryOut(captive: Captive): DisposalOutcome | undefined {
+    switch (this.disposal) {
+      case 'recruit':
+        return this.recruit(captive);
+      case 'release':
+        return this.release(captive);
+      case 'banish':
+        return this.banish(captive);
     }
-
-    if (this.disposal === 'release') {
-      this.captivity.release(captive);
-      this.publish(new CaptiveJudgedEvent(captive, 'released'));
-
-      return 'released';
-    }
-
-    this.banish(captive);
-
-    return 'banished';
   }
 
-  private recruit(captive: Captive): DisposalOutcome {
-    const outcome = this.captivity.recruit(captive) ? 'joined' : 'refused';
+  private recruit(captive: Captive): DisposalOutcome | undefined {
+    const recruited = this.captivity.recruit(captive);
 
-    this.publish(new CaptiveJudgedEvent(captive, outcome));
+    if (recruited) {
+      this.publish(new CaptiveJudgedEvent(captive, 'joined'));
+    }
 
-    return outcome;
+    return recruited ? 'joined' : undefined;
   }
 
-  private banish(captive: Captive): void {
+  private release(captive: Captive): 'released' {
+    const destination = this.captivity.release(captive);
+
+    if (isDefined(destination)) {
+      this.publishUpdates([destination]);
+    }
+    this.publish(new CaptiveJudgedEvent(captive, 'released'));
+
+    return 'released';
+  }
+
+  private banish(captive: Captive): 'banished' {
     const outcome = this.captivity.banish(captive);
 
     if (outcome) {
@@ -78,5 +99,7 @@ export class JudgeCaptiveCommand extends WorldCommand {
     } else {
       this.publish(new CaptiveJudgedEvent(captive, 'banished'));
     }
+
+    return 'banished';
   }
 }

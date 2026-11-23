@@ -18,7 +18,12 @@ const SOURCE_FOOD = 100;
 
 function setup() {
   const ruler = makeGeneral({ name: 'Avar' });
-  const family = makeFamily({ name: 'Alderwyn', ruler, members: [ruler] });
+  const family = makeFamily({
+    name: 'Alderwyn',
+    ruler,
+    members: [ruler],
+    fame: 10,
+  });
   const rival = makeFamily({ name: 'Crowe' });
 
   const source = makeProvince({
@@ -66,16 +71,16 @@ describe('MoveTroopsCommand', () => {
     const { source, neutral, command } = setup();
     const carried = new Nerith();
     const reserve = new Nerith();
-    source.addUnit(carried);
-    source.addUnit(reserve);
+    source.fifthUnits.addUnit(carried);
+    source.fifthUnits.addUnit(reserve);
     command.moveTo(neutral, {});
     command.carry(carried);
     command.execute();
 
-    expect(source.stationedUnits).toEqual([reserve]);
-    expect(neutral.stationedUnits).toEqual([carried]);
+    expect(source.fifthUnits.units).toEqual([reserve]);
+    expect(neutral.fifthUnits.units).toEqual([carried]);
     expect(neutral.belongsTo(source.family!)).toBe(true);
-    expect(source.hiredUnits).toEqual([]);
+    expect(source.fifthUnits.hiredUnits).toEqual([]);
   });
 
   it('reinforces an adjacent province you own without changing its ownership', () => {
@@ -92,6 +97,7 @@ describe('MoveTroopsCommand', () => {
     expect(owned.resources.food).toBe(30);
     expect(owned.belongsTo(family)).toBe(true);
     expect(owned.governor).toBeUndefined();
+    expect(family.fame).toBe(10);
     expect(source.goodwill).toBe(0);
     expect(source.actionCount).toBe(1);
   });
@@ -108,6 +114,7 @@ describe('MoveTroopsCommand', () => {
     expect(neutral.resources.gold).toBe(40);
     expect(neutral.resources.troops).toBe(60);
     expect(neutral.resources.food).toBe(30);
+    expect(family.fame).toBe(13);
   });
 
   it('offers adjacent provinces you own or that are neutral only', () => {
@@ -118,54 +125,121 @@ describe('MoveTroopsCommand', () => {
 
   it('carries a stationed unit to a province you own, leaving the rest', () => {
     const { source, owned, command } = setup();
-    source.addUnit(HiredUnit.ofName('Grimhides')!);
-    source.addUnit(HiredUnit.ofName('Bugbear')!);
+    source.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
+    source.fifthUnits.addUnit(HiredUnit.ofName('Bugbear')!);
 
     command.moveTo(owned, { troops: 10 });
-    command.carry(source.hiredUnits[0]);
+    command.carry(source.fifthUnits.hiredUnits[0]);
     command.execute();
 
-    expect(owned.hiredUnits.map((unit) => unit.name)).toEqual(['Grimhides']);
-    expect(source.hiredUnits.map((unit) => unit.name)).toEqual(['Bugbear']);
+    expect(owned.fifthUnits.hiredUnits.map((unit) => unit.name)).toEqual([
+      'Grimhides',
+    ]);
+    expect(source.fifthUnits.hiredUnits.map((unit) => unit.name)).toEqual([
+      'Bugbear',
+    ]);
   });
 
   it('relocates a carried unit even when no resources move', () => {
     const { source, owned, command } = setup();
-    source.addUnit(HiredUnit.ofName('Grimhides')!);
+    source.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
 
     command.moveTo(owned, {});
-    command.carry(source.hiredUnits[0]);
+    command.carry(source.fifthUnits.hiredUnits[0]);
     command.execute();
 
-    expect(owned.hiredUnits.map((unit) => unit.name)).toEqual(['Grimhides']);
-    expect(source.hiredUnits).toHaveLength(0);
+    expect(owned.fifthUnits.hiredUnits.map((unit) => unit.name)).toEqual([
+      'Grimhides',
+    ]);
+    expect(source.fifthUnits.hiredUnits).toHaveLength(0);
   });
 
   it('carries a unit into a freshly claimed neutral province', () => {
     const { family, neutral, source, command } = setup();
-    source.addUnit(HiredUnit.ofName('Grimhides')!);
+    source.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
 
     command.moveTo(neutral, { troops: 10 });
-    command.carry(source.hiredUnits[0]);
+    command.carry(source.fifthUnits.hiredUnits[0]);
     command.execute();
 
     expect(neutral.belongsTo(family)).toBe(true);
-    expect(neutral.hiredUnits.map((unit) => unit.name)).toEqual(['Grimhides']);
+    expect(neutral.fifthUnits.hiredUnits.map((unit) => unit.name)).toEqual([
+      'Grimhides',
+    ]);
   });
 
   it('allows a carried unit to join a destination already stationing its type', () => {
     const { source, owned, command } = setup();
-    source.addUnit(HiredUnit.ofName('Grimhides')!);
-    owned.addUnit(HiredUnit.ofName('Grimhides')!);
+    source.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
+    owned.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
 
     command.moveTo(owned, { troops: 10 });
-    command.carry(source.hiredUnits[0]);
+    command.carry(source.fifthUnits.hiredUnits[0]);
     command.execute();
 
-    expect(owned.hiredUnits.map((unit) => unit.name)).toEqual([
+    expect(owned.fifthUnits.hiredUnits.map((unit) => unit.name)).toEqual([
       'Grimhides',
       'Grimhides',
     ]);
-    expect(source.hiredUnits).toHaveLength(0);
+    expect(source.fifthUnits.hiredUnits).toHaveLength(0);
+  });
+
+  it('caps each amount by what the source holds and the target has room for', () => {
+    const { owned, command } = setup();
+    owned.addResources({ troops: 950 });
+    command.moveTo(owned, {});
+
+    expect(command.getMaximum('troops')).toBe(49);
+    expect(command.getMaximum('gold')).toBe(SOURCE_GOLD);
+  });
+
+  it.each([
+    ['more soldiers than the target has room for', { troops: 50 }],
+    ['a negative amount', { gold: 10, food: -5 }],
+    ['a fractional amount', { troops: 2.5 }],
+    ['more Gold than the source holds', { gold: SOURCE_GOLD + 1 }],
+  ])('refuses %s and changes nothing', (_case, cargo) => {
+    const { source, owned, command } = setup();
+    owned.addResources({ troops: 950 });
+
+    command.moveTo(owned, cargo);
+    command.execute();
+
+    expect(source.resources).toMatchObject({
+      gold: SOURCE_GOLD,
+      food: SOURCE_FOOD,
+      troops: SOURCE_TROOPS,
+    });
+    expect(owned.resources).toMatchObject({ gold: 0, food: 0, troops: 950 });
+    expect(source.actionCount).toBe(0);
+  });
+
+  it('moves an exact fit', () => {
+    const { source, owned, command } = setup();
+    owned.addResources({ troops: 950 });
+
+    command.moveTo(owned, { troops: 49 });
+    command.execute();
+
+    expect(owned.resources.troops).toBe(999);
+    expect(source.resources.troops).toBe(SOURCE_TROOPS - 49);
+    expect(source.actionCount).toBe(1);
+  });
+
+  it('refuses to carry a unit into a province with no room to station it', () => {
+    const { source, owned, command } = setup();
+    const carried = HiredUnit.ofName('Grimhides')!;
+    source.fifthUnits.addUnit(carried);
+    for (const name of ['Ogre', 'Bugbear', 'Fachan']) {
+      owned.fifthUnits.addUnit(HiredUnit.ofName(name)!);
+    }
+
+    command.moveTo(owned, { troops: 10 });
+    command.carry(carried);
+    command.execute();
+
+    expect(source.fifthUnits.units).toEqual([carried]);
+    expect(owned.resources.troops).toBe(0);
+    expect(source.actionCount).toBe(0);
   });
 });

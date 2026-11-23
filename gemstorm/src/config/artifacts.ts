@@ -1,7 +1,5 @@
 import type { ArtifactParams } from '@/core/domain/Artifact';
 
-export const ARTIFACT_FIND_CHANCE = 0.25;
-
 export const ARTIFACTS: readonly ArtifactParams[] = [
   { name: 'Argent Edge', characteristic: 'war', bonus: 25 },
   { name: 'Cinderbrand', characteristic: 'war', bonus: 30 },

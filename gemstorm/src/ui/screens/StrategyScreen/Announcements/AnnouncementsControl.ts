@@ -1,5 +1,6 @@
 import { CommandExecutor } from '@/core/CommandExecutor';
 import { AllianceAnswerCommand } from '@/core/commands/AllianceAnswerCommand';
+import { AnswerVassalOfferCommand } from '@/core/commands/AnswerVassalOfferCommand';
 import { CrownCommand } from '@/core/commands/CrownCommand';
 import { GrantArtifactCommand } from '@/core/commands/GrantArtifactCommand';
 import { Coronation } from '@/core/domain/Coronation';
@@ -15,12 +16,14 @@ import { SearchReportedEvent } from '@/core/events/SearchReportedEvent';
 import { SuccessionReportedEvent } from '@/core/events/SuccessionReportedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { UnitDesertedEvent } from '@/core/events/UnitDesertedEvent';
+import { VassalOfferedEvent } from '@/core/events/VassalOfferedEvent';
 import { Control } from '@/lib/Control';
 import type { EventClass } from '@/lib/EventBus';
 import { getGeneralPortraitUrl } from '@/ui/common/art/getGeneralPortraitUrl';
 import { DropdownControl } from '@/ui/common/Dropdown/DropdownControl';
 import type { DropdownOption } from '@/ui/common/Dropdown/DropdownView';
 import { BattleReportClosedEvent } from '@/ui/screens/StrategyScreen/BattleReport/BattleReportClosedEvent';
+import { CaptiveDialogToggledEvent } from '@/ui/screens/StrategyScreen/CaptiveDialog/CaptiveDialogToggledEvent';
 import { SearchReportClosedEvent } from '@/ui/screens/StrategyScreen/SearchReport/SearchReportClosedEvent';
 import { TurnHold } from '@/ui/screens/StrategyScreen/TurnHold';
 
@@ -41,6 +44,7 @@ type Announced =
   | GeneralDiedEvent
   | SuccessionReportedEvent
   | CaptiveJudgedEvent
+  | VassalOfferedEvent
   | AllianceOfferedEvent;
 
 export class AnnouncementsControl extends Control<
@@ -51,9 +55,11 @@ export class AnnouncementsControl extends Control<
   private readonly grantArtifact: GrantArtifactCommand;
   private readonly crown: CrownCommand;
   private readonly answerAlliance: AllianceAnswerCommand;
+  private readonly answerVassal: AnswerVassalOfferCommand;
   private readonly turnHold: TurnHold;
   private readonly queue: Announced[] = [];
   private reporting = false;
+  private judgingCaptive = false;
 
   public constructor(context: AnnouncementsContext) {
     super(AnnouncementsView, context, {
@@ -63,6 +69,7 @@ export class AnnouncementsControl extends Control<
     this.grantArtifact = new GrantArtifactCommand(context);
     this.crown = new CrownCommand(context);
     this.answerAlliance = new AllianceAnswerCommand(context);
+    this.answerVassal = new AnswerVassalOfferCommand(context);
     this.turnHold = new TurnHold(context.events);
   }
 
@@ -75,10 +82,15 @@ export class AnnouncementsControl extends Control<
     this.onWorldEvent(SuccessionReportedEvent, (event) => this.announce(event));
     this.onWorldEvent(CaptiveJudgedEvent, (event) => this.announce(event));
     this.onWorldEvent(AllianceOfferedEvent, (event) => this.announce(event));
+    this.onWorldEvent(VassalOfferedEvent, (event) => this.announce(event));
     this.onWorldEvent(SearchReportedEvent, () => this.holdForReport(true));
     this.onWorldEvent(SearchReportClosedEvent, () => this.holdForReport(false));
     this.onWorldEvent(BattleReportedEvent, () => this.holdForReport(true));
     this.onWorldEvent(BattleReportClosedEvent, () => this.holdForReport(false));
+    this.onWorldEvent(CaptiveDialogToggledEvent, ({ isOpen }) => {
+      this.judgingCaptive = isOpen;
+      this.refresh();
+    });
     this.subscribe(AnnouncementDismissedEvent, () => this.dismiss());
     this.subscribe(ChoiceConfirmedEvent, () => this.confirmChoice());
     this.subscribe(ChoiceDeclinedEvent, () => this.answerOffer(false));
@@ -103,7 +115,8 @@ export class AnnouncementsControl extends Control<
 
     if (
       event instanceof SuccessionReportedEvent ||
-      event instanceof AllianceOfferedEvent
+      event instanceof AllianceOfferedEvent ||
+      event instanceof VassalOfferedEvent
     ) {
       return true;
     }
@@ -155,7 +168,10 @@ export class AnnouncementsControl extends Control<
       this.takeArtifact(head);
     } else if (head instanceof SuccessionReportedEvent) {
       this.crownHeir(head);
-    } else if (head instanceof AllianceOfferedEvent) {
+    } else if (
+      head instanceof AllianceOfferedEvent ||
+      head instanceof VassalOfferedEvent
+    ) {
       this.answerOffer(true);
     }
   }
@@ -169,6 +185,10 @@ export class AnnouncementsControl extends Control<
       this.executor.execute(this.answerAlliance);
       this.dismiss();
       events.publish(new TurnEndedEvent(world.turnQueue.turnNumber));
+    } else if (head instanceof VassalOfferedEvent) {
+      this.answerVassal.answer(head.offer, accepted);
+      this.executor.execute(this.answerVassal);
+      this.dismiss();
     }
   }
 
@@ -209,7 +229,7 @@ export class AnnouncementsControl extends Control<
   private refresh(): void {
     const [head, ...waiting] = this.queue;
 
-    if (head && !this.reporting) {
+    if (head && !this.reporting && !this.judgingCaptive) {
       this.turnHold.hold();
       this.show(head, waiting.length);
     } else {
@@ -234,6 +254,8 @@ export class AnnouncementsControl extends Control<
       this.view.showVerdict(announced, pending);
     } else if (announced instanceof AllianceOfferedEvent) {
       this.view.askForAlliance(announced, pending);
+    } else if (announced instanceof VassalOfferedEvent) {
+      this.view.askForVassal(announced, pending);
     } else {
       this.view.showDesertion(announced, pending);
     }
@@ -264,7 +286,9 @@ export class AnnouncementsControl extends Control<
         this.buildOption(heir, `age ${heir.getAgeAt(date)}`),
       ),
     );
-    this.controls.recipient.setValue(coronation.heir?.name ?? '');
+    const [firstHeir] = coronation.heirs;
+
+    this.controls.recipient.setValue(firstHeir?.name ?? '');
   }
 
   private offerRecipients(found: ArtifactFoundEvent): void {

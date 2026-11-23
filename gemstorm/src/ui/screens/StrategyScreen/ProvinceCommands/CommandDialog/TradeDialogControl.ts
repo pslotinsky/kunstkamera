@@ -4,13 +4,12 @@ import type {
 } from '@/core/commands/province/TradeCommand';
 import type { MarketRateName } from '@/core/domain/MarketRate';
 import type { World } from '@/core/domain/World';
+import { isDefined } from '@/lib/value/isDefined';
 
 import { AmountFieldControl } from '../AmountField/AmountFieldControl';
 import { CommandDialogControl } from './CommandDialogControl';
 import { CommandStep } from './CommandStep';
 import { TradeDialogView } from './TradeDialogView';
-
-const FOOD_CEILING = 999;
 
 const DIRECTIONS: readonly { value: TradeDirection; label: string }[] = [
   { value: 'buy', label: 'Buy' },
@@ -43,16 +42,18 @@ export class TradeDialogControl extends CommandDialogControl<
   }
 
   public override get step(): CommandStep | undefined {
-    return this.direction === undefined
-      ? new CommandStep(FLAVOR[this.world.market.rate.name], DIRECTIONS)
-      : undefined;
+    const prompt = FLAVOR[this.world.market.rate.name];
+
+    return isDefined(this.direction)
+      ? undefined
+      : new CommandStep(prompt, DIRECTIONS);
   }
 
   public override open(command: TradeCommand): void {
     this.direction = undefined;
     this.controls.amount.reset();
-    this.update();
     super.open(command);
+    this.update();
   }
 
   public override refresh(): void {
@@ -64,34 +65,32 @@ export class TradeDialogControl extends CommandDialogControl<
   }
 
   protected override selectChoice(value: string): void {
-    this.direction = value as TradeDirection;
-    this.update();
+    const choice = DIRECTIONS.find((direction) => direction.value === value);
+
+    if (isDefined(choice)) {
+      this.direction = choice.value;
+      this.update();
+    }
   }
 
   protected override setupCommand(command: TradeCommand): void {
     command.direction = this.direction ?? 'buy';
-    command.food = this.controls.amount.value;
+    command.amount = this.controls.amount.value;
   }
 
   private update(): void {
-    this.view.showDirection(this.direction);
-    this.controls.amount.setMax(this.max);
-    this.view.setRange(this.direction, this.max);
-    this.view.enableConfirm(this.controls.amount.value > 0);
-  }
+    const { direction, command } = this;
+    const amount = this.controls.amount;
+    const hasTrade = isDefined(direction) && isDefined(command);
+    const minimum = hasTrade ? command.getMinimumAmount(direction) : 0;
+    const maximum = hasTrade ? command.getMaximumAmount(direction) : 0;
 
-  private get max(): number {
-    if (this.direction === undefined) {
-      return 0;
-    }
+    this.view.showDirection(direction);
+    amount.setMax(maximum);
+    this.view.setRange(direction, minimum, maximum);
 
-    const province = this.world.turnQueue.current;
-    const { market } = this.world;
-    const gold = province?.resources.gold ?? 0;
-    const food = province?.resources.food ?? 0;
+    const canConfirm = hasTrade && command.canTrade(direction, amount.value);
 
-    return this.direction === 'sell'
-      ? food
-      : Math.min(market.toFood(gold), FOOD_CEILING - food);
+    this.view.enableConfirm(canConfirm);
   }
 }

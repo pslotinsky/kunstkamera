@@ -11,7 +11,6 @@ import { DefenseDialogControl } from '@/ui/screens/StrategyScreen/DefenseDialog/
 
 import {
   advanceTo,
-  makeArmy,
   makeFamily,
   makeGeneral,
   makeProvince,
@@ -53,7 +52,7 @@ function setup(params: SetupParams = {}) {
     food: 100,
   });
 
-  attacked.addUnit(HiredUnit.ofName('Grimhides')!);
+  attacked.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
   player.homeProvince = attacked;
 
   const { world, events } = makeWorld([source, attacked, ...refuges], player);
@@ -75,10 +74,7 @@ function setup(params: SetupParams = {}) {
 
   const attack = new AttackCommand({ world, events });
 
-  attack.attackAt(
-    attacked,
-    makeArmy({ commander: darian, troops: 400, food: 400 }),
-  );
+  attack.attackAt(attacked, { troops: 400, food: 205 });
   attack.execute();
 
   const root = container.querySelector<HTMLElement>(`.${styles.root}`)!;
@@ -96,7 +92,7 @@ describe('DefenseDialogControl', () => {
 
     expect(button('[data-answer="fight"]').disabled).toBe(true);
     expect(button('[data-answer="retreat"]').disabled).toBe(false);
-    expect(button('[data-answer="surrender"]').disabled).toBe(true);
+    expect(button('[data-answer="surrender"]').disabled).toBe(false);
   });
 
   it('fights with the Fifth Unit standing in the province', () => {

@@ -52,7 +52,7 @@ export class CommandDialogsControl extends Control<
       hireMonsterDialog: new HireMonsterDialogControl('hire-monster', world),
       developDialog: new DevelopDialogControl('develop'),
       tradeDialog: new TradeDialogControl('trade', world),
-      giveFoodDialog: new GiveFoodDialogControl('give-food', world),
+      giveFoodDialog: new GiveFoodDialogControl('give-food'),
       transportDialog: new TransportDialogControl('transport', world),
       allyDialog: new AllyDialogControl('ally', world),
       negotiateDialog: new NegotiateDialogControl('negotiate', world),

@@ -6,6 +6,7 @@ import worldMapImageUrl from '@/assets/map.webp';
 import type { Province } from '@/core/domain/Province';
 import type { WorldMap } from '@/core/domain/WorldMap';
 import { View } from '@/lib/View';
+import { MapAmbience } from '@/ui/screens/StrategyScreen/WorldMap/ambience/MapAmbience';
 import { ProvinceMarkers } from '@/ui/screens/StrategyScreen/WorldMap/ProvinceMarkers';
 
 import styles from './MapPreview.module.scss';
@@ -46,6 +47,7 @@ export class MapPreviewView extends View {
     const markers = new ProvinceMarkers(svg);
 
     this.element.querySelector('image')?.setAttribute('href', worldMapImageUrl);
+    new MapAmbience(svg).play(this.lifetime.signal);
     markers.mount();
     this.markers = markers;
   }

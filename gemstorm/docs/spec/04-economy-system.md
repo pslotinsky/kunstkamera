@@ -113,9 +113,7 @@ Gold is used for:
 
 Major Gold income is associated with the yearly September processing.
 
-Gold income is influenced by province conditions, especially Loyalty.
-
-The exact tax formula remains unresolved.
+Gold income is calculated together with the Food harvest. The complete formula, including provinces with zero Cultivation or Loyalty, is in [Harvest](#harvest).
 
 ---
 
@@ -152,13 +150,23 @@ Food is used for:
 
 Major Food gain is associated with September harvest processing.
 
-Food harvest is influenced by Cultivation and Loyalty, and possibly Protection. A working, player-derived formula is:
+For each owned province, September income uses Cultivation, Loyalty, and the governor's CHA. If no general is present, use half the ruler's CHA. Protection does not contribute. Roll once per province:
 
 ```text
-Food Harvest = Loyalty + (Cultivation × 2) + Protection
+C = 3 × Cultivation
+L = 2 × Loyalty
+S = governor CHA (or ruler CHA ÷ 2 if no general is present)
+R = random integer from 0 to 30 + S
+
+if Cultivation = 0 or Loyalty = 0:
+    Gold gained = S ÷ 10
+    Food gained = R ÷ 10
+else:
+    Gold gained = (C + L + S) ÷ 2
+    Food gained = C + L + R
 ```
 
-Confidence: Medium. Whether Protection truly contributes is unconfirmed.
+All division rounds down. Gold and Food are each capped at 999. Harvest is added before September upkeep.
 
 ---
 
@@ -176,7 +184,7 @@ Trade uses the current market rate:
 | Average      | 1 Gold = 1 Food |
 | High         | 2 Gold = 1 Food |
 
-The exact timing of market rate changes remains unresolved.
+The market changes at the start of February, May, August, and November, always to one of the other two rates with equal chance.
 
 ---
 
@@ -295,7 +303,7 @@ Cultivation can be increased through Develop.
 
 ### Develop: Cultivation
 
-Develop: Cultivation costs 10 Gold and consumes the province’s monthly action. It raises the stat by +2 to +5 per use, scaling with the acting character’s INT / Domestic ability (minimum +2; exact thresholds unverified).
+Develop: Cultivation costs 10 Gold and consumes the province’s monthly action. It raises Cultivation by `INT ÷ 30 + 1`, rounded down and capped at 100, using the lord's INT or half the ruler's INT if no general is present. The gain is deterministic (+1 to +7 over the 0–200 stat range). The command is refused below 10 Gold or when Cultivation is already 100.
 
 ---
 
@@ -356,7 +364,7 @@ High Protection helps reduce or resist:
 - disaster damage;
 - long-term province degradation.
 
-There is evidence that Protection may also influence harvest, but this is not fully confirmed.
+Protection does not influence harvest.
 
 ---
 
@@ -475,7 +483,6 @@ flowchart TD
 
     Loyalty --> Harvest
     Cultivation --> Harvest
-    Protection -.-> Harvest
 
     Harvest --> Food
     Harvest --> Gold
@@ -489,7 +496,7 @@ flowchart TD
     Gold --> Hire["Hire Fifth Unit"]
 ```
 
-The dashed Protection → Harvest relationship is supported by some evidence but not fully verified.
+Protection does not contribute to harvest.
 
 ---
 
@@ -514,14 +521,100 @@ A well-managed province can support expansion, survive disasters, maintain loyal
 
 ---
 
-## Open Questions
+---
 
-The following economy details remain unresolved:
+## Detailed rules: September Harvest
 
-1. Exact September Gold income (tax) formula.
-2. Exact September Food harvest formula.
-3. Whether Protection directly contributes to harvest or only mitigates losses.
-4. Exact market rate timing.
-5. Exact reduction formulas for Cultivation and Protection damage.
-6. Exact economic effects of all good and bad events.
-7. Version differences in Trade, Transport, and monthly economic processing.
+One roll per owned province.
+
+```text
+C = 3 × Cultivation
+L = 2 × Loyalty
+S = lord CHA            (or ruler CHA ÷ 2 if no general is present)
+R = rand(31) + S
+
+if Cultivation = 0 or Loyalty = 0:
+    Gold += S ÷ 10
+    Food += R ÷ 10
+else:
+    Gold += (C + L + S) ÷ 2
+    Food += C + L + R
+```
+
+Both are capped at 999.
+
+**Protection does not contribute.** Soldiers and Fifth Units do not contribute. The governor contributes only through CHA.
+
+There is no separate tax: Gold and Food income are the same calculation, with Gold worth half and Food receiving the random 0–30 bonus.
+
+---
+
+---
+
+## Detailed rules: Develop
+
+```text
+P    = lord INT          (or ruler INT ÷ 2 if no general is present)
+gain = P ÷ 30 + 1
+stat = min(100, stat + gain)
+Gold −= 10
+```
+
+| INT     | Gain |
+| ------- | ---- |
+| 0–29    | +1   |
+| 30–59   | +2   |
+| 60–89   | +3   |
+| 90–119  | +4   |
+| 120–149 | +5   |
+| 150–179 | +6   |
+| 180–200 | +7   |
+
+There is no randomness. The command is refused below 10 Gold or when the stat is already 100.
+
+---
+
+---
+
+## Detailed rules: Give Food
+
+Amounts are 20, 50, 80, or 100 Food.
+
+```text
+if Loyalty = 100:
+    90% chance: lord CHA += 1   (cap 200)
+else:
+    C    = lord CHA      (or ruler CHA ÷ 2 if no general is present)
+    gain = (amount ÷ 10) × C ÷ 30
+    Loyalty = min(100, Loyalty + gain)
+Food −= amount
+```
+
+This equals the player-derived `CHA × Food ÷ 300` for the four fixed amounts.
+
+Giving food at full Loyalty is not wasted: it trains the lord's CHA. The game asks for confirmation first.
+
+---
+
+---
+
+## Detailed rules: Trade
+
+| Market state | Selling 1 Food gives | Buying with 1 Gold gives |
+| ------------ | -------------------- | ------------------------ |
+| Low          | 0.5 Gold             | 2 Food                   |
+| Average      | 1 Gold               | 1 Food                   |
+| High         | 2 Gold               | 0.5 Food                 |
+
+Results round down and are capped at 999. Trade is refused only when Gold and Food are both 999.
+
+Trade is free and repeatable within a turn.
+
+The amount offered is limited so the result cannot exceed the cap: the most that can be traded is the smaller of what the province has and what would fill the other resource to 999.
+
+**Rate change:** at the start of February, May, August, and November the state **always** changes, to one of the other two states with equal chance.
+
+---
+
+---
+

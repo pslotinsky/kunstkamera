@@ -4,14 +4,34 @@ import type {
   WorldCommand,
   WorldCommandContext,
 } from '@/core/commands/WorldCommand';
-import { Army } from '@/core/domain/Army';
-import { BATTLE_DAY_LIMIT } from '@/core/domain/BattleClock';
+import { AttackDeployment } from '@/core/domain/AttackDeployment';
 import type { Province } from '@/core/domain/Province';
+import type { ResourceGains } from '@/core/domain/Resources';
 import type { World } from '@/core/domain/World';
+import { sample } from '@/lib/array/sample';
+import { isDefined } from '@/lib/value/isDefined';
 
-import { countSendable } from './garrison';
+const EXPANSION_SHARE = 3;
+const HALF = 2;
 
-const ATTACK_ADVANTAGE = 1.25;
+interface AttackBand {
+  readonly maximumWar: number;
+  readonly advantage: number;
+  readonly escort: number;
+}
+
+const BOLDEST_BAND: AttackBand = {
+  maximumWar: Number.POSITIVE_INFINITY,
+  advantage: 1.0,
+  escort: 0.9,
+};
+
+const ATTACK_BANDS: readonly AttackBand[] = [
+  { maximumWar: 55, advantage: 1.6, escort: 1.4 },
+  { maximumWar: 75, advantage: 1.4, escort: 1.2 },
+  { maximumWar: 99, advantage: 1.2, escort: 1.0 },
+  BOLDEST_BAND,
+];
 
 export class WarPolicy {
   private readonly context: WorldCommandContext;
@@ -21,66 +41,122 @@ export class WarPolicy {
   }
 
   public chooseCommand(province: Province): WorldCommand | undefined {
-    return this.chooseClaim(province) ?? this.chooseAttack(province);
-  }
-
-  private chooseClaim(province: Province): WorldCommand | undefined {
-    const unclaimed = this.world.map
-      .getNeighbors(province)
-      .find((neighbor) => neighbor.isNeutral());
-    const troops = countSendable(province);
-
-    if (!unclaimed || troops === 0) {
-      return undefined;
-    }
-
-    const move = new MoveTroopsCommand(this.context);
-
-    move.moveTo(unclaimed, { troops });
-
-    return move;
+    return this.chooseAttack(province) ?? this.chooseExpansion(province);
   }
 
   private chooseAttack(province: Province): WorldCommand | undefined {
-    const target = this.findWeakestTarget(province);
-    const army = this.raiseArmy(province);
+    const band = this.findBand(province);
+    const target = this.findTarget(province, band);
 
-    if (!target || !army || !this.canBreak(army, target, province)) {
-      return undefined;
-    }
-
-    const attack = new AttackCommand(this.context);
-
-    attack.attackAt(target, army);
-
-    return attack;
-  }
-
-  private raiseArmy(province: Province): Army | undefined {
-    const commander = province.governor;
-    const troops = countSendable(province);
-    const [unit] = this.world.getFifthUnits(province);
-    const supply = Army.measureDailyFood(troops, unit) * BATTLE_DAY_LIMIT;
-    const food = Math.min(province.resources.food, supply);
-
-    return commander && (troops > 0 || unit?.standsAlone)
-      ? new Army({ commander, troops, food, unit })
+    return isDefined(target)
+      ? this.prepareAttack(province, target, band)
       : undefined;
   }
 
-  private findWeakestTarget(province: Province): Province | undefined {
-    return [...this.world.getHostileNeighbors(province)].sort(
-      (left, right) =>
-        this.world.getDefense(left) - this.world.getDefense(right),
-    )[0];
+  private prepareAttack(
+    province: Province,
+    target: Province,
+    band: AttackBand,
+  ): AttackCommand | undefined {
+    const troops = this.countEscort(province, target, band);
+    const [unit] = this.world.getFifthUnits(province);
+    const days = AttackDeployment.COMPUTER_SUPPLY_DAYS;
+    const food = AttackDeployment.foodForDays(troops, days, unit);
+    const force = { troops, unit, food };
+    const attack = new AttackCommand(this.context);
+    const deployment = attack.prepare(force);
+    const canLaunch =
+      troops > 0 &&
+      isDefined(deployment) &&
+      attack.canLaunch(target, deployment);
+
+    if (canLaunch) {
+      attack.attackAt(target, force);
+    }
+
+    return canLaunch ? attack : undefined;
   }
 
-  private canBreak(army: Army, target: Province, source: Province): boolean {
-    return (
-      army.supplyDays > 0 &&
-      source.resources.gold >= army.deploymentCost &&
-      army.strength >= this.world.getDefense(target) * ATTACK_ADVANTAGE
+  private findTarget(
+    province: Province,
+    band: AttackBand,
+  ): Province | undefined {
+    const hasSoldiers = province.resources.troops > 0;
+    const hasUnowned = this.hasUnownedNeighbor(province);
+    const isAhead = this.isAheadOfEveryEnemy(province, band);
+    const canAttack = hasSoldiers && !hasUnowned && isAhead;
+
+    return canAttack ? this.findWeakestEnemy(province) : undefined;
+  }
+
+  private hasUnownedNeighbor(province: Province): boolean {
+    const neighbors = this.world.map.getNeighbors(province);
+
+    return neighbors.some((neighbor) => neighbor.isNeutral());
+  }
+
+  private isAheadOfEveryEnemy(province: Province, band: AttackBand): boolean {
+    const { troops } = province.resources;
+    const enemies = this.world.getHostileNeighbors(province);
+
+    return enemies.every((enemy) => {
+      const required = enemy.resources.troops * band.advantage;
+
+      return troops >= required;
+    });
+  }
+
+  private findWeakestEnemy(province: Province): Province | undefined {
+    const enemies = this.world.getHostileNeighbors(province);
+    const [weakest] = [...enemies].sort(
+      (left, right) => left.resources.troops - right.resources.troops,
     );
+
+    return weakest;
+  }
+
+  private countEscort(
+    province: Province,
+    target: Province,
+    band: AttackBand,
+  ): number {
+    const escort = Math.floor(target.resources.troops * band.escort);
+    const half = Math.floor(province.resources.troops / HALF);
+
+    return Math.max(escort, half);
+  }
+
+  private findBand(province: Province): AttackBand {
+    const { war } = province.effectiveStats;
+    const band = ATTACK_BANDS.find((candidate) => war <= candidate.maximumWar);
+
+    return band ?? BOLDEST_BAND;
+  }
+
+  private chooseExpansion(province: Province): WorldCommand | undefined {
+    const unowned = this.world.map
+      .getNeighbors(province)
+      .filter((neighbor) => neighbor.isNeutral());
+    const move = new MoveTroopsCommand(this.context);
+
+    if (unowned.length > 0) {
+      const target = sample(unowned);
+      const cargo = this.measureExpansionCargo(province);
+
+      move.moveTo(target, cargo);
+    }
+
+    return move.isReady ? move : undefined;
+  }
+
+  private measureExpansionCargo(province: Province): ResourceGains {
+    const { gold, food, troops } = province.resources;
+
+    return {
+      gold: Math.floor(gold / EXPANSION_SHARE),
+      food: Math.floor(food / EXPANSION_SHARE),
+      troops: Math.floor(troops / EXPANSION_SHARE),
+    };
   }
 
   private get world(): World {

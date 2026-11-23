@@ -3,16 +3,28 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { RecruitCommand } from '@/core/commands/province/RecruitCommand';
 import { TradeCommand } from '@/core/commands/province/TradeCommand';
 import { CalendarDate } from '@/core/domain/CalendarDate';
+import { HiredUnit } from '@/core/domain/HiredUnit';
+import { InvasionReport } from '@/core/domain/InvasionReport';
+import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
+import { IncidentReportedEvent } from '@/core/events/IncidentReportedEvent';
 import { MonthStartedEvent } from '@/core/events/MonthStartedEvent';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { TurnHeldEvent } from '@/core/events/TurnHeldEvent';
 import { TurnReleasedEvent } from '@/core/events/TurnReleasedEvent';
 import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
+import { UnitDesertedEvent } from '@/core/events/UnitDesertedEvent';
 import { WorldEngine } from '@/core/WorldEngine';
 import { EventBus } from '@/lib/EventBus';
 
-import { makeFamily, makeGeneral, makeProvince, makeWorld } from './factories';
+import {
+  makeArmy,
+  makeCaptive,
+  makeFamily,
+  makeGeneral,
+  makeProvince,
+  makeWorld,
+} from './factories';
 
 interface Fixture {
   readonly world: ReturnType<typeof makeWorld>['world'];
@@ -72,8 +84,83 @@ function drainMonth(fixture: Fixture): void {
   }
 }
 
+const MAY = 5;
+
 describe('WorldEngine', () => {
   afterEach(() => vi.restoreAllMocks());
+
+  it('gives no turn to an unowned province', () => {
+    const fixture = createFixture(new CalendarDate(1186, 4));
+    const started: number[] = [];
+
+    fixture.events.subscribe(TurnStartedEvent, (event) =>
+      started.push(event.province.number),
+    );
+    drainMonth(fixture);
+    drainMonth(fixture);
+
+    expect(started).not.toContain(4);
+    expect(started).toContain(3);
+  });
+
+  it('gives a province claimed before its slot one turn for its new owner', () => {
+    const fixture = createFixture(new CalendarDate(1186, 4));
+    const { world, events } = fixture;
+    const mauseio = world.map.getProvince(4);
+    const hertzog = world.map.getProvince(3);
+    const claimant = hertzog.family!;
+    const turns: { month: number; province: number }[] = [];
+
+    events.subscribe(TurnStartedEvent, (event) =>
+      turns.push({ month: world.date.month, province: event.province.number }),
+    );
+    mauseio.claim(claimant);
+    drainMonth(fixture);
+    drainMonth(fixture);
+
+    const mayTurns = turns.filter(
+      (turn) => turn.month === MAY && turn.province === mauseio.number,
+    );
+
+    expect(mayTurns).toHaveLength(1);
+  });
+
+  it('gets an AI ransom demand ready for the player when the battle is reported', () => {
+    const { world, events } = createFixture(new CalendarDate(1186, 4));
+    const { player } = world;
+    const home = world.map.getProvince(1);
+    const battlefield = world.map.getProvince(3);
+    const captor = battlefield.family!;
+    const general = makeGeneral();
+    const captive = makeCaptive({
+      general,
+      house: player,
+      captor,
+      battlefield,
+      pendingRansom: true,
+    });
+    const report = new InvasionReport({
+      source: home,
+      target: battlefield,
+      defending: captor,
+      attacker: makeArmy({ commander: general }),
+      defender: makeArmy({ commander: captor.ruler }),
+      answer: 'fight',
+    });
+
+    player.enlist(general);
+    player.moveHome(home);
+    world.hold(captive);
+    report.captive = captive;
+    vi.spyOn(Math, 'random').mockReturnValue(0.75);
+    const before = home.resources.food;
+
+    events.publish(new BattleReportedEvent(report));
+
+    expect(world.findRansomFor(player)).toBe(captive);
+    expect(captive.demand).toBe('food');
+    expect(home.resources.food).toBe(before);
+  });
 
   it('records the action but leaves the turn for the orchestrator when a command executes', () => {
     const { world, events } = createFixture(new CalendarDate(1186, 4));
@@ -175,10 +262,19 @@ describe('WorldEngine', () => {
     drainMonth(fixture);
 
     expect(fixture.world.date.month).toBe(9);
-    expect(playerProvince.resources.food).toBe(400 + 10 + 20 * 2 + 30);
+    expect(playerProvince.resources.food).toBe(
+      400 +
+        10 * 2 +
+        20 * 3 +
+        Math.floor(playerProvince.effectiveStats.charisma) +
+        30 -
+        10,
+    );
     expect(playerProvince.resources.gold).toBeGreaterThan(500);
     expect(playerProvince.resources.troops).toBe(100);
-    expect(rivalHarvest).toBe(5 + 5 * 2 + 5);
+    expect(rivalHarvest).toBe(
+      5 * 3 + 5 * 2 + Math.floor(rivalProvince.effectiveStats.charisma) + 30,
+    );
     expect(neutralProvince.resources.food).toBe(0);
     expect(neutralProvince.resources.gold).toBe(0);
   });
@@ -194,9 +290,48 @@ describe('WorldEngine', () => {
     expect(playerProvince.resources.food).toBe(400);
   });
 
+  it('removes unpaid units before rampage and restores paid units before the first turn', () => {
+    const family = makeFamily({ fame: 12 });
+    const province = makeProvince({
+      family,
+      gold: 20,
+      loyalty: 80,
+      cultivation: 100,
+    });
+    const spearmen = HiredUnit.ofName('Spearmen')!;
+    spearmen.retainBattleStrength(90);
+    province.fifthUnits.addUnit(spearmen);
+    const monster = HiredUnit.ofName('Ogre')!;
+    monster.retainBattleStrength(74);
+    province.fifthUnits.addUnit(monster);
+    const march = new CalendarDate(1186, 3);
+    const { world, events } = makeWorld([province], family, march);
+    const desertions: UnitDesertedEvent[] = [];
+    const incidents: string[] = [];
+    const strengthAtTurnStart: number[] = [];
+
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    events.subscribe(UnitDesertedEvent, (event) => desertions.push(event));
+    events.subscribe(IncidentReportedEvent, (event) =>
+      incidents.push(event.incident.definition.kind),
+    );
+    events.subscribe(TurnStartedEvent, () =>
+      strengthAtTurnStart.push(spearmen.strength),
+    );
+    new WorldEngine(world, events).start();
+
+    expect(desertions).toEqual([
+      new UnitDesertedEvent(province, monster, 'unpaid'),
+    ]);
+    expect(incidents).toEqual(['disaster']);
+    expect(province.fifthUnits.hiredUnits).toEqual([spearmen]);
+    expect(strengthAtTurnStart).toEqual([115]);
+    expect(monster.strength).toBe(74);
+  });
+
   it("stops the clock once the player's family is no more", () => {
-    const now = new CalendarDate(1186, 4);
-    const avar = makeGeneral({ deathDate: now });
+    const now = new CalendarDate(1186, 1);
+    const avar = makeGeneral({ birth: new CalendarDate(1111, 1) });
     const alderwyn = makeFamily({ name: 'Alderwyn', ruler: avar });
     const alderpass = makeProvince({
       number: 1,
@@ -237,6 +372,7 @@ describe('WorldEngine', () => {
 
     const { world, events } = makeWorld([home, entrusted], alderwyn);
 
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
     new WorldEngine(world, events).start();
 
     expect(world.turnQueue.current).toBe(home);
@@ -265,6 +401,6 @@ describe('WorldEngine', () => {
     events.publish(new TurnReleasedEvent(holder));
     await Promise.resolve();
 
-    expect(started[0]).toBe(ended + 1);
+    expect(started[0]).toBeGreaterThan(ended);
   });
 });

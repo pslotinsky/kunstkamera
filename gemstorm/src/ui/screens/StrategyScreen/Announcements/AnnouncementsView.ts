@@ -2,8 +2,8 @@ import { html, type TemplateResult } from 'lit-html';
 
 import { Coronation } from '@/core/domain/Coronation';
 import type { Disbanding } from '@/core/domain/Disbanding';
-import type { Incident } from '@/core/domain/Incident';
 import type { SabotageDamage } from '@/core/domain/Infiltration';
+import type { Incident } from '@/core/domain/province-events/Incident';
 import type { World } from '@/core/domain/World';
 import type { AllianceOfferedEvent } from '@/core/events/AllianceOfferedEvent';
 import type { ArtifactFoundEvent } from '@/core/events/ArtifactFoundEvent';
@@ -21,6 +21,7 @@ import type {
   DesertionReason,
   UnitDesertedEvent,
 } from '@/core/events/UnitDesertedEvent';
+import type { VassalOfferedEvent } from '@/core/events/VassalOfferedEvent';
 import type { ChildrenViews } from '@/lib/Control';
 import type { EventBus } from '@/lib/EventBus';
 import { View } from '@/lib/View';
@@ -46,6 +47,7 @@ const DESERTION_REASONS: Record<DesertionReason, string> = {
 const SABOTAGE_DAMAGES: Record<SabotageDamage, string> = {
   troops: 'cut down the troops of',
   loyalty: 'turned the people against the lord of',
+  cultivation: 'destroyed crops in',
   protection: 'burned the walls of',
 };
 
@@ -57,11 +59,18 @@ interface Choice {
 
 type Verdict = CaptiveJudgedEvent['outcome'];
 
+const VASSAL_REQUESTS = [
+  'I ask for a place at your court. My duty will be to you.',
+  'If you have a place for me, I am prepared to serve.',
+  'I would gladly put my skills to use in your service.',
+  'I have been looking for a new ruler to serve. Will you take me in?',
+] as const;
+
 const VERDICTS: Record<Verdict, string> = {
   joined: 'recruited',
-  refused: 'released',
   released: 'released',
   banished: 'banished',
+  ransomed: 'ransomed',
 };
 
 interface Announcement {
@@ -136,9 +145,10 @@ export class AnnouncementsView extends View<
   }
 
   public showIncident(incident: Incident, pending: number): void {
-    const detail = incident.definition.grantsNerith
-      ? 'Available for one battle. No upkeep.'
-      : '';
+    const { definition } = incident;
+    const recruitsNerith =
+      definition.kind === 'good' && definition.effect.kind === 'nerith';
+    const detail = recruitsNerith ? 'Available for one battle. No upkeep.' : '';
     const text = incident.monster
       ? `The ${incident.monster} went on a rampage, ravaging the land.`
       : incident.definition.description.replace(
@@ -234,6 +244,20 @@ export class AnnouncementsView extends View<
     );
   }
 
+  public askForVassal(event: VassalOfferedEvent, pending: number): void {
+    const { general } = event.offer;
+
+    this.ask(
+      {
+        text: `${general.name} offers to join your court.`,
+        detail: VASSAL_REQUESTS[general.defectionClass],
+        icon: getGeneralPortraitUrl(general),
+      },
+      { label: '', action: 'Accept', decline: 'Reject' },
+      pending,
+    );
+  }
+
   public showSuccession(event: SuccessionReportedEvent, pending: number): void {
     const { outcome, cause } = event;
     const departure = this.describeDeparture(outcome, cause);
@@ -289,7 +313,7 @@ export class AnnouncementsView extends View<
   }
 
   private describeDisbanding(disbanding: Disbanding): string {
-    const { family, breakaways, gems, beneficiary } = disbanding;
+    const { family, breakaways, inheritances } = disbanding;
 
     if (family.isEqual(this.context.world.player)) {
       return 'Your house is no more.';
@@ -299,12 +323,12 @@ export class AnnouncementsView extends View<
       (breakaway) =>
         ` ${breakaway.ruler.name} now rules ${breakaway.homeProvince.name} as ${breakaway.name}.`,
     );
-    const passing =
-      beneficiary && gems.length
-        ? ` ${gems.map((gem) => gem.name).join(' and ')} ${gems.length > 1 ? 'pass' : 'passes'} to ${beneficiary.name}.`
-        : '';
+    const passing = inheritances.map(
+      ({ family: recipient, gem }) =>
+        ` ${gem.name} passes to ${recipient.name}.`,
+    );
 
-    return `${family.name} has no heir and is no more.${rulers.join('')}${passing}`;
+    return `${family.name} has no heir and is no more.${rulers.join('')}${passing.join('')}`;
   }
 
   private describeMission(outcome: MissionOutcome, you: string): Announcement {

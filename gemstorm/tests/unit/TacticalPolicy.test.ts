@@ -26,6 +26,21 @@ function closes(
   return roads.isCloser(order.destination, unit.cell);
 }
 
+const GATE_GUARD_CELLS = [
+  [9, 4],
+  [9, 3],
+  [9, 5],
+  [9, 2],
+] as const;
+
+function guardTheGate(battle: Battle): void {
+  const defenders = battle.getUnits(BattleSide.defender);
+
+  GATE_GUARD_CELLS.forEach(([column, row], index) => {
+    station(battle, defenders[index]!, column, row);
+  });
+}
+
 describe('TacticalPolicy', () => {
   it('comes for your flag when it is not outmatched', () => {
     const battle = makeBattle({ defender: makeArmy({ troops: 400 }) });
@@ -70,7 +85,8 @@ describe('TacticalPolicy', () => {
       defender: makeArmy({ troops: 40 }),
     });
     const enemy = new TacticalPolicy(BattleSide.defender);
-    const unit = battle.getUnits(BattleSide.defender)[0]!;
+    const gate = battle.field.getCell(9, 4)!;
+    const unit = battle.getUnit(gate)!;
 
     const order = enemy.orderUnit(unit, battle);
 
@@ -80,6 +96,7 @@ describe('TacticalPolicy', () => {
   it('names a target standing in its pattern from the cell it chose', () => {
     const battle = makeBattle({ defender: makeArmy({ troops: 400 }) });
     const enemy = new TacticalPolicy(BattleSide.defender);
+    guardTheGate(battle);
     const guard = battle.getUnits(BattleSide.defender)[0]!;
     const rider = battle.getUnits(BattleSide.attacker)[0]!;
 
@@ -99,6 +116,7 @@ describe('TacticalPolicy', () => {
   it('walks into a blow rather than waiting to be hit', () => {
     const battle = makeBattle({ defender: makeArmy({ troops: 400 }) });
     const enemy = new TacticalPolicy(BattleSide.defender);
+    guardTheGate(battle);
     const guard = battle.getUnits(BattleSide.defender)[1]!;
     const rider = battle.getUnits(BattleSide.attacker)[0]!;
 

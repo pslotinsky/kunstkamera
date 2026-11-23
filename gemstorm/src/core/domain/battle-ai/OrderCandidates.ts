@@ -1,5 +1,5 @@
 import type { Battle } from '../Battle';
-import { type BattleUnit, BLOW_WEIGHT, RETALIATION } from '../BattleUnit';
+import type { Approach, BattleUnit } from '../BattleUnit';
 import type { Cell } from '../Cell';
 import { UnitOrder } from '../UnitOrder';
 import { STEPS_CAP } from './Approach';
@@ -9,6 +9,18 @@ const CANDIDATES = 8;
 const WORK_CANDIDATES = 3;
 
 const WORTH_OF_WORK = 0.5;
+
+const BLOW_WEIGHT: Readonly<Record<Approach, number>> = {
+  front: 1,
+  flank: 1.4,
+  rear: 2,
+};
+
+const RETALIATION: Readonly<Record<Approach, number>> = {
+  front: 1,
+  flank: 0.6,
+  rear: 0.3,
+};
 
 interface Weighed {
   readonly order: UnitOrder;

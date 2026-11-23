@@ -78,7 +78,7 @@ export class ClashView extends View<ClashContext> {
     this.showCorner(
       'striker',
       clash.striker,
-      clash.strikerLeft + clash.backlash,
+      clash.strikerLeft + clash.strikerLosses,
     );
     this.showCorner('target', clash.target, clash.targetLeft + clash.losses);
     this.element.classList.remove(styles.hidden!);
@@ -90,7 +90,12 @@ export class ClashView extends View<ClashContext> {
   }
 
   public land(clash: Clash): void {
-    this.settle('striker', clash.striker, clash.strikerLeft, clash.backlash);
+    this.settle(
+      'striker',
+      clash.striker,
+      clash.strikerLeft,
+      clash.strikerLosses,
+    );
     this.settle('target', clash.target, clash.targetLeft, clash.losses);
   }
 
@@ -121,7 +126,7 @@ export class ClashView extends View<ClashContext> {
   private countFigures(unit: BattleUnit, strength: number): number {
     const share = (BLOCK_FIGURES * strength) / unit.committedStrength;
 
-    if (strength <= 0) {
+    if (strength < unit.unit.minimumActiveStrength) {
       return 0;
     }
 

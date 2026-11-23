@@ -4,6 +4,7 @@ import { LifecycleCommand } from '@/core/commands/LifecycleCommand';
 import { CalendarDate } from '@/core/domain/CalendarDate';
 import { Gem } from '@/core/domain/Gem';
 import type { General } from '@/core/domain/General';
+import { CampaignEndedEvent } from '@/core/events/CampaignEndedEvent';
 
 import {
   makeCaptive,
@@ -13,8 +14,8 @@ import {
   makeWorld,
 } from './factories';
 
-const MAY = new CalendarDate(1230, 5);
-const LATER = new CalendarDate(1260, 1);
+const JANUARY = new CalendarDate(1230, 1);
+const OLD_BIRTH = new CalendarDate(1155, 1);
 
 interface SetupOptions {
   readonly heirs?: readonly General[];
@@ -28,12 +29,12 @@ function setup(options: SetupOptions = {}) {
   const tovren = makeGeneral({
     name: 'Tovren',
     lineage: 'Emberholt',
-    deathDate: dying === 'ruler' ? MAY : LATER,
+    birth: dying === 'ruler' ? OLD_BIRTH : undefined,
   });
   const halric = makeGeneral({
     name: 'Halric',
     intelligence: 90,
-    deathDate: dying === 'lord' ? MAY : LATER,
+    birth: dying === 'lord' ? OLD_BIRTH : undefined,
   });
   const denric = makeGeneral({ name: 'Denric' });
   const emberholt = makeFamily({
@@ -69,7 +70,7 @@ function setup(options: SetupOptions = {}) {
   const { world, events } = makeWorld(
     [cinderpeak, duskcrag, pineward, ironpass],
     stormmere,
-    MAY,
+    JANUARY,
   );
 
   return {
@@ -93,26 +94,25 @@ function rollAt(roll: number): void {
 describe('LifecycleCommand', () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it('takes a general on his death date, and gives a rare survivor another month', () => {
-    const early = setup();
+  it('checks mortality once in January and increases the risk with age', () => {
+    const { world, lifecycle, tovren } = setup();
 
-    early.world.date = new CalendarDate(1230, 4);
+    rollAt(0.75);
+    lifecycle.execute();
+    expect(world.generals.all).toContain(tovren);
+
     rollAt(0);
-    early.lifecycle.execute();
+    lifecycle.execute();
+    expect(world.generals.all).toContain(tovren);
 
-    expect(early.emberholt.ruler).toBe(early.tovren);
+    world.date = JANUARY.next();
+    lifecycle.execute();
+    expect(world.generals.all).toContain(tovren);
 
-    rollAt(0.9);
-    early.world.date = MAY;
-    early.lifecycle.execute();
-
-    expect(early.world.generals.all).toContain(early.tovren);
-
-    rollAt(0.89);
-    early.world.date = new CalendarDate(1230, 6);
-    early.lifecycle.execute();
-
-    expect(early.world.generals.all).not.toContain(early.tovren);
+    rollAt(0.75);
+    world.date = new CalendarDate(1231, 1);
+    lifecycle.execute();
+    expect(world.generals.all).not.toContain(tovren);
   });
 
   it('buries a lord and hands his province back to his ruler', () => {
@@ -167,20 +167,27 @@ describe('LifecycleCommand', () => {
     expect(world.families.all).not.toContain(emberholt);
   });
 
-  it('disbands a family with no heir: each lord breaks away with his land, the best garrisoned takes the vassals and gems, the rest turns neutral', () => {
-    rollAt(0);
-
+  it('disbands an heirless house, draws breakaway names and Gem recipients, and offers its vassal to the smallest court', () => {
     const dovar = makeGeneral({ name: 'Dovar' });
     const {
       world,
       lifecycle,
       emberholt,
+      stormmere,
       halric,
       denric,
       cinderpeak,
       duskcrag,
       ironpass,
     } = setup({ garrisonedLord: dovar });
+    emberholt.gems = [...emberholt.gems, Gem.ofName('Asterion')];
+    vi.spyOn(Math, 'random')
+      .mockReturnValue(0)
+      .mockReturnValueOnce(0)
+      .mockReturnValueOnce(0.99)
+      .mockReturnValueOnce(0.99)
+      .mockReturnValueOnce(0)
+      .mockReturnValueOnce(0.99);
 
     lifecycle.execute();
 
@@ -189,37 +196,106 @@ describe('LifecycleCommand', () => {
 
     expect(world.families.all).not.toContain(emberholt);
     expect(cinderpeak.family).toBeUndefined();
+    expect(cinderpeak.governor).toBeUndefined();
     expect(weaker?.ruler).toBe(halric);
     expect(stronger?.ruler).toBe(dovar);
-    expect(stronger?.name).not.toBe(weaker?.name);
-    expect(stronger?.members).toContain(denric);
-    expect(weaker?.members).not.toContain(denric);
-    expect(stronger?.gems.map((gem) => gem.name)).toEqual(['Cindrath']);
+    expect(weaker?.name).toBe('Sunhallow');
+    expect(stronger?.name).toBe('Valecross');
+    expect(stormmere.gems.map((gem) => gem.name)).toEqual(['Cindrath']);
+    expect(stronger?.gems.map((gem) => gem.name)).toEqual(['Asterion']);
+    expect(weaker?.fame).toBe(3);
+    expect(stronger?.fame).toBe(3);
+    expect(world.wanderers.offer).toEqual({
+      general: denric,
+      court: stormmere,
+    });
+    expect(lifecycle.isComplete).toBe(false);
+
+    world.wanderers.answer(world.wanderers.offer!, false);
+    lifecycle.execute();
+
+    expect(weaker?.members).toContain(denric);
+    expect(world.wanderers.offer).toBeUndefined();
+    expect(lifecycle.isComplete).toBe(true);
   });
 
-  it('ages generals in January, one year in three, and never in other months', () => {
+  it('decays development in every province and ages survivors only in January', () => {
     const january = new CalendarDate(1200, 1);
     const ruler = makeGeneral({ birth: new CalendarDate(1170, 1), war: 50 });
     const family = makeFamily({ ruler });
-    const { world, events } = makeWorld(
-      [makeProvince({ family, governor: ruler })],
+    const owned = makeProvince({
       family,
-      january,
+      governor: ruler,
+      loyalty: 55,
+      cultivation: 39,
+      protection: 40,
+    });
+    const neutral = makeProvince({ number: 2, loyalty: 20, cultivation: 10 });
+    const { world, events } = makeWorld(
+      [owned, neutral],
+      family,
+      january.next(),
     );
     const lifecycle = new LifecycleCommand({ world, events });
 
-    rollAt(0.34);
-    lifecycle.execute();
-    world.date = january.next();
     rollAt(0);
     lifecycle.execute();
 
     expect(ruler.stats.war).toBe(50);
+    expect(owned.development.loyalty).toBe(55);
+    expect(neutral.development.loyalty).toBe(20);
 
     world.date = january;
-    rollAt(0.33);
+    lifecycle.execute();
     lifecycle.execute();
 
     expect(ruler.stats.war).toBe(52);
+    expect(owned.development).toMatchObject({
+      loyalty: 52,
+      cultivation: 37,
+      protection: 37,
+    });
+    expect(neutral.development).toMatchObject({
+      loyalty: 17,
+      cultivation: 9,
+      protection: 0,
+    });
+  });
+});
+
+describe('LifecycleCommand when the January deaths take everyone', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('ends the campaign once through the heirless fall when no general survives', () => {
+    const ruler = makeGeneral({ name: 'Avar', birth: OLD_BIRTH });
+    const kin = makeGeneral({
+      name: 'Nemer',
+      birth: OLD_BIRTH,
+      lineage: 'Alderwyn',
+    });
+    const rivalRuler = makeGeneral({ name: 'Darian', birth: OLD_BIRTH });
+    const player = makeFamily({
+      name: 'Alderwyn',
+      ruler,
+      members: [ruler, kin],
+    });
+    const rival = makeFamily({ name: 'Stormmere', ruler: rivalRuler });
+    const home = makeProvince({ number: 1, family: player, governor: ruler });
+    const rivalHome = makeProvince({
+      number: 2,
+      family: rival,
+      governor: rivalRuler,
+    });
+    player.moveHome(home);
+    rival.moveHome(rivalHome);
+    const { world, events } = makeWorld([home, rivalHome], player, JANUARY);
+    const endings: CampaignEndedEvent[] = [];
+    events.subscribe(CampaignEndedEvent, (event) => endings.push(event));
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
+    new LifecycleCommand({ world, events }).execute();
+
+    expect(world.campaign.isEnded).toBe(true);
+    expect(endings).toHaveLength(1);
   });
 });

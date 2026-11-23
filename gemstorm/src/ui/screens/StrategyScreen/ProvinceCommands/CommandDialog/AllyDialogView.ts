@@ -12,22 +12,22 @@ export class AllyDialogView extends CommandDialogView {
     this.confirmButton.disabled = true;
   }
 
-  public showProposal(
-    family: Family,
-    provinces: number,
-    proposer: Family,
-  ): void {
+  public showProposal(family: Family, proposer: Family): void {
     this.showLines(
       `Ally with ${family.name}`,
-      `${family.ruler.name} — Fame ${family.fame}, ${provinces} provinces. Peace between ${proposer.name} and ${family.name}: neither house may attack the other.`,
+      `${family.ruler.name} has ${family.ruler.stats.charisma} Charisma and ${family.gems.length} Gems. Your ruler has ${proposer.ruler.stats.charisma} Charisma and ${proposer.gems.length} Gems.`,
     );
     this.confirmButton.disabled = false;
   }
 
-  public showPact(family: Family, ally: Family): void {
+  public showPact(family: Family, ally: Family, canReplace: boolean): void {
+    const prompt = canReplace
+      ? 'Break the alliance? Choose another house on the map to offer a new pact.'
+      : 'Break the alliance?';
+
     this.showLines(
       `Peace holds between ${family.name} and ${ally.name}.`,
-      'Break the alliance?',
+      prompt,
     );
     this.confirmButton.disabled = false;
   }

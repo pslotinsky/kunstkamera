@@ -1,16 +1,16 @@
 import type { Family } from '@/core/domain/Family';
 import type { FifthUnit } from '@/core/domain/FifthUnit';
 import type { Province } from '@/core/domain/Province';
-import type { ResourceGains } from '@/core/domain/Resources';
+import type { ResourceGains, ResourceKey } from '@/core/domain/Resources';
+import { Shipment } from '@/core/domain/Shipment';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
+import { isDefined } from '@/lib/value/isDefined';
 
 import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
 export class MoveTroopsCommand extends ProvinceCommand {
   private target: Province | undefined;
-  private gold = 0;
-  private food = 0;
-  private troops = 0;
+  private cargo: ResourceGains = {};
   private carried: FifthUnit | undefined;
 
   public constructor(context: WorldCommandContext) {
@@ -19,13 +19,26 @@ export class MoveTroopsCommand extends ProvinceCommand {
 
   public moveTo(target: Province, cargo: ResourceGains): void {
     this.target = target;
-    this.gold = cargo.gold ?? 0;
-    this.food = cargo.food ?? 0;
-    this.troops = cargo.troops ?? 0;
+    this.cargo = cargo;
   }
 
   public carry(unit: FifthUnit | undefined): void {
     this.carried = unit;
+  }
+
+  public getMaximum(resource: ResourceKey): number {
+    const source = this.currentProvince;
+    const { target } = this;
+
+    return isDefined(source) && isDefined(target)
+      ? Shipment.getMaximum(source, target, resource)
+      : 0;
+  }
+
+  public get isReady(): boolean {
+    const shipment = this.prepareShipment();
+
+    return isDefined(shipment) && this.canMove(shipment);
   }
 
   public override canExecute(): boolean {
@@ -49,66 +62,53 @@ export class MoveTroopsCommand extends ProvinceCommand {
   }
 
   public execute(): void {
-    const source = this.currentProvince;
+    const owner = this.currentProvince?.family;
+    const shipment = this.prepareShipment();
 
-    if (source?.family && this.target && this.canMove(source, this.target)) {
-      this.march(source, source.family, this.target);
+    if (isDefined(owner) && isDefined(shipment) && this.canMove(shipment)) {
+      this.march(shipment, owner);
     }
   }
 
-  private march(source: Province, owner: Family, target: Province): void {
-    source.addResources({
-      gold: -this.gold,
-      food: -this.food,
-      troops: -this.troops,
-    });
-    target.addResources({
-      gold: this.gold,
-      food: this.food,
-      troops: this.troops,
-    });
+  private prepareShipment(): Shipment | undefined {
+    const source = this.currentProvince;
+    const { target } = this;
 
-    if (target.isNeutral()) {
-      this.claim(target, owner);
+    return isDefined(source) && isDefined(target)
+      ? new Shipment({ source, target, cargo: this.cargo })
+      : undefined;
+  }
+
+  private march(shipment: Shipment, owner: Family): void {
+    const { source, target } = shipment;
+
+    shipment.deliver();
+
+    if (isDefined(this.carried)) {
+      source.fifthUnits.transfer(this.carried, target.fifthUnits);
     }
-
-    this.relocateUnit(source, target);
+    target.claimUnowned(owner);
 
     this.publish(new ProvinceUpdatedEvent(target));
     this.complete(source);
   }
 
-  private relocateUnit(source: Province, target: Province): void {
-    if (this.isCarrying(source)) {
-      source.removeUnit(this.carried!);
-      target.addUnit(this.carried!);
-    }
-  }
-
-  private claim(target: Province, owner: Family): void {
-    target.claim(owner);
-    target.assignGovernor(owner.ruler);
-  }
-
-  private canMove(source: Province, target: Province): boolean {
-    const moved =
-      this.gold > 0 ||
-      this.food > 0 ||
-      this.troops > 0 ||
-      this.isCarrying(source);
-    const affordable =
-      source.resources.gold >= this.gold &&
-      source.resources.food >= this.food &&
-      source.resources.troops >= this.troops;
+  private canMove(shipment: Shipment): boolean {
+    const { source, target } = shipment;
+    const isCarrying = this.isCarrying(source);
+    const canStation = !isCarrying || target.fifthUnits.canStation;
 
     return (
-      this.selectableTargets.includes(target.number) && moved && affordable
+      this.selectableTargets.includes(target.number) &&
+      (!shipment.isEmpty || isCarrying) &&
+      shipment.isDeliverable &&
+      canStation
     );
   }
 
   private isCarrying(source: Province): boolean {
-    return (
-      this.carried !== undefined && source.stationedUnits.includes(this.carried)
-    );
+    const { carried } = this;
+
+    return isDefined(carried) && source.fifthUnits.hasUnit(carried);
   }
 }

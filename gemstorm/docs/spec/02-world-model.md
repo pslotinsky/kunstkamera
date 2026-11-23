@@ -468,3 +468,70 @@ Province
 ↓
 Economy / Army / Governor / Event / Invasion
 ```
+
+---
+
+## Detailed rules: Foundations
+
+### Random numbers
+
+```text
+seed = seed × 0x41C64E6D + 0x3039        (32-bit)
+rand()      = (seed >> 16) & 0x7FFF
+rand(n)     = rand() mod n               (0 … n−1; 0 when n = 0)
+chance(p)   = rand(100) < p              (p percent)
+```
+
+### The acting character
+
+Most province commands use one character's stat. That character is the **lord**: the first general in the province.
+
+If an owned province has no general in it, the family ruler's stat is used instead, **halved**.
+
+### Character stats
+
+Each general has three stats, each capped at 200:
+
+| Internal order | Name in this archive | Used for                                  |
+| -------------- | -------------------- | ----------------------------------------- |
+| 1              | INT (political)      | Develop, Search                           |
+| 2              | WAR                  | Battle, Search                            |
+| 3              | CHA (charm)          | Harvest, Give Food, Search                |
+
+
+
+### Soldiers and Fifth Unit slots
+
+A province holds **one pooled soldier count** (cap 999). The four standard battlefield units are formed from that pool when a battle starts.
+
+A province also has **five Fifth Unit slots**. A slot is empty, hired, or available for hire. At most three may be hired at once.
+
+---
+
+---
+
+## Detailed rules: View and Hidden Information
+
+View is free and may target **any of the 30 provinces**, whoever owns it.
+
+**Almost nothing is hidden.** For any rival the player can see:
+
+| Screen | Shows |
+| ------ | ----- |
+| Province | Owner, lord, Entrust marker, Gold, Food, Soldiers, Loyalty, Cultivation, Protection. |
+| One | Any general of that family: age, INT, WAR, CHA, house membership, and for a ruler Fame and the family's Gems. |
+| Many | Every general of that family: INT, WAR, CHA, province, rank. |
+| Land | Every province of that family: Gold, Food, Loyalty, Cultivation, Soldiers, who leads it, Entrust marker. |
+
+**The one hidden thing is a rival province's hired Fifth Units.** The Fifth Unit screen is refused for provinces of another family.
+
+**Search is the only way to learn it.** A failed search shows one randomly chosen hired unit of the target province with its Strength, or reports that none is employed there. A Pastha is never revealed this way.
+
+Also never shown to the player, for anyone: the policy counter and sum, a general's defection and recruit classes, and Gem rest counters other than through the "more rest is needed" refusal.
+
+On the player's own Fifth Unit screen, hired units and the family's Gem Guardians are listed. Units merely available for hire are not; they appear only in the Hire command.
+
+---
+
+---
+

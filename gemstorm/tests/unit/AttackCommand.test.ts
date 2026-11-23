@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { AttackCommand } from '@/core/commands/province/AttackCommand';
-import { Army, type ArmyParams } from '@/core/domain/Army';
+import type { AttackForce } from '@/core/domain/AttackDeployment';
 import { BattleOutcome } from '@/core/domain/BattleOutcome';
 import { BattleSide } from '@/core/domain/BattleSide';
 import { Gem } from '@/core/domain/Gem';
@@ -89,6 +89,8 @@ function setup(params: SetupParams = {}) {
 
   mine.ally = friend;
   friend.ally = mine;
+  mine.moveHome(source);
+  rival.moveHome(enemy);
 
   const { world, events } = makeWorld(
     [source, enemy, neutral, owned, allied, refuge, distant],
@@ -108,15 +110,14 @@ function setup(params: SetupParams = {}) {
     started = event;
   });
 
-  const attack = (order: Partial<ArmyParams>) => {
-    const params: ArmyParams = {
-      commander: order.commander ?? avar,
-      troops: order.troops ?? 156,
-      food: order.food ?? 120,
-      unit: order.unit,
+  const attack = (order: Partial<AttackForce> = {}) => {
+    const force: AttackForce = {
+      troops: SOURCE_TROOPS,
+      food: 48,
+      ...order,
     };
 
-    command.attackAt(enemy, new Army(params));
+    command.attackAt(enemy, force);
     command.execute();
   };
 
@@ -144,6 +145,7 @@ function setup(params: SetupParams = {}) {
     marven,
     mine,
     rival,
+    world,
     source,
     enemy,
     owned,
@@ -157,17 +159,22 @@ function setup(params: SetupParams = {}) {
 }
 
 describe('AttackCommand', () => {
-  it('can attack with Nerith alone, but cannot summon a visit that has already departed', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('requires soldiers alongside a Fifth Unit and checks that the unit is still available', () => {
     const { source, attack, started } = setup();
     const nerith = new Nerith();
-    source.addUnit(nerith);
-    source.removeUnit(nerith);
+    source.fifthUnits.addUnit(nerith);
     attack({ troops: 0, unit: nerith });
     expect(started()).toBeUndefined();
-    source.addUnit(nerith);
-    attack({ troops: 0, unit: nerith });
+
+    source.fifthUnits.removeUnit(nerith);
+    attack({ troops: 100, unit: nerith });
+    expect(started()).toBeUndefined();
+
+    source.fifthUnits.addUnit(nerith);
+    attack({ troops: 100, unit: nerith });
     expect(started()?.battle.attacker.unit).toBe(nerith);
-    expect(started()?.battle.getUnits(BattleSide.attacker)).toHaveLength(1);
   });
 
   it('offers adjacent provinces held by another house only', () => {
@@ -179,38 +186,48 @@ describe('AttackCommand', () => {
   it('spends the troops, the food, the deployment gold, and the turn', () => {
     const { source, attack } = setup();
 
-    attack({ troops: 156, food: 120 });
+    attack({ troops: 156, food: 129 });
 
     expect(source.resources.gold).toBe(SOURCE_GOLD - 29);
+    expect(source.resources.troops).toBe(0);
+    expect(source.resources.food).toBe(SOURCE_FOOD - 129);
     expect(source.goodwill).toBe(-1);
     expect(source.actionCount).toBe(1);
   });
 
-  it('refuses an army it cannot pay for, man, or feed for a day', () => {
+  it('refuses an army the province cannot pay for, man, or feed', () => {
     const cases = [
-      { troops: 156, food: 120, gold: 10 },
-      { troops: 0, food: 120, gold: SOURCE_GOLD },
-      { troops: 156, food: 10, gold: SOURCE_GOLD },
+      { troops: 156, carried: 48, food: SOURCE_FOOD, gold: 10 },
+      { troops: 0, carried: 48, food: SOURCE_FOOD, gold: SOURCE_GOLD },
+      { troops: 156, carried: 48, food: 47, gold: SOURCE_GOLD },
+      { troops: 156, carried: 15, food: SOURCE_FOOD, gold: SOURCE_GOLD },
+      { troops: 156, carried: 48.5, food: SOURCE_FOOD, gold: SOURCE_GOLD },
     ];
 
-    for (const { troops, food, gold } of cases) {
+    for (const { troops, carried, food, gold } of cases) {
       const { source, enemy, attack } = setup();
-      source.addResources({ gold: gold - SOURCE_GOLD });
+      source.addResources({
+        gold: gold - SOURCE_GOLD,
+        food: food - SOURCE_FOOD,
+      });
 
-      attack({ troops, food });
+      attack({ troops, food: carried });
 
       expect(source.resources.troops).toBe(SOURCE_TROOPS);
-      expect(source.resources.food).toBe(SOURCE_FOOD);
+      expect(source.resources.food).toBe(food);
       expect(source.goodwill).toBe(0);
       expect(enemy.belongsTo(source.family!)).toBe(false);
     }
   });
 
   it('hands the province to the winner, garrisoned under its commander', () => {
-    const { avar, rhovan, mine, source, enemy, attack, finish, report } =
+    const { avar, rhovan, mine, source, owned, enemy, attack, finish, report } =
       setup();
 
-    attack({ commander: rhovan });
+    mine.moveHome(owned);
+    source.assignGovernor(rhovan);
+    attack();
+    expect(source.governor).toBeUndefined();
     finish(BattleSide.attacker);
 
     const outcome = report()!.outcome!;
@@ -222,10 +239,44 @@ describe('AttackCommand', () => {
     expect(source.ruledBy(avar)).toBe(true);
   });
 
-  it('rules a province taken by the ruler himself at a distance', () => {
-    const { avar, enemy, attack, finish } = setup();
+  it('moves the ruler and court to the conquered province, leaving the origin under remote rule', () => {
+    const { avar, rhovan, mine, world, source, enemy, attack, finish } =
+      setup();
 
-    attack({ commander: avar });
+    attack();
+    expect(source.residentGovernor).toBeUndefined();
+    finish(BattleSide.attacker);
+
+    expect(enemy.residentGovernor).toBe(avar);
+    expect(mine.homeProvince).toBe(enemy);
+    expect(world.getResidence(mine, rhovan)).toBe(enemy);
+    expect(source.isRemotelyRuled).toBe(true);
+  });
+
+  it('keeps a captured attacking lord out of his former province', () => {
+    const { avar, rhovan, mine, owned, source, attack, finish, report } =
+      setup();
+    mine.moveHome(owned);
+    source.assignGovernor(rhovan);
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
+    attack();
+    finish(BattleSide.defender);
+
+    expect(report()?.captive?.general).toBe(rhovan);
+    expect(source.governor).toBe(avar);
+    expect(source.isRemotelyRuled).toBe(true);
+  });
+
+  it('uses half the ruler’s War for an attack from an unstaffed province', () => {
+    const { mine, avar, source, owned, enemy, attack, finish, started } =
+      setup();
+    mine.moveHome(owned);
+    source.assignGovernor(undefined);
+
+    attack();
+    expect(started()?.battle.attacker.commander).toBe(avar);
+    expect(started()?.battle.attacker.commanderWar).toBe(25);
     finish(BattleSide.attacker);
 
     expect(enemy.ruledBy(avar)).toBe(true);
@@ -238,7 +289,7 @@ describe('AttackCommand', () => {
       defenderFood: 400,
     });
 
-    attack({ troops: 20, food: 120 });
+    attack({ troops: 20 });
     finish(BattleSide.defender);
 
     const outcome = report()!.outcome!;
@@ -247,36 +298,38 @@ describe('AttackCommand', () => {
     expect(enemy.belongsTo(rival)).toBe(true);
     expect(enemy.ruledBy(marven)).toBe(true);
     expect(enemy.resources.troops).toBe(outcome.defenderSurvivors);
-    expect(source.resources.troops).toBe(
-      SOURCE_TROOPS - 20 + outcome.attackerSurvivors,
-    );
+    expect(source.resources.troops).toBe(SOURCE_TROOPS - 20 + 10);
     expect(source.goodwill).toBe(-1);
   });
 
-  it('takes an abandoned province and moves the lord to his refuge', () => {
-    const { mine, marven, enemy, refuge, attack, report } = setup({
+  it('takes an abandoned province and moves the escaping defender to his refuge', () => {
+    const { mine, marven, rival, enemy, refuge, attack, report } = setup({
       defenders: 0,
       defenderFood: 0,
     });
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
 
-    attack({ troops: 156, food: 120 });
+    attack();
 
     expect(report()!.answer).toBe('retreat');
     expect(report()!.outcome).toBeUndefined();
     expect(refuge.ruledBy(marven)).toBe(true);
+    expect(rival.homeProvince).toBe(refuge);
     expect(enemy.belongsTo(mine)).toBe(true);
     expect(enemy.resources.troops).toBe(156);
   });
 
   it('stations a marching hired unit in the province it took', () => {
     const { source, enemy, attack, finish } = setup();
-    source.addUnit(HiredUnit.ofName('Grimhides')!);
+    source.fifthUnits.addUnit(HiredUnit.ofName('Grimhides')!);
 
-    attack({ unit: source.hiredUnits[0] });
+    attack({ unit: source.fifthUnits.hiredUnits[0] });
     finish(BattleSide.attacker);
 
-    expect(enemy.hiredUnits.map((unit) => unit.name)).toEqual(['Grimhides']);
-    expect(source.hiredUnits).toHaveLength(0);
+    expect(enemy.fifthUnits.hiredUnits.map((unit) => unit.name)).toEqual([
+      'Grimhides',
+    ]);
+    expect(source.fifthUnits.hiredUnits).toHaveLength(0);
   });
 
   it('leaves a summoned guardian stationed nowhere', () => {
@@ -285,7 +338,7 @@ describe('AttackCommand', () => {
     attack({ unit: mine.guardians[0] });
     finish(BattleSide.attacker);
 
-    expect(enemy.hiredUnits).toHaveLength(0);
+    expect(enemy.fifthUnits.hiredUnits).toHaveLength(0);
     expect(mine.guardians.map((guardian) => guardian.name)).toEqual([
       'Voltryn',
     ]);

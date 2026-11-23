@@ -1,4 +1,4 @@
-import { HiredUnit } from '@/core/domain/HiredUnit';
+import type { HiredUnit } from '@/core/domain/HiredUnit';
 
 import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
@@ -23,15 +23,15 @@ export class HireMonsterCommand extends ProvinceCommand {
   }
 
   public get hireableNames(): readonly string[] {
-    const province = this.currentProvince;
+    return this.hireableUnits.map((unit) => unit.name);
+  }
 
-    return province
-      ? province.hirePool.filter((name) => !province.hasUnit(name))
-      : [];
+  public get hireableUnits(): readonly HiredUnit[] {
+    return this.currentProvince?.fifthUnits.hireableUnits ?? [];
   }
 
   public get stationedUnits(): readonly HiredUnit[] {
-    return this.currentProvince?.hiredUnits ?? [];
+    return this.currentProvince?.fifthUnits.hiredUnits ?? [];
   }
 
   public execute(): void {
@@ -42,19 +42,24 @@ export class HireMonsterCommand extends ProvinceCommand {
     }
   }
 
+  protected override recordAction(goodwill: number): void {
+    const { world } = this.context;
+    const province = this.currentProvince;
+
+    if (province && !world.isPlayerRun(province)) {
+      super.recordAction(goodwill);
+    }
+  }
+
   private runHire(): void {
     const province = this.currentProvince;
-    const unit = this.chosen ? HiredUnit.ofName(this.chosen) : undefined;
+    const unit = this.hireableUnits.find(
+      (offered) => offered.name === this.chosen,
+    );
 
-    if (
-      province &&
-      unit &&
-      province.hirePool.includes(unit.name) &&
-      !province.hasUnit(unit.name) &&
-      province.resources.gold >= unit.cost
-    ) {
-      province.addResources({ gold: -unit.cost });
-      province.addUnit(unit);
+    if (province && unit && province.resources.gold >= unit.cost) {
+      province.reduceResources({ gold: unit.cost });
+      province.fifthUnits.hireUnit(unit);
       this.complete(province);
     }
   }
@@ -66,7 +71,7 @@ export class HireMonsterCommand extends ProvinceCommand {
     );
 
     if (province && unit) {
-      province.removeUnit(unit);
+      province.fifthUnits.dismissUnit(unit);
       this.complete(province);
     }
   }

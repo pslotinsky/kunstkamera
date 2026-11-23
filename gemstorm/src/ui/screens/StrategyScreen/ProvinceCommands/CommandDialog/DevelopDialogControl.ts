@@ -2,6 +2,7 @@ import {
   DevelopCommand,
   type DevelopTarget,
 } from '@/core/commands/province/DevelopCommand';
+import { isDefined } from '@/lib/value/isDefined';
 
 import { CommandDialogControl } from './CommandDialogControl';
 import { CommandStep } from './CommandStep';
@@ -23,11 +24,12 @@ export class DevelopDialogControl extends CommandDialogControl<
   }
 
   public override get step(): CommandStep {
-    return new CommandStep(
-      `Invest ${DevelopCommand.COST} gold in what?`,
-      TARGETS,
-      this.target,
+    const prompt = `Invest ${DevelopCommand.COST} gold in what?`;
+    const availableTargets = TARGETS.filter(({ value }) =>
+      this.command?.canDevelop(value),
     );
+
+    return new CommandStep(prompt, availableTargets, this.target);
   }
 
   public override open(command: DevelopCommand): void {
@@ -36,8 +38,12 @@ export class DevelopDialogControl extends CommandDialogControl<
   }
 
   protected override selectChoice(value: string): void {
-    this.target = value as DevelopTarget;
-    this.submit();
+    const target = TARGETS.find((choice) => choice.value === value)?.value;
+
+    if (isDefined(target) && this.command?.canDevelop(target)) {
+      this.target = target;
+      this.submit();
+    }
   }
 
   protected override setupCommand(command: DevelopCommand): void {

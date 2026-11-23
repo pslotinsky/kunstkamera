@@ -1,12 +1,17 @@
-import { ARTIFACT_FIND_CHANCE } from '@/config/artifacts';
-import { Artifact } from '@/core/domain/Artifact';
+import type { Artifact } from '@/core/domain/Artifact';
 import type { Province } from '@/core/domain/Province';
 import { ArtifactFoundEvent } from '@/core/events/ArtifactFoundEvent';
 import { SearchReportedEvent } from '@/core/events/SearchReportedEvent';
+import { sample } from '@/lib/array/sample';
+import { isDefined } from '@/lib/value/isDefined';
 
 import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
 const SEARCH_COST = 5;
+const DISCOVERY_CHANCE = 0.5;
+const GOVERNOR_SEARCH_DIVISOR = 20;
+const REMOTE_SEARCH_DIVISOR = 40;
+const PERCENT_SCALE = 100;
 
 export class SearchCommand extends ProvinceCommand {
   private target: Province | undefined;
@@ -34,19 +39,45 @@ export class SearchCommand extends ProvinceCommand {
     const target = this.target;
 
     if (province && target && this.canExecute() && this.isForeign(target)) {
-      province.addResources({ gold: -SEARCH_COST });
-      this.publish(new SearchReportedEvent(target, target.stationedUnits));
-      this.reportFind(province, target);
+      province.reduceResources({ gold: SEARCH_COST });
+      this.reportResult(province, target);
       this.complete(province);
     }
   }
 
-  private reportFind(province: Province, target: Province): void {
-    if (Math.random() < ARTIFACT_FIND_CHANCE) {
-      this.publish(
-        new ArtifactFoundEvent(province, target, Artifact.createRandom()),
-      );
+  private reportResult(province: Province, target: Province): void {
+    const artifact = this.findArtifact(province);
+
+    if (isDefined(artifact)) {
+      this.publish(new ArtifactFoundEvent(province, target, artifact));
+    } else {
+      const hired = target.fifthUnits.hiredUnits;
+      const revealed = hired.length > 0 ? [sample(hired)] : [];
+
+      this.publish(new SearchReportedEvent(target, revealed));
     }
+  }
+
+  private findArtifact(province: Province): Artifact | undefined {
+    const { campaign } = this.context.world;
+    const found =
+      campaign.hasUndiscoveredArtifacts &&
+      Math.random() < DISCOVERY_CHANCE &&
+      Math.random() < this.getSearchChance(province);
+
+    return found ? campaign.discoverArtifact() : undefined;
+  }
+
+  private getSearchChance(province: Province): number {
+    const { governor, family } = province;
+    const total = governor?.stats.total ?? family?.ruler.stats.total ?? 0;
+    const divisor =
+      !isDefined(governor) || province.isRemotelyRuled
+        ? REMOTE_SEARCH_DIVISOR
+        : GOVERNOR_SEARCH_DIVISOR;
+    const score = total / divisor;
+
+    return score / PERCENT_SCALE;
   }
 
   private isForeign(province: Province): boolean {

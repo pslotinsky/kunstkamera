@@ -27,9 +27,9 @@ describe('HireMonsterCommand', () => {
     command.hire('Grimhides');
     command.execute();
 
-    expect(province.hiredUnits).toHaveLength(1);
-    expect(province.hiredUnits[0]?.name).toBe('Grimhides');
-    expect(province.hiredUnits[0]?.strength).toBe(100);
+    expect(province.fifthUnits.hiredUnits).toHaveLength(1);
+    expect(province.fifthUnits.hiredUnits[0]?.name).toBe('Grimhides');
+    expect(province.fifthUnits.hiredUnits[0]?.strength).toBe(100);
     expect(province.resources.gold).toBe(INITIAL_GOLD - 20);
   });
 
@@ -48,7 +48,7 @@ describe('HireMonsterCommand', () => {
     command.hire('Grimhides');
     command.execute();
 
-    expect(province.hiredUnits).toHaveLength(0);
+    expect(province.fifthUnits.hiredUnits).toHaveLength(0);
     expect(province.resources.gold).toBe(10);
   });
 
@@ -58,7 +58,7 @@ describe('HireMonsterCommand', () => {
     command.hire('Wyverns');
     command.execute();
 
-    expect(province.hiredUnits).toHaveLength(0);
+    expect(province.fifthUnits.hiredUnits).toHaveLength(0);
   });
 
   it('refuses to hire a type already stationed', () => {
@@ -68,11 +68,11 @@ describe('HireMonsterCommand', () => {
     command.execute();
     command.execute();
 
-    expect(province.hiredUnits).toHaveLength(1);
+    expect(province.fifthUnits.hiredUnits).toHaveLength(1);
     expect(province.resources.gold).toBe(INITIAL_GOLD - 20);
   });
 
-  it('dismisses a stationed unit, leaving the rest and refunding no gold', () => {
+  it('returns a wounded unit to the pool without refunding Gold', () => {
     const { province, command } = createFixture();
 
     command.hire('Grimhides');
@@ -80,13 +80,26 @@ describe('HireMonsterCommand', () => {
     command.hire('Bugbear');
     command.execute();
 
+    const grimhides = province.fifthUnits.hiredUnits.find(
+      (unit) => unit.name === 'Grimhides',
+    )!;
+    grimhides.retainBattleStrength(74);
     const goldAfterHiring = province.resources.gold;
 
     command.dismiss('Grimhides');
     command.execute();
 
-    expect(province.hiredUnits.map((unit) => unit.name)).toEqual(['Bugbear']);
+    expect(province.fifthUnits.hiredUnits.map((unit) => unit.name)).toEqual([
+      'Bugbear',
+    ]);
     expect(province.resources.gold).toBe(goldAfterHiring);
+    expect(province.fifthUnits.hirePool).toContain(grimhides);
+
+    command.hire('Grimhides');
+    command.execute();
+
+    expect(province.fifthUnits.hiredUnits).toContain(grimhides);
+    expect(grimhides.strength).toBe(74);
   });
 
   it('ignores a dismiss for a type the province does not station', () => {
@@ -98,6 +111,8 @@ describe('HireMonsterCommand', () => {
     command.dismiss('Bugbear');
     command.execute();
 
-    expect(province.hiredUnits.map((unit) => unit.name)).toEqual(['Grimhides']);
+    expect(province.fifthUnits.hiredUnits.map((unit) => unit.name)).toEqual([
+      'Grimhides',
+    ]);
   });
 });

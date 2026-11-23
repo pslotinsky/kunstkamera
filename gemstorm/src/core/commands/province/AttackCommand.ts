@@ -1,4 +1,8 @@
 import type { Army } from '@/core/domain/Army';
+import {
+  AttackDeployment,
+  type AttackForce,
+} from '@/core/domain/AttackDeployment';
 import { Battle } from '@/core/domain/Battle';
 import { AutoBattle } from '@/core/domain/battle-ai/AutoBattle';
 import { Invasion } from '@/core/domain/Invasion';
@@ -6,6 +10,7 @@ import type { InvasionReport } from '@/core/domain/InvasionReport';
 import type { Province } from '@/core/domain/Province';
 import { DefenseRequestedEvent } from '@/core/events/DefenseRequestedEvent';
 import { WarReportedEvent } from '@/core/events/WarReportedEvent';
+import { isDefined } from '@/lib/value/isDefined';
 
 import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
@@ -13,20 +18,29 @@ const ATTACK_GOODWILL = -1;
 
 export class AttackCommand extends ProvinceCommand {
   private target: Province | undefined;
-  private attacker: Army | undefined;
+  private force: AttackForce | undefined;
   private suspended = false;
 
   public constructor(context: WorldCommandContext) {
     super('Attack', context);
   }
 
-  public attackAt(target: Province, attacker: Army): void {
+  public attackAt(target: Province, force: AttackForce): void {
     this.target = target;
-    this.attacker = attacker;
+    this.force = force;
   }
 
   public override canExecute(): boolean {
-    return this.requiresTarget;
+    const source = this.currentProvince;
+    const days =
+      isDefined(source) && this.context.world.isComputerRun(source)
+        ? AttackDeployment.COMPUTER_SUPPLY_DAYS
+        : 1;
+    const troops = AttackDeployment.MIN_TROOPS;
+    const food = AttackDeployment.foodForDays(troops, days);
+    const minimum = this.prepare({ troops, food });
+
+    return this.requiresTarget && (minimum?.isAffordable ?? false);
   }
 
   public override suspendsTurn(): boolean {
@@ -46,34 +60,58 @@ export class AttackCommand extends ProvinceCommand {
   public execute(): void {
     this.suspended = false;
 
-    const source = this.currentProvince;
-    const target = this.target;
-    const attacker = this.attacker;
+    const { target, force } = this;
+    const deployment = isDefined(force) ? this.prepare(force) : undefined;
 
     if (
-      source &&
-      target &&
-      attacker &&
-      this.canLaunch(source, target, attacker)
+      isDefined(target) &&
+      isDefined(deployment) &&
+      this.canLaunch(target, deployment)
     ) {
-      this.march(source, target, attacker);
+      this.march(deployment.source, target, deployment.muster());
     }
   }
 
-  private canLaunch(
-    source: Province,
-    target: Province,
-    attacker: Army,
-  ): boolean {
+  public prepare(force: AttackForce): AttackDeployment | undefined {
+    const source = this.currentProvince;
+    const commander = source?.residentGovernor ?? source?.family?.ruler;
+
+    return isDefined(source) && isDefined(commander)
+      ? new AttackDeployment(source, commander, force)
+      : undefined;
+  }
+
+  public canLaunch(target: Province, deployment: AttackDeployment): boolean {
     return (
-      this.selectableTargets.includes(target.number) &&
-      attacker.canFight() &&
-      (!attacker.unit ||
-        this.context.world.getFifthUnits(source).includes(attacker.unit)) &&
-      attacker.supplyDays > 0 &&
-      source.resources.troops >= attacker.troops &&
-      source.resources.food >= attacker.food &&
-      source.resources.gold >= attacker.deploymentCost
+      this.canTarget(deployment.source, target) &&
+      this.canSupply(deployment) &&
+      this.canBringUnit(deployment)
+    );
+  }
+
+  private canTarget(source: Province, target: Province): boolean {
+    return (
+      source === this.currentProvince &&
+      this.context.world.getHostileNeighbors(source).includes(target)
+    );
+  }
+
+  private canSupply(deployment: AttackDeployment): boolean {
+    const { source, dailyFood, food } = deployment;
+    const isComputerRun = this.context.world.isComputerRun(source);
+    const computerFood = dailyFood * AttackDeployment.COMPUTER_SUPPLY_DAYS;
+    const hasRequiredFood = !isComputerRun || food === computerFood;
+
+    return hasRequiredFood && deployment.isAffordable;
+  }
+
+  private canBringUnit(deployment: AttackDeployment): boolean {
+    const { source, force } = deployment;
+    const { unit } = force;
+
+    return (
+      !isDefined(unit) ||
+      this.context.world.getFifthUnits(source).includes(unit)
     );
   }
 

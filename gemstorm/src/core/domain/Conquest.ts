@@ -7,14 +7,14 @@ import type { InvasionReport } from './InvasionReport';
 import type { Province } from './Province';
 import type { World } from './World';
 
-const CAPTURE_ODDS = 0.35;
-const CORNERED_ODDS = 0.95;
+const CAPTURE_ON_ATTACKER_WIN = 115;
+const CAPTURE_ON_DEFENDER_WIN = 110;
+const PERCENT_SCALE = 100;
 
 interface Loser {
   readonly general: General;
   readonly house: Family;
   readonly captor: Family;
-  readonly seat: Province;
 }
 
 export interface ConquestParams {
@@ -37,13 +37,9 @@ export class Conquest {
   public takeCaptive(): Captive | undefined {
     const loser = this.findLoser();
 
-    if (!loser || !this.isCaught(loser)) {
-      return undefined;
-    }
-
-    const captive = new Captive(loser);
-
-    return captive.ransom.spendFrom(loser.seat) ? undefined : captive;
+    return loser && this.isCaught(loser)
+      ? new Captive({ ...loser, battlefield: this.report.target })
+      : undefined;
   }
 
   public endHouse(house?: Family): boolean {
@@ -60,7 +56,11 @@ export class Conquest {
   }
 
   private hasFallen(house?: Family): house is Family {
-    return isDefined(house) && this.world.countProvinces(house) === 0;
+    return (
+      isDefined(house) &&
+      this.world.countProvinces(house) === 0 &&
+      !this.world.isHeld(house.ruler)
+    );
   }
 
   private findLoser(): Loser | undefined {
@@ -76,52 +76,47 @@ export class Conquest {
           general: this.report.defender.commander,
           house: defending,
           captor: attacking,
-          seat: this.report.target,
         }
       : {
           general: this.report.attacker.commander,
           house: attacking,
           captor: defending,
-          seat: this.source,
         };
   }
 
   private isCaught(loser: Loser): boolean {
+    const army = this.report.isTaken
+      ? this.report.defender
+      : this.report.attacker;
+    let caught = false;
+
+    if (!army.remotelyCommanded && !loser.general.captureImmune) {
+      const surrendered =
+        this.report.isTaken && this.report.answer === 'surrender';
+
+      if (surrendered || !this.hasEscape(loser)) {
+        caught = true;
+      } else {
+        caught = this.rollCapture(loser.general);
+      }
+    }
+
+    return caught;
+  }
+
+  private hasEscape({ house }: Loser): boolean {
     return (
-      this.isLastStand(loser) ||
-      (!this.isStandIn(loser) && Math.random() < this.weighOdds())
+      isDefined(this.report.refuge) ||
+      (!this.report.isTaken && this.source.belongsTo(house))
     );
   }
 
-  private isStandIn({ house, general }: Loser): boolean {
-    return (
-      this.report.isTaken &&
-      house.isRuler(general) &&
-      !this.report.target.isHome
-    );
-  }
+  private rollCapture(general: General): boolean {
+    const base = this.report.isTaken
+      ? CAPTURE_ON_ATTACKER_WIN
+      : CAPTURE_ON_DEFENDER_WIN;
+    const chance = Math.max(0, base - general.stats.war) / PERCENT_SCALE;
 
-  private isLastStand({ house, general }: Loser): boolean {
-    return house.isRuler(general) && this.world.countProvinces(house) === 1;
-  }
-
-  private weighOdds(): number {
-    return this.isCornered() ? CORNERED_ODDS : CAPTURE_ODDS;
-  }
-
-  private isCornered(): boolean {
-    return this.report.isTaken && !this.hasRefuge();
-  }
-
-  private hasRefuge(): boolean {
-    const { target } = this.report;
-    const house = target.family;
-
-    return (
-      isDefined(house) &&
-      this.world.map
-        .getNeighbors(target)
-        .some((neighbor) => neighbor.belongsTo(house))
-    );
+    return Math.random() < chance;
   }
 }

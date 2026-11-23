@@ -4,6 +4,7 @@ import type { General } from '@/core/domain/General';
 import type { Province } from '@/core/domain/Province';
 import { MissionReportedEvent } from '@/core/events/MissionReportedEvent';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
+import { isDefined } from '@/lib/value/isDefined';
 
 import { ProvinceCommand, type WorldCommandContext } from '../ProvinceCommand';
 
@@ -28,10 +29,26 @@ export class NegotiateCommand extends ProvinceCommand {
     this.approach = { mission: 'surrender', family };
   }
 
+  public override canExecute(): boolean {
+    const province = this.currentProvince;
+
+    return isDefined(province) && province.isHome && !province.family?.royal;
+  }
+
+  public canDemandSurrender(target: Family): boolean {
+    const family = this.currentProvince?.family;
+
+    return (
+      isDefined(family) &&
+      this.canExecute() &&
+      this.createEnvoy(family).canDemandSurrender(target)
+    );
+  }
+
   public override get selectableTargets(): readonly number[] {
     const family = this.currentProvince?.family;
 
-    return family
+    return isDefined(family) && this.canExecute()
       ? this.context.world.map.provinces
           .filter((province) => family.isHostileTo(province.family))
           .map((province) => province.number)
@@ -39,16 +56,35 @@ export class NegotiateCommand extends ProvinceCommand {
   }
 
   public getCandidates(target: Province): readonly General[] {
-    const { family, governor } = target;
+    const source = this.currentProvince?.family;
+    const { family } = target;
     let candidates: readonly General[] = [];
 
-    if (family && target.isHome) {
-      candidates = this.context.world.getVassals(family);
-    } else if (governor && target.hasLord) {
-      candidates = [governor];
+    if (this.canExecute() && isDefined(source) && isDefined(family)) {
+      const envoy = this.createEnvoy(source);
+
+      candidates = this.getPostedGenerals(target, family).filter((general) =>
+        envoy.canApproach(general),
+      );
     }
 
     return candidates;
+  }
+
+  private getPostedGenerals(
+    target: Province,
+    family: Family,
+  ): readonly General[] {
+    const { governor } = target;
+    let generals: readonly General[] = [];
+
+    if (target.isHome) {
+      generals = this.context.world.getVassals(family);
+    } else if (isDefined(governor) && target.hasLord) {
+      generals = [governor];
+    }
+
+    return generals;
   }
 
   public execute(): void {
@@ -56,12 +92,17 @@ export class NegotiateCommand extends ProvinceCommand {
     const family = province?.family;
     const approach = this.approach;
 
-    if (province && family && approach) {
-      const envoy = new Envoy({ world: this.context.world, family });
+    if (
+      this.canExecute() &&
+      isDefined(province) &&
+      isDefined(family) &&
+      isDefined(approach)
+    ) {
+      const envoy = this.createEnvoy(family);
 
       if (approach.mission === 'defection') {
         this.sendForDefection(province, envoy, approach.general);
-      } else if (family.isHostileTo(approach.family)) {
+      } else if (envoy.canDemandSurrender(approach.family)) {
         this.sendForSurrender(province, envoy, approach.family);
       }
     }
@@ -76,7 +117,7 @@ export class NegotiateCommand extends ProvinceCommand {
     const rival = world.findFamilyOf(general);
     const governed = world.getRuledProvince(general);
 
-    if (rival && envoy.canPersuade(general)) {
+    if (isDefined(rival) && envoy.canApproach(general)) {
       const persuaded = envoy.persuade(general);
 
       this.publish(
@@ -120,5 +161,9 @@ export class NegotiateCommand extends ProvinceCommand {
     }
 
     this.complete(province);
+  }
+
+  private createEnvoy(family: Family): Envoy {
+    return new Envoy({ world: this.context.world, family });
   }
 }

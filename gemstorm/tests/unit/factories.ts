@@ -14,7 +14,11 @@ import { Characteristics } from '@/core/domain/Characteristics';
 import { Development } from '@/core/domain/Development';
 import { Family } from '@/core/domain/Family';
 import type { Gem } from '@/core/domain/Gem';
-import { General } from '@/core/domain/General';
+import {
+  type DefectionClass,
+  General,
+  type RecruitClass,
+} from '@/core/domain/General';
 import { Invasion, type InvasionParams } from '@/core/domain/Invasion';
 import {
   InvasionReport,
@@ -34,7 +38,9 @@ interface GeneralParams {
   readonly war?: number | undefined;
   readonly charisma?: number | undefined;
   readonly lineage?: string | undefined;
-  readonly deathDate?: CalendarDate | undefined;
+  readonly recruitClass?: RecruitClass;
+  readonly defectionClass?: DefectionClass;
+  readonly captureImmune?: boolean;
 }
 
 interface FamilyParams {
@@ -70,13 +76,15 @@ export function makeGeneral(params: GeneralParams = {}): General {
   return new General({
     name: params.name ?? `General ${generalSequence}`,
     birth: params.birth ?? new CalendarDate(1156, 1),
+    recruitClass: params.recruitClass ?? 3,
+    defectionClass: params.defectionClass ?? 0,
+    captureImmune: params.captureImmune,
     stats: Characteristics.from({
       intelligence: params.intelligence ?? 50,
       war: params.war ?? 50,
       charisma: params.charisma ?? 50,
     }),
     lineage: params.lineage,
-    deathDate: params.deathDate,
   });
 }
 
@@ -191,6 +199,7 @@ export function makeArmy(params: Partial<ArmyParams> = {}): Army {
     troops: params.troops ?? 200,
     food: params.food ?? 400,
     unit: params.unit,
+    remotelyCommanded: params.remotelyCommanded ?? false,
   });
 }
 
@@ -257,12 +266,22 @@ export function makeInvasionReport(
   });
 }
 
-export function makeCaptive(params: Partial<CaptiveParams> = {}): Captive {
-  return new Captive({
+export function makeCaptive(
+  params: Partial<CaptiveParams> & { readonly pendingRansom?: boolean } = {},
+): Captive {
+  const captor = params.captor ?? makeFamily();
+  const captive = new Captive({
     general: params.general ?? makeGeneral(),
     house: params.house ?? makeFamily(),
-    captor: params.captor ?? makeFamily(),
+    captor,
+    battlefield: params.battlefield ?? captor.homeProvince,
   });
+
+  if (!params.pendingRansom) {
+    captive.closeRansom();
+  }
+
+  return captive;
 }
 
 export function makeBattle(params: MakeBattleParams = {}): Battle {

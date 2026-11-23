@@ -1,51 +1,55 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Ransom } from '@/core/domain/Ransom';
 
-import { makeGeneral, makeProvince } from './factories';
+import { makeFamily, makeGeneral, makeProvince } from './factories';
 
 describe('Ransom', () => {
-  it('prices a captive by what he is worth in war', () => {
-    const ransom = Ransom.forGeneral(makeGeneral({ war: 77 }));
+  afterEach(() => vi.restoreAllMocks());
 
-    expect(ransom.gold).toBe(154);
-    expect(ransom.food).toBe(231);
+  it('prices the demand from INT and WAR and charges more for a member of the ruling house', () => {
+    const house = makeFamily({ name: 'Stormmere' });
+    const stats = { intelligence: 51, war: 77 };
+    const vassal = makeGeneral(stats);
+    const kin = makeGeneral({ ...stats, lineage: house.name });
+
+    expect(Ransom.forGeneral(vassal, house)).toMatchObject({
+      gold: 35,
+      food: 60,
+    });
+    expect(Ransom.forGeneral(kin, house)).toMatchObject({ gold: 52, food: 90 });
   });
 
-  it('is spent in gold when the province has it', () => {
-    const ransom = Ransom.forGeneral(makeGeneral({ war: 77 }));
-    const province = makeProvince({ gold: 216, food: 300 });
+  it.each([
+    [39, 0, false],
+    [40, 0.04, true],
+    [47, 0.05, false],
+    [48, 0.74, true],
+    [59, 0.75, false],
+    [60, 0.99, true],
+  ])(
+    'checks the treasury before rolling for payment (%s, %s)',
+    (gold, roll, accepts) => {
+      vi.spyOn(Math, 'random').mockReturnValue(roll);
+      const ransom = new Ransom(40, 75);
+      const home = makeProvince({ gold, food: 200 });
 
-    expect(ransom.spendFrom(province)).toBe(true);
-    expect(province.resources.gold).toBe(216 - 154);
-    expect(province.resources.food).toBe(300);
-  });
+      expect(ransom.willPay('gold', home)).toBe(accepts);
+    },
+  );
 
-  it('is spent in food when the gold falls short', () => {
-    const ransom = Ransom.forGeneral(makeGeneral({ war: 77 }));
-    const province = makeProvince({ gold: 136, food: 300 });
+  it('can be paid only in the requested currency and credits the battlefield', () => {
+    const ransom = new Ransom(40, 75);
+    const home = makeProvince({ gold: 30, food: 120 });
+    const battlefield = makeProvince({ gold: 10, food: 15 });
 
-    expect(ransom.spendFrom(province)).toBe(true);
-    expect(province.resources.gold).toBe(136);
-    expect(province.resources.food).toBe(300 - 231);
-  });
+    expect(ransom.canPay('gold', home)).toBe(false);
+    expect(ransom.canPay('food', home)).toBe(true);
 
-  it('takes nothing from a province that can meet neither price', () => {
-    const ransom = Ransom.forGeneral(makeGeneral({ war: 77 }));
-    const province = makeProvince({ gold: 136, food: 145 });
+    ransom.pay('gold', home, battlefield);
+    ransom.pay('food', home, battlefield);
 
-    expect(ransom.spendFrom(province)).toBe(false);
-    expect(province.resources.gold).toBe(136);
-    expect(province.resources.food).toBe(145);
-  });
-
-  it('can be met in gold alone or in food alone', () => {
-    const ransom = Ransom.forGeneral(makeGeneral({ war: 77 }));
-
-    expect(ransom.canBePaidBy(makeProvince({ gold: 154, food: 0 }))).toBe(true);
-    expect(ransom.canBePaidBy(makeProvince({ gold: 0, food: 231 }))).toBe(true);
-    expect(ransom.canBePaidBy(makeProvince({ gold: 153, food: 230 }))).toBe(
-      false,
-    );
+    expect(home.resources).toMatchObject({ gold: 30, food: 45 });
+    expect(battlefield.resources).toMatchObject({ gold: 10, food: 90 });
   });
 });

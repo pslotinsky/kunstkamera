@@ -1,14 +1,22 @@
+import { sample } from '@/lib/array/sample';
+import { isDefined } from '@/lib/value/isDefined';
+
 import type { Captive } from './Captive';
+import type { RecruitClass } from './General';
+import type { Province } from './Province';
 import { Succession, type SuccessionOutcome } from './Succession';
 import type { World } from './World';
 
 export type Disposal = 'recruit' | 'release' | 'banish';
 
-export type DisposalOutcome = 'joined' | 'refused' | 'released' | 'banished';
+export type DisposalOutcome = 'joined' | 'released' | 'banished';
 
-const RECRUIT_ODDS = 0.5;
-const RULER_RECRUIT_ODDS = 0.2;
-const RELEASE_WAR_LOSS = 5;
+const REQUIRED_FAME: Readonly<Record<RecruitClass, number>> = {
+  0: 51,
+  1: 31,
+  2: 16,
+  3: 0,
+};
 
 export class Captivity {
   private readonly world: World;
@@ -17,22 +25,31 @@ export class Captivity {
     this.world = world;
   }
 
-  public recruit(captive: Captive): boolean {
-    const success = Math.random() < this.weighOdds(captive);
+  public canRecruit(captive: Captive): boolean {
+    const { general, house, captor } = captive;
+    const hasRequiredFame = captor.fame >= REQUIRED_FAME[general.recruitClass];
+    const isProtectedRuler =
+      captive.isRuler &&
+      (house.isEqual(this.world.player) ||
+        this.world.getHeirs(house).length > 0);
 
-    if (success) {
+    return hasRequiredFame && !isProtectedRuler;
+  }
+
+  public recruit(captive: Captive): boolean {
+    const canRecruit = this.canRecruit(captive);
+
+    if (canRecruit) {
       this.turn(captive);
     }
 
-    return success;
+    return canRecruit;
   }
 
-  private weighOdds(captive: Captive): number {
-    return captive.isRuler ? RULER_RECRUIT_ODDS : RECRUIT_ODDS;
-  }
-
-  public release(captive: Captive): void {
-    captive.general.decreaseWar(RELEASE_WAR_LOSS);
+  public release(captive: Captive): Province | undefined {
+    return captive.isRuler
+      ? this.resettleRuler(captive)
+      : this.sendToCourt(captive);
   }
 
   public banish(captive: Captive): SuccessionOutcome | undefined {
@@ -52,13 +69,92 @@ export class Captivity {
   }
 
   private turn(captive: Captive): void {
-    const wasRuler = captive.isRuler;
-
-    captive.house.discharge(captive.general);
-    captive.captor.enlist(captive.general);
-
-    if (wasRuler) {
-      this.world.absorb(captive.house, captive.captor);
+    captive.general.renounceHouse();
+    if (captive.isRuler) {
+      this.recruitRuler(captive);
+    } else {
+      this.bringToCourt(captive);
     }
+  }
+
+  private recruitRuler(captive: Captive): void {
+    const { house, captor } = captive;
+
+    this.world.absorb(house, captor);
+    for (const prisoner of this.world.getCaptivesOf(captor)) {
+      if (prisoner.house.isEqual(house)) {
+        this.world.free(prisoner);
+      }
+    }
+  }
+
+  private bringToCourt(captive: Captive): void {
+    const { general, house, captor } = captive;
+
+    this.sendToCourt(captive);
+    house.discharge(general);
+    captor.enlist(general);
+  }
+
+  private sendToCourt(captive: Captive): Province | undefined {
+    const { general, house } = captive;
+    const province = this.world.getRuledProvince(general);
+    const governed = province?.belongsTo(house) ? province : undefined;
+
+    governed?.assignGovernor(house.ruler);
+
+    return governed;
+  }
+
+  private resettleRuler(captive: Captive): Province | undefined {
+    const { house, captor } = captive;
+    const destination = this.findReleaseDestination(captive);
+
+    if (isDefined(destination)) {
+      if (destination.isNeutral()) {
+        destination.claim(house);
+      }
+
+      house.moveHome(destination);
+    } else {
+      this.world.campaign.recordFall(house, 'last-province-lost', captor);
+      this.disbandReleasedHouse(captive);
+    }
+
+    return destination;
+  }
+
+  private disbandReleasedHouse(captive: Captive): void {
+    const { general, house, captor } = captive;
+    const vassals = this.world
+      .getVassals(house)
+      .filter((vassal) => !this.world.isHeld(vassal));
+
+    this.world.dissolve(house, captor);
+    this.world.wanderers.resettle([general, ...vassals]);
+  }
+
+  private findReleaseDestination(captive: Captive): Province | undefined {
+    const remaining = this.findRemainingProvinces(captive);
+    const destinations =
+      remaining.length > 0
+        ? remaining
+        : this.findUnownedNeighbors(captive.battlefield);
+
+    return destinations.length > 0 ? sample(destinations) : undefined;
+  }
+
+  private findRemainingProvinces(captive: Captive): readonly Province[] {
+    const { house, battlefield } = captive;
+
+    return this.world
+      .getFamilyProvinces(house)
+      .filter((province) => !province.isEqual(battlefield));
+  }
+
+  private findUnownedNeighbors(battlefield: Province): readonly Province[] {
+    return this.world.map
+      .getNeighbors(battlefield)
+      .filter((province) => province.isNeutral());
   }
 }

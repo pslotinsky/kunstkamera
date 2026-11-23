@@ -1,3 +1,8 @@
+@use "sass:math";
+
+$painting-width: 1672;
+$painting-height: 941;
+
 .root {
   --motion: running;
 
@@ -20,7 +25,7 @@
   top: 50%;
   right: -2%;
   left: -2%;
-  aspect-ratio: 1672 / 941;
+  aspect-ratio: $painting-width / $painting-height;
   translate: 0 -50%;
   will-change: transform;
 }
@@ -30,6 +35,64 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.river {
+  position: absolute;
+  top: math.percentage(math.div(699, $painting-height));
+  left: math.percentage(math.div(280, $painting-width));
+  width: math.percentage(math.div(1392, $painting-width));
+  height: math.percentage(math.div(219, $painting-height));
+}
+
+.riverFrame {
+  position: absolute;
+  inset: 0;
+  background: url("@/assets/title/river.webp") 0 0 / 100% 300% no-repeat;
+  animation: 1.8s linear infinite;
+  animation-play-state: var(--motion);
+
+  &:nth-child(2) {
+    opacity: 0;
+    background-position-y: 50%;
+    animation-name: river-second;
+  }
+
+  &:nth-child(3) {
+    opacity: 0;
+    background-position-y: 100%;
+    animation-name: river-third;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes river-second {
+  0% {
+    opacity: 0;
+  }
+  33%,
+  67% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes river-third {
+  0%,
+  33% {
+    opacity: 0;
+  }
+  67% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 .flag {

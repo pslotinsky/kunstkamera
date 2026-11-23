@@ -1,13 +1,10 @@
 import type { AttackCommand } from '@/core/commands/province/AttackCommand';
-import { Army } from '@/core/domain/Army';
+import type { AttackForce } from '@/core/domain/AttackDeployment';
 import type { FifthUnit } from '@/core/domain/FifthUnit';
-import type { General } from '@/core/domain/General';
 import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
 import { isDefined } from '@/lib/value/isDefined';
-import { getGeneralPortraitUrl } from '@/ui/common/art/getGeneralPortraitUrl';
 import { DropdownControl } from '@/ui/common/Dropdown/DropdownControl';
-import type { DropdownOption } from '@/ui/common/Dropdown/DropdownView';
 import { toUnitOptions } from '@/ui/common/Dropdown/dropdown-options';
 
 import { AmountFieldControl } from '../AmountField/AmountFieldControl';
@@ -15,7 +12,6 @@ import { AttackDialogView } from './AttackDialogView';
 import { CommandDialogControl } from './CommandDialogControl';
 
 type AttackControls = {
-  readonly commander: DropdownControl;
   readonly troops: AmountFieldControl;
   readonly food: AmountFieldControl;
   readonly unit: DropdownControl;
@@ -27,14 +23,13 @@ export class AttackDialogControl extends CommandDialogControl<
   AttackControls
 > {
   private readonly world: World;
-  private target: Province | undefined = undefined;
+  private target: Province | undefined;
 
   public constructor(name: string, world: World) {
     super(
       AttackDialogView,
       { name },
       {
-        commander: new DropdownControl({ name: 'commander' }),
         troops: new AmountFieldControl({ name: 'troops' }),
         food: new AmountFieldControl({ name: 'food' }),
         unit: new DropdownControl({ name: 'unit' }),
@@ -46,11 +41,10 @@ export class AttackDialogControl extends CommandDialogControl<
   public override open(command: AttackCommand): void {
     this.target = undefined;
     this.controls.troops.reset();
-    this.controls.food.reset();
     this.controls.unit.reset();
-    this.controls.commander.setValue(this.defaultCommander()?.name ?? '');
-    this.update();
+    this.controls.food.reset();
     super.open(command);
+    this.update();
   }
 
   public override get targetPrompt(): string {
@@ -65,115 +59,65 @@ export class AttackDialogControl extends CommandDialogControl<
   }
 
   protected override onMount(): void {
-    this.controls.commander.onChange(() => this.update());
     this.controls.troops.onChange(() => this.update());
     this.controls.food.onChange(() => this.update());
     this.controls.unit.onChange(() => this.update());
   }
 
   protected override setupCommand(command: AttackCommand): void {
-    const army = this.buildArmy();
-
-    if (this.target && army) {
-      command.attackAt(this.target, army);
+    if (isDefined(this.target)) {
+      command.attackAt(this.target, this.buildForce());
     }
   }
 
   private update(): void {
-    const province = this.world.turnQueue.current;
+    const { current } = this.world.turnQueue;
+    const maxTroops = current?.resources.troops ?? 0;
+    const maxFood = current?.resources.food ?? 0;
 
-    this.controls.commander.setOptions(this.commanderOptions());
-    this.controls.unit.setOptions(this.unitOptions());
-    this.controls.troops.setMax(province?.resources.troops ?? 0);
-    this.controls.food.setMax(province?.resources.food ?? 0);
-
+    this.controls.unit.setOptions(toUnitOptions(this.availableUnits()));
+    this.controls.troops.setMax(maxTroops);
+    this.controls.food.setMax(maxFood);
+    this.view.setTroopsRange(maxTroops);
     this.view.showTarget(this.target);
     this.view.showForm(isDefined(this.target));
-    this.showCommitment(province);
+    this.showCommitment();
   }
 
-  private showCommitment(province: Province | undefined): void {
-    const army = this.buildArmy();
+  private showCommitment(): void {
+    const { command, target } = this;
+    const deployment = command?.prepare(this.buildForce());
+    const canLaunch =
+      isDefined(target) &&
+      isDefined(deployment) &&
+      command?.canLaunch(target, deployment) === true;
+    const commander = deployment?.commander.name ?? '';
+    const remote =
+      isDefined(deployment) && !isDefined(deployment.source.residentGovernor);
 
-    this.view.setTroopsRange(province?.resources.troops ?? 0);
-    this.view.setFoodRange(army?.dailyFood ?? 0, province?.resources.food ?? 0);
-    this.view.showFigures(army?.deploymentCost ?? 0, army?.supplyDays ?? 0);
-    this.view.enableConfirm(this.canLaunch(province, army));
-  }
-
-  private canLaunch(
-    province: Province | undefined,
-    army: Army | undefined,
-  ): boolean {
-    return (
-      isDefined(this.target) &&
-      isDefined(province) &&
-      isDefined(army) &&
-      army.canFight() &&
-      army.supplyDays > 0 &&
-      province.resources.gold >= army.deploymentCost
+    this.view.showCommander(commander, remote);
+    this.view.setFoodRange(
+      deployment?.dailyFood ?? 0,
+      deployment?.source.resources.food ?? 0,
     );
+    this.view.showFigures(deployment?.gold ?? 0, deployment?.supplyDays ?? 0);
+    this.view.enableConfirm(canLaunch);
   }
 
-  private buildArmy(): Army | undefined {
-    const commander = this.chosenCommander();
-
-    return commander
-      ? new Army({
-          commander,
-          troops: this.controls.troops.value,
-          food: this.controls.food.value,
-          unit: this.chosenUnit(),
-        })
-      : undefined;
-  }
-
-  private commanderOptions(): DropdownOption[] {
-    return this.candidates().map((candidate) => ({
-      value: candidate.name,
-      label: candidate.name,
-      icon: getGeneralPortraitUrl(candidate),
-      note: `WAR ${candidate.stats.war}`,
-    }));
-  }
-
-  private unitOptions(): DropdownOption[] {
-    return toUnitOptions(this.availableUnits());
-  }
-
-  private chosenCommander(): General | undefined {
-    const chosen = this.controls.commander.value;
-    const candidates = this.candidates();
-
-    return (
-      candidates.find((candidate) => candidate.name === chosen) ?? candidates[0]
+  private buildForce(): AttackForce {
+    const troops = this.controls.troops.value;
+    const food = this.controls.food.value;
+    const selected = this.controls.unit.value;
+    const unit = this.availableUnits().find(
+      (candidate) => candidate.name === selected,
     );
-  }
 
-  private chosenUnit(): FifthUnit | undefined {
-    return this.availableUnits().find(
-      (unit) => unit.name === this.controls.unit.value,
-    );
-  }
-
-  private candidates(): readonly General[] {
-    const province = this.world.turnQueue.current;
-    const family = province?.family;
-    const governor = province?.governor;
-    const seated = governor ? [governor] : [];
-    const idle =
-      family && province?.isHome ? this.world.getVassals(family) : [];
-
-    return [...seated, ...idle];
-  }
-
-  private defaultCommander(): General | undefined {
-    return this.world.turnQueue.current?.governor ?? this.candidates()[0];
+    return { troops, food, unit };
   }
 
   private availableUnits(): readonly FifthUnit[] {
-    const province = this.world.turnQueue.current;
+    const { current } = this.world.turnQueue;
 
-    return province ? this.world.getFifthUnits(province) : [];
+    return isDefined(current) ? this.world.getFifthUnits(current) : [];
   }
 }

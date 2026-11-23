@@ -45,8 +45,13 @@
   cursor: pointer;
 }
 
-.choice:hover {
+.choice:hover:not(:disabled) {
   background: var(--button-hover);
+}
+
+.choice:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
 .hidden {

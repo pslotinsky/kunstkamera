@@ -10,8 +10,8 @@
   list-style: none;
 }
 
-$picture-size: 8rem;
-$tile-height: 12.5rem;
+$emblem-size: 8rem;
+$portrait-size: 8.5rem;
 
 .tile {
   @include new-game-screen.choice;
@@ -19,8 +19,9 @@ $tile-height: 12.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: new-game-screen.$space-small;
-  height: $tile-height;
+  justify-content: center;
+  gap: new-game-screen.$space;
+  aspect-ratio: 1;
 }
 
 .selected {
@@ -28,15 +29,15 @@ $tile-height: 12.5rem;
 }
 
 .emblem {
-  width: $picture-size;
-  height: $picture-size;
+  width: $emblem-size;
+  height: $emblem-size;
   object-fit: contain;
   filter: drop-shadow(0 0.4rem 0.6rem rgba(0, 0, 0, 0.6));
 }
 
 .portrait {
-  width: $picture-size;
-  height: $picture-size;
+  width: $portrait-size;
+  height: $portrait-size;
   object-fit: cover;
   border: 1px solid var(--trim);
   border-radius: 4px;
@@ -50,5 +51,5 @@ $tile-height: 12.5rem;
   font-weight: 600;
   line-height: 1.2;
   text-align: center;
-  margin-block: auto;
+  text-box: trim-both cap alphabetic;
 }

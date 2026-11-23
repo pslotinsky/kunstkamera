@@ -18,9 +18,9 @@ const SWORD_OF_VICTORY = new Artifact({
 });
 
 describe('GrantArtifactCommand', () => {
-  it('raises the characteristic the artifact names, and never past 100', () => {
+  it('raises the named characteristic up to the cap of 200', () => {
     const scholar = makeGeneral({ name: 'Nemer', intelligence: 60, war: 52 });
-    const veteran = makeGeneral({ name: 'Rhovan', war: 87 });
+    const veteran = makeGeneral({ name: 'Rhovan', war: 187 });
     const family = makeFamily({
       name: 'Alderwyn',
       ruler: scholar,
@@ -41,6 +41,6 @@ describe('GrantArtifactCommand', () => {
     command.grant(SWORD_OF_VICTORY, veteran);
     command.execute();
 
-    expect(veteran.stats.war).toBe(100);
+    expect(veteran.stats.war).toBe(200);
   });
 });

@@ -178,6 +178,7 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
   private executeAndRefresh(pending: PendingDialog): void {
     this.executor.execute(pending.command);
     pending.dialog.refresh();
+    this.showStep();
   }
 
   private closeDialog(): void {

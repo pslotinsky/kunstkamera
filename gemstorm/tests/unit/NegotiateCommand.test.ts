@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { NegotiateCommand } from '@/core/commands/province/NegotiateCommand';
+import { MissionReportedEvent } from '@/core/events/MissionReportedEvent';
 
 import {
   advanceTo,
@@ -11,7 +12,10 @@ import {
 } from './factories';
 
 function setup() {
-  const alderwyn = makeFamily({ name: 'Alderwyn' });
+  const alderwyn = makeFamily({
+    name: 'Alderwyn',
+    ruler: makeGeneral({ charisma: 75 }),
+  });
   const darian = makeGeneral({ name: 'Darian' });
   const marven = makeGeneral({ name: 'Marven' });
   const brennor = makeGeneral({ name: 'Brennor' });
@@ -21,7 +25,8 @@ function setup() {
     members: [darian, marven, brennor],
   });
 
-  const alderpass = makeProvince({ number: 1, family: alderwyn });
+  const alderpass = makeProvince({ number: 1, family: alderwyn, gold: 100 });
+  const outpost = makeProvince({ number: 3, family: alderwyn });
   const rimewatch = makeProvince({
     number: 20,
     family: stormmere,
@@ -35,9 +40,10 @@ function setup() {
   const neutral = makeProvince({ number: 9 });
 
   stormmere.moveHome(rimewatch);
+  alderwyn.moveHome(alderpass);
 
   const { world, events } = makeWorld(
-    [alderpass, rimewatch, pineward, neutral],
+    [alderpass, outpost, rimewatch, pineward, neutral],
     alderwyn,
   );
 
@@ -45,6 +51,11 @@ function setup() {
 
   return {
     command: new NegotiateCommand({ world, events }),
+    world,
+    events,
+    alderpass,
+    outpost,
+    stormmere,
     marven,
     brennor,
     rimewatch,
@@ -53,6 +64,8 @@ function setup() {
 }
 
 describe('NegotiateCommand', () => {
+  afterEach(() => vi.restoreAllMocks());
+
   it('reaches every rival province, however far', () => {
     const { command } = setup();
 
@@ -64,5 +77,63 @@ describe('NegotiateCommand', () => {
 
     expect(command.getCandidates(pineward)).toEqual([marven]);
     expect(command.getCandidates(rimewatch)).toEqual([brennor]);
+  });
+
+  it('spends the capital’s action on a failed offer but costs no Gold', () => {
+    const { command, events, alderpass, marven } = setup();
+    const reports: MissionReportedEvent[] = [];
+
+    events.subscribe(MissionReportedEvent, (event) => reports.push(event));
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
+    command.persuade(marven);
+    command.execute();
+
+    expect(reports[0]?.outcome).toMatchObject({
+      kind: 'defection',
+      persuaded: false,
+    });
+    expect(alderpass.actionCount).toBe(1);
+    expect(alderpass.resources.gold).toBe(100);
+  });
+
+  it('rejects defection from a province other than the capital', () => {
+    const { command, world, outpost, pineward, marven, stormmere } = setup();
+
+    advanceTo(world, outpost);
+    command.persuade(marven);
+    command.execute();
+
+    expect(command.getCandidates(pineward)).toEqual([]);
+    expect(outpost.actionCount).toBe(0);
+    expect(pineward.family).toBe(stormmere);
+  });
+
+  it('can demand surrender from the capital and uses its action on refusal', () => {
+    const { command, events, alderpass, stormmere } = setup();
+    const reports: MissionReportedEvent[] = [];
+
+    events.subscribe(MissionReportedEvent, (event) => reports.push(event));
+
+    expect(command.canDemandSurrender(stormmere)).toBe(true);
+    command.demandSurrender(stormmere);
+    command.execute();
+
+    expect(reports[0]?.outcome).toMatchObject({
+      kind: 'surrender',
+      yielded: false,
+    });
+    expect(alderpass.actionCount).toBe(1);
+    expect(alderpass.resources.gold).toBe(100);
+  });
+
+  it('rejects surrender demands from a province other than the capital', () => {
+    const { command, world, outpost, stormmere } = setup();
+
+    advanceTo(world, outpost);
+    command.demandSurrender(stormmere);
+    command.execute();
+
+    expect(command.canDemandSurrender(stormmere)).toBe(false);
+    expect(outpost.actionCount).toBe(0);
   });
 });

@@ -4,7 +4,7 @@
 
 The global map is the strategic screen: the fixed map of Aureth, its 30 provinces, and who owns each. It is the **foundation feature** — the first thing built and the surface every strategic command is launched from.
 
-This feature owns the _view and selection_ layer: rendering provinces, showing ownership, inspecting a province, opening its command menu, and highlighting adjacency. The commands themselves (develop, recruit, attack, move…) are owned by their own features and only _entered_ here. Two related actions start their lives here but resolve elsewhere: the **scout** that reveals a rival's hidden detail is feature 7, and **claiming** a neutral by moving into it is feature 5 — this feature only shows their starting state.
+This feature owns the _view and selection_ layer: rendering provinces, showing ownership, inspecting a province, opening its command menu, and highlighting adjacency. The commands themselves (develop, recruit, attack, move…) are owned by their own features and only _entered_ here. Two related actions start their lives here but resolve elsewhere: **Search**, the only way to learn a rival's hired Fifth Units, is feature 7, and **claiming** a neutral by moving into it is feature 5 — this feature only shows their starting state.
 
 ## Glossary
 
@@ -13,7 +13,7 @@ This feature owns the _view and selection_ layer: rendering provinces, showing o
 | World (Aureth) | The top-level aggregate: the fixed island kingdom; one 30-province map shared by all four scenarios (geography never changes — only the political state does). |
 | Province         | Primary territorial unit (numbered 1–30, named). Holds an owner, local economy, a governor, adjacency, and hireable Fifth Units.                               |
 | Family           | A political actor that owns provinces, generals, and Gems.                                                                                                     |
-| Player           | The family you control — full detail and commands apply to its provinces. Hardcoded for now; chosen at setup (feature 16).                                     |
+| Player           | The family you control — commands apply to its provinces that are not Entrusted. Chosen at setup (feature 16).                                                 |
 | Ownership        | Each province belongs to one family, or is **neutral** (unclaimed).                                                                                            |
 | Adjacency        | Which provinces border each other — the _only_ routes for movement and invasion.                                                                               |
 | Governor         | The general administering a province (distinct from a family's ruler).                                                                                         |
@@ -23,9 +23,9 @@ This feature owns the _view and selection_ layer: rendering provinces, showing o
 - Render the fixed 30-province map of Aureth.
 - Show each province's owning family (colour / banner), and mark neutral provinces.
 - Select a province and inspect its details.
-- Full detail for the provinces you own; limited detail (owner and name) for rival and neutral provinces — the scout that reveals a rival is feature 7.
-- Open the command menu for a province you control — the entry surface for its monthly orders. The menu only _launches_ commands; each command's behaviour is owned by its feature and resolved there. Rival and neutral provinces show no menu.
-- Mark the ruler-only commands (◆ — Diplomacy, Change Lord, Entrust) apart from those any resident lord repeats (◇); with one player family the player is always ruler, so this is recorded now and enforced when vassal autonomy (feature 12) lands.
+- Full detail for every province, whoever owns it: owner, lord, Entrust marker, Gold, Food, Troops, Loyalty, Cultivation, Protection. Almost nothing is hidden; the one exception is a rival's hired Fifth Units, which only Search reveals (feature 7). See [View and Hidden Information](../spec/02-world-model.md#detailed-rules-view-and-hidden-information).
+- Open the command menu for the province whose turn it is, when the player runs it (owned and not Entrusted) — the entry surface for its monthly orders. The menu only _launches_ commands; each command's behaviour is owned by its feature and resolved there. Other provinces show no menu.
+- Change Lord is issued only from the ruler's home province; Entrust can be issued from any own province.
 - Render the command menu inert at first — visible, non-interactive placeholders — so the surface exists before any command behaviour does.
 - Highlight the selected province's adjacent provinces; acting on them (move/claim → feature 5, attack → feature 8) is entered here, resolved there.
 
@@ -35,13 +35,13 @@ This feature owns the _view and selection_ layer: rendering provinces, showing o
 flowchart LR
   player((Player))
   player --> uc1(["View the world & ownership"])
-  player --> uc2(["Inspect own province (full) → command menu"])
-  player --> uc3(["Inspect rival / neutral province (limited)"])
+  player --> uc2(["Inspect the current turn's province → command menu"])
+  player --> uc3(["Inspect rival / neutral province (no menu)"])
   player --> uc4(["Plan a move / invasion via adjacency"])
 ```
 
-- **Inspect own province** — select → full panel (gold, food, troops, loyalty, cultivation, protection, governor) plus its command menu.
-- **Inspect rival / neutral** — select → limited panel: owner and name only; private detail stays hidden until a scout reveals it (feature 7), and no command menu appears (you cannot order what you do not control).
+- **Inspect the current turn's province** — select → full panel (gold, food, troops, loyalty, cultivation, protection, governor) plus its command menu, if the player runs it.
+- **Inspect rival / neutral** — select → the same full panel, but no command menu appears (you cannot order what you do not control). Only a rival's hired Fifth Units stay hidden (Search, feature 7).
 - **Plan a move / invasion** — select one of your provinces → its adjacent provinces highlight; only adjacent enemy provinces are attackable.
 
 ## UI
@@ -64,9 +64,9 @@ flowchart LR
 +----------------------------------------------------+
 ```
 
-Rival or neutral province selected → the lower panel collapses to identity only (owner + name); its private facts stay hidden until scouted (feature 7), and no command menu appears.
+Rival or neutral province selected → the same facts panel, with no command menu.
 
-A province you own adds its command menu beneath the facts — the four in-game groups, each command an inert launch point resolved by its owning feature:
+The current turn's province, when the player runs it, adds its command menu beneath the facts — the four in-game groups, each command a launch point resolved by its owning feature:
 
 ```text
 +----------------------------------------------------+
@@ -75,11 +75,9 @@ A province you own adds its command menu beneath the facts — the four in-game 
 +----------------------------------------------------+
 | Military   Domestic    Diplomacy   Vassal          |
 |  Attack     Develop      Ally        View          |
-|  Recruit    Cultivate    Negotiate   Change Lord   |
-|  Move       Protect                  Entrust       |
-|  Hire       Trade                    Search        |
-|             Give Food                              |
-|             Transport                              |
+|  Recruit    Trade        Negotiate   Change Lord   |
+|  Move       Give Food    Sabotage    Entrust       |
+|  Hire       Transport    Plunder     Search        |
 +----------------------------------------------------+
 ```
 
@@ -88,8 +86,8 @@ The menu mirrors the in-game grouping; the canonical register of which commands 
 | Group | Commands | Resolved by |
 | --- | --- | --- |
 | Military | Attack, Recruit, Move Troops, Hire Monster | 5 Armies & movement, 6 Fifth Units, 9 Battle |
-| Domestic | Develop, Cultivation, Protection, Trade, Give Food, Transport | 3 Province economy |
-| Diplomacy | Ally, Negotiate (Defection, Surrender, Sabotage, Plunder) | 11 Diplomacy |
+| Domestic | Develop (Cultivation or Protection), Trade, Give Food, Transport | 3 Province economy |
+| Diplomacy | Ally, Negotiate, Sabotage, Plunder | 11 Diplomacy |
 | Vassal | View, Change Lord, Entrust, Search | 4 Generals & lords, 7 Search & treasure, 13 Strategic AI |
 
 ## Research
@@ -135,11 +133,11 @@ classDiagram
   class Province {
     +int number
     +string name
-    +Family owner
+    +Family family
     +Resources resources
     +Development development
     +General governor
-    +int[] adjacent
+    +int[] neighbors
   }
   class Resources {
     <<value object>>
@@ -167,7 +165,9 @@ classDiagram
     +Image portrait
     +Stats stats
     +CalendarDate birth
-    +int loyalty
+    +int recruitClass
+    +int defectionClass
+    +string lineage
   }
   class Stats {
     <<value object>>
@@ -181,7 +181,7 @@ classDiagram
   World "1" --> "1" Family : player
   World "1" *-- "1" CalendarDate
   WorldMap "1" --> "30" Province
-  Province "*" --> "0..1" Family : owner
+  Province "*" --> "0..1" Family : family
   Province "*" --> "0..1" General : governor
   Province "1" *-- "1" Resources
   Province "1" *-- "1" Development
@@ -192,14 +192,14 @@ classDiagram
   Family "1" --> "1" Province : homeProvince
 ```
 
-_Shape only: `name / INT / WAR / CHA / birth` follow the canonical record in appendix-b §B.2; `loyalty` is the hidden general loyalty (≠ a province's public loyalty), and `fame` lives on the ruler, not the general. `player` is the family you control — hardcoded now, chosen at setup (feature 16). Aging, stat growth/decline, and death belong to feature 11 (Character lifecycle)._
+_Shape only: `name / INT / WAR / CHA / birth` follow the canonical record in appendix-b §B.2; a general's hidden loyalty is not a changing value but fixed facts — `recruitClass`, `defectionClass`, and house membership (see [General Loyalty](../spec/05-characters.md#detailed-rules-general-loyalty)) — and `fame` lives on the ruler, not the general. `player` is the family you control, chosen at setup (feature 16). Aging, stat growth/decline, and death belong to feature 11 (Character lifecycle)._
 
 ## Tests
 
 The map is the view/selection layer, so tests target the **data** and the **render-model** (the deterministic state → view mapping the renderer consumes) — not pixels. Whether the artwork actually reads as Gemstorm is manual/eyeball QA, not an automated assertion.
 
 - **World data integrity (unit):** all 30 provinces present and named per appendix-a; adjacency is symmetric (if A borders B, B borders A); connection counts match appendix-a. Every province has exactly one authored map region, and regions map 1:1 onto provinces.
-- **Selection & adjacency (unit):** selecting a province yields exactly its `adjacent` set as the highlight; inspecting your own province exposes the full panel, while a rival's or a neutral's exposes the limited view only (the scout reveal is feature 7).
+- **Selection & adjacency (unit):** selecting a province yields exactly its `neighbors` set as the highlight; inspecting any province, own, rival, or neutral, exposes the full facts panel.
 - **Render-model (unit):** the state → view mapping is a pure function — each province resolves to its owner's tint (from the family crest), neutral provinces resolve to the neutral style, and the selected province plus its neighbors carry the highlight flags. Assert the mapping, not the image.
-- **Command menu (unit):** the command menu is present only for a province the player owns; rival and neutral provinces yield no menu. Assert the render-model, not pixels.
+- **Command menu (unit):** the command menu is present only for the current turn's province when the player runs it (owned and not Entrusted); every other province yields no menu. Assert the render-model, not pixels.
 - **Interaction (integration):** selecting a province on the map opens its panel; choosing a highlighted neighbor routes into the correct command entry. Tests the event → state → view wiring, still without asserting pixels.

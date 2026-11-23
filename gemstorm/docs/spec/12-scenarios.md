@@ -337,7 +337,7 @@ Larger blocs become more important than the smaller early-war houses.
 
 Known high-level changes include:
 
-- Tate is reduced compared with its initial emergence;
+- Tate holds two provinces, as in Scenario 2, with a slightly larger army and roster;
 - Molbrew has declined or disappeared;
 - Chrysalis has declined or disappeared;
 - Blanche and Lyle have become stronger;
@@ -555,16 +555,60 @@ flowchart TD
 
 ---
 
-## Open Questions
+---
 
-The following scenario details remain unresolved or require final structured extraction:
+House difficulty ratings and the differences in scenario data and prologues between localizations have not been established. Starting resource and hire-pool data are described in [Appendix B](./appendix-b-character-and-scenario-data.md).
 
-1. Exact playable families for Flax’s Shame.
-2. Full starting resource tables for all provinces and scenarios.
-3. Full starting Fifth Unit / hire pool data by province.
-4. Formal difficulty ratings for each playable house.
-5. Version differences between Gemfire and Royal Blood scenario data.
-6. Exact narrative differences between localized Gemfire and Royal Blood prologues.
+## Detailed rules: New Game
+
+
+
+### Nothing is computed at start
+
+Each scenario starts from a complete, fixed game state. No value is randomised, derived by formula, or adjusted for human or computer families.
+
+There is **no difficulty or handicap setting**. The player-count choice (1, 2, or Demo) only decides which families are human. Two players cannot pick the same family or the same advisor.
+
+### Start date
+
+Every scenario is stored at **December of year 0** and immediately advances one month. Play therefore begins in **January of year 1, after the January processing has already run once**: yearly decay, old-age death rolls, and yearly stat changes all apply before the first turn.
+
+Scenarios 1–4 begin with every character 1, 6, 11, and 16 years older than their base age.
+
+### Regularities in the start data
+
+| Value                    | Rule in all four scenarios                                              |
+| ------------------------ | ----------------------------------------------------------------------- |
+| Ruler Fame               | 3 × provinces owned.                                                    |
+| Market                   | Average.                                                                |
+| Treasures                | All eight undiscovered.                                                 |
+| Gem rest                 | 0 for every Gem.                                                        |
+| Alliances                | None.                                                                   |
+| Policy counters          | 0 in every province.                                                    |
+| Hire pool, monsters      | Every province offers two monsters for hire.                            |
+| Hire pool, mercenaries   | 12 units for hire: two each of the six kinds, in 12 different provinces. |
+| Hired units              | None.                                                                   |
+| Unowned provinces        | No soldiers and Loyalty 0.                                              |
+
+Fame at 3 per province matches the +3 a ruler gains for every province acquired.
+
+### Mercenaries are a finite pool
+
+No code ever creates a mercenary unit. The 12 starting units are all that will exist:
+
+- they move between provinces by migration;
+- a deserted or dismissed mercenary returns to the hire pool where it stands;
+- a mercenary destroyed in battle is gone for good.
+
+Monsters, by contrast, are restocked twice a year.
+
+### House membership
+
+Which generals belong to their ruler's house is set per scenario. It is a short list of named kin — at most three per family, and none for some. The ruler himself is not marked; he needs no heir status.
+
+A family with no marked kin has no heir: its ruler's death or banishment splits the family.
+
+---
 
 ---
 

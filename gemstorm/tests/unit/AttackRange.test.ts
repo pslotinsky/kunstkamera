@@ -10,14 +10,14 @@ import { FifthUnit } from '@/core/domain/FifthUnit';
 import { StandardUnit } from '@/core/domain/StandardUnit';
 import type { RangePattern, Unit } from '@/core/domain/Unit';
 
-import { makeGeneral } from './factories';
-
 const SKYREACH = 22;
 const field = Battlefield.ofProvince(SKYREACH);
 
 function guardian(range: RangePattern): FifthUnit {
   return new FifthUnit({
     name: 'Asterion',
+    attack: 29,
+    defense: 29,
     move: 2,
     range,
     description: 'a guardian',
@@ -29,7 +29,8 @@ function station(unit: Unit, column: number, row: number): BattleUnit {
   return new BattleUnit({
     unit,
     side: BattleSide.attacker,
-    commander: makeGeneral(),
+    slot: 0,
+    commanderWar: 50,
     strength: 40,
     cell: field.getCell(column, row)!,
     facing: Facing.east,
