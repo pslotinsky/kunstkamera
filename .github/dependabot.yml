@@ -1,15 +1,25 @@
 version: 2
 updates:
   - package-ecosystem: npm
-    directory: /gemstorm
+    directories:
+      - /debt-dungeon
+      - /gemstorm
+      - /showcase
     schedule:
       interval: weekly
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 2
     groups:
       minor-and-patch:
+        patterns:
+          - '*'
         update-types:
           - minor
           - patch
+      major:
+        patterns:
+          - '*'
+        update-types:
+          - major
 
   - package-ecosystem: github-actions
     directory: /
