@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { OptionsControl } from '@/ui/common/Options/OptionsControl';
 import { SoundBoard } from '@/ui/common/sound/SoundBoard';
+import { SoundSettings } from '@/ui/common/sound/SoundSettings';
 
 let options: OptionsControl | undefined;
 
@@ -49,6 +50,7 @@ afterEach(() => {
   document.body.replaceChildren();
   Reflect.deleteProperty(HTMLDialogElement.prototype, 'showModal');
   vi.restoreAllMocks();
+  localStorage.clear();
 });
 
 describe('OptionsControl', () => {
@@ -111,5 +113,24 @@ describe('OptionsControl', () => {
     slider('sfx').dispatchEvent(new Event('change', { bubbles: true }));
 
     expect(click).toHaveBeenCalledOnce();
+  });
+
+  it('remembers each change as it is made', () => {
+    const { sounds } = mount();
+    const volume = slider('music');
+
+    volume.value = '35';
+    volume.dispatchEvent(new Event('input', { bubbles: true }));
+    volume.dispatchEvent(new Event('change', { bubbles: true }));
+    toggle('sfx').click();
+    masterToggle().click();
+
+    const restored = new SoundBoard();
+    new SoundSettings(restored).restore();
+
+    expect(sounds.music.volume).toBe(0.35);
+    expect(restored.music.volume).toBe(0.35);
+    expect(restored.sfx.isEnabled).toBe(false);
+    expect(restored.master.isEnabled).toBe(false);
   });
 });
