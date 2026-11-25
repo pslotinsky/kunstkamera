@@ -200,8 +200,8 @@ Starting a campaign: title screen, scenario and family choice, and an advisor to
 
 Persistence of game state between sessions.
 
-- [ ] save a game in progress
-- [ ] load and resume a saved game
+- [x] save a game in progress
+- [x] load and resume a saved game
 
 ## 18. Options / settings
 
