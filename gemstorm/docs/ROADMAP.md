@@ -207,10 +207,11 @@ Persistence of game state between sessions.
 
 Game settings and session control.
 
-- [ ] set the message speed
-- [ ] toggle battle animation
-- [ ] toggle sound
-- [ ] quit, or hand the game to the computer to finish
+- [x] toggle sound
+- [x] keep sound settings between sessions
+- [ ] ~~set the message speed~~ — cancelled
+- [ ] ~~toggle battle animation~~ — cancelled
+- [ ] ~~hand the game to the computer to finish~~ — cancelled
 
 ## 19. Multiplayer
 

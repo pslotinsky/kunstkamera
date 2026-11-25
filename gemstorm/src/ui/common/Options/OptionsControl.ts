@@ -1,4 +1,5 @@
 import { Control } from '@/lib/Control';
+import { SoundSettings } from '@/ui/common/sound/SoundSettings';
 
 import { ChannelStripControl } from './ChannelStrip/ChannelStripControl';
 import { VolumeDragEndedEvent } from './ChannelStrip/events/VolumeDragEndedEvent';
@@ -30,14 +31,21 @@ export class OptionsControl extends Control<OptionsView, OptionsControls> {
 
   protected override onMount(): void {
     const { sounds } = this.context;
+    const { music, sfx } = this.controls;
+    const settings = new SoundSettings(sounds);
 
     this.subscribe(MuteChangedEvent, (event) => {
       sounds.master.setEnabled(!event.muted);
-      this.controls.music.showState();
-      this.controls.sfx.showState();
+      music.showState();
+      sfx.showState();
+      settings.store();
     });
-    this.controls.sfx.view.subscribe(VolumeDragEndedEvent, () =>
-      sounds.playClick(),
-    );
+    music.view.subscribe(MuteChangedEvent, () => settings.store());
+    music.view.subscribe(VolumeDragEndedEvent, () => settings.store());
+    sfx.view.subscribe(MuteChangedEvent, () => settings.store());
+    sfx.view.subscribe(VolumeDragEndedEvent, () => {
+      sounds.playClick();
+      settings.store();
+    });
   }
 }
