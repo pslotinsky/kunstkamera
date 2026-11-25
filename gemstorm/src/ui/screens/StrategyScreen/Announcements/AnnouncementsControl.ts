@@ -17,6 +17,7 @@ import { SuccessionReportedEvent } from '@/core/events/SuccessionReportedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
 import { UnitDesertedEvent } from '@/core/events/UnitDesertedEvent';
 import { VassalOfferedEvent } from '@/core/events/VassalOfferedEvent';
+import { TurnHold } from '@/core/TurnHold';
 import { Control } from '@/lib/Control';
 import type { EventClass } from '@/lib/EventBus';
 import { getGeneralPortraitUrl } from '@/ui/common/art/getGeneralPortraitUrl';
@@ -25,7 +26,6 @@ import type { DropdownOption } from '@/ui/common/Dropdown/DropdownView';
 import { BattleReportClosedEvent } from '@/ui/screens/StrategyScreen/BattleReport/BattleReportClosedEvent';
 import { CaptiveDialogToggledEvent } from '@/ui/screens/StrategyScreen/CaptiveDialog/CaptiveDialogToggledEvent';
 import { SearchReportClosedEvent } from '@/ui/screens/StrategyScreen/SearchReport/SearchReportClosedEvent';
-import { TurnHold } from '@/ui/screens/StrategyScreen/TurnHold';
 
 import { AnnouncementDismissedEvent } from './AnnouncementDismissedEvent';
 import {
@@ -133,9 +133,9 @@ export class AnnouncementsControl extends Control<
     }
 
     if (event instanceof CaptiveJudgedEvent) {
-      const { house, captor } = event.captive;
+      const { captive } = event;
 
-      return house.isEqual(player) && !captor.isEqual(player);
+      return captive.belongsTo(player) && !captive.isHeldBy(player);
     }
 
     return (

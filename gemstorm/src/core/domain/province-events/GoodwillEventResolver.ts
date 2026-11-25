@@ -177,7 +177,7 @@ export class GoodwillEventResolver {
       gains[stat] = this.rollBetween(...CHARACTER_EVENT_RANGE);
     }
 
-    recipient.stats = recipient.stats.increase(gains);
+    recipient.changeStats(gains);
   }
 
   private rewardFamily(family: Family): void {

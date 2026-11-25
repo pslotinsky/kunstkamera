@@ -185,7 +185,7 @@ describe('Province events', () => {
     province.assignGovernor(makeGeneral());
     province.claim(family);
     expect(province.isEventDue).toBe(true);
-    province.claim(makeFamily({ name: family.name }));
+    province.claim(makeFamily());
 
     expect(province.isEventDue).toBe(false);
     expect(province.goodwill).toBe(0);

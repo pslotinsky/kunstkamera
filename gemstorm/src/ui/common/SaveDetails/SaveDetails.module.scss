@@ -1,0 +1,61 @@
+@use "@/ui/common/kit";
+
+.preview {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin: 1.5rem 0 0.75rem;
+}
+
+.portrait {
+  flex: none;
+  width: 6.5rem;
+  height: 6.5rem;
+  object-fit: cover;
+  border: 1px solid var(--trim);
+  border-radius: 4px;
+}
+
+.previewText {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+
+  > p {
+    margin: 0;
+    line-height: 1.15;
+  }
+}
+
+.house {
+  @include kit.display-type;
+
+  color: var(--gold-text);
+  font-size: 1.9rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.scenario {
+  color: var(--ink-soft);
+  font-size: 1.25rem;
+  font-style: italic;
+}
+
+.moment {
+  margin-top: 0.2rem;
+  font-size: 1.15rem;
+  font-weight: 500;
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+
+.savedAt {
+  font-size: 1rem;
+  color: var(--ink-muted);
+}
+
+.detailsPanel {
+  display: contents;
+}

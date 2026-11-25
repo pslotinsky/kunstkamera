@@ -1,5 +1,6 @@
 import type { CommandGroup } from '@/core/commands/province/catalog';
 import type { World } from '@/core/domain/World';
+import type { GameSaves } from '@/core/saves/GameSaves';
 import type { ChildrenViews } from '@/lib/Control';
 import type { EventBus } from '@/lib/EventBus';
 import type { SoundBoard } from '@/ui/common/sound/SoundBoard';
@@ -11,6 +12,7 @@ export interface CampaignContext {
   readonly events: EventBus;
   readonly commands: readonly CommandGroup[];
   readonly sounds: SoundBoard;
+  readonly saves: GameSaves;
 }
 
 export type CampaignControls = {

@@ -5,8 +5,11 @@ import { MonthStartedEvent } from '@/core/events/MonthStartedEvent';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
 import { WarReportedEvent } from '@/core/events/WarReportedEvent';
+import { TurnHold } from '@/core/TurnHold';
+import type { SaveBlocker } from '@/core/WorldEngine';
 import { Control } from '@/lib/Control';
 import type { EventClass } from '@/lib/EventBus';
+import { isDefined } from '@/lib/value/isDefined';
 import { PlaqueControl } from '@/ui/common/Plaque/PlaqueControl';
 import { AdviceControl } from '@/ui/screens/StrategyScreen/Advice/AdviceControl';
 import { AnnouncementsControl } from '@/ui/screens/StrategyScreen/Announcements/AnnouncementsControl';
@@ -22,7 +25,6 @@ import { GamePanelControl } from '@/ui/screens/StrategyScreen/GamePanel/GamePane
 import { TargetingEndedEvent } from '@/ui/screens/StrategyScreen/ProvinceCommands/TargetingEndedEvent';
 import { TargetingStartedEvent } from '@/ui/screens/StrategyScreen/ProvinceCommands/TargetingStartedEvent';
 import { SearchReportControl } from '@/ui/screens/StrategyScreen/SearchReport/SearchReportControl';
-import { TurnHold } from '@/ui/screens/StrategyScreen/TurnHold';
 import { WorldMapControl } from '@/ui/screens/StrategyScreen/WorldMap/WorldMapControl';
 
 import { OverlayToggledEvent } from './OverlayToggledEvent';
@@ -30,6 +32,12 @@ import { StrategyScreenView } from './StrategyScreenView';
 import type { StrategyScreenContext, StrategyScreenControls } from './types';
 
 const COMPUTER_TURN_MS = 400;
+
+const SAVE_BLOCK_REASONS: Record<SaveBlocker, string> = {
+  'campaign-ended': 'This campaign has ended.',
+  'computer-turn': 'Wait for a province you control.',
+  interruption: 'Finish the current report or decision before saving.',
+};
 
 export class StrategyScreenControl extends Control<
   StrategyScreenView,
@@ -85,6 +93,9 @@ export class StrategyScreenControl extends Control<
       gameMenu: new GameMenuControl({
         events: context.events,
         sounds: context.sounds,
+        world: context.world,
+        saves: context.saves,
+        saveBlockReason: () => this.saveBlockReason,
       }),
     });
     this.turnHold = new TurnHold(context.events);
@@ -92,6 +103,14 @@ export class StrategyScreenControl extends Control<
 
   public onQuit(handler: () => void): void {
     this.controls.gameMenu.onQuit(handler);
+  }
+
+  private get saveBlockReason(): string | undefined {
+    const blocker = this.context.saveBlocker();
+
+    return isDefined(blocker)
+      ? SAVE_BLOCK_REASONS[blocker]
+      : this.controls.gamePanel.saveBlockReason;
   }
 
   protected override onMount(): void {

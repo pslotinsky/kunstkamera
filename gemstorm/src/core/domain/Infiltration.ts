@@ -115,7 +115,7 @@ export class Infiltration {
     if (isDefined(governor) && Math.random() < SABOTAGE_TRAINING_CHANCE) {
       const stat = sample(TRAINABLE_STATS);
 
-      governor.stats = governor.stats.increase({ [stat]: SABOTAGE_STAT_GAIN });
+      governor.changeStats({ [stat]: SABOTAGE_STAT_GAIN });
     }
   }
 
@@ -142,7 +142,7 @@ export class Infiltration {
     if (isDefined(governor)) {
       const war = this.rollBetween(0, MAX_PLUNDER_WAR_GAIN);
 
-      governor.stats = governor.stats.increase({ war });
+      governor.changeStats({ war });
     }
   }
 

@@ -26,6 +26,7 @@ export class Family {
   public gems: readonly Gem[];
   public ally: Family | undefined;
   public readonly royal: boolean;
+
   private rulerFame: number;
 
   public constructor(params: FamilyParams) {
@@ -90,8 +91,20 @@ export class Family {
   }
 
   public surrenderTo(victor: Family): void {
-    victor.gems = [...victor.gems, ...this.gems];
+    victor.receiveGems(this.gems);
     this.gems = [];
+  }
+
+  public receiveGems(gems: readonly Gem[]): void {
+    this.gems = [...this.gems, ...gems];
+  }
+
+  public takeGems(): readonly Gem[] {
+    const gems = this.gems;
+
+    this.gems = [];
+
+    return gems;
   }
 
   public get vassals(): readonly General[] {
@@ -120,6 +133,14 @@ export class Family {
     this.homeProvince = province;
     province.assignGovernor(this.ruler);
     province.cancelEntrust();
+  }
+
+  public reestablishCourt(ruler: General, home: Province, fame: number): void {
+    this.breakAlliance();
+    this.crown(ruler, fame);
+    this.members = [ruler];
+    this.homeProvince = home;
+    this.gems = [];
   }
 
   public isEqual(other: Family): boolean {

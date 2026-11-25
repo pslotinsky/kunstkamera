@@ -6,7 +6,11 @@ const RATE_CHANGE_MONTHS = [2, 5, 8, 11];
 const RATES = [MarketRate.LOW, MarketRate.AVERAGE, MarketRate.HIGH];
 
 export class Market {
-  public rate: MarketRate = MarketRate.AVERAGE;
+  public rate: MarketRate;
+
+  public constructor(rate = MarketRate.AVERAGE) {
+    this.rate = rate;
+  }
 
   public swing(month: number): void {
     if (RATE_CHANGE_MONTHS.includes(month)) {

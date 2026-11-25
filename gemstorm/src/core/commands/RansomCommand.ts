@@ -73,7 +73,7 @@ export class RansomCommand extends WorldCommand {
     if (isDefined(ransom) && captive.canDemandRansom) {
       captive.demandRansom(currency);
 
-      if (!house.isEqual(this.context.world.player)) {
+      if (!captive.belongsTo(this.context.world.player)) {
         const home = house.homeProvince;
         const accepted =
           home.belongsTo(house) && ransom.willPay(currency, home);

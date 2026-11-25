@@ -1,5 +1,6 @@
 import './style.scss';
 
+import { GameSaves } from '@/core/saves/GameSaves';
 import { AppControl } from '@/ui/app/App/AppControl';
 import { SoundDirector } from '@/ui/app/SoundDirector';
 import { SoundBoard } from '@/ui/common/sound/SoundBoard';
@@ -14,7 +15,8 @@ const sounds = new SoundBoard();
 if (import.meta.env.DEV) {
   Object.assign(window, { sounds });
 }
-const shell = new AppControl({ sounds });
+const saves = new GameSaves();
+const shell = new AppControl({ sounds, saves });
 const director = new SoundDirector({ sounds });
 
 shell.mount(app);

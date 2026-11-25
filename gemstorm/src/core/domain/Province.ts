@@ -26,6 +26,11 @@ export interface ProvinceParams {
   readonly hirePool?: readonly string[] | undefined;
 }
 
+interface ProvinceActionCycle {
+  readonly goodwill: number;
+  readonly actionCount: number;
+}
+
 const MAX_GOODWILL = 15;
 const ACTIONS_PER_CYCLE = 3;
 const REMOTE_PENALTY = 0.5;
@@ -72,7 +77,7 @@ export class Province {
   }
 
   public claim(family: Family): void {
-    if (this.house !== family) {
+    if (!this.belongsTo(family)) {
       this.resetActionCycle();
     }
     this.house = family;
@@ -218,6 +223,26 @@ export class Province {
   public resetActionCycle(): void {
     this.actionCount = 0;
     this.goodwill = 0;
+  }
+
+  public restoreActionCycle({
+    actionCount,
+    goodwill,
+  }: ProvinceActionCycle): void {
+    const validCount =
+      Number.isInteger(actionCount) &&
+      actionCount >= 0 &&
+      actionCount <= ACTIONS_PER_CYCLE;
+
+    const validGoodwill =
+      Number.isInteger(goodwill) && Math.abs(goodwill) <= MAX_GOODWILL;
+
+    if (!validCount || !validGoodwill) {
+      throw new Error('Invalid province action cycle');
+    }
+
+    this.actionCount = actionCount;
+    this.goodwill = goodwill;
   }
 
   public isEqual(other?: Province | number): boolean {

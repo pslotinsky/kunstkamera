@@ -53,7 +53,7 @@ export class Succession {
   private disband(family: Family, banisher: Family | undefined): Disbanding {
     this.world.campaign.recordFall(family, 'no-heir', banisher);
 
-    const { ruler: deposed, gems } = family;
+    const deposed = family.ruler;
     const provinces = this.world.getFamilyProvinces(family);
     const breakaways = compact(
       provinces.map((province) => this.breakAway(province)),
@@ -63,7 +63,7 @@ export class Succession {
     );
 
     this.world.dissolve(family);
-    family.gems = [];
+    const gems = family.takeGems();
     const inheritances = this.passGems(gems, banisher);
     this.world.wanderers.resettle(vassals);
 
@@ -104,7 +104,7 @@ export class Succession {
           banisher ?? (survivors.length > 0 ? sample(survivors) : undefined);
 
         if (isDefined(family)) {
-          family.gems = [...family.gems, gem];
+          family.receiveGems([gem]);
         }
 
         return isDefined(family) ? { gem, family } : undefined;

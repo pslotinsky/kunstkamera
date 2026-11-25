@@ -42,9 +42,16 @@
   text-align: center;
 }
 
+.reason {
+  margin: -0.4rem 0 0;
+  font-size: 1.2rem;
+}
+
 .actions {
   display: flex;
+  justify-content: flex-end;
   gap: 1rem;
+  margin-top: 1rem;
 }
 
 .action {
@@ -56,4 +63,60 @@
 
 .hidden {
   display: none;
+}
+
+.toast {
+  @include kit.display-type;
+
+  position: absolute;
+  top: 1.75rem;
+  left: calc((100% + var(--hud-width) + 1rem) / 2);
+  z-index: 6;
+  margin: 0;
+  padding: 0.7rem 1.6rem;
+  color: var(--gold-text);
+  font-size: 1.5rem;
+  white-space: nowrap;
+  pointer-events: none;
+  background: var(--surface-800);
+  border: 1px solid var(--trim);
+  border-radius: 4px;
+  box-shadow: 0 0.5rem 1.4rem rgb(0 0 0 / 45%);
+  translate: -50% 0;
+  opacity: 0;
+  visibility: hidden;
+
+  &.shown {
+    visibility: visible;
+    animation: toast 2.6s ease-out forwards;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+      opacity: 1;
+    }
+  }
+}
+
+@keyframes toast {
+  0% {
+    opacity: 0;
+    translate: -50% -0.5rem;
+  }
+  10%,
+  80% {
+    opacity: 1;
+    translate: -50% 0;
+  }
+  100% {
+    opacity: 0;
+    translate: -50% 0;
+  }
+}
+
+.message {
+  margin: 0.75rem 0 0;
+
+  &:empty {
+    margin: 0;
+  }
 }

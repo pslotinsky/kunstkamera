@@ -4,6 +4,7 @@ import type { Collection } from '@/lib/Collection';
 import { isDefined } from '@/lib/value/isDefined';
 
 import type { Advisor } from './Advisor';
+import type { ArtifactParams } from './Artifact';
 import type { CalendarDate } from './CalendarDate';
 import { Campaign } from './Campaign';
 import type { Captive } from './Captive';
@@ -11,6 +12,7 @@ import { Family } from './Family';
 import type { FifthUnit } from './FifthUnit';
 import type { General, GeneralRank } from './General';
 import { Market } from './Market';
+import type { MarketRate } from './MarketRate';
 import type { Province } from './Province';
 import { TurnQueue } from './TurnQueue';
 import { WanderingGenerals } from './WanderingGenerals';
@@ -27,11 +29,15 @@ export interface WorldParams {
   readonly generals: Collection<string, General>;
   readonly player: Family;
   readonly advisor?: Advisor | undefined;
+  readonly scenario?: number;
+  readonly turnQueue?: TurnQueue;
+  readonly artifacts?: readonly ArtifactParams[];
+  readonly marketRate?: MarketRate | undefined;
 }
 
 export class World {
   public date: CalendarDate;
-  public readonly market = new Market();
+  public readonly market: Market;
   public readonly campaign: Campaign;
   public readonly wanderers: WanderingGenerals;
   public readonly turnQueue: TurnQueue;
@@ -39,19 +45,34 @@ export class World {
   public readonly families: Collection<string, Family>;
   public readonly generals: Collection<string, General>;
   public readonly player: Family;
+  public readonly scenario: number | undefined;
 
   private exiled: readonly General[] = [];
   private held: readonly Captive[] = [];
 
   public constructor(params: WorldParams) {
     this.date = params.date;
+    this.market = new Market(params.marketRate);
     this.map = params.map;
     this.families = params.families;
     this.generals = params.generals;
     this.player = params.player;
-    this.turnQueue = new TurnQueue(this.map.provinces);
-    this.campaign = new Campaign(this, params.advisor);
+    this.scenario = params.scenario;
+    this.turnQueue = params.turnQueue ?? TurnQueue.create(this.map.provinces);
+    this.campaign = new Campaign(this, params.advisor, params.artifacts);
     this.wanderers = new WanderingGenerals(this);
+  }
+
+  public advanceMonth(): void {
+    this.date = this.date.next();
+  }
+
+  public get captives(): readonly Captive[] {
+    return this.held;
+  }
+
+  public get exiles(): readonly General[] {
+    return this.exiled;
   }
 
   public hold(captive: Captive): void {
@@ -67,13 +88,17 @@ export class World {
   }
 
   public getCaptivesOf(captor: Family): readonly Captive[] {
-    return this.held.filter((captive) => captive.captor.isEqual(captor));
+    return this.held.filter((captive) => captive.isHeldBy(captor));
   }
 
   public findRansomFor(house: Family): Captive | undefined {
     return this.held.find(
-      (captive) => captive.house.isEqual(house) && isDefined(captive.demand),
+      (captive) => captive.belongsTo(house) && isDefined(captive.demand),
     );
+  }
+
+  public get hasUnansweredRansom(): boolean {
+    return this.held.some((captive) => isDefined(captive.demand));
   }
 
   public exile(general: General): void {
@@ -132,20 +157,31 @@ export class World {
       return undefined;
     }
 
-    const founded = new Family({
-      name,
-      ruler: lord,
-      members: [lord],
-      homeProvince: province,
-      fame: BREAKAWAY_FAME,
-    });
-
     this.findFamilyOf(lord)?.discharge(lord);
     lord.renounceHouse();
+
+    const dissolved = this.findDissolvedHouse(name);
+    const founded =
+      dissolved ??
+      new Family({
+        name,
+        ruler: lord,
+        members: [lord],
+        homeProvince: province,
+        fame: BREAKAWAY_FAME,
+      });
+
+    dissolved?.reestablishCourt(lord, province, BREAKAWAY_FAME);
     this.families.add(name, founded);
     province.claim(founded);
 
     return founded;
+  }
+
+  private findDissolvedHouse(name: string): Family | undefined {
+    const houses = this.held.flatMap(({ house, captor }) => [house, captor]);
+
+    return houses.find((house) => house.name === name);
   }
 
   public dissolve(family: Family, victor?: Family): void {

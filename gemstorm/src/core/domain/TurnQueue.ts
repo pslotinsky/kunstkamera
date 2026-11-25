@@ -2,15 +2,43 @@ import { shuffle } from '@/lib/array/shuffle';
 
 import type { Province } from './Province';
 
+interface SavedTurnOrder {
+  readonly order: readonly Province[];
+  readonly index: number;
+}
+
 export class TurnQueue {
+  public static create(provinces: readonly Province[]): TurnQueue {
+    const order = shuffle(provinces);
+
+    return new TurnQueue(provinces, order, 0);
+  }
+
+  public static restore(
+    provinces: readonly Province[],
+    saved: SavedTurnOrder,
+  ): TurnQueue {
+    const order = [...saved.order];
+
+    return new TurnQueue(provinces, order, saved.index);
+  }
+
   private readonly provinces: readonly Province[];
+  private order: readonly Province[];
+  private currentIndex: number;
 
-  private order: Province[] = [];
-  private currentIndex = 0;
-
-  public constructor(provinces: readonly Province[]) {
+  private constructor(
+    provinces: readonly Province[],
+    order: readonly Province[],
+    currentIndex: number,
+  ) {
     this.provinces = provinces;
-    this.reset();
+    this.order = order;
+    this.currentIndex = currentIndex;
+  }
+
+  public get provinceOrder(): readonly Province[] {
+    return this.order;
   }
 
   public get pending(): readonly Province[] {

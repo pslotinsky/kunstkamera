@@ -28,11 +28,10 @@ import { MonthStartedEvent } from '@/core/events/MonthStartedEvent';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 import { SuccessionReportedEvent } from '@/core/events/SuccessionReportedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
-import { TurnHeldEvent } from '@/core/events/TurnHeldEvent';
-import { TurnReleasedEvent } from '@/core/events/TurnReleasedEvent';
 import { TurnScheduledEvent } from '@/core/events/TurnScheduledEvent';
 import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
 import { WarReportedEvent } from '@/core/events/WarReportedEvent';
+import { TurnHold } from '@/core/TurnHold';
 import { WorldEngine } from '@/core/WorldEngine';
 
 import {
@@ -363,7 +362,7 @@ describe('Campaign completion through game actions', () => {
       captor: rival,
     });
     const judge = new JudgeCaptiveCommand(context);
-    const holder = {};
+    const holder = new TurnHold(events);
     let coronation: Coronation | undefined;
 
     province.fifthUnits.addUnit(unit);
@@ -371,7 +370,7 @@ describe('Campaign completion through game actions', () => {
     events.subscribe(SuccessionReportedEvent, (event) => {
       if (event.outcome instanceof Coronation) {
         coronation = event.outcome;
-        events.publish(new TurnHeldEvent(holder));
+        holder.hold();
       }
     });
     judge.judge(captive, 'banish');
@@ -387,8 +386,8 @@ describe('Campaign completion through game actions', () => {
 
     crown.crown(coronation!, heirs[1]!);
     execute(context, crown);
-    events.publish(new TurnReleasedEvent(holder));
-    events.publish(new TurnReleasedEvent(holder));
+    holder.release();
+    holder.release();
     await Promise.resolve();
     events.publish(new TurnEndedEvent(turnNumber));
 
@@ -428,13 +427,13 @@ describe('Campaign completion through game actions', () => {
     });
     const context = makeWorld([home, other], player, date);
     const { world, events } = context;
-    const holder = {};
+    const holder = new TurnHold(events);
     let coronation: Coronation | undefined;
 
     events.subscribe(SuccessionReportedEvent, (event) => {
       if (event.outcome instanceof Coronation) {
         coronation = event.outcome;
-        events.publish(new TurnHeldEvent(holder));
+        holder.hold();
       }
     });
     vi.spyOn(Math, 'random').mockReturnValue(0);
@@ -448,7 +447,7 @@ describe('Campaign completion through game actions', () => {
 
     crown.crown(coronation!, heirs[1]!);
     execute(context, crown);
-    events.publish(new TurnReleasedEvent(holder));
+    holder.release();
     await Promise.resolve();
 
     expect(world.generals.all).not.toContain(lord);
@@ -599,12 +598,10 @@ describe('Campaign completion through game actions', () => {
 
     const attack = new AttackCommand(context);
     const endings: CampaignEndedEvent[] = [];
-    const reportHold = {};
+    const reportHold = new TurnHold(events);
 
     events.subscribe(CampaignEndedEvent, (event) => endings.push(event));
-    events.subscribe(BattleReportedEvent, () =>
-      events.publish(new TurnHeldEvent(reportHold)),
-    );
+    events.subscribe(BattleReportedEvent, () => reportHold.hold());
     attack.attackAt(target, { troops: 50, food: 30 });
     execute(context, attack);
 
@@ -617,7 +614,7 @@ describe('Campaign completion through game actions', () => {
     const judge = new JudgeCaptiveCommand(context);
     judge.judge(world.findCaptiveOf(player)!, 'recruit');
     execute(context, judge);
-    events.publish(new TurnReleasedEvent(reportHold));
+    reportHold.release();
     const gold = source.resources.gold;
     const recruit = new RecruitCommand(context);
 
@@ -628,7 +625,7 @@ describe('Campaign completion through game actions', () => {
     events.publish(new MonthEndedEvent(world.date));
     events.publish(new MonthStartedEvent(world.date));
     events.publish(new TurnScheduledEvent());
-    events.publish(new TurnReleasedEvent({}));
+    new TurnHold(events).release();
     await Promise.resolve();
 
     expect(world.campaign.outcome?.isVictory).toBe(true);

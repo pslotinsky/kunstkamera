@@ -3,13 +3,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { TurnHeldEvent } from '@/core/events/TurnHeldEvent';
 import { TurnReleasedEvent } from '@/core/events/TurnReleasedEvent';
+import { WorldFactory } from '@/core/WorldFactory';
 import { EventBus } from '@/lib/EventBus';
 import { SoundBoard } from '@/ui/common/sound/SoundBoard';
 import { GameMenuControl } from '@/ui/screens/StrategyScreen/GameMenu/GameMenuControl';
+import type { GameMenuContext } from '@/ui/screens/StrategyScreen/GameMenu/types';
+
+import { makeSaves } from './factories';
 
 let menu: GameMenuControl | undefined;
 
-function setup() {
+function setup(overrides: Partial<GameMenuContext> = {}) {
   const events = new EventBus();
   const held = vi.fn();
   const released = vi.fn();
@@ -18,7 +22,14 @@ function setup() {
 
   events.subscribe(TurnHeldEvent, held);
   events.subscribe(TurnReleasedEvent, released);
-  menu = new GameMenuControl({ events, sounds: new SoundBoard() });
+  menu = new GameMenuControl({
+    events,
+    sounds: new SoundBoard(),
+    world: new WorldFactory().create(),
+    saves: overrides.saves ?? makeSaves().saves,
+    saveBlockReason: () => undefined,
+    ...overrides,
+  });
   menu.mount(container);
   menu.onQuit(quit);
   menu.open();
@@ -61,6 +72,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.unstubAllGlobals();
   menu?.unmount();
   menu = undefined;
   document.body.replaceChildren();
@@ -122,5 +134,42 @@ describe('GameMenuControl', () => {
     button('Quit').click();
 
     expect(quit).toHaveBeenCalledOnce();
+  });
+
+  it('checks eligibility again on replacement and keeps the menu open after a rejected write', () => {
+    const { saves, storage, values } = makeSaves();
+    const setItem = vi.spyOn(storage, 'setItem').mockImplementation(() => {
+      throw new Error('Quota exceeded');
+    });
+    values.set('gemstorm.save.1', '{broken save');
+    const world = new WorldFactory().create();
+    while (
+      world.turnQueue.current &&
+      !world.isPlayerRun(world.turnQueue.current)
+    ) {
+      world.turnQueue.next();
+    }
+    const saveBlockReason = vi.fn<() => string | undefined>();
+    const { released } = setup({ world, saves, saveBlockReason });
+
+    button('Save Game').click();
+    button('Slot 1 Unreadable save').click();
+    const replace = button('Replace');
+    replace.focus();
+    saveBlockReason.mockReturnValue('Finish the current decision.');
+    replace.click();
+    expect(setItem).not.toHaveBeenCalled();
+    const message =
+      dialog('game-menu-heading').querySelector('[role="status"]');
+    expect(message?.textContent).toBe('Finish the current decision.');
+
+    saveBlockReason.mockReturnValue(undefined);
+    replace.click();
+    expect(setItem).toHaveBeenCalledOnce();
+    expect(message?.textContent).toBe('The game could not be saved.');
+    expect(document.activeElement).toBe(replace);
+    expect(dialog('game-menu-heading').open).toBe(true);
+    expect(values.get('gemstorm.save.1')).toBe('{broken save');
+    expect(released).not.toHaveBeenCalled();
   });
 });

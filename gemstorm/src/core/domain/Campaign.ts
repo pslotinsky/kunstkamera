@@ -3,7 +3,7 @@ import { sample } from '@/lib/array/sample';
 import { isDefined } from '@/lib/value/isDefined';
 
 import type { Advisor } from './Advisor';
-import { Artifact } from './Artifact';
+import { Artifact, type ArtifactParams } from './Artifact';
 import {
   CampaignOutcome,
   type CampaignReason,
@@ -19,14 +19,23 @@ export class Campaign {
   public readonly advisor: Advisor | undefined;
 
   private readonly world: World;
-  private undiscoveredArtifacts = ARTIFACTS;
+  private undiscoveredArtifacts: readonly ArtifactParams[];
   private concluded: CampaignOutcome | undefined;
   private fallen: CampaignOutcome | undefined;
   private succession: Coronation | undefined;
 
-  public constructor(world: World, advisor?: Advisor) {
+  public constructor(
+    world: World,
+    advisor?: Advisor,
+    artifacts: readonly ArtifactParams[] = ARTIFACTS,
+  ) {
     this.world = world;
     this.advisor = advisor;
+    this.undiscoveredArtifacts = artifacts;
+  }
+
+  public get remainingArtifacts(): readonly ArtifactParams[] {
+    return this.undiscoveredArtifacts;
   }
 
   public get outcome(): CampaignOutcome | undefined {

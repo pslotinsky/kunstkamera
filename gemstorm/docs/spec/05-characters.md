@@ -660,6 +660,8 @@ The ransom moves from the losing ruler's home province into the province that wa
 
 A ransomed prisoner returns to his ruler's court.
 
+If a captive's house dissolves and later returns under the same name, its current capital can pay any remaining ransom. The prisoner rejoins that house's current court when ransomed or released.
+
 ### Fate
 
 The choices are **Recruit, Release, Banish**. There is no execution.

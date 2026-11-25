@@ -54,6 +54,7 @@ export class WorldFactory {
       families,
       generals,
       player,
+      scenario: scenario.number,
       advisor: start?.advisor,
     });
   }

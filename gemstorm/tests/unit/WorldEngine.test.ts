@@ -10,10 +10,9 @@ import { IncidentReportedEvent } from '@/core/events/IncidentReportedEvent';
 import { MonthStartedEvent } from '@/core/events/MonthStartedEvent';
 import { ProvinceUpdatedEvent } from '@/core/events/ProvinceUpdatedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
-import { TurnHeldEvent } from '@/core/events/TurnHeldEvent';
-import { TurnReleasedEvent } from '@/core/events/TurnReleasedEvent';
 import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
 import { UnitDesertedEvent } from '@/core/events/UnitDesertedEvent';
+import { TurnHold } from '@/core/TurnHold';
 import { WorldEngine } from '@/core/WorldEngine';
 import { EventBus } from '@/lib/EventBus';
 
@@ -385,20 +384,20 @@ describe('WorldEngine', () => {
 
   it('starts no turn while something holds it, and ignores a stale turn end', async () => {
     const { world, events } = createFixture(new CalendarDate(1186, 4));
-    const holder = {};
+    const holder = new TurnHold(events);
     const ended = world.turnQueue.turnNumber;
     const started: number[] = [];
 
     events.subscribe(TurnStartedEvent, (event) =>
       started.push(event.turnNumber),
     );
-    events.publish(new TurnHeldEvent(holder));
+    holder.hold();
     events.publish(new TurnEndedEvent(ended));
     events.publish(new TurnEndedEvent(ended + 1));
 
     expect(started).toEqual([]);
 
-    events.publish(new TurnReleasedEvent(holder));
+    holder.release();
     await Promise.resolve();
 
     expect(started[0]).toBeGreaterThan(ended);

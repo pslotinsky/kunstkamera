@@ -19,6 +19,14 @@ export class Gem {
     return new Gem(definition);
   }
 
+  public static restore(name: string, readyOn?: CalendarDate): Gem {
+    const gem = Gem.ofName(name);
+
+    gem.readyOn = readyOn;
+
+    return gem;
+  }
+
   public readonly gemstone: string;
   public readonly guardian: FifthUnit;
 

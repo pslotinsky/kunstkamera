@@ -5,6 +5,7 @@ import type { Province } from '@/core/domain/Province';
 import type { World } from '@/core/domain/World';
 import { CampaignEndedEvent } from '@/core/events/CampaignEndedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
+import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
 import { Control } from '@/lib/Control';
 import type { EventBus } from '@/lib/EventBus';
 import type { AdviceControl } from '@/ui/screens/StrategyScreen/Advice/AdviceControl';
@@ -30,6 +31,7 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
   private readonly advice: AdviceControl;
 
   private pending: PendingDialog | null = null;
+  private isFinishingTurn = false;
 
   public constructor(
     world: World,
@@ -52,6 +54,18 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
     this.view.hide();
   }
 
+  public get saveBlockReason(): string | undefined {
+    let reason: string | undefined;
+
+    if (this.pending) {
+      reason = 'Finish or close the current order before saving.';
+    } else if (this.isFinishingTurn) {
+      reason = 'Wait for the current order to finish before saving.';
+    }
+
+    return reason;
+  }
+
   public pickTarget(province: Province): void {
     if (this.pending) {
       this.pending.dialog.chooseTarget(province);
@@ -68,6 +82,13 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
   }
 
   protected override onMount(): void {
+    this.context.events.subscribe(
+      TurnStartedEvent,
+      () => {
+        this.isFinishingTurn = false;
+      },
+      this.signal,
+    );
     this.context.events.subscribe(
       CampaignEndedEvent,
       () => {
@@ -159,13 +180,13 @@ export class ProvinceCommandsControl extends Control<ProvinceCommandsView> {
   }
 
   private holdTurn(): void {
+    this.isFinishingTurn = true;
     this.view.closeGroups();
     this.view.disableActions();
   }
 
   private finishTurn(): void {
-    this.view.closeGroups();
-    this.view.disableActions();
+    this.holdTurn();
 
     const { world, events } = this.context;
 

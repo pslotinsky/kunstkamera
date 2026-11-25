@@ -1,6 +1,6 @@
 import type { Artifact } from './Artifact';
 import type { CalendarDate } from './CalendarDate';
-import { Characteristics } from './Characteristics';
+import type { Characteristics, CharacteristicsValues } from './Characteristics';
 import type { Family } from './Family';
 
 export type GeneralRank = 'ruler' | 'lord' | 'vassal';
@@ -26,6 +26,7 @@ export interface GeneralParams {
   readonly defectionClass: DefectionClass;
   readonly lineage?: string | undefined;
   readonly captureImmune?: boolean | undefined;
+  readonly houseMembership?: boolean;
 }
 
 export class General {
@@ -35,8 +36,8 @@ export class General {
   public readonly recruitClass: RecruitClass;
   public readonly defectionClass: DefectionClass;
   public readonly captureImmune: boolean;
-  private readonly lineage: string | undefined;
-  private hasHouseMembership = true;
+  public readonly lineage: string | undefined;
+  private houseMembership: boolean;
 
   public constructor(params: GeneralParams) {
     this.name = params.name;
@@ -46,6 +47,11 @@ export class General {
     this.defectionClass = params.defectionClass;
     this.lineage = params.lineage;
     this.captureImmune = params.captureImmune ?? false;
+    this.houseMembership = params.houseMembership ?? true;
+  }
+
+  public get hasHouseMembership(): boolean {
+    return this.houseMembership;
   }
 
   public ageYear(date: CalendarDate, rank: GeneralRank): void {
@@ -65,9 +71,13 @@ export class General {
   }
 
   public receive(artifact: Artifact): void {
-    this.stats = this.stats.increase({
+    this.changeStats({
       [artifact.characteristic]: artifact.bonus,
     });
+  }
+
+  public changeStats(changes: CharacteristicsValues): void {
+    this.stats = this.stats.increase(changes);
   }
 
   public loseWar(amount: number): void {
@@ -83,7 +93,7 @@ export class General {
   }
 
   public renounceHouse(): void {
-    this.hasHouseMembership = false;
+    this.houseMembership = false;
   }
 
   public isEqual(other: General): boolean {
@@ -91,7 +101,7 @@ export class General {
   }
 
   private changeAllStats(amount: number): void {
-    this.stats = this.stats.increase({
+    this.changeStats({
       intelligence: amount,
       war: amount,
       charisma: amount,
