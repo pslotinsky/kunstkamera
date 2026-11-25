@@ -217,6 +217,6 @@ Game settings and session control.
 
 Hot-seat play: multiple human players sharing one game.
 
-- [ ] hand a family to another human player
-- [ ] take turns hot-seat, swapping control each turn
-- [ ] drop a player and let the computer take over
+- [ ] ~~hand a family to another human player~~ — cancelled
+- [ ] ~~take turns hot-seat, swapping control each turn~~ — cancelled
+- [ ] ~~drop a player and let the computer take over~~ — cancelled
