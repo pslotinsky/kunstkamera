@@ -191,7 +191,7 @@ export class BattleReportView extends View<BattleReportContext> {
       return '';
     }
 
-    return captive.captor.isEqual(this.context.world.player)
+    return captive.isHeldBy(this.context.world.player)
       ? `${captive.general.name} of ${captive.house.name} is your prisoner.`
       : `${captive.general.name} is taken by ${captive.captor.name}.`;
   }

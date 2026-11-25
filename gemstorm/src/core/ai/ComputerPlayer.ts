@@ -90,7 +90,7 @@ export class ComputerPlayer {
     if (
       world.campaign.canProgress &&
       world.hasCaptive(captive) &&
-      !captive.captor.isEqual(world.player) &&
+      !captive.isHeldBy(world.player) &&
       captive.canDemandRansom
     ) {
       this.executor.execute(this.captor.demandRansom(captive));

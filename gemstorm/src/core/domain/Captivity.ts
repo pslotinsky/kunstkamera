@@ -30,7 +30,7 @@ export class Captivity {
     const hasRequiredFame = captor.fame >= REQUIRED_FAME[general.recruitClass];
     const isProtectedRuler =
       captive.isRuler &&
-      (house.isEqual(this.world.player) ||
+      (captive.belongsTo(this.world.player) ||
         this.world.getHeirs(house).length > 0);
 
     return hasRequiredFame && !isProtectedRuler;
@@ -49,7 +49,7 @@ export class Captivity {
   public release(captive: Captive): Province | undefined {
     return captive.isRuler
       ? this.resettleRuler(captive)
-      : this.sendToCourt(captive);
+      : this.returnToCourt(captive);
   }
 
   public banish(captive: Captive): SuccessionOutcome | undefined {
@@ -82,7 +82,7 @@ export class Captivity {
 
     this.world.absorb(house, captor);
     for (const prisoner of this.world.getCaptivesOf(captor)) {
-      if (prisoner.house.isEqual(house)) {
+      if (prisoner.belongsTo(house)) {
         this.world.free(prisoner);
       }
     }
@@ -91,12 +91,27 @@ export class Captivity {
   private bringToCourt(captive: Captive): void {
     const { general, house, captor } = captive;
 
-    this.sendToCourt(captive);
-    house.discharge(general);
+    this.vacateProvince(captive);
+    const former = this.world.findFamilyOf(general) ?? house;
+
+    former.discharge(general);
     captor.enlist(general);
   }
 
-  private sendToCourt(captive: Captive): Province | undefined {
+  private returnToCourt(captive: Captive): Province | undefined {
+    const province = this.vacateProvince(captive);
+    const { general, house } = captive;
+    const former = this.world.findFamilyOf(general);
+
+    if (this.world.families.has(house.name) && !former?.isEqual(house)) {
+      former?.discharge(general);
+      house.enlist(general);
+    }
+
+    return province;
+  }
+
+  private vacateProvince(captive: Captive): Province | undefined {
     const { general, house } = captive;
     const province = this.world.getRuledProvince(general);
     const governed = province?.belongsTo(house) ? province : undefined;

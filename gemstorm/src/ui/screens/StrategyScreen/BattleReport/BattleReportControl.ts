@@ -1,8 +1,8 @@
 import type { InvasionReport } from '@/core/domain/InvasionReport';
 import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
+import { TurnHold } from '@/core/TurnHold';
 import { Control } from '@/lib/Control';
-import { TurnHold } from '@/ui/screens/StrategyScreen/TurnHold';
 
 import { BattleReportClosedEvent } from './BattleReportClosedEvent';
 import { BattleReportDismissedEvent } from './BattleReportDismissedEvent';

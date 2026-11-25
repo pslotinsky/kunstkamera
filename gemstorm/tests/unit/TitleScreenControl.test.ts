@@ -1,15 +1,18 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { WorldFactory } from '@/core/WorldFactory';
 import { SoundBoard } from '@/ui/common/sound/SoundBoard';
 import { TitleScreenControl } from '@/ui/screens/TitleScreen/TitleScreenControl';
 
+import { advanceTo, makeSaves } from './factories';
+
 let title: TitleScreenControl | undefined;
 
-function mount(): void {
+function mount(saves = makeSaves().saves): void {
   const container = document.createElement('div');
   document.body.append(container);
-  title = new TitleScreenControl({ sounds: new SoundBoard() });
+  title = new TitleScreenControl({ sounds: new SoundBoard(), saves });
   title.mount(container);
 }
 
@@ -67,10 +70,13 @@ describe('TitleScreenControl', () => {
 
     button('Options').click();
 
-    expect(document.querySelector('dialog')?.open).toBe(true);
+    const options = document.querySelector<HTMLDialogElement>(
+      '[aria-labelledby="options-heading"]',
+    )!;
+    expect(options.open).toBe(true);
     expect(isScenePaused()).toBe(true);
 
-    document.querySelector('dialog')!.close();
+    options.close();
 
     expect(isScenePaused()).toBe(false);
   });
@@ -83,5 +89,21 @@ describe('TitleScreenControl', () => {
 
     title!.show();
     expect(isScenePaused()).toBe(false);
+  });
+
+  it('shows Continue when another tab saves a game', () => {
+    const { saves } = makeSaves();
+    mount(saves);
+    const continueButton =
+      document.querySelector<HTMLButtonElement>('[data-continue]')!;
+    expect(continueButton.hidden).toBe(true);
+
+    const world = new WorldFactory().create();
+    advanceTo(world, world.player.homeProvince);
+    expect(saves.save(1, world)).toBe(true);
+    window.dispatchEvent(new StorageEvent('storage'));
+
+    expect(continueButton.hidden).toBe(false);
+    expect(continueButton.ariaLabel).toContain('Month 1');
   });
 });

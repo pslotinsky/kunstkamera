@@ -6,6 +6,7 @@ import type { DefenseChoice, Invasion } from '@/core/domain/Invasion';
 import type { Province } from '@/core/domain/Province';
 import { DefenseRequestedEvent } from '@/core/events/DefenseRequestedEvent';
 import { TurnEndedEvent } from '@/core/events/TurnEndedEvent';
+import { TurnHold } from '@/core/TurnHold';
 import { Control } from '@/lib/Control';
 import { DropdownControl } from '@/ui/common/Dropdown/DropdownControl';
 import {
@@ -15,7 +16,6 @@ import {
 } from '@/ui/common/Dropdown/dropdown-options';
 import { TargetingEndedEvent } from '@/ui/screens/StrategyScreen/ProvinceCommands/TargetingEndedEvent';
 import { TargetingStartedEvent } from '@/ui/screens/StrategyScreen/ProvinceCommands/TargetingStartedEvent';
-import { TurnHold } from '@/ui/screens/StrategyScreen/TurnHold';
 
 import { AnswerChosenEvent } from './AnswerChosenEvent';
 import {

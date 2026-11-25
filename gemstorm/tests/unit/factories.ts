@@ -1,3 +1,5 @@
+import { vi } from 'vitest';
+
 import type { Advisor } from '@/core/domain/Advisor';
 import { Army, type ArmyParams } from '@/core/domain/Army';
 import { Battle, type BattleParams } from '@/core/domain/Battle';
@@ -28,6 +30,7 @@ import { Province } from '@/core/domain/Province';
 import { Resources } from '@/core/domain/Resources';
 import { World } from '@/core/domain/World';
 import { WorldMap } from '@/core/domain/WorldMap';
+import { GameSaves } from '@/core/saves/GameSaves';
 import { Collection } from '@/lib/Collection';
 import { EventBus } from '@/lib/EventBus';
 
@@ -95,10 +98,11 @@ let familySequence = 0;
 export function makeFamily(params: FamilyParams = {}): Family {
   familySequence += 1;
 
+  const name = params.name ?? `Family ${familySequence}`;
   const ruler = params.ruler ?? makeGeneral();
 
   return new Family({
-    name: params.name ?? `Family ${familySequence}`,
+    name,
     ruler,
     members: params.members ?? [ruler],
     homeProvince: params.homeProvince ?? makePlaceholderHome(),
@@ -270,7 +274,7 @@ export function makeCaptive(
   params: Partial<CaptiveParams> & { readonly pendingRansom?: boolean } = {},
 ): Captive {
   const captor = params.captor ?? makeFamily();
-  const captive = new Captive({
+  const captive = Captive.capture({
     general: params.general ?? makeGeneral(),
     house: params.house ?? makeFamily(),
     captor,
@@ -316,4 +320,28 @@ export function runOutTheClock(battle: Battle): Battle {
   }
 
   return battle;
+}
+
+export function makeSaves() {
+  const values = new Map<string, string>();
+  const storage = {
+    getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, value: string) => {
+      values.set(key, value);
+    },
+  };
+
+  vi.stubGlobal('localStorage', storage);
+
+  return { saves: new GameSaves(), values, storage };
+}
+
+export function blockSaves(): GameSaves {
+  const refuse = () => {
+    throw new Error('Access denied');
+  };
+
+  vi.stubGlobal('localStorage', { getItem: refuse, setItem: refuse });
+
+  return new GameSaves();
 }

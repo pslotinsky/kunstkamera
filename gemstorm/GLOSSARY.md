@@ -8,7 +8,7 @@ Gemstorm is a fantasy strategy game set on Aureth, with its own characters, hous
 The island continent whose thirty provinces form the campaign world.
 
 **House**:
-A ruling family that holds provinces, commands generals, and keeps its own treasury of Gems.
+A ruling family that holds provinces, commands generals, and keeps its own treasury of Gems. A dissolved house can return under the same name and remains the home house of its captives.
 
 **General**:
 A member of a house who can govern a province or command its troops.

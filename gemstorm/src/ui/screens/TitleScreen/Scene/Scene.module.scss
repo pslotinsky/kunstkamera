@@ -25,7 +25,7 @@ $painting-height: 941;
   top: 50%;
   right: -2%;
   left: -2%;
-  aspect-ratio: $painting-width / $painting-height;
+  aspect-ratio: math.div($painting-width, $painting-height);
   translate: 0 -50%;
   will-change: transform;
 }

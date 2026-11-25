@@ -1,0 +1,42 @@
+@use "@/ui/common/kit";
+
+.campaign {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  white-space: nowrap;
+}
+
+.date {
+  font-weight: 500;
+  font-variant: small-caps;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+  opacity: 0.78;
+}
+
+.crest {
+  width: 1.35em;
+  height: 1.35em;
+  object-fit: contain;
+}
+
+.slots {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.slot {
+  @include kit.framed-button;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 4.25rem;
+
+  &[aria-pressed="true"] {
+    background: var(--surface-600);
+    border-color: var(--gold-text);
+  }
+}

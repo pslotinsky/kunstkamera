@@ -1,6 +1,8 @@
 import { createCommandGroups } from '@/core/commands/province/catalog';
+import type { World } from '@/core/domain/World';
 import { BattleEndedEvent } from '@/core/events/BattleEndedEvent';
 import { BattleStartedEvent } from '@/core/events/BattleStartedEvent';
+import type { GameSaves } from '@/core/saves/GameSaves';
 import { WorldEngine } from '@/core/WorldEngine';
 import { type CampaignStart, WorldFactory } from '@/core/WorldFactory';
 import { Control } from '@/lib/Control';
@@ -13,31 +15,61 @@ import { StrategyScreenControl } from '@/ui/screens/StrategyScreen/StrategyScree
 import { CampaignView } from './CampaignView';
 import type { CampaignContext, CampaignControls } from './types';
 
+type CampaignOpening = (engine: WorldEngine) => void;
+
 export class CampaignControl extends Control<CampaignView, CampaignControls> {
   public static create(
     start: CampaignStart,
     sounds: SoundBoard,
+    saves: GameSaves,
   ): CampaignControl {
     const world = new WorldFactory().create(start);
+    const context = CampaignControl.createContext(world, sounds, saves);
+
+    return new CampaignControl(context, (engine) => engine.start());
+  }
+
+  public static resume(
+    world: World,
+    sounds: SoundBoard,
+    saves: GameSaves,
+  ): CampaignControl {
+    const context = CampaignControl.createContext(world, sounds, saves);
+
+    return new CampaignControl(context, (engine) => engine.resume());
+  }
+
+  private static createContext(
+    world: World,
+    sounds: SoundBoard,
+    saves: GameSaves,
+  ): CampaignContext {
     const events = new EventBus();
     const commands = createCommandGroups({ world, events });
 
-    return new CampaignControl({ world, events, commands, sounds });
+    return { world, events, commands, sounds, saves };
   }
 
   private readonly engine: WorldEngine;
   private readonly director: CampaignSoundDirector;
+  private readonly opening: CampaignOpening;
 
-  public constructor(context: CampaignContext) {
+  public constructor(context: CampaignContext, opening: CampaignOpening) {
+    const engine = new WorldEngine(context.world, context.events);
+
     super(CampaignView, context, {
-      strategyScreen: new StrategyScreenControl(context),
+      strategyScreen: new StrategyScreenControl({
+        ...context,
+        saveBlocker: () => engine.saveBlocker,
+      }),
       battleScreen: new BattleScreenControl({
         world: context.world,
         events: context.events,
         sounds: context.sounds,
       }),
     });
-    this.engine = new WorldEngine(context.world, context.events);
+    this.engine = engine;
+    this.opening = opening;
     this.director = new CampaignSoundDirector(context);
   }
 
@@ -64,7 +96,8 @@ export class CampaignControl extends Control<CampaignView, CampaignControls> {
       this.signal,
     );
     this.director.listen();
-    this.engine.start();
+
+    this.opening(this.engine);
   }
 
   protected override onUnmount(): void {

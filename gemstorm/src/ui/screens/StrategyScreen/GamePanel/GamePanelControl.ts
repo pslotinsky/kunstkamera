@@ -48,6 +48,10 @@ export class GamePanelControl extends Control<
     this.refreshAdvice();
   }
 
+  public get saveBlockReason(): string | undefined {
+    return this.controls.provinceCommands.saveBlockReason;
+  }
+
   public showProvinceInfo(province: Province): void {
     this.controls.provinceInfo.showProvince(province);
     this.refreshAdvice();

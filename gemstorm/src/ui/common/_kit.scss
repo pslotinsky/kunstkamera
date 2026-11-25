@@ -131,9 +131,23 @@
   @include double-trim;
 
   border-width: 2px;
+  transition:
+    background-color 120ms ease-out,
+    border-color 120ms ease-out;
 
   &:hover:not(:disabled) {
     background-color: var(--surface-600);
+    border-color: var(--gold-text);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--surface-800);
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--gold-text);
+    outline-offset: 4px;
   }
 
   &:disabled {

@@ -24,7 +24,11 @@ import { TurnReleasedEvent } from '@/core/events/TurnReleasedEvent';
 import { TurnScheduledEvent } from '@/core/events/TurnScheduledEvent';
 import { TurnStartedEvent } from '@/core/events/TurnStartedEvent';
 import { WarReportedEvent } from '@/core/events/WarReportedEvent';
+import type { TurnHold } from '@/core/TurnHold';
 import type { EventBus, EventClass } from '@/lib/EventBus';
+import { isDefined } from '@/lib/value/isDefined';
+
+export type SaveBlocker = 'campaign-ended' | 'computer-turn' | 'interruption';
 
 export class WorldEngine {
   private readonly executor: CommandExecutor;
@@ -36,7 +40,7 @@ export class WorldEngine {
   private readonly hiredUnitRecovery: RecoverHiredUnitsCommand;
   private readonly restockHirePools: RestockHirePoolsCommand;
   private readonly migrateMercenaries: MigrateMercenariesCommand;
-  private readonly holders = new Set<object>();
+  private readonly holders = new Set<TurnHold>();
   private readonly lifetime = new AbortController();
 
   private fought: Invasion | undefined;
@@ -73,6 +77,65 @@ export class WorldEngine {
   }
 
   public start(): void {
+    this.startListening();
+
+    this.advance();
+  }
+
+  public resume(): void {
+    const { current, turnNumber } = this.world.turnQueue;
+
+    this.startListening();
+
+    if (isDefined(current)) {
+      this.started = turnNumber;
+      this.phase = 'taking-turn';
+      this.events.publish(new TurnStartedEvent(turnNumber, current));
+    }
+  }
+
+  public get saveBlocker(): SaveBlocker | undefined {
+    let blocker: SaveBlocker | undefined;
+
+    if (this.isOver) {
+      blocker = 'campaign-ended';
+    } else if (!this.isPlayerTurn) {
+      blocker = 'computer-turn';
+    } else if (this.isInterrupted) {
+      blocker = 'interruption';
+    }
+
+    return blocker;
+  }
+
+  private get isOver(): boolean {
+    return this.lifetime.signal.aborted || !this.world.campaign.canProgress;
+  }
+
+  private get isPlayerTurn(): boolean {
+    const { current, turnNumber } = this.world.turnQueue;
+
+    return (
+      this.phase === 'taking-turn' &&
+      this.started === turnNumber &&
+      isDefined(current) &&
+      this.world.isPlayerRun(current)
+    );
+  }
+
+  private get isInterrupted(): boolean {
+    return (
+      this.world.hasUnansweredRansom ||
+      isDefined(this.fought) ||
+      [...this.holders].some(({ kind }) => kind === 'interruption')
+    );
+  }
+
+  public stop(): void {
+    this.lifetime.abort();
+  }
+
+  private startListening(): void {
     this.listen(TurnEndedEvent, (event) =>
       this.handleTurnEnd(event.turnNumber),
     );
@@ -108,11 +171,6 @@ export class WorldEngine {
     this.listen(BattleEndedEvent, (event) => {
       this.settleBattle(event.outcome, event.refuge);
     });
-    this.advance();
-  }
-
-  public stop(): void {
-    this.lifetime.abort();
   }
 
   private requestRansom({ captive }: InvasionReport): void {
@@ -168,7 +226,7 @@ export class WorldEngine {
         this.nextTurn();
         break;
       case 'next-month':
-        this.world.date = this.world.date.next();
+        this.world.advanceMonth();
         this.startMonth();
         break;
       case 'taking-turn':

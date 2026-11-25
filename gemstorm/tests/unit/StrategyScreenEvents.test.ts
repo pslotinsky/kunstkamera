@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { CalendarDate } from '@/core/domain/CalendarDate';
 import { ProvinceEventResolver } from '@/core/domain/province-events/ProvinceEventResolver';
@@ -7,7 +7,13 @@ import { IncidentReportedEvent } from '@/core/events/IncidentReportedEvent';
 import { SoundBoard } from '@/ui/common/sound/SoundBoard';
 import { StrategyScreenControl } from '@/ui/screens/StrategyScreen/StrategyScreenControl';
 
-import { advanceTo, makeFamily, makeProvince, makeWorld } from './factories';
+import {
+  advanceTo,
+  makeFamily,
+  makeProvince,
+  makeSaves,
+  makeWorld,
+} from './factories';
 
 const screens: StrategyScreenControl[] = [];
 const visibility = Object.getOwnPropertyDescriptor(
@@ -28,6 +34,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.unstubAllGlobals();
   for (const screen of screens.splice(0)) {
     screen.unmount();
   }
@@ -69,6 +76,8 @@ function setup() {
     events,
     sounds: new SoundBoard(),
     commands: [],
+    saves: makeSaves().saves,
+    saveBlocker: () => undefined,
   });
   screen.mount(container);
   screens.push(screen);

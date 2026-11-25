@@ -1,3 +1,9 @@
+import type { TurnHold } from '@/core/TurnHold';
+
 export class TurnReleasedEvent {
-  public constructor(public readonly holder: object) {}
+  public readonly holder: TurnHold;
+
+  public constructor(holder: TurnHold) {
+    this.holder = holder;
+  }
 }

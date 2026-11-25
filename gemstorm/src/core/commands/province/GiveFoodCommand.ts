@@ -52,7 +52,7 @@ export class GiveFoodCommand extends ProvinceCommand {
     const governor = province.governor ?? province.family?.ruler;
 
     if (isDefined(governor) && Math.random() < CHARISMA_TRAINING_CHANCE) {
-      governor.stats = governor.stats.increase({
+      governor.changeStats({
         charisma: CHARISMA_TRAINING_GAIN,
       });
     }

@@ -5,10 +5,10 @@ import type { Captive } from '@/core/domain/Captive';
 import type { Disposal } from '@/core/domain/Captivity';
 import type { RansomCurrency } from '@/core/domain/Ransom';
 import { TurnReleasedEvent } from '@/core/events/TurnReleasedEvent';
+import { TurnHold } from '@/core/TurnHold';
 import { Control } from '@/lib/Control';
 import { isDefined } from '@/lib/value/isDefined';
 import { BattleReportClosedEvent } from '@/ui/screens/StrategyScreen/BattleReport/BattleReportClosedEvent';
-import { TurnHold } from '@/ui/screens/StrategyScreen/TurnHold';
 
 import { CaptiveDialogToggledEvent } from './CaptiveDialogToggledEvent';
 import {
@@ -95,10 +95,7 @@ export class CaptiveDialogControl extends Control<CaptiveDialogView> {
   private dispose(disposal: Disposal): void {
     const { captive } = this;
 
-    if (
-      isDefined(captive) &&
-      captive.captor.isEqual(this.context.world.player)
-    ) {
+    if (isDefined(captive) && captive.isHeldBy(this.context.world.player)) {
       this.judge.judge(captive, disposal);
       this.executor.execute(this.judge);
 
@@ -130,10 +127,7 @@ export class CaptiveDialogControl extends Control<CaptiveDialogView> {
   private demand(currency: RansomCurrency): void {
     const { captive } = this;
 
-    if (
-      isDefined(captive) &&
-      captive.captor.isEqual(this.context.world.player)
-    ) {
+    if (isDefined(captive) && captive.isHeldBy(this.context.world.player)) {
       this.ransom.demand(captive, currency);
       this.executor.execute(this.ransom);
 
@@ -152,10 +146,7 @@ export class CaptiveDialogControl extends Control<CaptiveDialogView> {
   private answer(accepted: boolean): void {
     const { captive } = this;
 
-    if (
-      isDefined(captive) &&
-      captive.house.isEqual(this.context.world.player)
-    ) {
+    if (isDefined(captive) && captive.belongsTo(this.context.world.player)) {
       this.ransom.answer(captive, accepted);
       this.executor.execute(this.ransom);
 

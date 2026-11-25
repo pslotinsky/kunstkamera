@@ -1,5 +1,7 @@
 import type { CommandGroup } from '@/core/commands/province/catalog';
 import type { World } from '@/core/domain/World';
+import type { GameSaves } from '@/core/saves/GameSaves';
+import type { SaveBlocker } from '@/core/WorldEngine';
 import type { ChildrenViews } from '@/lib/Control';
 import type { EventBus } from '@/lib/EventBus';
 import type { PlaqueControl } from '@/ui/common/Plaque/PlaqueControl';
@@ -21,6 +23,8 @@ export interface StrategyScreenContext {
   readonly events: EventBus;
   readonly commands: readonly CommandGroup[];
   readonly sounds: SoundBoard;
+  readonly saves: GameSaves;
+  readonly saveBlocker: () => SaveBlocker | undefined;
 }
 
 export type StrategyScreenControls = {

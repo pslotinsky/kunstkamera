@@ -6,9 +6,8 @@ import { NegotiateCommand } from '@/core/commands/province/NegotiateCommand';
 import { CampaignOutcome } from '@/core/domain/CampaignOutcome';
 import { BattleReportedEvent } from '@/core/events/BattleReportedEvent';
 import { CampaignEndedEvent } from '@/core/events/CampaignEndedEvent';
-import { TurnHeldEvent } from '@/core/events/TurnHeldEvent';
-import { TurnReleasedEvent } from '@/core/events/TurnReleasedEvent';
 import { WarReportedEvent } from '@/core/events/WarReportedEvent';
+import { TurnHold } from '@/core/TurnHold';
 import { WorldFactory } from '@/core/WorldFactory';
 import { SoundBoard } from '@/ui/common/sound/SoundBoard';
 import { AnnouncementsControl } from '@/ui/screens/StrategyScreen/Announcements/AnnouncementsControl';
@@ -167,13 +166,13 @@ describe('Campaign ending presentation', () => {
       target: provinces[29]!,
       defending: rival,
     });
-    const holder = {};
+    const holder = new TurnHold(events);
     const outcome = fixture.finish();
 
-    events.publish(new TurnHeldEvent(holder));
+    holder.hold();
     events.publish(new WarReportedEvent(report));
     events.publish(new CampaignEndedEvent(outcome));
-    events.publish(new TurnReleasedEvent(holder));
+    holder.release();
     await Promise.resolve();
 
     expect(fixture.shown()).toBe(false);

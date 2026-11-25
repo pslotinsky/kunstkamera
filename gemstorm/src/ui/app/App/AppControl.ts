@@ -1,5 +1,7 @@
+import type { SlotNumber } from '@/core/saves/GameSaves';
 import type { CampaignStart } from '@/core/WorldFactory';
 import { Control } from '@/lib/Control';
+import { isDefined } from '@/lib/value/isDefined';
 import { CampaignControl } from '@/ui/app/Campaign/CampaignControl';
 import { NewGameScreenControl } from '@/ui/screens/NewGameScreen/NewGameScreenControl';
 import { NewGameChosenEvent } from '@/ui/screens/TitleScreen/events/NewGameChosenEvent';
@@ -13,7 +15,7 @@ export class AppControl extends Control<AppView, AppControls> {
 
   public constructor(context: AppContext) {
     super(AppView, context, {
-      titleScreen: new TitleScreenControl({ sounds: context.sounds }),
+      titleScreen: new TitleScreenControl(context),
       newStrategyScreen: new NewGameScreenControl(),
     });
   }
@@ -26,6 +28,7 @@ export class AppControl extends Control<AppView, AppControls> {
     });
     newGame.onBack(() => title.show());
     newGame.onBegin((start) => this.startCampaign(start));
+    title.onLoad((slot) => this.loadCampaign(slot));
   }
 
   protected override onUnmount(): void {
@@ -33,8 +36,27 @@ export class AppControl extends Control<AppView, AppControls> {
   }
 
   private startCampaign(start: CampaignStart): void {
-    const campaign = CampaignControl.create(start, this.context.sounds);
+    const { sounds, saves } = this.context;
+    const campaign = CampaignControl.create(start, sounds, saves);
 
+    this.mountCampaign(campaign);
+  }
+
+  private loadCampaign(slot: SlotNumber): boolean {
+    const { sounds, saves } = this.context;
+    const world = saves.load(slot);
+
+    if (isDefined(world)) {
+      const campaign = CampaignControl.resume(world, sounds, saves);
+
+      this.controls.titleScreen.hide();
+      this.mountCampaign(campaign);
+    }
+
+    return isDefined(world);
+  }
+
+  private mountCampaign(campaign: CampaignControl): void {
     campaign.onQuit(() => this.quitCampaign());
     campaign.mount(this.view.openStage());
     this.campaign = campaign;

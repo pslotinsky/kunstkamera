@@ -38,7 +38,7 @@ export class Conquest {
     const loser = this.findLoser();
 
     return loser && this.isCaught(loser)
-      ? new Captive({ ...loser, battlefield: this.report.target })
+      ? Captive.capture({ ...loser, battlefield: this.report.target })
       : undefined;
   }
 

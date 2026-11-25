@@ -13,6 +13,15 @@ export interface CaptiveParams {
 }
 
 export class Captive {
+  public static capture(params: CaptiveParams): Captive {
+    const { general, house } = params;
+    const ransom = house.isRuler(general)
+      ? undefined
+      : Ransom.forGeneral(general, house);
+
+    return new Captive(params, ransom);
+  }
+
   public readonly general: General;
   public readonly house: Family;
   public readonly captor: Family;
@@ -20,14 +29,12 @@ export class Captive {
   private pendingRansom: Ransom | undefined;
   private requestedCurrency: RansomCurrency | undefined;
 
-  public constructor(params: CaptiveParams) {
+  public constructor(params: CaptiveParams, ransom?: Ransom) {
     this.general = params.general;
     this.house = params.house;
     this.captor = params.captor;
     this.battlefield = params.battlefield;
-    this.pendingRansom = this.isRuler
-      ? undefined
-      : Ransom.forGeneral(this.general, this.house);
+    this.pendingRansom = ransom;
   }
 
   public get isRuler(): boolean {
@@ -44,6 +51,14 @@ export class Captive {
 
   public get canDemandRansom(): boolean {
     return isDefined(this.pendingRansom) && !isDefined(this.requestedCurrency);
+  }
+
+  public belongsTo(house: Family): boolean {
+    return this.house.isEqual(house);
+  }
+
+  public isHeldBy(captor: Family): boolean {
+    return this.captor.isEqual(captor);
   }
 
   public demandRansom(currency: RansomCurrency): void {
