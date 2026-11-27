@@ -16,9 +16,9 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.5",
-    "fumadocs-core": "^16.19.5",
+    "fumadocs-core": "^16.19.7",
     "fumadocs-mdx": "^15.6.4",
-    "fumadocs-ui": "^16.19.5",
+    "fumadocs-ui": "^16.19.7",
     "isbot": "^5",
     "mermaid": "^12.3.0",
     "react": "^19.3.1",
